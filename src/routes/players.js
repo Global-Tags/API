@@ -13,6 +13,7 @@ router.route(`/:uuid`)
 
     const player = await server.db.players.findOne({ uuid });
     if(!player) return res.status(404).send({ error: `This player does not have a tag!` });
+    if(player.banned) return res.status(403).send({ error: `This player is banned from using this addon!` });
 
     res.send({
         uuid: player.uuid,
@@ -26,9 +27,10 @@ router.route(`/:uuid`)
 
     if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to set a global tag!` });
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
-    if(!tag || tag.length <= server.cfg.validation.minTag || tag.length > server.cfg.validation.maxTag) return res.status(400).send({ error: `The tag has to be between 1 and 30 characters.` });
-
+    
     const player = await server.db.players.findOne({ uuid });
+    if(player && player.banned) return res.status(403).send({ error: `You are banned from using this addon!` });
+    if(!tag || tag.length <= server.cfg.validation.minTag || tag.length > server.cfg.validation.maxTag) return res.status(400).send({ error: `The tag has to be between 1 and 30 characters.` });
     
     if(!player) {
         await new server.db.players({
@@ -56,7 +58,9 @@ router.route(`/:uuid`)
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
 
     const player = await server.db.players.findOne({ uuid });
-    if(!player || !player.tag) return res.status(404).send({ error: `You don't have a tag!` });
+    if(!player) return res.status(404).send({ error: `You don't have a tag!` });
+    if(player.banned) return res.status(403).send({ error: `You are banned from using this addon!` });
+    if(!player.tag) return res.status(404).send({ error: `You don't have a tag!` });
 
     player.tag = null;
     await player.save();
@@ -73,8 +77,13 @@ router.post(`/:uuid/report`, async (req, res) => {
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
 
     const player = await server.db.players.findOne({ uuid });
-    if(!player || !player.tag) return res.status(404).send({ error: `This player does not have a tag!` });
+    if(!player) return res.status(404).send({ error: `This player does not have a tag!` });
+    if(player.banned) return res.status(403).send({ error: `This user is already banned!` });
+    if(!player.tag) return res.status(404).send({ error: `This player does not have a tag!` });
+
     const reporterUuid = await server.util.getUuidbySession(authorization);
+    const reporter = await server.db.players.findOne({ uuid: reporterUuid });
+    if(reporter && reporter.banned) return res.status(403).send({ error: `You are banned from using this addon!` });
 
     if(reporterUuid == uuid) return res.status(400).send({ error: `You can't report yourself!` });
     if(player.reports.some((report) => report.by == reporterUuid && report.reportedName == player.tag)) return res.status(400).send({ error: `You already reported this player's tag!` });
