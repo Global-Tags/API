@@ -27,6 +27,11 @@ app.get(`/`, (req, res) => {
     });
 });
 
+app.use((req, res, next) => {
+    console.log(`[REQUEST] ${req.method.toUpperCase()} ${req.path} [${!!req.headers.authorization ? `` : `NO `}AUTH]`);
+    next();
+});
+
 readdirSync(`./src/routes`).filter(file => file.endsWith(`.js`)).forEach(file => {
     /**
      * @type {express.IRouter}
