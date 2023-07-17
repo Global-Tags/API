@@ -23,7 +23,7 @@ router.route(`/:uuid`)
     const authenticated = authorization && await server.util.validSession(authorization, uuid);
 
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
-    if(!tag) return res.status(400).send({ error: `Please provide a tag property!` });
+    if(!tag || tag.length <= 1 || tag.length > 20) return res.status(400).send({ error: `The tag has to be between 1 and 20 characters.` });
 
     const player = await server.db.players.findOne({ uuid });
     
@@ -52,7 +52,7 @@ router.route(`/:uuid`)
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
 
     const player = await server.db.players.findOne({ uuid });
-    if(!player) return res.status(404).send({ error: `This player does not have a tag!` });
+    if(!player || !player.tag) return res.status(404).send({ error: `You don't have a tag!` });
 
     player.tag = null;
     await player.save();
