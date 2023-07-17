@@ -42,7 +42,7 @@ router.route(`/:uuid`)
         if(player.tag == tag) return res.status(400).send({ error: `You already have this tag!` });
 
         player.tag = tag;
-        player.history.push(tag);
+        if(!player.history[player.history.length - 1] == tag) player.history.push(tag);
         await player.save();
         
         res.status(200).send({ message: `Your tag was successfully updated!` });
@@ -75,6 +75,9 @@ router.post(`/:uuid/report`, async (req, res) => {
     const player = await server.db.players.findOne({ uuid });
     if(!player || !player.tag) return res.status(404).send({ error: `This player does not have a tag!` });
     const reporterUuid = await server.util.getUuidbySession(authorization);
+
+    if(reporterUuid == uuid) return res.status(400).send({ error: `You can't report yourself!` });
+    if(player.reports.some((report) => report.by == reporterUuid && report.reportedName == player.tag)) return res.status(400).send({ error: `You already reported this player's tag!` });
 
     player.reports.push({
         by: reporterUuid,
