@@ -1,3 +1,4 @@
+const { default: axios } = require("axios");
 const express = require(`express`);
 const router = express.Router();
 
@@ -77,6 +78,27 @@ router.post(`/:uuid/report`, async (req, res) => {
     });
     await player.save();
 
+    if(server.cfg.discordReports.active) axios.post(server.cfg.discordReports.webhook, {
+        content: server.cfg.discordReports.content,
+        embeds: [{
+            color: 0xff0000,
+            title: `New Report!`,
+            fields: [
+                {
+                    name: `Reported UUID`,
+                    value: `\`\`\`${player.uuid}\`\`\``
+                },
+                {
+                    name: `Reported Tag`,
+                    value: `\`\`\`${player.tag}\`\`\``
+                },
+                {
+                    name: `Reporter UUID`,
+                    value: `\`\`\`${reporterUuid}\`\`\``
+                }
+            ]
+        }]
+    });
     res.status(200).send({ message: `The player was reported!` });
 });
 

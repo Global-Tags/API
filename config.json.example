@@ -1,5 +1,10 @@
 {
     "port": 5000,
     "requireSessionIds": true,
-    "srv": ""
+    "srv": "",
+    "discordReports": {
+        "active": true,
+        "content": "",
+        "webhook": "https://discord.com/api/webhooks/<id>/<token>"
+    }
 }
