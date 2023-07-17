@@ -24,7 +24,7 @@ router.route(`/:uuid`)
     const authenticated = authorization && await server.util.validSession(authorization, uuid, true);
 
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
-    if(!tag || tag.length <= 1 || tag.length > 20) return res.status(400).send({ error: `The tag has to be between 1 and 20 characters.` });
+    if(!tag || tag.length <= server.cfg.validation.minTag || tag.length > server.cfg.validation.maxTag) return res.status(400).send({ error: `The tag has to be between 1 and 30 characters.` });
 
     const player = await server.db.players.findOne({ uuid });
     

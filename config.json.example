@@ -2,6 +2,10 @@
     "port": 5000,
     "requireSessionIds": true,
     "srv": "",
+    "validation": {
+        "minTag": 1,
+        "maxTag": 30
+    },
     "discordReports": {
         "active": true,
         "content": "",
