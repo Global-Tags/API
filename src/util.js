@@ -26,5 +26,15 @@ module.exports = {
         // TODO: Change this in the future
         
         return true;
+    },
+
+    /**
+     * 
+     * @param {string} sessionId 
+     * @returns 
+     */
+
+    async getUuidbySession(sessionId) {
+        return `ID 12345`;
     }
 }

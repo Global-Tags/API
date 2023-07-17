@@ -60,4 +60,24 @@ router.route(`/:uuid`)
     res.status(200).send({ message: `Your tag was successfully reset!` });
 });
 
+router.post(`/:uuid/report`, async (req, res) => {
+    const uuid = req.params.uuid.replaceAll(`-`, ``);
+    const { authorization } = req.headers;
+    const authenticated = authorization && await server.util.validSession(authorization, uuid, false);
+
+    if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
+
+    const player = await server.db.players.findOne({ uuid });
+    if(!player || !player.tag) return res.status(404).send({ error: `This player does not have a tag!` });
+    const reporterUuid = await server.util.getUuidbySession(authorization);
+
+    player.reports.push({
+        by: reporterUuid,
+        reportedName: player.tag
+    });
+    await player.save();
+
+    res.status(200).send({ message: `The player was reported!` });
+});
+
 module.exports = router;

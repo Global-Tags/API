@@ -12,6 +12,16 @@ const player = Schema({
         required: true,
         default: []
     },
+    reports: {
+        type: [
+            {
+                by: SchemaTypes.String,
+                reportedName: SchemaTypes.String
+            }
+        ],
+        required: true,
+        default: []
+    },
     banned: {
         type: SchemaTypes.Boolean,
         required: true,
