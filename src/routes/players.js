@@ -7,10 +7,10 @@ router.route(`/:uuid`)
     const { authorization } = req.headers;
     const authenticated = authorization && await server.util.validSession(authorization, uuid);
 
-    if(server.cfg.requireSessionIds && !authenticated) return res.status(401).send({ message: `You're not allowed to perform that request!` });
+    if(server.cfg.requireSessionIds && !authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
 
     const player = await server.db.players.findOne({ uuid });
-    if(!player) return res.status(404).send({ message: `This player does not have a tag!` });
+    if(!player) return res.status(404).send({ error: `This player does not have a tag!` });
 
     res.send({
         uuid: player.uuid,
@@ -22,8 +22,8 @@ router.route(`/:uuid`)
     const { authorization } = req.headers;
     const authenticated = authorization && await server.util.validSession(authorization, uuid);
 
-    if(!authenticated) return res.status(401).send({ message: `You're not allowed to perform that request!` });
-    if(!tag) return res.status(400).send({ message: `Please provide a tag property!` });
+    if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
+    if(!tag) return res.status(400).send({ error: `Please provide a tag property!` });
 
     const player = await server.db.players.findOne({ uuid });
     
@@ -36,7 +36,7 @@ router.route(`/:uuid`)
         
         res.status(201).send({ message: `Your tag was successfully set!` });
     } else {
-        if(player.tag == tag) return res.status(400).send({ message: `You already have this tag!` });
+        if(player.tag == tag) return res.status(400).send({ error: `You already have this tag!` });
 
         player.tag = tag;
         player.history.push(tag);
@@ -49,10 +49,10 @@ router.route(`/:uuid`)
     const { authorization } = req.headers;
     const authenticated = authorization && await server.util.validSession(authorization, uuid);
 
-    if(!authenticated) return res.status(401).send({ message: `You're not allowed to perform that request!` });
+    if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
 
     const player = await server.db.players.findOne({ uuid });
-    if(!player) return res.status(404).send({ message: `This player does not have a tag!` });
+    if(!player) return res.status(404).send({ error: `This player does not have a tag!` });
 
     player.tag = null;
     await player.save();

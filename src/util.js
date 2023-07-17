@@ -11,7 +11,7 @@ module.exports = {
 
     catchError(req, res, next) {
         res.status(404).send({
-            message: `404: Not Found`
+            error: `404: Not Found`
         });
     },
 
