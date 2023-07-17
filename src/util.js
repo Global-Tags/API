@@ -19,9 +19,10 @@ module.exports = {
      * 
      * @param {string} sessionId 
      * @param {string} uuid 
+     * @param {boolean} equal 
      */
 
-    async validSession(sessionId, uuid) {
+    async validSession(sessionId, uuid, equal) {
         // TODO: Change this in the future
         
         return true;

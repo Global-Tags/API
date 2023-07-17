@@ -5,7 +5,7 @@ router.route(`/:uuid`)
 .get(async (req, res) => {
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { authorization } = req.headers;
-    const authenticated = authorization && await server.util.validSession(authorization, uuid);
+    const authenticated = authorization && await server.util.validSession(authorization, uuid, false);
 
     if(server.cfg.requireSessionIds && !authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
 
@@ -20,7 +20,7 @@ router.route(`/:uuid`)
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { tag } = req.body;
     const { authorization } = req.headers;
-    const authenticated = authorization && await server.util.validSession(authorization, uuid);
+    const authenticated = authorization && await server.util.validSession(authorization, uuid, true);
 
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
     if(!tag || tag.length <= 1 || tag.length > 20) return res.status(400).send({ error: `The tag has to be between 1 and 20 characters.` });
@@ -47,7 +47,7 @@ router.route(`/:uuid`)
 }).delete(async (req, res) => {
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { authorization } = req.headers;
-    const authenticated = authorization && await server.util.validSession(authorization, uuid);
+    const authenticated = authorization && await server.util.validSession(authorization, uuid, true);
 
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
 
