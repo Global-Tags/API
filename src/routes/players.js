@@ -8,6 +8,7 @@ router.route(`/:uuid`)
     const { authorization } = req.headers;
     const authenticated = authorization && await server.util.validSession(authorization, uuid, false);
 
+    if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to use this feature!` });
     if(server.cfg.requireSessionIds && !authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
 
     const player = await server.db.players.findOne({ uuid });
@@ -23,6 +24,7 @@ router.route(`/:uuid`)
     const { authorization } = req.headers;
     const authenticated = authorization && await server.util.validSession(authorization, uuid, true);
 
+    if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to set a global tag!` });
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
     if(!tag || tag.length <= server.cfg.validation.minTag || tag.length > server.cfg.validation.maxTag) return res.status(400).send({ error: `The tag has to be between 1 and 30 characters.` });
 
@@ -50,6 +52,7 @@ router.route(`/:uuid`)
     const { authorization } = req.headers;
     const authenticated = authorization && await server.util.validSession(authorization, uuid, true);
 
+    if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to use this feature!` });
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
 
     const player = await server.db.players.findOne({ uuid });
@@ -66,6 +69,7 @@ router.post(`/:uuid/report`, async (req, res) => {
     const { authorization } = req.headers;
     const authenticated = authorization && await server.util.validSession(authorization, uuid, false);
 
+    if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to use this feature!` });
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
 
     const player = await server.db.players.findOne({ uuid });

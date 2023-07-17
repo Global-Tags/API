@@ -1,3 +1,4 @@
+const { default: axios } = require('axios');
 const { Request, Response, NextFunction } = require('express');
 
 module.exports = {
@@ -23,9 +24,9 @@ module.exports = {
      */
 
     async validSession(sessionId, uuid, equal) {
-        // TODO: Change this in the future
-        
-        return true;
+        const sessionUuid = await this.getUuidbySession(sessionId);
+        if(equal) return sessionUuid === uuid;
+        else return !!sessionUuid;
     },
 
     /**
@@ -35,6 +36,16 @@ module.exports = {
      */
 
     async getUuidbySession(sessionId) {
-        return `ID 12345`;
+        try {
+            const response = await axios.get(`https://api.minecraftservices.com/minecraft/profile`, {
+                headers: {
+                    Authorization: `Bearer ${sessionId}`
+                }
+            });
+
+            return response.data.id;
+        } catch(error) {
+            return null;
+        }
     }
 }
