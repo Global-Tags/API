@@ -1,5 +1,6 @@
 const { default: axios } = require("axios");
 const express = require(`express`);
+const Permission = require("../Permission");
 const router = express.Router();
 
 router.route(`/:uuid`)
@@ -13,7 +14,11 @@ router.route(`/:uuid`)
 
     const player = await server.db.players.findOne({ uuid });
     if(!player) return res.status(404).send({ error: `This player does not have a tag!` });
-    if(player.banned) return res.status(403).send({ error: `This player is banned from using this addon!` });
+    if(!player.hasPermissions(Permission.ShowTag)) return res.status(403).send({ error: `This player is banned from showing their tag!` });
+
+    const requesterUuid = await server.util.getUuidbySession(authorization);
+    const requester = await server.db.players.findOne({ uuid: requesterUuid });
+    if(requester && !requester.hasPermissions(Permission.GetTags)) return res.status(403).send({ error: `You are banned from requesting other players' tags!` });
 
     res.send({
         uuid: player.uuid,
@@ -29,7 +34,7 @@ router.route(`/:uuid`)
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
     
     const player = await server.db.players.findOne({ uuid });
-    if(player && player.banned) return res.status(403).send({ error: `You are banned from using this addon!` });
+    if(player && !player.hasPermissions(Permission.ChangeTag)) return res.status(403).send({ error: `You are banned from changing your tag!` });
     if(!tag || tag.length <= server.cfg.validation.minTag || tag.length > server.cfg.validation.maxTag) return res.status(400).send({ error: `The tag has to be between 1 and 30 characters.` });
     
     if(!player) {
@@ -59,7 +64,7 @@ router.route(`/:uuid`)
 
     const player = await server.db.players.findOne({ uuid });
     if(!player) return res.status(404).send({ error: `You don't have a tag!` });
-    if(player.banned) return res.status(403).send({ error: `You are banned from using this addon!` });
+    if(!player.hasPermissions(Permission.ChangeTag)) return res.status(403).send({ error: `You are banned from changing your tag!` });
     if(!player.tag) return res.status(404).send({ error: `You don't have a tag!` });
 
     player.tag = null;
@@ -78,12 +83,12 @@ router.post(`/:uuid/report`, async (req, res) => {
 
     const player = await server.db.players.findOne({ uuid });
     if(!player) return res.status(404).send({ error: `This player does not have a tag!` });
-    if(player.banned) return res.status(403).send({ error: `This user is already banned!` });
+    if(!player.hasPermissions(Permission.ShowTag, Permission.GetTags, Permission.ChangeTag, Permission.ReportTag)) return res.status(403).send({ error: `The player has already been punished!` });
     if(!player.tag) return res.status(404).send({ error: `This player does not have a tag!` });
 
     const reporterUuid = await server.util.getUuidbySession(authorization);
     const reporter = await server.db.players.findOne({ uuid: reporterUuid });
-    if(reporter && reporter.banned) return res.status(403).send({ error: `You are banned from using this addon!` });
+    if(reporter && !reporter.hasPermissions(Permission.ReportTag)) return res.status(403).send({ error: `You are banned from reporting other players!` });
 
     if(reporterUuid == uuid) return res.status(400).send({ error: `You can't report yourself!` });
     if(player.reports.some((report) => report.by == reporterUuid && report.reportedName == player.tag)) return res.status(400).send({ error: `You already reported this player's tag!` });
