@@ -21,15 +21,17 @@ server.http = http.createServer(app).listen(server.cfg.port, () => {
     server.db.connection.connect(server.cfg.srv);
 });
 
+app.use((req, res, next) => {
+    const version = req.headers[`x-addon-version`] ? `Addon v${req.headers[`x-addon-version`]}` : `API`;
+
+    console.log(`[REQUEST] ${req.method.toUpperCase()} ${req.path} [${version}] [${!!req.headers.authorization ? `` : `NO `}AUTH]`);
+    next();
+});
+
 app.get(`/`, (req, res) => {
     res.send({
         version: require(`./package.json`).version
     });
-});
-
-app.use((req, res, next) => {
-    console.log(`[REQUEST] ${req.method.toUpperCase()} ${req.path} [${!!req.headers.authorization ? `` : `NO `}AUTH]`);
-    next();
 });
 
 readdirSync(`./src/routes`).filter(file => file.endsWith(`.js`)).forEach(file => {
