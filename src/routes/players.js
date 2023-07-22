@@ -36,7 +36,8 @@ router.route(`/:uuid`)
     
     const player = await server.db.players.findOne({ uuid });
     if(player && !player.hasPermissions(Permission.ChangeTag)) return res.status(403).send({ error: `You are banned from changing your tag!` });
-    if(!tag || tag.length <= server.cfg.validation.minTag || tag.length > server.cfg.validation.maxTag) return res.status(400).send({ error: `The tag has to be between 1 and 30 characters.` });
+    const { minTag, maxTag } = server.cfg.validation;
+    if(!tag || tag.length <= minTag || tag.length > maxTag) return res.status(400).send({ error: `The tag has to be between ${minTag} and ${maxTag} characters.` });
     
     if(!player) {
         await new server.db.players({
