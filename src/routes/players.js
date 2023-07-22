@@ -22,7 +22,8 @@ router.route(`/:uuid`)
 
     res.send({
         uuid: player.uuid,
-        tag: player.tag
+        tag: player.tag,
+        position: player.position
     });
 }).post(async (req, res) => {
     const uuid = req.params.uuid.replaceAll(`-`, ``);
@@ -35,7 +36,8 @@ router.route(`/:uuid`)
     
     const player = await server.db.players.findOne({ uuid });
     if(player && !player.hasPermissions(Permission.ChangeTag)) return res.status(403).send({ error: `You are banned from changing your tag!` });
-    if(!tag || tag.length <= server.cfg.validation.minTag || tag.length > server.cfg.validation.maxTag) return res.status(400).send({ error: `The tag has to be between 1 and 30 characters.` });
+    const { minTag, maxTag } = server.cfg.validation;
+    if(!tag || tag.length <= minTag || tag.length > maxTag) return res.status(400).send({ error: `The tag has to be between ${minTag} and ${maxTag} characters.` });
     
     if(!player) {
         await new server.db.players({
@@ -83,7 +85,7 @@ router.post(`/:uuid/report`, async (req, res) => {
 
     const player = await server.db.players.findOne({ uuid });
     if(!player) return res.status(404).send({ error: `This player does not have a tag!` });
-    if(!player.hasPermissions(Permission.ShowTag, Permission.GetTags, Permission.ChangeTag, Permission.ReportTag)) return res.status(403).send({ error: `The player has already been punished!` });
+    if(!player.hasPermissions(Permission.DEFAULT)) return res.status(403).send({ error: `The player has already been punished!` });
     if(!player.tag) return res.status(404).send({ error: `This player does not have a tag!` });
 
     const reporterUuid = await server.util.getUuidbySession(authorization);
@@ -121,6 +123,28 @@ router.post(`/:uuid/report`, async (req, res) => {
         }]
     });
     res.status(200).send({ message: `The player was reported!` });
+});
+
+router.post(`/:uuid/position`, async (req, res) => {
+    const uuid = req.params.uuid.replaceAll(`-`, ``);
+    const position = req.body.position?.toUpperCase();
+    const { authorization } = req.headers;
+    const authenticated = authorization && await server.util.validSession(authorization, uuid, true);
+
+    if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to use this feature!` });
+    if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
+
+    const player = await server.db.players.findOne({ uuid });
+    if(!player) return res.status(404).send({ error: `You don't have a tag!` });
+    if(!player.hasPermissions(Permission.ChangePosition)) return res.status(403).send({ error: `You are banned from changing your tag's position!` });
+    if(!player.tag) return res.status(404).send({ error: `Please set a tag first!` });
+    if(!position || ![`ABOVE`, `BELOW`, `RIGHT`, `LEFT`].includes(position)) return res.status(400).send({ error: `Please provide a position!` });
+    if(position == player.position) return res.status(400).send({ error: `Your tag is already in this position!` });
+
+    player.position = position;
+    await player.save();
+
+    res.status(200).send({ message: `Your position was successfully set!` });
 });
 
 module.exports = router;
