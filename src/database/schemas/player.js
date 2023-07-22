@@ -8,6 +8,12 @@ const player = Schema({
         unique: true
     },
     tag: SchemaTypes.String,
+    position: {
+        type: SchemaTypes.String,
+        enum: [`ABOVE`, `BELOW`, `RIGHT`, `LEFT`],
+        required: true,
+        default: `ABOVE`
+    },
     history: {
         type: [SchemaTypes.String],
         required: true,
@@ -26,12 +32,7 @@ const player = Schema({
     permissions: {
         type: [SchemaTypes.Number],
         required: true,
-        default: [
-            Permission.ShowTag,
-            Permission.GetTags,
-            Permission.ChangeTag,
-            Permission.ReportTag
-        ]
+        default: Permission.DEFAULT
     },
     banned: {
         type: SchemaTypes.Boolean,
