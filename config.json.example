@@ -1,6 +1,7 @@
 {
     "port": 5000,
     "requireSessionIds": true,
+    "logTimeFormat": "YYYY-MM-DD HH:mm:ss",
     "srv": "",
     "validation": {
         "minTag": 1,
