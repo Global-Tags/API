@@ -62,7 +62,7 @@ module.exports = {
      */
 
     ratelimitResponse(req, res, ratelimit) {
-        if(server.cfg.ratelimit.active) return false;
+        if(!server.cfg.ratelimit.active) return false;
         const ratelimitData = server.util.getRatelimitData(req.ip, ratelimit);
         res.setHeader(`X-RateLimit-Limit`, ratelimit.max);
         if(!ratelimitData.limited) res.setHeader(`X-RateLimit-Remaining`, ratelimitData.remaining); // ik this looks weird but the order of the headers is important
