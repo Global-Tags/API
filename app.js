@@ -11,6 +11,7 @@ app.disable(`x-powered-by`);
 global.server = {};
 server.cfg = require(`./config.json`);
 server.util = require(`./src/util`);
+app.set(`trust proxy`, server.cfg.proxied);
 
 // Database
 server.db = {};
@@ -67,6 +68,7 @@ app.use((req, res, next) => {
     const time = moment(new Date()).format(server.cfg.logTimeFormat);
 
     console.log(`[${time}] ${req.method.toUpperCase()} ${req.path} [${version}] [${!!req.headers.authorization ? `` : `NO `}AUTH]`);
+    console.log(req.ip, req.socket.remoteAddress);
     next();
 });
 
