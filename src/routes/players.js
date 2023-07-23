@@ -5,6 +5,8 @@ const router = express.Router();
 
 router.route(`/:uuid`)
 .get(async (req, res) => {
+    if(server.util.ratelimitResponse(req, res, server.ratelimit.getTag)) return;
+
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { authorization } = req.headers;
     const authenticated = authorization && await server.util.validSession(authorization, uuid, false);
@@ -26,6 +28,8 @@ router.route(`/:uuid`)
         position: player.position
     });
 }).post(async (req, res) => {
+    if(server.util.ratelimitResponse(req, res, server.ratelimit.changeTag)) return;
+
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { tag } = req.body;
     const { authorization } = req.headers;
@@ -57,6 +61,8 @@ router.route(`/:uuid`)
         res.status(200).send({ message: `Your tag was successfully updated!` });
     }
 }).delete(async (req, res) => {
+    if(server.util.ratelimitResponse(req, res, server.ratelimit.changeTag)) return;
+
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { authorization } = req.headers;
     const authenticated = authorization && await server.util.validSession(authorization, uuid, true);
@@ -76,6 +82,8 @@ router.route(`/:uuid`)
 });
 
 router.post(`/:uuid/report`, async (req, res) => {
+    if(server.util.ratelimitResponse(req, res, server.ratelimit.report)) return;
+
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { authorization } = req.headers;
     const authenticated = authorization && await server.util.validSession(authorization, uuid, false);
@@ -126,6 +134,8 @@ router.post(`/:uuid/report`, async (req, res) => {
 });
 
 router.post(`/:uuid/position`, async (req, res) => {
+    if(server.util.ratelimitResponse(req, res, server.ratelimit.changePosition)) return;
+
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const position = req.body.position?.toUpperCase();
     const { authorization } = req.headers;
