@@ -10,5 +10,24 @@
         "active": true,
         "content": "",
         "webhook": "https://discord.com/api/webhooks/<id>/<token>"
+    },
+    "ratelimit": {
+        "active": true,
+        "getTag": {
+            "max": 1000,
+            "seconds": 60
+        },
+        "changeTag": {
+            "max": 5,
+            "seconds": 60
+        },
+        "changePosition": {
+            "max": 5,
+            "seconds": 60
+        },
+        "reportPlayer": {
+            "max": 5,
+            "seconds": 60
+        }
     }
 }
