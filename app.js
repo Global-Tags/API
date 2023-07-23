@@ -4,6 +4,7 @@ const parser = require(`body-parser`);
 const { readdirSync } = require(`fs`);
 const app = express();
 app.use(parser.json());
+app.disable(`x-powered-by`);
 
 // Server configuration
 global.server = {};
@@ -14,6 +15,45 @@ server.util = require(`./src/util`);
 server.db = {};
 server.db.connection = require(`./src/database/connection`);
 server.db.players = require(`./src/database/schemas/player`);
+
+/**
+ * @typedef {Map<String, { requests: number, timestamp: number }>} PlayerMap
+ */
+
+// Ratelimit
+server.ratelimit = {};
+server.ratelimit.getTag = {
+    /**
+     * @type {PlayerMap}
+     */
+    players: new Map(),
+    max: server.cfg.ratelimit.getTag.max,
+    time: server.cfg.ratelimit.getTag.seconds * 1000
+};
+server.ratelimit.changeTag = {
+    /**
+     * @type {PlayerMap}
+     */
+    players: new Map(),
+    max: server.cfg.ratelimit.changeTag.max,
+    time: server.cfg.ratelimit.changeTag.seconds * 1000
+};
+server.ratelimit.changePosition = {
+    /**
+     * @type {PlayerMap}
+     */
+    players: new Map(),
+    max: server.cfg.ratelimit.changePosition.max,
+    time: server.cfg.ratelimit.changePosition.seconds * 1000
+}
+server.ratelimit.report = {
+    /**
+     * @type {PlayerMap}
+     */
+    players: new Map(),
+    max: server.cfg.ratelimit.reportPlayer.max,
+    time: server.cfg.ratelimit.reportPlayer.seconds * 1000
+};
 
 server.http = http.createServer(app).listen(server.cfg.port, () => {
     console.log(`[SERVER] HTTP listening on Port ${server.cfg.port}`);
