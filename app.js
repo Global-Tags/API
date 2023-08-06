@@ -71,6 +71,18 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use((req, res, next) => {
+    const requiredVersion = server.cfg.requiredAddonVersion.replaceAll(`.`, ``);
+    let version = req.headers[`x-addon-version`];
+    if(!version) return next();
+    version = version.replaceAll(`.`, ``);
+    if(isNaN(version) || isNaN(requiredVersion)) return next();
+    if(parseInt(version) < parseInt(requiredVersion)) return res.status(400).send({
+        error: `The API needs a newer addon version. Please update the Addon to v${server.cfg.requiredAddonVersion}!`
+    });
+    next();
+});
+
 app.get(`/`, (req, res) => {
     res.send({
         version: require(`./package.json`).version
