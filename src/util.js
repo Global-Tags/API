@@ -1,5 +1,6 @@
 const { default: axios } = require('axios');
 const { Request, Response, NextFunction } = require('express');
+const jwt = require(`jsonwebtoken`);
 
 module.exports = {
 
@@ -23,28 +24,28 @@ module.exports = {
      * @param {boolean} equal 
      */
 
-    async validSession(sessionId, uuid, equal) {
-        const sessionUuid = await this.getUuidbySession(sessionId);
-        if(equal) return sessionUuid === uuid;
-        else return !!sessionUuid;
+    validJWTSession(token, uuid, equal) {
+        const tokenUuid = this.getUuidByJWT(token);
+        if(equal) return tokenUuid === uuid;
+        else return !!tokenUuid;
     },
 
     /**
      * 
-     * @param {string} sessionId 
+     * @param {string} token 
      * @returns {string?}
      */
 
-    async getUuidbySession(sessionId) {
+    getUuidByJWT(token) {
+        const decodedToken = jwt.decode(token, { complete: true });
+        if(!decodedToken) return null;
+        if(decodedToken.payload.iss != `LabyConnect`) return null;
+        
         try {
-            const response = await axios.get(`https://api.minecraftservices.com/minecraft/profile`, {
-                headers: {
-                    Authorization: `Bearer ${sessionId}`
-                }
-            });
-
-            return response.data.id;
-        } catch(error) {
+            const verifiedToken = jwt.verify(token, server.cfg.labyConnect);
+    
+            return verifiedToken.uuid;
+        } catch(err) {
             return null;
         }
     },
