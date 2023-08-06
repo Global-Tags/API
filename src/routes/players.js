@@ -9,7 +9,7 @@ router.route(`/:uuid`)
 
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { authorization } = req.headers;
-    const authenticated = authorization && await server.util.validSession(authorization, uuid, false);
+    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, false);
 
     if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to use this feature!` });
     if(server.cfg.requireSessionIds && !authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
@@ -18,7 +18,7 @@ router.route(`/:uuid`)
     if(!player) return res.status(404).send({ error: `This player does not have a tag!` });
     if(!player.hasPermissions(Permission.ShowTag)) return res.status(403).send({ error: `This player is banned from showing their tag!` });
 
-    const requesterUuid = await server.util.getUuidbySession(authorization);
+    const requesterUuid = server.util.getUuidByJWT(authorization);
     const requester = await server.db.players.findOne({ uuid: requesterUuid });
     if(requester && !requester.hasPermissions(Permission.GetTags)) return res.status(403).send({ error: `You are banned from requesting other players' tags!` });
 
@@ -33,7 +33,7 @@ router.route(`/:uuid`)
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { tag } = req.body;
     const { authorization } = req.headers;
-    const authenticated = authorization && await server.util.validSession(authorization, uuid, true);
+    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, true);
 
     if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to set a global tag!` });
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
@@ -65,7 +65,7 @@ router.route(`/:uuid`)
 
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { authorization } = req.headers;
-    const authenticated = authorization && await server.util.validSession(authorization, uuid, true);
+    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, true);
 
     if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to use this feature!` });
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
@@ -86,7 +86,7 @@ router.post(`/:uuid/report`, async (req, res) => {
 
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { authorization } = req.headers;
-    const authenticated = authorization && await server.util.validSession(authorization, uuid, false);
+    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, false);
 
     if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to use this feature!` });
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
@@ -96,7 +96,7 @@ router.post(`/:uuid/report`, async (req, res) => {
     if(!player.hasPermissions(Permission.DEFAULT)) return res.status(403).send({ error: `The player has already been punished!` });
     if(!player.tag) return res.status(404).send({ error: `This player does not have a tag!` });
 
-    const reporterUuid = await server.util.getUuidbySession(authorization);
+    const reporterUuid = server.util.getUuidByJWT(authorization);
     const reporter = await server.db.players.findOne({ uuid: reporterUuid });
     if(reporter && !reporter.hasPermissions(Permission.ReportTag)) return res.status(403).send({ error: `You are banned from reporting other players!` });
 
@@ -139,7 +139,7 @@ router.post(`/:uuid/position`, async (req, res) => {
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const position = req.body.position?.toUpperCase();
     const { authorization } = req.headers;
-    const authenticated = authorization && await server.util.validSession(authorization, uuid, true);
+    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, true);
 
     if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to use this feature!` });
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
