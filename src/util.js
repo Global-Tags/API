@@ -44,7 +44,7 @@ module.exports = {
         try {
             const verifiedToken = jwt.verify(token, server.cfg.labyConnect);
     
-            return verifiedToken.uuid;
+            return verifiedToken.uuid?.replaceAll(`-`, ``);
         } catch(err) {
             return null;
         }
