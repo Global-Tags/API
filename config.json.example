@@ -1,7 +1,6 @@
 {
     "port": 5000,
     "proxied": true,
-    "requiredAddonVersion": "1.0.5",
     "requireSessionIds": true,
     "logTimeFormat": "YYYY-MM-DD HH:mm:ss",
     "srv": "",
