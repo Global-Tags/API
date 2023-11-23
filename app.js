@@ -67,7 +67,7 @@ app.use((req, res, next) => {
     const version = req.headers[`x-addon-version`] ? `Addon v${req.headers[`x-addon-version`]}` : `API`;
     const time = moment(new Date()).format(server.cfg.logTimeFormat);
 
-    if(req.path == `/` && server.cfg.logVersionPath) console.log(`[${time}] ${req.method.toUpperCase()} ${req.path} [${version}] [${!!req.headers.authorization ? `` : `NO `}AUTH]`);
+    if(req.path != `/ping`) console.log(`[${time}] ${req.method.toUpperCase()} ${req.path} [${version}] [${!!req.headers.authorization ? `` : `NO `}AUTH]`);
     next();
 });
 
@@ -76,6 +76,10 @@ app.get(`/`, (req, res) => {
         version: require(`./package.json`).version
     });
 });
+
+app.get(`/ping`, (req, res) => {
+    res.status(204).send();
+})
 
 readdirSync(`./src/routes`).filter(file => file.endsWith(`.js`)).forEach(file => {
     /**
