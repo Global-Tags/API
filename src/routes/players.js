@@ -16,11 +16,11 @@ router.route(`/:uuid`)
 
     const player = await server.db.players.findOne({ uuid });
     if(!player) return res.status(404).send({ error: `This player does not have a tag!` });
-    if(!player.hasPermissions(Permission.ShowTag)) return res.status(403).send({ error: `This player is banned from showing their tag!` });
+    if(!player.hasPermission(Permission.ShowTag)) return res.status(403).send({ error: `This player is banned from showing their tag!` });
 
     const requesterUuid = server.util.getUuidByJWT(authorization);
     const requester = await server.db.players.findOne({ uuid: requesterUuid });
-    if(requester && !requester.hasPermissions(Permission.GetTags)) return res.status(403).send({ error: `You are banned from requesting other players' tags!` });
+    if(requester && !requester.hasPermission(Permission.GetTags)) return res.status(403).send({ error: `You are banned from requesting other players' tags!` });
 
     res.send({
         uuid: player.uuid,
@@ -39,7 +39,7 @@ router.route(`/:uuid`)
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
     
     const player = await server.db.players.findOne({ uuid });
-    if(player && !player.hasPermissions(Permission.ChangeTag)) return res.status(403).send({ error: `You are banned from changing your tag!` });
+    if(player && !player.hasPermission(Permission.ChangeTag)) return res.status(403).send({ error: `You are banned from changing your tag!` });
     const { minTag, maxTag } = server.cfg.validation;
     if(!tag || tag.length <= minTag || tag.length > maxTag) return res.status(400).send({ error: `The tag has to be between ${minTag} and ${maxTag} characters.` });
     
@@ -72,7 +72,7 @@ router.route(`/:uuid`)
 
     const player = await server.db.players.findOne({ uuid });
     if(!player) return res.status(404).send({ error: `You don't have a tag!` });
-    if(!player.hasPermissions(Permission.ChangeTag)) return res.status(403).send({ error: `You are banned from changing your tag!` });
+    if(!player.hasPermission(Permission.ChangeTag)) return res.status(403).send({ error: `You are banned from changing your tag!` });
     if(!player.tag) return res.status(404).send({ error: `You don't have a tag!` });
 
     player.tag = null;
@@ -98,14 +98,17 @@ router.post(`/:uuid/report`, async (req, res) => {
 
     const reporterUuid = server.util.getUuidByJWT(authorization);
     const reporter = await server.db.players.findOne({ uuid: reporterUuid });
-    if(reporter && !reporter.hasPermissions(Permission.ReportTag)) return res.status(403).send({ error: `You are banned from reporting other players!` });
+    if(reporter && !reporter.hasPermission(Permission.ReportTag)) return res.status(403).send({ error: `You are banned from reporting other players!` });
 
     if(reporterUuid == uuid) return res.status(400).send({ error: `You can't report yourself!` });
     if(player.reports.some((report) => report.by == reporterUuid && report.reportedName == player.tag)) return res.status(400).send({ error: `You already reported this player's tag!` });
+    const { reason } = req.body;
+    if(!reason || typeof reason != 'string' || reason.trim() == ``) return res.status(400).send({ error: `You have to provide a valid reason!` });
 
     player.reports.push({
         by: reporterUuid,
-        reportedName: player.tag
+        reportedName: player.tag,
+        reason
     });
     await player.save();
 
@@ -126,11 +129,15 @@ router.post(`/:uuid/report`, async (req, res) => {
                 {
                     name: `Reporter UUID`,
                     value: `\`\`\`${reporterUuid}\`\`\``
+                },
+                {
+                    name: `Reason`,
+                    value: `\`\`\`${reason}\`\`\``
                 }
             ]
         }]
     });
-    res.status(200).send({ message: `The player was reported!` });
+    res.status(200).send({ message: `The player was successfully reported!` });
 });
 
 router.post(`/:uuid/position`, async (req, res) => {
@@ -146,7 +153,7 @@ router.post(`/:uuid/position`, async (req, res) => {
 
     const player = await server.db.players.findOne({ uuid });
     if(!player) return res.status(404).send({ error: `You don't have a tag!` });
-    if(!player.hasPermissions(Permission.ChangePosition)) return res.status(403).send({ error: `You are banned from changing your tag's position!` });
+    if(!player.hasPermission(Permission.ChangePosition)) return res.status(403).send({ error: `You are banned from changing your tag's position!` });
     if(!player.tag) return res.status(404).send({ error: `Please set a tag first!` });
     if(!position || ![`ABOVE`, `BELOW`, `RIGHT`, `LEFT`].includes(position)) return res.status(400).send({ error: `Please provide a position!` });
     if(position == player.position) return res.status(400).send({ error: `Your tag is already in this position!` });
