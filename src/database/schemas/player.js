@@ -34,10 +34,19 @@ const player = new Schema({
         required: true,
         default: false
     },
-    banned: {
-        type: SchemaTypes.Boolean,
-        required: true,
-        default: false
+    ban: {
+        active: {
+            type: SchemaTypes.Boolean,
+            required: true,
+            default: false
+        },
+        reason: SchemaTypes.String,
+    }
+}, {
+    methods: {
+        isBanned() {
+            return this.ban.active;
+        }
     }
 });
 
