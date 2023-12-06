@@ -1,5 +1,4 @@
 const { SchemaTypes, Schema, model } = require('mongoose');
-const Permission = require('../../Permission');
 
 const player = new Schema({
     uuid: {
@@ -30,38 +29,15 @@ const player = new Schema({
         required: true,
         default: []
     },
-    permissions: {
-        type: [SchemaTypes.Number],
+    admin: {
+        type: SchemaTypes.Boolean,
         required: true,
-        default: Permission.DEFAULT
+        default: false
     },
     banned: {
         type: SchemaTypes.Boolean,
         required: true,
         default: false
-    }
-}, {
-    methods: {
-
-        /**
-         * 
-         * @param {number[]} permissions 
-         * @returns {boolean}
-         */
-
-        hasPermissions(permissions) {
-            return permissions.every((permission) => this.permissions.includes(permission));
-        },
-
-        /**
-         * 
-         * @param {number} permission 
-         * @returns {boolean}
-         */
-
-        hasPermission(permission) {
-            return this.permissions.includes(permission);
-        }
     }
 });
 
