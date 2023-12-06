@@ -20,7 +20,8 @@ router.route(`/:uuid`)
     res.send({
         uuid: player.uuid,
         tag: player.tag,
-        position: player.position
+        position: player.position,
+        admin: player.admin
     });
 }).post(async (req, res) => {
     if(server.util.ratelimitResponse(req, res, server.ratelimit.changeTag)) return;
