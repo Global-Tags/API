@@ -116,8 +116,6 @@ router.route(`/:uuid/ban`)
     const player = await server.db.players.findOne({ uuid });
     if(!player) return res.status(404).send({ error: `There is no such player in our records!` });
 
-    await player.save();
-
     res.status(200).send({ banned: player.isBanned(), reason: `${player.ban.reason}` });
 }).post(async (req, res) => {
     const uuid = req.params.uuid.replaceAll(`-`, ``);
