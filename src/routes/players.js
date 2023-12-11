@@ -197,7 +197,7 @@ router.post(`/:uuid/report`, async (req, res) => {
     });
     await player.save();
 
-    if(server.cfg.bot.enabled && server.cfg.bot.reports.active) bot.client.channels.cache.get(bot.cfg.ids.reports).send({
+    if(server.cfg.bot.enabled && server.cfg.bot.reports.active) bot.client.channels.cache.get(bot.cfg.reports.channel).send({
         content: bot.cfg.reports.content,
         embeds: [
             new EmbedBuilder()
