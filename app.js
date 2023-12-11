@@ -57,10 +57,11 @@ server.ratelimit.report = {
     time: server.cfg.ratelimit.reportPlayer.seconds * 1000
 };
 
-server.http = http.createServer(app).listen(server.cfg.port, () => {
+server.http = http.createServer(app).listen(server.cfg.port, async () => {
     console.log(`[SERVER] HTTP listening on Port ${server.cfg.port}`);
 
-    server.db.connection.connect(server.cfg.srv);
+    await server.db.connection.connect(server.cfg.srv);
+    if(server.cfg.bot.enabled) require(`./bot`);
 });
 
 app.use((req, res, next) => {
