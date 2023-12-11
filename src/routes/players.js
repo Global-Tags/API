@@ -111,28 +111,28 @@ router.route(`/:uuid/ban`)
 .get(async (req, res) => {
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { authorization } = req.headers;
-    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, true);
+    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, false);
 
     if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to use this feature!` });
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
 
-    const executer = await server.db.players.findOne({ uuid: server.util.getUuidByJWT(authorization) });
-    if(!executer || !executer.admin) return res.status(403).send({ error: `You're not allowed to perform that request!` });
+    const executor = await server.db.players.findOne({ uuid: server.util.getUuidByJWT(authorization) });
+    if(!executor || !executor.admin) return res.status(403).send({ error: `You're not allowed to perform that request!` });
 
     const player = await server.db.players.findOne({ uuid });
     if(!player) return res.status(404).send({ error: `There is no such player in our records!` });
 
-    res.status(200).send({ banned: player.isBanned(), reason: `${player.ban.reason}` });
+    res.status(200).send({ banned: player.isBanned(), reason: player.isBanned() ? player.ban.reason || null : null });
 }).post(async (req, res) => {
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { authorization } = req.headers;
-    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, true);
+    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, false);
 
     if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to use this feature!` });
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
 
-    const executer = await server.db.players.findOne({ uuid: server.util.getUuidByJWT(authorization) });
-    if(!executer || !executer.admin) return res.status(403).send({ error: `You're not allowed to perform that request!` });
+    const executor = await server.db.players.findOne({ uuid: server.util.getUuidByJWT(authorization) });
+    if(!executor || !executor.admin) return res.status(403).send({ error: `You're not allowed to perform that request!` });
 
     const player = await server.db.players.findOne({ uuid });
     if(!player) return res.status(404).send({ error: `There is no such player in our records!` });
@@ -146,13 +146,13 @@ router.route(`/:uuid/ban`)
 }).delete(async (req, res) => {
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { authorization } = req.headers;
-    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, true);
+    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, false);
 
     if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to use this feature!` });
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
 
-    const executer = await server.db.players.findOne({ uuid: server.util.getUuidByJWT(authorization) });
-    if(!executer || !executer.admin) return res.status(403).send({ error: `You're not allowed to perform that request!` });
+    const executor = await server.db.players.findOne({ uuid: server.util.getUuidByJWT(authorization) });
+    if(!executor || !executor.admin) return res.status(403).send({ error: `You're not allowed to perform that request!` });
 
     const player = await server.db.players.findOne({ uuid });
     if(!player) return res.status(404).send({ error: `There is no such player in our records!` });
