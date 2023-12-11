@@ -9,11 +9,6 @@
         "minTag": 1,
         "maxTag": 30
     },
-    "discordReports": {
-        "active": true,
-        "content": "",
-        "webhook": "https://discord.com/api/webhooks/<id>/<token>"
-    },
     "ratelimit": {
         "active": true,
         "getTag": {
@@ -31,6 +26,15 @@
         "reportPlayer": {
             "max": 5,
             "seconds": 60
+        }
+    },
+    "bot": {
+        "enabled": true,
+        "token": "",
+        "reports": {
+            "active": true,
+            "channel": "",
+            "content": ""
         }
     }
 }

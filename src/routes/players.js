@@ -1,4 +1,4 @@
-const { default: axios } = require("axios");
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const express = require(`express`);
 const router = express.Router();
 
@@ -111,28 +111,28 @@ router.route(`/:uuid/ban`)
 .get(async (req, res) => {
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { authorization } = req.headers;
-    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, true);
+    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, false);
 
     if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to use this feature!` });
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
 
-    const executer = await server.db.players.findOne({ uuid: server.util.getUuidByJWT(authorization) });
-    if(!executer || !executer.admin) return res.status(403).send({ error: `You're not allowed to perform that request!` });
+    const executor = await server.db.players.findOne({ uuid: server.util.getUuidByJWT(authorization) });
+    if(!executor || !executor.admin) return res.status(403).send({ error: `You're not allowed to perform that request!` });
 
     const player = await server.db.players.findOne({ uuid });
     if(!player) return res.status(404).send({ error: `There is no such player in our records!` });
 
-    res.status(200).send({ banned: player.isBanned(), reason: `${player.ban.reason}` });
+    res.status(200).send({ banned: player.isBanned(), reason: player.isBanned() ? player.ban.reason || null : null });
 }).post(async (req, res) => {
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { authorization } = req.headers;
-    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, true);
+    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, false);
 
     if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to use this feature!` });
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
 
-    const executer = await server.db.players.findOne({ uuid: server.util.getUuidByJWT(authorization) });
-    if(!executer || !executer.admin) return res.status(403).send({ error: `You're not allowed to perform that request!` });
+    const executor = await server.db.players.findOne({ uuid: server.util.getUuidByJWT(authorization) });
+    if(!executor || !executor.admin) return res.status(403).send({ error: `You're not allowed to perform that request!` });
 
     const player = await server.db.players.findOne({ uuid });
     if(!player) return res.status(404).send({ error: `There is no such player in our records!` });
@@ -146,13 +146,13 @@ router.route(`/:uuid/ban`)
 }).delete(async (req, res) => {
     const uuid = req.params.uuid.replaceAll(`-`, ``);
     const { authorization } = req.headers;
-    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, true);
+    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, false);
 
     if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to use this feature!` });
     if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
 
-    const executer = await server.db.players.findOne({ uuid: server.util.getUuidByJWT(authorization) });
-    if(!executer || !executer.admin) return res.status(403).send({ error: `You're not allowed to perform that request!` });
+    const executor = await server.db.players.findOne({ uuid: server.util.getUuidByJWT(authorization) });
+    if(!executor || !executor.admin) return res.status(403).send({ error: `You're not allowed to perform that request!` });
 
     const player = await server.db.players.findOne({ uuid });
     if(!player) return res.status(404).send({ error: `There is no such player in our records!` });
@@ -182,7 +182,7 @@ router.post(`/:uuid/report`, async (req, res) => {
     if(!player.tag) return res.status(404).send({ error: `This player does not have a tag!` });
 
     const reporterUuid = server.util.getUuidByJWT(authorization);
-    const reporter = await server.db.players.findOne({ uuid: reporterUuid });
+    // const reporter = await server.db.players.findOne({ uuid: reporterUuid });
     // if(reporter && reporter.isBanned()) return res.status(403).send({ error: `You are banned from reporting other players!` });
 
     if(reporterUuid == uuid) return res.status(400).send({ error: `You can't report yourself!` });
@@ -197,12 +197,13 @@ router.post(`/:uuid/report`, async (req, res) => {
     });
     await player.save();
 
-    if(server.cfg.discordReports.active) axios.post(server.cfg.discordReports.webhook, {
-        content: server.cfg.discordReports.content,
-        embeds: [{
-            color: 0xff0000,
-            title: `New Report!`,
-            fields: [
+    if(server.cfg.bot.enabled && server.cfg.bot.reports.active) bot.client.channels.cache.get(bot.cfg.reports.channel).send({
+        content: bot.cfg.reports.content,
+        embeds: [
+            new EmbedBuilder()
+            .setColor(0xff0000)
+            .setTitle(`New report!`)
+            .addFields([
                 {
                     name: `Reported UUID`,
                     value: `\`\`\`${player.uuid}\`\`\``
@@ -219,8 +220,25 @@ router.post(`/:uuid/report`, async (req, res) => {
                     name: `Reason`,
                     value: `\`\`\`${reason}\`\`\``
                 }
-            ]
-        }]
+            ])
+        ],
+        components: [
+            new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                .setLabel(`Ban`)
+                .setCustomId(`ban`)
+                .setStyle(ButtonStyle.Danger),
+                new ButtonBuilder()
+                .setLabel(`Clear tag`)
+                .setCustomId(`clearTag`)
+                .setStyle(ButtonStyle.Danger),
+                new ButtonBuilder()
+                .setLabel(`Finish action`)
+                .setCustomId(`finishAction`)
+                .setStyle(ButtonStyle.Success),
+            )
+        ]
     });
     res.status(200).send({ message: `The player was successfully reported!` });
 });

@@ -1,4 +1,3 @@
-const { default: axios } = require('axios');
 const { Request, Response, NextFunction } = require('express');
 const jwt = require(`jsonwebtoken`);
 
