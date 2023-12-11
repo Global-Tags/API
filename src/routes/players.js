@@ -38,7 +38,13 @@ router.route(`/:uuid`)
     if(player && player.isBanned()) return res.status(403).send({ error: `You are banned from changing your tag!` });
     const { minTag, maxTag } = server.cfg.validation;
     if(!tag || tag.length <= minTag || tag.length > maxTag) return res.status(400).send({ error: `The tag has to be between ${minTag} and ${maxTag} characters.` });
-    
+    if([`labymod`].some((word) => {
+        if(tag.replace(/(&|§)[0-9A-FK-ORX]/gi, ``).toLowerCase().includes(word)) {
+            res.status(400).send({ error: `You're not allowed to include "${word}" in your Global Tag!` });
+            return true;
+        } else return false;
+    })) return;
+
     if(!player) {
         await new server.db.players({
             uuid,
