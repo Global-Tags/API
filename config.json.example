@@ -23,6 +23,10 @@
             "max": 5,
             "seconds": 60
         },
+        "changeIcon": {
+            "max": 5,
+            "seconds": 60
+        },
         "reportPlayer": {
             "max": 5,
             "seconds": 60
