@@ -107,6 +107,30 @@ router.post(`/:uuid/position`, async (req, res) => {
     res.status(200).send({ message: `Your position was successfully set!` });
 });
 
+router.post(`/:uuid/icon`, async (req, res) => {
+    if(server.util.ratelimitResponse(req, res, server.ratelimit.changeIcon)) return;
+
+    const uuid = req.params.uuid.replaceAll(`-`, ``);
+    const icon = req.body.icon?.toUpperCase();
+    const { authorization } = req.headers;
+    const authenticated = authorization && server.util.validJWTSession(authorization, uuid, true);
+
+    if(authorization == `0`) return res.status(401).send({ error: `You need a premium account to use this feature!` });
+    if(!authenticated) return res.status(401).send({ error: `You're not allowed to perform that request!` });
+
+    const player = await server.db.players.findOne({ uuid });
+    if(!player) return res.status(404).send({ error: `You don't have a tag!` });
+    if(player.isBanned()) return res.status(403).send({ error: `You are banned!` });
+    if(!player.tag) return res.status(404).send({ error: `Please set a tag first!` });
+    if(!icon) return res.status(400).send({ error: `Please provide an icon type!` });
+    if(icon == player.icon) return res.status(400).send({ error: `You already chose this icon!` });
+
+    player.icon = icon;
+    await player.save();
+
+    res.status(200).send({ message: `Your icon was successfully set!` });
+});
+
 router.route(`/:uuid/ban`)
 .get(async (req, res) => {
     const uuid = req.params.uuid.replaceAll(`-`, ``);
