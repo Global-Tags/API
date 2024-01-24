@@ -21,6 +21,7 @@ router.route(`/:uuid`)
         uuid: player.uuid,
         tag: player.tag,
         position: player.position,
+        icon: player.icon,
         admin: player.admin
     });
 }).post(async (req, res) => {
