@@ -13,6 +13,11 @@ const player = new Schema({
         required: true,
         default: `ABOVE`
     },
+    icon: {
+        type: SchemaTypes.String,
+        required: true,
+        default: `NONE`
+    },
     history: {
         type: [SchemaTypes.String],
         required: true,

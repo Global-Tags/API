@@ -23,38 +23,47 @@ server.db.players = require(`./src/database/schemas/player`);
  */
 
 // Ratelimit
-server.ratelimit = {};
-server.ratelimit.getTag = {
-    /**
-     * @type {PlayerMap}
-     */
-    players: new Map(),
-    max: server.cfg.ratelimit.getTag.max,
-    time: server.cfg.ratelimit.getTag.seconds * 1000
-};
-server.ratelimit.changeTag = {
-    /**
-     * @type {PlayerMap}
-     */
-    players: new Map(),
-    max: server.cfg.ratelimit.changeTag.max,
-    time: server.cfg.ratelimit.changeTag.seconds * 1000
-};
-server.ratelimit.changePosition = {
-    /**
-     * @type {PlayerMap}
-     */
-    players: new Map(),
-    max: server.cfg.ratelimit.changePosition.max,
-    time: server.cfg.ratelimit.changePosition.seconds * 1000
-}
-server.ratelimit.report = {
-    /**
-     * @type {PlayerMap}
-     */
-    players: new Map(),
-    max: server.cfg.ratelimit.reportPlayer.max,
-    time: server.cfg.ratelimit.reportPlayer.seconds * 1000
+server.ratelimit = {
+    getTag: {
+        /**
+         * @type {PlayerMap}
+         */
+        players: new Map(),
+        max: server.cfg.ratelimit.getTag.max,
+        time: server.cfg.ratelimit.getTag.seconds * 1000
+    },
+    changeTag: {
+        /**
+         * @type {PlayerMap}
+         */
+        players: new Map(),
+        max: server.cfg.ratelimit.changeTag.max,
+        time: server.cfg.ratelimit.changeTag.seconds * 1000
+    },
+    changePosition: {
+        /**
+         * @type {PlayerMap}
+         */
+        players: new Map(),
+        max: server.cfg.ratelimit.changePosition.max,
+        time: server.cfg.ratelimit.changePosition.seconds * 1000
+    },
+    changeIcon: {
+        /**
+         * @type {PlayerMap}
+         */
+        players: new Map(),
+        max: server.cfg.ratelimit.changeIcon.max,
+        time: server.cfg.ratelimit.changeIcon.seconds * 1000
+    },
+    report: {
+        /**
+         * @type {PlayerMap}
+         */
+        players: new Map(),
+        max: server.cfg.ratelimit.reportPlayer.max,
+        time: server.cfg.ratelimit.reportPlayer.seconds * 1000
+    }
 };
 
 server.http = http.createServer(app).listen(server.cfg.port, async () => {
