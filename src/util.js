@@ -18,7 +18,7 @@ module.exports = {
         const version = req.headers[`x-addon-version`] ? `Addon v${req.headers[`x-addon-version`]}` : `API`;
         const time = moment(new Date()).format(server.cfg.logTimeFormat);
     
-        if(req.path != `/ping`) console.log(`[${time}] ${req.method.toUpperCase()} ${req.path} [${version}] [${!!req.headers.authorization ? `` : `NO `}AUTH]`);
+        if(req.path != `/ping`) console.log(`[${time}] ${req.method.toUpperCase()} ${req.path} [${version}] [${!!req.headers.authorization ? `` : `NO `}AUTH] [${req.language.toUpperCase()}]`);
         next();
     },
 
