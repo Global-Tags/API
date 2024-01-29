@@ -1,5 +1,4 @@
 const express = require(`express`);
-const { Request } = require(`express`);
 const http = require(`http`);
 const parser = require(`body-parser`);
 const { readdirSync } = require(`fs`);
