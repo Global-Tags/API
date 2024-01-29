@@ -3,6 +3,7 @@ const { Request } = require(`express`);
 const http = require(`http`);
 const parser = require(`body-parser`);
 const { readdirSync } = require(`fs`);
+const { CronJob } = require("cron");
 const app = express();
 app.use(parser.json());
 app.disable(`x-powered-by`);
@@ -95,6 +96,10 @@ readdirSync(`./src/routes`).filter(file => file.endsWith(`.js`)).forEach(file =>
     app.use(`/${file.slice(0, -3)}`, route);
     route.use(server.util.catchError);
     console.log(`[SERVER] Loaded Route /${file.slice(0, -3)}`);
+
+    new CronJob(`0 */6 * * *`, () => {
+        server.util.pullNewTranslations();
+    }, null, true, null, null);
 });
 
 app.use(server.util.catchError);
