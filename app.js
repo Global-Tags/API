@@ -1,7 +1,7 @@
 const express = require(`express`);
+const { Request } = require(`express`);
 const http = require(`http`);
 const parser = require(`body-parser`);
-const moment = require(`moment`);
 const { readdirSync } = require(`fs`);
 const app = express();
 app.use(parser.json());
@@ -73,13 +73,8 @@ server.http = http.createServer(app).listen(server.cfg.port, async () => {
     if(server.cfg.bot.enabled) require(`./bot`);
 });
 
-app.use((req, res, next) => {
-    const version = req.headers[`x-addon-version`] ? `Addon v${req.headers[`x-addon-version`]}` : `API`;
-    const time = moment(new Date()).format(server.cfg.logTimeFormat);
-
-    if(req.path != `/ping`) console.log(`[${time}] ${req.method.toUpperCase()} ${req.path} [${version}] [${!!req.headers.authorization ? `` : `NO `}AUTH]`);
-    next();
-});
+app.use(server.util.i18n);
+app.use(server.util.log);
 
 app.get(`/`, (req, res) => {
     res.send({
