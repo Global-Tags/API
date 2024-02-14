@@ -8,12 +8,9 @@ module.exports = {
      */
 
     async connect(srv) {
-        if(!srv) return console.error('[DB] No SRV Provided!');
-        await connect(srv, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        }).then(() => {
-            console.log('[DB] Connected!');
+        console.log(`[DB] Connecting...`);
+        return await connect(srv).then(() => {
+            return console.log('[DB] Connected!');
         });
     }
 }
