@@ -31,33 +31,44 @@ module.exports = {
             embeds: [
                 new EmbedBuilder()
                 .setColor(bot.colors.standart)
+                .setThumbnail(`https://laby.net/texture/profile/head/${resolvable.replaceAll(`-`, ``)}.png?size=1024&overlay`)
                 .setTitle(`Playerdata`)
                 .addFields([
                     {
+                        name: `UUID`,
+                        value: `\`\`\`${data.uuid}\`\`\``
+                    },
+                    {
                         name: `Tag`,
-                        value: `\`\`\`${data.ban.active ? `Hidden because user is banned` : translateColors(data.tag) || `--`}\`\`\``
+                        value: `\`\`\`ansi\n${translateColors(data.ban.active ? `Hidden because user is banned` : data.tag || `--`)}\`\`\``
                     },
                     {
                         name: `Position`,
-                        value: `\`\`\`${data.position.charAt(0).toUpperCase() + data.position.substring(1).toLowerCase()}\`\`\``
+                        value: `\`\`\`${data.position.charAt(0).toUpperCase() + data.position.substring(1).toLowerCase()}\`\`\``,
+                        inline: true
                     },
                     {
                         name: `Icon`,
-                        value: `\`\`\`${data.icon.charAt(0).toUpperCase() + data.icon.substring(1).toLowerCase()}\`\`\``
+                        value: `\`\`\`${data.icon.charAt(0).toUpperCase() + data.icon.substring(1).toLowerCase()}\`\`\``,
+                        inline: true
                     },
                     {
                         name: `Admin`,
-                        value: `\`\`\`${data.admin ? `Yes` : `No`}\`\`\``
+                        value: `\`\`\`ansi\n${translateColors(data.admin ? `&aYes` : `&cNo`)}\`\`\``,
+                        inline: true
                     },
                     {
                         name: `Banned`,
-                        value: `\`\`\`${data.ban.active ? `Yes` : `No`}\`\`\``
+                        value: `\`\`\`ansi\n${translateColors(data.ban.active ? `&cYes` : `&aNo`)}\`\`\``,
+                        inline: true
                     },
                     {
                         name: `Ban reason`,
-                        value: `\`\`\`${data.ban.active ? data.ban.reason || `--` : `--`}\`\`\``
+                        value: `\`\`\`${data.ban.active ? data.ban.reason || `--` : `--`}\`\`\``,
+                        inline: true
                     }
                 ])
+                .setImage(`https://cdn.rappytv.com/bots/placeholder.png`)
             ]
         });
     }
@@ -70,6 +81,23 @@ module.exports = {
  */
 
 function translateColors(text) {
-    // TODO: Improve with ansi codes
-    return text.replace(/(&|§)[0-9A-FK-ORX]/gi, ``);
+    return text
+        .replaceAll(/(&|§)0/gi, `[0;30m`)
+        .replaceAll(/(&|§)7/gi, `[0;30m`)
+        .replaceAll(/(&|§)8/gi, `[0;30m`)
+        .replaceAll(/(&|§)4/gi, `[0;31m`)
+        .replaceAll(/(&|§)c/gi, `[0;31m`)
+        .replaceAll(/(&|§)2/gi, `[0;32m`)
+        .replaceAll(/(&|§)a/gi, `[0;32m`)
+        .replaceAll(/(&|§)6/gi, `[0;33m`)
+        .replaceAll(/(&|§)e/gi, `[0;33m`)
+        .replaceAll(/(&|§)1/gi, `[0;34m`)
+        .replaceAll(/(&|§)9/gi, `[0;34m`)
+        .replaceAll(/(&|§)5/gi, `[0;35m`)
+        .replaceAll(/(&|§)d/gi, `[0;35m`)
+        .replaceAll(/(&|§)3/gi, `[0;36m`)
+        .replaceAll(/(&|§)b/gi, `[0;36m`)
+        .replaceAll(/(&|§)f/gi, `[0;37m`)
+        .replaceAll(/(&|§)r/gi, `[0;37m`)
+        .replace(/(&|§)[0-9A-FK-ORX]/gi, ``);
 }
