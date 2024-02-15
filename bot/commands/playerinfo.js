@@ -1,3 +1,4 @@
+const { default: axios } = require("axios");
 const { CommandInteraction, CommandInteractionOptionResolver, GuildMember, User, ApplicationCommandOptionType, EmbedBuilder } = require("discord.js");
 const regex = /[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}|[a-f0-9]{8}(?:[a-f0-9]{4}){4}[a-f0-9]{8}/;
 
@@ -22,21 +23,33 @@ module.exports = {
      */
 
     async execute(interaction, options, member, user) {
-        const resolvable = options.getString(`player`);
-        if(!regex.test(resolvable)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ At the moment only uuids are supported!`)], ephemeral: true });
-        const data = await server.db.players.findOne({ uuid: resolvable.replaceAll(`-`, ``) });
+        let name, uuid = options.getString(`player`);
+        if(!regex.test(uuid)) {
+            try {
+                const res = await axios({
+                    method: `get`,
+                    url: `https://api.mojang.com/users/profiles/minecraft/${uuid}`,
+                });
+
+                uuid = res.data.id;
+                name = res.data.name;
+            } catch(err) {
+                return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ An error ocurred while fetching the player data. Please try again later or enter a uuid!`)], ephemeral: true });
+            }
+        }
+        const data = await server.db.players.findOne({ uuid: uuid.replaceAll(`-`, ``) });
 
         if(!data) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ This player is not in our records!`)], ephemeral: true });
         interaction.reply({
             embeds: [
                 new EmbedBuilder()
                 .setColor(bot.colors.standart)
-                .setThumbnail(`https://laby.net/texture/profile/head/${resolvable.replaceAll(`-`, ``)}.png?size=1024&overlay`)
-                .setTitle(`Playerdata`)
+                .setThumbnail(`https://laby.net/texture/profile/head/${uuid.replaceAll(`-`, ``)}.png?size=1024&overlay`)
+                .setTitle(`Playerdata${!!name ? ` of ${name}` : ``}`)
                 .addFields([
                     {
                         name: `UUID`,
-                        value: `\`\`\`${data.uuid}\`\`\``
+                        value: `\`\`\`${uuid}\`\`\``
                     },
                     {
                         name: `Tag`,
@@ -69,6 +82,7 @@ module.exports = {
                     }
                 ])
                 .setImage(`https://cdn.rappytv.com/bots/placeholder.png`)
+                .setFooter({ text: `© RappyTV, ${new Date().getFullYear()}`})
             ]
         });
     }
