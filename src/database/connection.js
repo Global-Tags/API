@@ -10,6 +10,7 @@ module.exports = {
     async connect(srv) {
         console.log(`[DB] Connecting...`);
         return await connect(srv).then(() => {
+            server.db.initialized = true;
             return console.log('[DB] Connected!');
         });
     }
