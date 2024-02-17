@@ -14,9 +14,11 @@ server.util = require(`./src/util`);
 app.set(`trust proxy`, server.cfg.proxied);
 
 // Database
-server.db = {};
-server.db.connection = require(`./src/database/connection`);
-server.db.players = require(`./src/database/schemas/player`);
+server.db = {
+    connection: require(`./src/database/connection`),
+    initialized: false,
+    players: require(`./src/database/schemas/player`)
+};
 
 /**
  * @typedef {Map<String, { requests: number, timestamp: number }>} PlayerMap
@@ -89,7 +91,12 @@ app.get(`/`, (req, res) => {
 
 app.get(`/ping`, (req, res) => {
     res.status(204).send();
-})
+});
+
+app.use((req, res, next) => {
+    if(!server.db.initialized) return res.status(503).send({ error: `The database is not fully initialized yet!` });
+    next();
+});
 
 readdirSync(`./src/routes`).filter(file => file.endsWith(`.js`)).forEach(file => {
     /**
