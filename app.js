@@ -71,8 +71,7 @@ server.ratelimit = {
 server.http = http.createServer(app).listen(server.cfg.port, async () => {
     console.log(`[SERVER] HTTP listening on Port ${server.cfg.port}`);
 
-    await server.db.connection.connect(server.cfg.srv);
-    if(server.cfg.bot.enabled) require(`./bot`);
+    server.db.connection.connect(server.cfg.srv);
 });
 
 app.use((req, res, next) => {

@@ -1,4 +1,5 @@
-const { connect } = require('mongoose');
+const { CronJob } = require('cron');
+const { connect, connection } = require('mongoose');
 
 module.exports = {
 
@@ -9,9 +10,20 @@ module.exports = {
 
     async connect(srv) {
         console.log(`[DB] Connecting...`);
-        return await connect(srv).then(() => {
+        connect(srv).then(() => {
             server.db.initialized = true;
-            return console.log('[DB] Connected!');
+            if(server.cfg.bot.enabled) require(`../../bot`);
+            console.log('[DB] Connected!');
+
+            new CronJob(`*/5 * * * *`, () => {
+                if(!connection) {
+                    console.log(`[DB] Lost connection!`);
+                    this.connect(srv);
+                }
+            });
+        }).catch((err) => {
+            console.error(new Error(err));
+            setTimeout(() => this.connect(srv), 5000);
         });
     }
 }
