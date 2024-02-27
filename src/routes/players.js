@@ -39,7 +39,7 @@ router.route(`/:uuid`)
     if(player && player.isBanned()) return res.status(403).send({ error: `You are banned from changing your tag!` });
     const { minTag, maxTag } = server.cfg.validation;
     if(!tag || tag.length <= minTag || tag.length > maxTag) return res.status(400).send({ error: `The tag has to be between ${minTag} and ${maxTag} characters.` });
-    if([`labymod`].some((word) => {
+    if(server.cfg.validation.blacklist.tag.some((word) => {
         if(tag.replace(/(&|§)[0-9A-FK-ORX]/gi, ``).toLowerCase().includes(word)) {
             res.status(400).send({ error: `You're not allowed to include "${word}" in your Global Tag!` });
             return true;
@@ -125,6 +125,7 @@ router.post(`/:uuid/icon`, async (req, res) => {
     if(!player.tag) return res.status(404).send({ error: `Please set a tag first!` });
     if(!icon) return res.status(400).send({ error: `Please provide an icon type!` });
     if(icon == player.icon) return res.status(400).send({ error: `You already chose this icon!` });
+    if(server.cfg.validation.blacklist.icon.includes(icon.toLowerCase())) return res.status(403).send({ error: `You're not allowed to choose this icon!` });
 
     player.icon = icon;
     await player.save();
