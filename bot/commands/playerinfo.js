@@ -34,7 +34,7 @@ module.exports = {
                 uuid = res.data.id;
                 name = res.data.name;
             } catch(err) {
-                return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ An error ocurred while fetching the player data. Please try again later or enter a uuid!`)], ephemeral: true });
+                return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ There is no player with this name!`)], ephemeral: true });
             }
         }
         const data = await server.db.players.findOne({ uuid: uuid.replaceAll(`-`, ``) });
