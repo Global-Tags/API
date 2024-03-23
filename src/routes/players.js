@@ -2,6 +2,8 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("
 const express = require(`express`);
 const router = express.Router();
 
+const colorCodeRegex = /(&|§)[0-9A-FK-ORX]/gi;
+
 router.route(`/:uuid`)
 .get(async (req, res) => {
     if(server.util.ratelimitResponse(req, res, server.ratelimit.getTag)) return;
@@ -37,10 +39,10 @@ router.route(`/:uuid`)
     
     const player = await server.db.players.findOne({ uuid });
     if(player && player.isBanned()) return res.status(403).send({ error: `You are banned from changing your tag!` });
-    const { minTag, maxTag } = server.cfg.validation;
-    if(!tag || tag.length <= minTag || tag.length > maxTag) return res.status(400).send({ error: `The tag has to be between ${minTag} and ${maxTag} characters.` });
-    if(server.cfg.validation.blacklist.tag.some((word) => {
-        if(tag.replace(/(&|§)[0-9A-FK-ORX]/gi, ``).toLowerCase().includes(word)) {
+    const { blacklist, min, max } = server.cfg.validation.tag;
+    if(!tag || tag.length <= min || tag.length > max) return res.status(400).send({ error: `The tag has to be between ${min} and ${max} characters.` });
+    if(blacklist.some((word) => {
+        if(tag.replace(colorCodeRegex, ``).toLowerCase().includes(word)) {
             res.status(400).send({ error: `You're not allowed to include "${word}" in your Global Tag!` });
             return true;
         } else return false;
@@ -125,7 +127,7 @@ router.post(`/:uuid/icon`, async (req, res) => {
     if(!player.tag) return res.status(404).send({ error: `Please set a tag first!` });
     if(!icon) return res.status(400).send({ error: `Please provide an icon type!` });
     if(icon == player.icon) return res.status(400).send({ error: `You already chose this icon!` });
-    if(server.cfg.validation.blacklist.icon.includes(icon.toLowerCase())) return res.status(403).send({ error: `You're not allowed to choose this icon!` });
+    if(server.cfg.validation.icon.blacklist.includes(icon.toLowerCase())) return res.status(403).send({ error: `You're not allowed to choose this icon!` });
 
     player.icon = icon;
     await player.save();
@@ -251,6 +253,10 @@ router.post(`/:uuid/report`, async (req, res) => {
         components: [
             new ActionRowBuilder()
             .addComponents(
+                new ButtonBuilder()
+                .setLabel(`Watch`)
+                .setCustomId(`watch`)
+                .setStyle(ButtonStyle.Primary),
                 new ButtonBuilder()
                 .setLabel(`Ban`)
                 .setCustomId(`ban`)
