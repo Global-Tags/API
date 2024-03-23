@@ -23,6 +23,11 @@ const player = new Schema({
         required: true,
         default: []
     },
+    watchlist: {
+        type: SchemaTypes.Boolean,
+        required: true,
+        default: false
+    },
     reports: {
         type: [
             {
