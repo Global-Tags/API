@@ -1,5 +1,5 @@
 const { default: axios } = require("axios");
-const { CommandInteraction, CommandInteractionOptionResolver, GuildMember, User, ApplicationCommandOptionType, EmbedBuilder } = require("discord.js");
+const { CommandInteraction, CommandInteractionOptionResolver, GuildMember, User, ApplicationCommandOptionType, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const regex = /[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}|[a-f0-9]{8}(?:[a-f0-9]{4}){4}[a-f0-9]{8}/;
 
 module.exports = {
@@ -34,7 +34,8 @@ module.exports = {
                 uuid = res.data.id;
                 name = res.data.name;
             } catch(err) {
-                return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ There is no player with this name!`)], ephemeral: true });
+                console.log(`[ERROR] Mojang API error: ${err?.response?.data || `Undefined data`}`);
+                return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ ${err?.response?.data?.errorMessage || `An error ocurred with the request to mojang`}`)], ephemeral: true });
             }
         }
         const data = await server.db.players.findOne({ uuid: uuid.replaceAll(`-`, ``) });
@@ -83,6 +84,15 @@ module.exports = {
                 ])
                 .setImage(`https://cdn.rappytv.com/bots/placeholder.png`)
                 .setFooter({ text: `© RappyTV, ${new Date().getFullYear()}`})
+            ],
+            components: !bot.cfg.staff.includes(user.id) ? [] : [
+                new ActionRowBuilder()
+                    .addComponents(
+                        new ButtonBuilder()
+                        .setLabel(`Actions`)
+                        .setCustomId(`actions`)
+                        .setStyle(ButtonStyle.Primary)
+                    )
             ]
         });
     }
