@@ -42,6 +42,7 @@
     "bot": {
         "enabled": true,
         "token": "",
+        "staff": [],
         "reports": {
             "active": true,
             "channel": "",
