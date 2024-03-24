@@ -39,7 +39,7 @@ router.route(`/:uuid`)
     
     const player = await server.db.players.findOne({ uuid });
     if(player && player.isBanned()) return res.status(403).send({ error: `You are banned from changing your tag!` });
-    const { blacklist, min, max } = server.cfg.validation.tag;
+    const { blacklist, watchlist, min, max } = server.cfg.validation.tag;
     if(!tag || tag.length <= min || tag.length > max) return res.status(400).send({ error: `The tag has to be between ${min} and ${max} characters.` });
     if(blacklist.some((word) => {
         if(tag.replace(colorCodeRegex, ``).toLowerCase().includes(word)) {
@@ -47,11 +47,54 @@ router.route(`/:uuid`)
             return true;
         } else return false;
     })) return;
+    const isWatched = (player && player.watchlist) || watchlist.some((word) => {
+        if(tag.replace(colorCodeRegex, ``).toLowerCase().includes(word)) {
+            console.log(`[INFO] Now watching ${uuid} for matching "${word}" in "${tag}".`);
+            if(server.cfg.bot.enabled && server.cfg.bot.watchlist.active) bot.client.channels.cache.get(bot.cfg.watchlist.channel).send({
+                content: bot.cfg.watchlist.content,
+                embeds: [
+                    new EmbedBuilder()
+                    .setColor(0x5865f2)
+                    .setTitle(`New watched player`)
+                    .addFields([
+                        {
+                            name: `Watched UUID`,
+                            value: `\`\`\`${player.uuid}\`\`\``
+                        },
+                        {
+                            name: `New tag`,
+                            value: `\`\`\`${tag}\`\`\``
+                        },
+                        {
+                            name: `Matched word`,
+                            value: `\`\`\`${word}\`\`\``
+                        }
+                    ])
+                ],
+                components: [
+                    new ActionRowBuilder()
+                    .addComponents(
+                        new ButtonBuilder()
+                        .setLabel(`Actions`)
+                        .setCustomId(`actions`)
+                        .setStyle(ButtonStyle.Primary),
+                        new ButtonBuilder()
+                        .setLabel(`Finish actions`)
+                        .setCustomId(`finishAction`)
+                        .setStyle(ButtonStyle.Success),
+                    )
+                ]
+            });
+            return true;
+        }
+        return false;
+    });
 
     if(!player) {
         await new server.db.players({
             uuid,
             tag,
+            watchlist: isWatched,
             history: [tag]
         }).save();
         
@@ -60,11 +103,44 @@ router.route(`/:uuid`)
         if(player.tag == tag) return res.status(400).send({ error: `You already have this tag!` });
 
         player.tag = tag;
+        if(watchlist) player.watchlist = true;
         if(player.history[player.history.length - 1] != tag) player.history.push(tag);
         await player.save();
         
         res.status(200).send({ message: `Your tag was successfully updated!` });
     }
+
+    if(isWatched && server.cfg.bot.enabled && server.cfg.bot.watchlist.active) bot.client.channels.cache.get(bot.cfg.watchlist.channel).send({
+        content: bot.cfg.watchlist.content,
+        embeds: [
+            new EmbedBuilder()
+            .setColor(0x5865f2)
+            .setTitle(`New tag change`)
+            .addFields([
+                {
+                    name: `Watched UUID`,
+                    value: `\`\`\`${player.uuid}\`\`\``
+                },
+                {
+                    name: `New tag`,
+                    value: `\`\`\`${player.tag}\`\`\``
+                }
+            ])
+        ],
+        components: [
+            new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                .setLabel(`Actions`)
+                .setCustomId(`actions`)
+                .setStyle(ButtonStyle.Primary),
+                new ButtonBuilder()
+                .setLabel(`Finish actions`)
+                .setCustomId(`finishAction`)
+                .setStyle(ButtonStyle.Success),
+            )
+        ]
+    });
 }).delete(async (req, res) => {
     if(server.util.ratelimitResponse(req, res, server.ratelimit.changeTag)) return;
 
@@ -254,19 +330,11 @@ router.post(`/:uuid/report`, async (req, res) => {
             new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
-                .setLabel(`Watch`)
-                .setCustomId(`watch`)
+                .setLabel(`Actions`)
+                .setCustomId(`actions`)
                 .setStyle(ButtonStyle.Primary),
                 new ButtonBuilder()
-                .setLabel(`Ban`)
-                .setCustomId(`ban`)
-                .setStyle(ButtonStyle.Danger),
-                new ButtonBuilder()
-                .setLabel(`Clear tag`)
-                .setCustomId(`clearTag`)
-                .setStyle(ButtonStyle.Danger),
-                new ButtonBuilder()
-                .setLabel(`Finish action`)
+                .setLabel(`Finish actions`)
                 .setCustomId(`finishAction`)
                 .setStyle(ButtonStyle.Success),
             )
