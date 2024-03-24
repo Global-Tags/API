@@ -2,6 +2,8 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("
 const express = require(`express`);
 const router = express.Router();
 
+const colorCodeRegex = /(&|§)[0-9A-FK-ORX]/gi;
+
 router.route(`/:uuid`)
 .get(async (req, res) => {
     if(server.util.ratelimitResponse(req, res, server.ratelimit.getTag)) return;
@@ -37,19 +39,63 @@ router.route(`/:uuid`)
     
     const player = await server.db.players.findOne({ uuid });
     if(player && player.isBanned()) return res.status(403).send({ error: `You are banned from changing your tag!` });
-    const { minTag, maxTag } = server.cfg.validation;
-    if(!tag || tag.length <= minTag || tag.length > maxTag) return res.status(400).send({ error: `The tag has to be between ${minTag} and ${maxTag} characters.` });
-    if(server.cfg.validation.blacklist.tag.some((word) => {
-        if(tag.replace(/(&|§)[0-9A-FK-ORX]/gi, ``).toLowerCase().includes(word)) {
+    const { blacklist, watchlist, min, max } = server.cfg.validation.tag;
+    if(!tag || tag.length <= min || tag.length > max) return res.status(400).send({ error: `The tag has to be between ${min} and ${max} characters.` });
+    if(blacklist.some((word) => {
+        if(tag.replace(colorCodeRegex, ``).toLowerCase().includes(word)) {
             res.status(400).send({ error: `You're not allowed to include "${word}" in your Global Tag!` });
             return true;
         } else return false;
     })) return;
+    const isWatched = (player && player.watchlist) || watchlist.some((word) => {
+        if(tag.replace(colorCodeRegex, ``).toLowerCase().includes(word)) {
+            console.log(`[INFO] Now watching ${uuid} for matching "${word}" in "${tag}".`);
+            if(server.cfg.bot.enabled && server.cfg.bot.watchlist.active) bot.client.channels.cache.get(bot.cfg.watchlist.channel).send({
+                content: bot.cfg.watchlist.content,
+                embeds: [
+                    new EmbedBuilder()
+                    .setColor(0x5865f2)
+                    .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
+                    .setTitle(`New watched player`)
+                    .addFields([
+                        {
+                            name: `Watched UUID`,
+                            value: `\`\`\`${player.uuid}\`\`\``
+                        },
+                        {
+                            name: `New tag`,
+                            value: `\`\`\`${tag}\`\`\``
+                        },
+                        {
+                            name: `Matched word`,
+                            value: `\`\`\`${word}\`\`\``
+                        }
+                    ])
+                ],
+                components: [
+                    new ActionRowBuilder()
+                    .addComponents(
+                        new ButtonBuilder()
+                        .setLabel(`Actions`)
+                        .setCustomId(`actions`)
+                        .setStyle(ButtonStyle.Primary),
+                        new ButtonBuilder()
+                        .setLabel(`Finish actions`)
+                        .setCustomId(`finishAction`)
+                        .setStyle(ButtonStyle.Success),
+                    )
+                ]
+            });
+            return true;
+        }
+        return false;
+    });
 
     if(!player) {
         await new server.db.players({
             uuid,
             tag,
+            watchlist: isWatched,
             history: [tag]
         }).save();
         
@@ -58,11 +104,45 @@ router.route(`/:uuid`)
         if(player.tag == tag) return res.status(400).send({ error: `You already have this tag!` });
 
         player.tag = tag;
+        if(watchlist) player.watchlist = true;
         if(player.history[player.history.length - 1] != tag) player.history.push(tag);
         await player.save();
         
         res.status(200).send({ message: `Your tag was successfully updated!` });
     }
+
+    if(isWatched && server.cfg.bot.enabled && server.cfg.bot.watchlist.active) bot.client.channels.cache.get(bot.cfg.watchlist.channel).send({
+        content: bot.cfg.watchlist.content,
+        embeds: [
+            new EmbedBuilder()
+            .setColor(0x5865f2)
+            .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
+            .setTitle(`New tag change`)
+            .addFields([
+                {
+                    name: `Watched UUID`,
+                    value: `\`\`\`${player.uuid}\`\`\``
+                },
+                {
+                    name: `New tag`,
+                    value: `\`\`\`${player.tag}\`\`\``
+                }
+            ])
+        ],
+        components: [
+            new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                .setLabel(`Actions`)
+                .setCustomId(`actions`)
+                .setStyle(ButtonStyle.Primary),
+                new ButtonBuilder()
+                .setLabel(`Finish actions`)
+                .setCustomId(`finishAction`)
+                .setStyle(ButtonStyle.Success),
+            )
+        ]
+    });
 }).delete(async (req, res) => {
     if(server.util.ratelimitResponse(req, res, server.ratelimit.changeTag)) return;
 
@@ -125,7 +205,7 @@ router.post(`/:uuid/icon`, async (req, res) => {
     if(!player.tag) return res.status(404).send({ error: `Please set a tag first!` });
     if(!icon) return res.status(400).send({ error: `Please provide an icon type!` });
     if(icon == player.icon) return res.status(400).send({ error: `You already chose this icon!` });
-    if(server.cfg.validation.blacklist.icon.includes(icon.toLowerCase())) return res.status(403).send({ error: `You're not allowed to choose this icon!` });
+    if(server.cfg.validation.icon.blacklist.includes(icon.toLowerCase())) return res.status(403).send({ error: `You're not allowed to choose this icon!` });
 
     player.icon = icon;
     await player.save();
@@ -228,6 +308,7 @@ router.post(`/:uuid/report`, async (req, res) => {
         embeds: [
             new EmbedBuilder()
             .setColor(0xff0000)
+            .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
             .setTitle(`New report!`)
             .addFields([
                 {
@@ -252,15 +333,11 @@ router.post(`/:uuid/report`, async (req, res) => {
             new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
-                .setLabel(`Ban`)
-                .setCustomId(`ban`)
-                .setStyle(ButtonStyle.Danger),
+                .setLabel(`Actions`)
+                .setCustomId(`actions`)
+                .setStyle(ButtonStyle.Primary),
                 new ButtonBuilder()
-                .setLabel(`Clear tag`)
-                .setCustomId(`clearTag`)
-                .setStyle(ButtonStyle.Danger),
-                new ButtonBuilder()
-                .setLabel(`Finish action`)
+                .setLabel(`Finish actions`)
                 .setCustomId(`finishAction`)
                 .setStyle(ButtonStyle.Success),
             )
