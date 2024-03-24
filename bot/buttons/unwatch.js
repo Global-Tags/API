@@ -1,7 +1,7 @@
 const { ButtonInteraction, Message, GuildMember, User, EmbedBuilder } = require("discord.js");
 
 module.exports = {
-    id: `watch`,
+    id: `unwatch`,
 
     /**
      * 
