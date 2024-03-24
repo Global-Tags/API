@@ -19,6 +19,6 @@ module.exports = {
         player.watchlist = true;
         player.save();
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.success).setDescription(`✅ The player is not being watched!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.success).setDescription(`✅ The player is now being watched!`)], ephemeral: true });
     }
 }
