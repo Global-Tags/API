@@ -55,6 +55,7 @@ router.route(`/:uuid`)
                 embeds: [
                     new EmbedBuilder()
                     .setColor(0x5865f2)
+                    .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
                     .setTitle(`New watched player`)
                     .addFields([
                         {
@@ -115,6 +116,7 @@ router.route(`/:uuid`)
         embeds: [
             new EmbedBuilder()
             .setColor(0x5865f2)
+            .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
             .setTitle(`New tag change`)
             .addFields([
                 {
@@ -306,6 +308,7 @@ router.post(`/:uuid/report`, async (req, res) => {
         embeds: [
             new EmbedBuilder()
             .setColor(0xff0000)
+            .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
             .setTitle(`New report!`)
             .addFields([
                 {
