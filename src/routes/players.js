@@ -41,6 +41,7 @@ router.route(`/:uuid`)
     if(player && player.isBanned()) return res.status(403).send({ error: `You are banned from changing your tag!` });
     const { blacklist, watchlist, min, max } = server.cfg.validation.tag;
     if(!tag || tag.length <= min || tag.length > max) return res.status(400).send({ error: `The tag has to be between ${min} and ${max} characters.` });
+    if(tag.trim() == '') return res.status(400).send({ error: `The tag must not be empty!` });
     if(blacklist.some((word) => {
         if(tag.replace(colorCodeRegex, ``).toLowerCase().includes(word)) {
             res.status(400).send({ error: `You're not allowed to include "${word}" in your Global Tag!` });
