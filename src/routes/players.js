@@ -105,7 +105,7 @@ router.route(`/:uuid`)
         if(player.tag == tag) return res.status(400).send({ error: `You already have this tag!` });
 
         player.tag = tag;
-        if(watchlist) player.watchlist = true;
+        if(isWatched) player.watchlist = true;
         if(player.history[player.history.length - 1] != tag) player.history.push(tag);
         await player.save();
         
