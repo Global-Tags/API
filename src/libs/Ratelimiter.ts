@@ -23,6 +23,18 @@ class Ratelimiter {
     private maxRequests: number;
     private resetAfter: number;
 
+    public static initialize() {
+        for(const type of RatelimitType) {
+            if(isNaN(Number(type))) {
+                new Ratelimiter(type as RatelimitType);
+            }
+        }
+    }
+
+    public static get(type: RatelimitType): Ratelimiter | undefined {
+        return this.ratelimiters.get(type);
+    }
+
     constructor(type: RatelimitType) {
         this.type = type;
         const config: { max: number, seconds: number } = ratelimit.actions[type.toString() as keyof typeof ratelimit.actions];
