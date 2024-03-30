@@ -60,4 +60,4 @@ const schema = new Schema({
     }
 });
 
-module.exports = model('players', schema);
+export default model('players', schema);
