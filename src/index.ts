@@ -2,14 +2,17 @@ import { Elysia } from "elysia";
 import { swagger } from "@elysiajs/swagger";
 import Logger from "./libs/Logger";
 import { connect } from "./database/mongo";
-import * as config from "../config.json";
 import { getRouter } from "./libs/RouteLoader";
+import * as config from "../config.json";
+import { version } from "../package.json";
 
 // Database connection
 connect(config.srv);
 
 // Elysia API
 export const api = new Elysia()
+.get(`/`, () => ({ version }))
+.get(`/ping`, ({ error }) => { return error(204, "") })
 .use(swagger())
 .use(getRouter(`/players/:uuid`, __dirname))
 .onStart(() => Logger.info(`Elysia listening on port ${config.port}!`))
