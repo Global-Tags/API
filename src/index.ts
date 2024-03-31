@@ -5,11 +5,13 @@ import { connect } from "./database/mongo";
 import { getRouter } from "./libs/RouteLoader";
 import * as config from "../config.json";
 import { version } from "../package.json";
+import access from "./middleware/AccessLog";
 
 // TODO: Implement ratelimiter
 
 // Elysia API
 export const api = new Elysia()
+.onTransform(access)
 .get(`/`, () => ({ version }))
 .get(`/ping`, ({ error }: Context) => { return error(204, "") })
 .use(swagger({
