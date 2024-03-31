@@ -6,9 +6,6 @@ import { getRouter } from "./libs/RouteLoader";
 import * as config from "../config.json";
 import { version } from "../package.json";
 
-// Database connection
-connect(config.srv);
-
 // TODO: Implement ratelimiter
 
 // Elysia API
@@ -38,3 +35,6 @@ export const api = new Elysia()
 .use(getRouter(`/players/:uuid`, __dirname))
 .onStart(() => Logger.info(`Elysia listening on port ${config.port}!`))
 .listen(config.port);
+
+// Database connection
+connect(config.srv);
