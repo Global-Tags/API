@@ -43,6 +43,13 @@ export default class Actions extends Button {
                 .setLabel(`Clear tag`)
                 .setCustomId(`clearTag`)
                 .setStyle(ButtonStyle.Danger)
+            ),
+            new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(
+                new ButtonBuilder()
+                .setLabel(`Unban`)
+                .setCustomId(`unban`)
+                .setStyle(ButtonStyle.Success)
             )
         ]
 
