@@ -1,8 +1,9 @@
 import Elysia, { t } from "elysia";
 import players from "../database/schemas/players";
-import * as config from "../../config.json";
-import { validJWTSession } from "../libs/SessionValidator";
 import Logger from "../libs/Logger";
+import { sendMessage, NotificationType } from "../libs/DiscordNotifier";
+import { validJWTSession } from "../libs/SessionValidator";
+import * as config from "../../config.json";
 
 const colorCodeRegex = /(&|§)[0-9A-FK-ORX]/gi;
 
@@ -51,10 +52,8 @@ export default new Elysia()
     })) return;
     const isWatched = (player && player.watchlist) || watchlist.some((word) => {
         if(tag.replace(colorCodeRegex, ``).toLowerCase().includes(word)) {
-            Logger.warn(`[INFO] Now watching ${uuid} for matching "${word}" in "${tag}".`);
-            if(config.bot.enabled && config.bot.watchlist.active) {
-                // TODO: Implement old discord bot notification
-            }
+            Logger.warn(`Now watching ${uuid} for matching "${word}" in "${tag}".`);
+            sendMessage({ type: NotificationType.WatchlistAdd, uuid, tag, word });
             return true;
         }
         return false;
@@ -67,8 +66,6 @@ export default new Elysia()
             watchlist: isWatched,
             history: [tag]
         }).save();
-        
-        error(201, { message: `Your tag was successfully set!` });
     } else {
         if(player.tag == tag) return error(400, { error: `You already have this tag!` });
 
@@ -76,13 +73,10 @@ export default new Elysia()
         if(isWatched) player.watchlist = true;
         if(player.history[player.history.length - 1] != tag) player.history.push(tag);
         await player.save();
-        
-        return { message: `Your tag was successfully updated!` };
     }
 
-    if(isWatched && config.bot.enabled && config.bot.watchlist.active) {
-        // TODO: Implement old discord bot notification
-    }
+    if(isWatched) sendMessage({ type: NotificationType.WatchlistTagUpdate, uuid, tag });
+    return { message: `Your tag was successfully updated!` };
 }, {
     params: t.Object({ uuid: t.String() }),
     body: t.Object({ tag: t.String() }),

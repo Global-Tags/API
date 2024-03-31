@@ -2,6 +2,7 @@ import Elysia, { t } from "elysia";
 import { getUuidByJWT, validJWTSession } from "../libs/SessionValidator";
 import * as config from "../../config.json";
 import players from "../database/schemas/players";
+import { NotificationType, sendMessage } from "../libs/DiscordNotifier";
 
 export default new Elysia({
     prefix: "/report"
@@ -19,7 +20,7 @@ export default new Elysia({
     if(player.admin) return error(403, { error: `You can't report admins!` });
     if(!player.tag) return error(404, { error: `This player does not have a tag!` });
 
-    const reporterUuid = getUuidByJWT(authorization);
+    const reporterUuid = getUuidByJWT(authorization)!;
     if(reporterUuid == uuid) return error(400, { error: `You can't report yourself!` });
     if(player.reports.some((report) => report.by == reporterUuid && report.reportedName == player.tag)) return error(400, { error: `You already reported this player's tag!` });
     const { reason } = body;
@@ -32,9 +33,13 @@ export default new Elysia({
     });
     await player.save();
 
-    if(config.bot.enabled && config.bot.reports.active) {
-        // TODO: Implement old discord bot notification
-    }
+    sendMessage({
+        type: NotificationType.Report,
+        uuid,
+        reporterUuid,
+        reason,
+        tag: player.tag
+    });
     return { message: `The player was successfully reported!` };
 }, {
     body: t.Object({ reason: t.String() }),
