@@ -100,7 +100,7 @@ export default new Elysia()
     if(player.isBanned()) return error(403, { error: `You are banned!` });
     if(!player.tag) return error(404, { error: `You don't have a tag!` });
 
-    player.tag = undefined;
+    player.tag = null;
     await player.save();
 
     return { message: `Your tag was successfully reset!` };

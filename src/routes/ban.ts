@@ -12,7 +12,7 @@ export default new Elysia({
     if(authorization == `0`) return error(401, { error: `You need a premium account to use this feature!` });
     if(!authenticated) return error(401, { error: `You're not allowed to perform that request!` });
 
-    const executor = await players.findOne({ uuid: getUuidByJWT(authorization) });
+    const executor = await players.findOne({ uuid: getUuidByJWT(authorization)! });
     if(!executor || !executor.admin) return error(403, { error: `You're not allowed to perform that request!` });
 
     const player = await players.findOne({ uuid });
@@ -30,7 +30,7 @@ export default new Elysia({
     if(authorization == `0`) return error(401, { error: `You need a premium account to use this feature!` });
     if(!authenticated) return error(401, { error: `You're not allowed to perform that request!` });
 
-    const executor = await players.findOne({ uuid: getUuidByJWT(authorization) });
+    const executor = await players.findOne({ uuid: getUuidByJWT(authorization)! });
     if(!executor || !executor.admin) return error(403, { error: `You're not allowed to perform that request!` });
 
     const player = await players.findOne({ uuid });
@@ -56,7 +56,7 @@ export default new Elysia({
     if(authorization == `0`) return error(401, { error: `You need a premium account to use this feature!` });
     if(!authenticated) return error(401, { error: `You're not allowed to perform that request!` });
 
-    const executor = await players.findOne({ uuid: getUuidByJWT(authorization) });
+    const executor = await players.findOne({ uuid: getUuidByJWT(authorization)! });
     if(!executor || !executor.admin) return error(403, { error: `You're not allowed to perform that request!` });
 
     const player = await players.findOne({ uuid });
