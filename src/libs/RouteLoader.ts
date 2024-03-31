@@ -10,7 +10,7 @@ export async function getRouter(prefix: string, dirname: string): Promise<Elysia
         const route: Elysia = (await import(join(directory, file))).default;
     
         app.use(route);
-        Logger.info(`Loaded route ${prefix}/${file != `root.ts` ? file.slice(0, -3) : ``}`);
+        Logger.debug(`Loaded route ${prefix}/${file != `root.ts` ? file.slice(0, -3) : ``}`);
     }
 
     return app;

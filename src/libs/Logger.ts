@@ -1,6 +1,10 @@
 import chalk from "chalk";
 
 export default class Logger {
+    public static debug(text: any) {
+        console.log(chalk.blueBright(`[DEBUG]`), text);
+    }
+
     public static info(text: any) {
         console.log(chalk.blue(`[INFO]`), text);
     }

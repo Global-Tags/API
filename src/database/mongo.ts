@@ -5,7 +5,7 @@ import * as config from "../../config.json";
 export async function connect(srv: string) {
     return await mongoose.connect(srv)
     .then(() => {
-        Logger.info("Connected to MongoDB!");
+        Logger.info("Connected to database!");
         if(config.bot.enabled) import("../bot/bot");
     }).catch((err) => {
         Logger.error(`Failed to establish database connection! ${err}`);

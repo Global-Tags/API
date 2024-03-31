@@ -33,12 +33,12 @@ async function registerCommands() {
             dm_permission: false
         });
     });
-    Logger.info(`Loaded ${commands.length} commands!`);
+    Logger.debug(`Loaded ${commands.length} commands!`);
 
     await (async () => {
         try {
             await rest.put(Routes.applicationCommands(bot.client.user!.id), { body: commands });
-            Logger.info(`Registered ${commands.length} commands!`);
+            Logger.debug(`Registered ${commands.length} commands!`);
         } catch (error) {
             Logger.error(error);
         }
