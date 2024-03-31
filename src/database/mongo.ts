@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
 import Logger from "../libs/Logger";
+import { spawn } from "../bot/bot";
 import * as config from "../../config.json";
 
 export async function connect(srv: string) {
     return await mongoose.connect(srv)
     .then(() => {
         Logger.info("Connected to database!");
-        if(config.bot.enabled) import("../bot/bot");
+        if(config.bot.enabled) spawn();
     }).catch((err) => {
         Logger.error(`Failed to establish database connection! ${err}`);
         setTimeout(() => connect(srv), 5000);

@@ -60,4 +60,4 @@ export const modals = new Collection<string, Modal>();
     });
 })();
 
-client.login(config.bot.token);
+export const spawn = () => client.login(config.bot.token);

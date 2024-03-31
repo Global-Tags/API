@@ -6,11 +6,13 @@ import { getRouter } from "./libs/RouteLoader";
 import * as config from "../config.json";
 import { version } from "../package.json";
 import access from "./middleware/AccessLog";
+import checkDatabase from "./middleware/DatabaseChecker";
 
 // TODO: Implement ratelimiter
 
 // Elysia API
 export const api = new Elysia()
+.onRequest(checkDatabase)
 .onTransform(access)
 .get(`/`, () => ({ version }))
 .get(`/ping`, ({ error }: Context) => { return error(204, "") })
@@ -35,8 +37,9 @@ export const api = new Elysia()
     }
 }))
 .use(getRouter(`/players/:uuid`, __dirname))
-.onStart(() => Logger.info(`Elysia listening on port ${config.port}!`))
-.listen(config.port);
+.onStart(() => {
+    Logger.info(`Elysia listening on port ${config.port}!`);
 
-// Database connection
-connect(config.srv);
+    connect(config.srv);
+})
+.listen(config.port);
