@@ -1,13 +1,5 @@
-import { Context } from "elysia";
+import { IpContext } from "../middleware/RatelimitChecker";
 import { ratelimit } from "../../config.json";
-
-enum RatelimitType {
-    GetTag,
-    ChangeTag,
-    ChangePosition,
-    ChangeIcon,
-    Report
-}
 
 type RatelimitData = {
     reset: number,
@@ -15,45 +7,49 @@ type RatelimitData = {
     remaining: number
 };
 
-class Ratelimiter {
-    private static ratelimiters: Map<RatelimitType, Ratelimiter> = new Map();
+type RatelimiterKey = {
+    method: string,
+    regex: string
+}
+
+export default class Ratelimiter {
+    private static ratelimiters: Map<RatelimiterKey, Ratelimiter> = new Map();
     private static enabled: boolean = ratelimit.active;
-    private type: RatelimitType;
+    public key;
     private players: Map<string, { requests: number, timestamp: number }> = new Map();
     private maxRequests: number;
     private resetAfter: number;
 
     public static initialize() {
-        for(const type of RatelimitType) {
-            if(isNaN(Number(type))) {
-                new Ratelimiter(type as RatelimitType);
-            }
+        for(const route of ratelimit.routes) {
+            const key: RatelimiterKey = { method: route.method, regex: route.regex };
+            this.ratelimiters.set(key, new Ratelimiter(key));
         }
     }
 
-    public static get(type: RatelimitType): Ratelimiter | undefined {
-        return this.ratelimiters.get(type);
+    public static get(method: string, path: string): Ratelimiter | null {
+        for(const key of this.ratelimiters.keys()) {
+            const res = path.match(new RegExp(key.regex));
+            if(res && method == key.method) return this.ratelimiters.get(key) || null;
+        }
+        return null;
     }
 
-    constructor(type: RatelimitType) {
-        this.type = type;
-        const config: { max: number, seconds: number } = ratelimit.actions[type.toString() as keyof typeof ratelimit.actions];
+    constructor(key: RatelimiterKey) {
+        this.key = key;
+        const config: { max: number, seconds: number } = ratelimit.routes.find((route) => route.regex == key.regex)!;
         this.maxRequests = config.max;
         this.resetAfter = config.seconds * 1000;
-        Ratelimiter.ratelimiters.set(type, this);
+        Ratelimiter.ratelimiters.set(key, this);
     }
 
-    public ratelimitResponse({ set, error }: Context): boolean {
-        if(!Ratelimiter.enabled) return false;
-        const ratelimitData = this.getRatelimitData("");
-        set.headers[`X-RateLimit-Limit`] = String(this.maxRequests.toString);
+    public ratelimitResponse({ set, error, ip }: IpContext): any {
+        if(!Ratelimiter.enabled) return;
+        const ratelimitData = this.getRatelimitData(ip?.address);
+        set.headers[`X-RateLimit-Limit`] = String(this.maxRequests);
         set.headers[`X-RateLimit-Remaining`] = String(ratelimitData.remaining);
         set.headers[`X-RateLimit-Reset`] = String(ratelimitData.reset / 1000);
-        if(ratelimitData.limited) {
-            error(429, { error: `You're being ratelimited! Please try again in ${Math.ceil(ratelimitData.reset / 1000)} seconds!` });
-            return true;
-        }
-        return false;
+        if(ratelimitData.limited) return error(429, { error: `You're being ratelimited! Please try again in ${Math.ceil(ratelimitData.reset / 1000)} seconds!` });
     }
 
     public getRatelimitData(ip: string): RatelimitData {
@@ -75,8 +71,12 @@ class Ratelimiter {
         }
         return {
             limited: player.requests++ >= this.maxRequests,
-            remaining: this.maxRequests - player.requests,
+            remaining: Math.max(this.maxRequests - player.requests, 0),
             reset: player.timestamp + this.resetAfter - Date.now()
         };
     }
 }
+
+function getValueFromRegex(path: string, map: Map<string, Ratelimiter>) {
+    
+  }

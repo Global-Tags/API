@@ -2,6 +2,7 @@
     "compilerOptions": {
       "strict": true,
       "resolveJsonModule": true,
-      "lib": ["es2023"]
+      "lib": ["es2023"],
+      "downlevelIteration": true
     }
 }
