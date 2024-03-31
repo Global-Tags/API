@@ -10,6 +10,7 @@ import checkDatabase from "./middleware/DatabaseChecker";
 import Ratelimiter from "./libs/Ratelimiter";
 import checkRatelimit from "./middleware/RatelimitChecker";
 import { ip } from "elysia-ip";
+import { NotificationType, sendMessage } from "./libs/DiscordNotifier";
 
 // Elysia API
 export const api = new Elysia()
@@ -45,5 +46,17 @@ export const api = new Elysia()
     Ratelimiter.initialize();
 
     connect(config.srv);
+}).onError(({ code, set, error }) => {
+    if(code == 'VALIDATION') {
+        set.status = 422;
+        return { error: error.message };
+    } else if(code == 'NOT_FOUND') {
+        set.status = 404;
+        return { error: `Not Found` };
+    } else {
+        set.status = 500;
+        Logger.error(error.message);
+        return { error: `An unknown error ocurred! Please try again later` };
+    }
 })
 .listen(config.port);

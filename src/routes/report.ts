@@ -42,7 +42,7 @@ export default new Elysia({
     });
     return { message: `The player was successfully reported!` };
 }, {
-    body: t.Object({ reason: t.String() }),
+    body: t.Object({ reason: t.String({ error: `Missing field "reason".` }) }, { error: `Missing field "reason".` }),
     params: t.Object({ uuid: t.String() }),
-    headers: t.Object({ authorization: t.String() })
+    headers: t.Object({ authorization: t.String({ error: `You're not authorized!` }) }, { error: `You're not authorized!` })
 });

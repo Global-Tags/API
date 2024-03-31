@@ -29,7 +29,7 @@ export default new Elysia()
     };
 }, {
     params: t.Object({ uuid: t.String() }),
-    headers: t.Object({ authorization: config.requireSessionIds ? t.String() : t.Optional(t.String()) })
+    headers: t.Object({ authorization: config.requireSessionIds ? t.String({ error: `You're not authorized!` }) : t.Optional(t.String()) }, { error: `You're not authorized!` })
 }).post(`/`, async ({ error, params, headers, body }) => { // Change tag
     const uuid = params.uuid.replaceAll(`-`, ``);
     const tag = body.tag;
@@ -79,8 +79,8 @@ export default new Elysia()
     return { message: `Your tag was successfully updated!` };
 }, {
     params: t.Object({ uuid: t.String() }),
-    body: t.Object({ tag: t.String() }),
-    headers: t.Object({ authorization: t.String() })
+    body: t.Object({ tag: t.String({ error: `Missing field "tag".` }) }, { error: `Missing field "tag".` }),
+    headers: t.Object({ authorization: t.String({ error: `You're not authorized!` }) }, { error: `You're not authorized!` })
 }).delete(`/`, async ({ error, params, headers }) => { // Delete tag
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
@@ -100,5 +100,5 @@ export default new Elysia()
     return { message: `Your tag was successfully reset!` };
 }, {
     params: t.Object({ uuid: t.String() }),
-    headers: t.Object({ authorization: t.String() })
+    headers: t.Object({ authorization: t.String({ error: `You're not authorized!` }) }, { error: `You're not authorized!` })
 });

@@ -21,7 +21,7 @@ export default new Elysia({
     return { banned: player.isBanned(), reason: player.isBanned() ? player.ban?.reason || null : null };
 }, {
     params: t.Object({ uuid: t.String() }),
-    headers: t.Object({ authorization: t.String() })
+    headers: t.Object({ authorization: t.String({ error: `You're not authorized!` }) }, { error: `You're not authorized!` })
 }).post(`/`, async ({ error, params, headers, body }) => { // Ban player
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
@@ -45,9 +45,9 @@ export default new Elysia({
 
     return { message: `The player was successfully banned!` };
 }, {
-    body: t.Object({ reason: t.String() }),
+    body: t.Object({ reason: t.String({ error: `Missing field "reason".` }) }, { error: `Missing field "reason".` }),
     params: t.Object({ uuid: t.String() }),
-    headers: t.Object({ authorization: t.String() })
+    headers: t.Object({ authorization: t.String({ error: `You're not authorized!` }) }, { error: `You're not authorized!` })
 }).delete(`/`, async ({ error, params, headers, body }) => { // Unban player
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
@@ -72,5 +72,5 @@ export default new Elysia({
     return { message: `The player was successfully unbanned!` };
 }, {
     params: t.Object({ uuid: t.String() }),
-    headers: t.Object({ authorization: t.String() })
+    headers: t.Object({ authorization: t.String({ error: `You're not authorized!` }) }, { error: `You're not authorized!` })
 });

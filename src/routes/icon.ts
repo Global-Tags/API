@@ -26,7 +26,7 @@ export default new Elysia({
 
     return { message: `Your icon was successfully set!` };
 }, {
-    body: t.Object({ icon: t.String() }),
+    body: t.Object({ icon: t.String({ error: `Missing field "icon".` }) }, { error: `Missing field "icon".` }),
     params: t.Object({ uuid: t.String() }),
-    headers: t.Object({ authorization: t.String() })
+    headers: t.Object({ authorization: t.String({ error: `You're not authorized!` }) }, { error: `You're not authorized!` })
 });
