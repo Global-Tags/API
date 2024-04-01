@@ -9,8 +9,7 @@ import access from "./middleware/AccessLog";
 import checkDatabase from "./middleware/DatabaseChecker";
 import Ratelimiter from "./libs/Ratelimiter";
 import checkRatelimit from "./middleware/RatelimitChecker";
-import { ip } from "elysia-ip";
-import { NotificationType, sendMessage } from "./libs/DiscordNotifier";
+import { ip } from "./middleware/ObtainIP";
 
 // Elysia API
 export const api = new Elysia()
@@ -19,7 +18,7 @@ export const api = new Elysia()
 .onBeforeHandle(checkRatelimit)
 .get(`/`, () => ({ version }))
 .get(`/ping`, ({ error }: Context) => { return error(204, "") })
-.use(ip())
+.use(ip({ checkHeaders: ['x-real-ip'] }))
 .use(swagger({
     autoDarkMode: true,
     swaggerOptions: {

@@ -45,7 +45,7 @@ export default class Ratelimiter {
 
     public ratelimitResponse({ set, error, ip }: IpContext): any {
         if(!Ratelimiter.enabled) return;
-        const ratelimitData = this.getRatelimitData(ip?.address);
+        const ratelimitData = this.getRatelimitData(ip);
         set.headers[`X-RateLimit-Limit`] = String(this.maxRequests);
         set.headers[`X-RateLimit-Remaining`] = String(ratelimitData.remaining);
         set.headers[`X-RateLimit-Reset`] = String(ratelimitData.reset / 1000);
