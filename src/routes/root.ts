@@ -22,14 +22,26 @@ export default new Elysia()
 
     return {
         uuid: player.uuid,
-        tag: player.tag,
+        tag: player.tag!,
         position: player.position,
         icon: player.icon,
         admin: player.admin
     };
 }, {
-    params: t.Object({ uuid: t.String() }),
-    headers: t.Object({ authorization: config.requireSessionIds ? t.String({ error: `You're not authorized!` }) : t.Optional(t.String()) }, { error: `You're not authorized!` })
+    detail: {
+        tags: ['Interactions'],
+        description: `Get another players' tag info`
+    },
+    response: {
+        200: t.Object({ uuid: t.String(), tag: t.Optional(t.String()), position: t.String(), icon: t.String(), admin: t.Boolean({ default: false }) }, { description: `You received the tag data.` }),
+        401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
+        403: t.Object({ error: t.String() }, { description: `The player is banned.` }),
+        404: t.Object({ error: t.String() }, { description: `The player is not in the database.` }),
+        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    },
+    params: t.Object({ uuid: t.String({ description: `The uuid of the player you want to fetch the info of` }) }),
+    headers: t.Object({ authorization: config.requireSessionIds ? t.String({ error: `You're not authorized!`, description: `Your LabyConnect JWT` }) : t.Optional(t.String({ description: `Your LabyConnect JWT` })) }, { error: `You're not authorized!` }),
 }).post(`/`, async ({ error, params, headers, body }) => { // Change tag
     const uuid = params.uuid.replaceAll(`-`, ``);
     const tag = body.tag;
@@ -44,12 +56,8 @@ export default new Elysia()
     const { blacklist, watchlist, min, max } = config.validation.tag;
     if(!tag || tag.length <= min || tag.length > max) return error(400, { error: `The tag has to be between ${min} and ${max} characters.` });
     if(tag.trim() == '') return error(400, { error: `The tag must not be empty!` });
-    if(blacklist.some((word) => {
-        if(tag.replace(colorCodeRegex, ``).toLowerCase().includes(word)) {
-            error(400, { error: `You're not allowed to include "${word}" in your Global Tag!` });
-            return true;
-        } else return false;
-    })) return;
+    const blacklistedWord = blacklist.find((word) => tag.replace(colorCodeRegex, ``).toLowerCase().includes(word));
+    if(blacklistedWord) return error(400, { error: `You're not allowed to include "${blacklistedWord}" in your Global Tag!` });;
     const isWatched = (player && player.watchlist) || watchlist.some((word) => {
         if(tag.replace(colorCodeRegex, ``).toLowerCase().includes(word)) {
             Logger.warn(`Now watching ${uuid} for matching "${word}" in "${tag}".`);
@@ -67,7 +75,7 @@ export default new Elysia()
             history: [tag]
         }).save();
     } else {
-        if(player.tag == tag) return error(400, { error: `You already have this tag!` });
+        if(player.tag == tag) return error(406, { error: `You already have this tag!` });
 
         player.tag = tag;
         if(isWatched) player.watchlist = true;
@@ -78,9 +86,22 @@ export default new Elysia()
     if(isWatched) sendMessage({ type: NotificationType.WatchlistTagUpdate, uuid, tag });
     return { message: `Your tag was successfully updated!` };
 }, {
-    params: t.Object({ uuid: t.String() }),
+    detail: {
+        tags: ['Settings'],
+        description: `Change your global tag`
+    },
+    response: {
+        200: t.Object({ message: t.String() }, { description: `The player was successfully reported` }),
+        400: t.Object({ error: t.String() }, { description: `Your tag contains a blacklisted word.` }),
+        401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
+        403: t.Object({ error: t.String() }, { description: `You're banned.` }),
+        406: t.Object({ error: t.String() }, { description: `You already have this tag.` }),
+        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    },
+    params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
     body: t.Object({ tag: t.String({ error: `Missing field "tag".` }) }, { error: `Missing field "tag".` }),
-    headers: t.Object({ authorization: t.String({ error: `You're not authorized!` }) }, { error: `You're not authorized!` })
+    headers: t.Object({ authorization: t.String({ error: `You're not authorized!`, description: `Your LabyConnect JWT` }) }, { error: `You're not authorized!` })
 }).delete(`/`, async ({ error, params, headers }) => { // Delete tag
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
@@ -99,6 +120,18 @@ export default new Elysia()
 
     return { message: `Your tag was successfully reset!` };
 }, {
-    params: t.Object({ uuid: t.String() }),
-    headers: t.Object({ authorization: t.String({ error: `You're not authorized!` }) }, { error: `You're not authorized!` })
+    detail: {
+        tags: ['Settings'],
+        description: `Delete your global tag`
+    },
+    response: {
+        200: t.Object({ message: t.String() }, { description: `The player was successfully reported` }),
+        401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
+        403: t.Object({ error: t.String() }, { description: `You're banned.` }),
+        404: t.Object({ error: t.String() }, { description: `You don't have a tag.` }),
+        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    },
+    params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
+    headers: t.Object({ authorization: t.String({ error: `You're not authorized!`, description: `Your LabyConnect JWT` }) }, { error: `You're not authorized!` })
 });

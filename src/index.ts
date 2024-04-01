@@ -1,4 +1,4 @@
-import { Context, Elysia } from "elysia";
+import { Context, Elysia, t } from "elysia";
 import { swagger } from "@elysiajs/swagger";
 import Logger from "./libs/Logger";
 import { connect } from "./database/mongo";
@@ -16,27 +16,52 @@ export const api = new Elysia()
 .onRequest(checkDatabase)
 .onTransform(access)
 .onBeforeHandle(checkRatelimit)
-.get(`/`, () => ({ version }))
-.get(`/ping`, ({ error }: Context) => { return error(204, "") })
+.get(`/`, () => ({ version }), {
+    detail: {
+        tags: [`API`],
+        description: `Returns the API version. Used by the /gt command of the addon.`
+    },
+    response: {
+        200: t.Object({ version: t.String() }, { description: `You received the version` }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    }
+})
+.get(`/ping`, ({ error }: Context) => { return error(204, "") }, {
+    detail: {
+        tags: [`API`],
+        description: `Used by uptime checkers. This route is not being logged`
+    },
+    response: {
+        204: t.Null({ description: `The server is reachable` }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    }
+})
 .use(ip({ checkHeaders: ['x-real-ip'] }))
 .use(swagger({
+    path: '/docs',
     autoDarkMode: true,
-    swaggerOptions: {
-        tryItOutEnabled: false
-    },
     exclude: [
-        `/players/{uuid}/ban/`
+        `/players/{uuid}/ban/`,
+        `/docs`,
+        `/docs/json`
     ],
     documentation: {
         info: {
             version,
-            title: `GlobalTags LabyMod Addon API`,
+            title: `GlobalTags API`,
+            description: `This documentation is for the API of the GlobalTags addon for the LabyMod Minecraft client.`,
             contact: {
                 name: `RappyTV`,
                 url: `https://www.rappytv.com`,
                 email: `contact@rappytv.com`
             }
-        }
+        },
+        tags: [
+            { name: `Docs`, description: `Read about the API usage` },
+            { name: `API`, description: `Get info about the API` },
+            { name: `Interactions`, description: `Interact with other players` },
+            { name: `Settings`, description: `Modify the settings of your global tag` }
+        ]
     }
 }))
 .use(getRouter(`/players/:uuid`, __dirname))
