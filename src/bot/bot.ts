@@ -61,3 +61,4 @@ export const modals = new Collection<string, Modal>();
 })();
 
 export const spawn = () => client.login(config.bot.token);
+export const destroy = () => client.destroy();
