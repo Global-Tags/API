@@ -32,7 +32,7 @@ export const api = new Elysia()
         description: `Used by uptime checkers. This route is not being logged`
     },
     response: {
-        204: t.Null({ description: `The server is reachable` }),
+        204: t.Any({ description: `The server is reachable` }),
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     }
 })
