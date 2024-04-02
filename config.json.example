@@ -1,6 +1,6 @@
 {
     "port": 5000,
-    "proxied": true,
+    "ipHeaders": ["x-real-ip"],
     "requireSessionIds": true,
     "logLevel": "Info", // Error, Warn, Info or Debug
     "logTimeFormat": "YYYY-MM-DD HH:mm:ss",

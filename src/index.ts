@@ -36,7 +36,7 @@ export const api = new Elysia()
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     }
 })
-.use(ip({ checkHeaders: ['x-real-ip'] }))
+.use(ip({ checkHeaders: config.ipHeaders }))
 .use(swagger({
     path: '/docs',
     autoDarkMode: true,
