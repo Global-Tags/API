@@ -18,8 +18,8 @@ export default new Elysia({
     if(!player) return error(404, { error: `You don't have a tag!` });
     if(player.isBanned()) return error(403, { error: `You are banned!` });
     if(!player.tag) return error(404, { error: `Please set a tag first!` });
-    if(icon == player.icon) return error(406, { error: `You already chose this icon!` });
-    if(config.validation.icon.blacklist.includes(icon.toLowerCase())) return error(406, { error: `You're not allowed to choose this icon!` });
+    if(icon == player.icon) return error(400, { error: `You already chose this icon!` });
+    if(config.validation.icon.blacklist.includes(icon.toLowerCase())) return error(422, { error: `You're not allowed to choose this icon!` });
 
     player.icon = icon;
     await player.save();
@@ -32,10 +32,11 @@ export default new Elysia({
     },
     response: {
         200: t.Object({ message: t.String() }, { description: `The icon was successfully changed` }),
+        400: t.Object({ error: t.String() }, { description: `You tried chose an icon that you're already using.` }),
         401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
         403: t.Object({ error: t.String() }, { description: `You're banned.` }),
         404: t.Object({ error: t.String() }, { description: `You don't have a tag to change the icon of.` }),
-        406: t.Object({ error: t.String() }, { description: `You tried chose an icon that you're already using or which is blacklisted.` }),
+        422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
         429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },

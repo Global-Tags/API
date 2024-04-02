@@ -23,6 +23,7 @@ export default new Elysia({
     params: t.Object({ uuid: t.String() }),
     headers: t.Object({ authorization: t.String({ error: `You're not authorized!` }) }, { error: `You're not authorized!` })
 }).post(`/`, async ({ error, params, headers, body }) => { // Ban player
+    console.log(body.reason);
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
     const authenticated = authorization && validJWTSession(authorization, uuid, false);
@@ -45,7 +46,7 @@ export default new Elysia({
 
     return { message: `The player was successfully banned!` };
 }, {
-    body: t.Object({ reason: t.String({ error: `Missing field "reason".` }) }, { error: `Missing field "reason".` }),
+    body: t.Object({ reason: t.Optional(t.String()) }, { error: `Unexpected value in body` }),
     params: t.Object({ uuid: t.String() }),
     headers: t.Object({ authorization: t.String({ error: `You're not authorized!` }) }, { error: `You're not authorized!` })
 }).delete(`/`, async ({ error, params, headers, body }) => { // Unban player

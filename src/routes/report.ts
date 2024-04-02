@@ -16,15 +16,15 @@ export default new Elysia({
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: `This player does not have a tag!` });
-    if(player.isBanned()) return error(406, { error: `The player is already banned!` });
+    if(player.isBanned()) return error(403, { error: `The player is already banned!` });
     if(player.admin) return error(403, { error: `You can't report admins!` });
     if(!player.tag) return error(404, { error: `This player does not have a tag!` });
 
     const reporterUuid = getUuidByJWT(authorization)!;
-    if(reporterUuid == uuid) return error(406, { error: `You can't report yourself!` });
-    if(player.reports.some((report) => report.by == reporterUuid && report.reportedName == player.tag)) return error(400, { error: `You already reported this player's tag!` });
+    if(reporterUuid == uuid) return error(403, { error: `You can't report yourself!` });
+    if(player.reports.some((report) => report.by == reporterUuid && report.reportedName == player.tag)) return error(403, { error: `You already reported this player's tag!` });
     const { reason } = body;
-    if(!reason || typeof reason != 'string' || reason.trim() == ``) return error(400, { error: `You have to provide a valid reason!` });
+    if(reason.trim() == ``) return error(422, { error: `You have to provide a valid reason!` });
 
     player.reports.push({
         by: reporterUuid || undefined,
@@ -48,15 +48,14 @@ export default new Elysia({
     },
     response: {
         200: t.Object({ message: t.String() }, { description: `The player was successfully reported` }),
-        400: t.Object({ error: t.String() }, { description: `You provided an invalid reason.` }),
         401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
-        403: t.Object({ error: t.String() }, { description: `You tried to report an admin.` }),
+        403: t.Object({ error: t.String() }, { description: `You have tried to report someone whom you are not allowed to report.` }),
         404: t.Object({ error: t.String() }, { description: `The player you tried to report does not have a tag.` }),
-        406: t.Object({ error: t.String() }, { description: `You tried to report yourself or a player which is already banned.` }),
+        422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
         429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },
-    body: t.Object({ reason: t.String({ error: `Missing field "reason".`, description: `Why do you want to report the player` }) }, { error: `Missing field "reason".` }),
+    body: t.Object({ reason: t.String({ minLength: 2, maxLength: 200, error: `Invalid reason.`, description: `Why do you want to report the player` }) }, { error: `Missing field "reason".` }),
     params: t.Object({ uuid: t.String({ description: `The UUID of the player you want to report` }) }),
     headers: t.Object({ authorization: t.String({ error: `You're not authorized!`, description: `Your LabyConnect JWT` }) }, { error: `You're not authorized!` })
 });

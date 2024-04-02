@@ -53,11 +53,10 @@ export default new Elysia()
     
     const player = await players.findOne({ uuid });
     if(player && player.isBanned()) return error(403, { error: `You are banned from changing your tag!` });
-    const { blacklist, watchlist, min, max } = config.validation.tag;
-    if(!tag || tag.length <= min || tag.length > max) return error(400, { error: `The tag has to be between ${min} and ${max} characters.` });
-    if(tag.trim() == '') return error(400, { error: `The tag must not be empty!` });
+    const { blacklist, watchlist } = config.validation.tag;
+    if(tag.trim() == '') return error(422, { error: `The tag must not be empty!` });
     const blacklistedWord = blacklist.find((word) => tag.replace(colorCodeRegex, ``).toLowerCase().includes(word));
-    if(blacklistedWord) return error(400, { error: `You're not allowed to include "${blacklistedWord}" in your Global Tag!` });;
+    if(blacklistedWord) return error(422, { error: `You're not allowed to include "${blacklistedWord}" in your Global Tag!` });;
     const isWatched = (player && player.watchlist) || watchlist.some((word) => {
         if(tag.replace(colorCodeRegex, ``).toLowerCase().includes(word)) {
             Logger.warn(`Now watching ${uuid} for matching "${word}" in "${tag}".`);
@@ -75,7 +74,7 @@ export default new Elysia()
             history: [tag]
         }).save();
     } else {
-        if(player.tag == tag) return error(406, { error: `You already have this tag!` });
+        if(player.tag == tag) return error(400, { error: `You already have this tag!` });
 
         player.tag = tag;
         if(isWatched) player.watchlist = true;
@@ -92,15 +91,15 @@ export default new Elysia()
     },
     response: {
         200: t.Object({ message: t.String() }, { description: `The player was successfully reported` }),
-        400: t.Object({ error: t.String() }, { description: `Your tag contains a blacklisted word.` }),
+        400: t.Object({ error: t.String() }, { description: `You already have this tag.` }),
         401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
         403: t.Object({ error: t.String() }, { description: `You're banned.` }),
-        406: t.Object({ error: t.String() }, { description: `You already have this tag.` }),
+        422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
         429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },
     params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
-    body: t.Object({ tag: t.String({ error: `Missing field "tag".` }) }, { error: `Missing field "tag".` }),
+    body: t.Object({ tag: t.String({ minLength: config.validation.tag.min, maxLength: config.validation.tag.max, error: `The tag has to be between ${config.validation.tag.min} and ${config.validation.tag.max} characters.` }) }, { error: `Missing field "tag".` }),
     headers: t.Object({ authorization: t.String({ error: `You're not authorized!`, description: `Your LabyConnect JWT` }) }, { error: `You're not authorized!` })
 }).delete(`/`, async ({ error, params, headers }) => { // Delete tag
     const uuid = params.uuid.replaceAll(`-`, ``);
