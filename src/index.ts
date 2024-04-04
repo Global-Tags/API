@@ -57,7 +57,6 @@ export default new Elysia()
             }
         },
         tags: [
-            { name: `Docs`, description: `Read about the API usage` },
             { name: `API`, description: `Get info about the API` },
             { name: `Interactions`, description: `Interact with other players` },
             { name: `Settings`, description: `Modify the settings of your global tag` }
