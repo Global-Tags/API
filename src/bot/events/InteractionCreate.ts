@@ -1,15 +1,13 @@
-const { Interaction, EmbedBuilder } = require(`discord.js`);
+import { CommandInteractionOptionResolver, EmbedBuilder, GuildMember, Interaction } from "discord.js";
+import Event from "../structs/Event";
+import * as bot from "../bot";
 
-module.exports = {
-    name: `interactionCreate`,
-    once: false,
+export default class InteractionCreate extends Event {
+    constructor() {
+        super("interactionCreate", false);
+    }
 
-    /**
-     * 
-     * @param {Interaction} interaction 
-     */
-
-    async action(interaction) {
+    async fire(interaction: Interaction) {
         if(interaction.isChatInputCommand()) {
             const { member, user, commandName, options } = interaction;
             const cmd = bot.commands.get(commandName);
@@ -17,8 +15,8 @@ module.exports = {
             if(!cmd) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ Unknown command!`)], ephemeral: true });
 
             try {
-                cmd.execute(interaction, options, member, user);
-            } catch(err) {
+                cmd.execute(interaction, options as CommandInteractionOptionResolver, member as GuildMember, user);
+            } catch(err: any) {
                 if(!interaction.replied) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setTitle(`❌ An error ocurred!`).setDescription(err)], ephemeral: true });
             }
         } else if(interaction.isButton()) {
@@ -28,8 +26,8 @@ module.exports = {
             if(!btn) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ Unknown button!`)], ephemeral: true });
 
             try {
-                btn.execute(interaction, message, member, user);
-            } catch(err) {
+                btn.trigger(interaction, message, member as GuildMember, user);
+            } catch(err: any) {
                 if(!interaction.replied) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setTitle(`❌ An error ocurred!`).setDescription(err)], ephemeral: true });
             }
         } else if(interaction.isModalSubmit()) {
@@ -39,8 +37,8 @@ module.exports = {
             if(!modal) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ Unknown modal!`)], ephemeral: true });
 
             try {
-                modal.execute(interaction, message, fields, member, user);
-            } catch(err) {
+                modal.submit(interaction, message!, fields, member as GuildMember, user);
+            } catch(err: any) {
                 if(!interaction.replied) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setTitle(`❌ An error ocurred!`).setDescription(err)], ephemeral: true });
             }
         }

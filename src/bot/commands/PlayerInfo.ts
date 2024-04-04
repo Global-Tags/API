@@ -1,29 +1,29 @@
-const { default: axios } = require("axios");
-const { CommandInteraction, CommandInteractionOptionResolver, GuildMember, User, ApplicationCommandOptionType, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, User } from "discord.js";
+import Command from "../structs/Command";
+import axios from "axios";
+import players from "../../database/schemas/players";
+import * as bot from "../bot";
+import * as config from "../../../config.json";
 const regex = /[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}|[a-f0-9]{8}(?:[a-f0-9]{4}){4}[a-f0-9]{8}/;
 
-module.exports = {
-    name: `playerinfo`,
-    description: `Fetches GlobalTag data about a player.`,
-    options: [
-        {
-            name: `player`,
-            description: `Either the player name or the player's minecraft uuid.`,
-            required: true,
-            type: ApplicationCommandOptionType.String
-        }
-    ],
+export default class PlayerInfo extends Command {
+    constructor() {
+        super(
+            "playerinfo",
+            "Fetches GlobalTag data about a player.",
+            [
+                {
+                    name: `player`,
+                    description: `Either the player name or the player's minecraft uuid.`,
+                    required: true,
+                    type: ApplicationCommandOptionType.String
+                }
+            ]
+        );
+    }
 
-    /**
-     * 
-     * @param {CommandInteraction} interaction 
-     * @param {CommandInteractionOptionResolver} options 
-     * @param {GuildMember} member 
-     * @param {User} user 
-     */
-
-    async execute(interaction, options, member, user) {
-        let name, uuid = options.getString(`player`);
+    async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, user: User) {
+        let name, uuid = options.getString(`player`)!;
         if(!regex.test(uuid)) {
             try {
                 const res = await axios({
@@ -33,12 +33,12 @@ module.exports = {
 
                 uuid = res.data.id;
                 name = res.data.name;
-            } catch(err) {
+            } catch(err: any) {
                 console.log(`[ERROR] Mojang API error: ${err?.response?.data || `Undefined data`}`);
-                return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ ${err?.response?.data?.errorMessage || `An error ocurred with the request to mojang`}`)], ephemeral: true });
+                return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ ${err?.response?.data.errorMessage || `An error ocurred with the request to mojang`}`)], ephemeral: true });
             }
         }
-        const data = await server.db.players.findOne({ uuid: uuid.replaceAll(`-`, ``) });
+        const data = await players.findOne({ uuid: uuid.replaceAll(`-`, ``) });
 
         if(!data) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ This player is not in our records!`)], ephemeral: true });
         interaction.reply({
@@ -54,7 +54,7 @@ module.exports = {
                     },
                     {
                         name: `Tag`,
-                        value: `\`\`\`ansi\n${translateColors(data.ban.active ? `Hidden because user is banned` : data.tag || `--`)}\`\`\``
+                        value: `\`\`\`ansi\n${translateColors(data.ban?.active ? `Hidden because user is banned` : data.tag || `--`)}\`\`\``
                     },
                     {
                         name: `Position`,
@@ -73,20 +73,20 @@ module.exports = {
                     },
                     {
                         name: `Banned`,
-                        value: `\`\`\`ansi\n${translateColors(data.ban.active ? `&cYes` : `&aNo`)}\`\`\``,
+                        value: `\`\`\`ansi\n${translateColors(data.ban?.active ? `&cYes` : `&aNo`)}\`\`\``,
                         inline: true
                     },
                     {
                         name: `Ban reason`,
-                        value: `\`\`\`${data.ban.active ? data.ban.reason || `--` : `--`}\`\`\``,
+                        value: `\`\`\`${data.ban?.active ? data.ban?.reason || `--` : `--`}\`\`\``,
                         inline: true
                     }
                 ])
                 .setImage(`https://cdn.rappytv.com/bots/placeholder.png`)
                 .setFooter({ text: `© RappyTV, ${new Date().getFullYear()}`})
             ],
-            components: !bot.cfg.staff.includes(user.id) ? [] : [
-                new ActionRowBuilder()
+            components: !(config.bot.staff as Array<string>).includes(user.id) ? [] : [
+                new ActionRowBuilder<ButtonBuilder>()
                     .addComponents(
                         new ButtonBuilder()
                         .setLabel(`Actions`)
@@ -98,13 +98,7 @@ module.exports = {
     }
 }
 
-/**
- * 
- * @param {string} text 
- * @returns {string}
- */
-
-function translateColors(text) {
+function translateColors(text: string): string {
     return text
         .replaceAll(/(&|§)0/gi, `[0;30m`)
         .replaceAll(/(&|§)7/gi, `[0;30m`)

@@ -1,63 +1,63 @@
-const { SchemaTypes, Schema, model } = require('mongoose');
+import { Schema, model } from "mongoose";
 
-const player = new Schema({
+const schema = new Schema({
     uuid: {
-        type: SchemaTypes.String,
+        type: String,
         required: true,
         unique: true
     },
-    tag: SchemaTypes.String,
+    tag: String,
     position: {
-        type: SchemaTypes.String,
+        type: String,
         enum: [`ABOVE`, `BELOW`, `RIGHT`, `LEFT`],
         required: true,
         default: `ABOVE`
     },
     icon: {
-        type: SchemaTypes.String,
+        type: String,
         required: true,
         default: `NONE`
     },
     history: {
-        type: [SchemaTypes.String],
+        type: [String],
         required: true,
         default: []
     },
     watchlist: {
-        type: SchemaTypes.Boolean,
+        type: Boolean,
         required: true,
         default: false
     },
     reports: {
         type: [
             {
-                by: SchemaTypes.String,
-                reportedName: SchemaTypes.String,
-                reason: SchemaTypes.String
+                by: String,
+                reportedName: String,
+                reason: String
             }
         ],
         required: true,
         default: []
     },
     admin: {
-        type: SchemaTypes.Boolean,
+        type: Boolean,
         required: true,
         default: false
     },
     ban: {
         active: {
-            type: SchemaTypes.Boolean,
+            type: Boolean,
             required: true,
             default: false
         },
-        reason: SchemaTypes.String,
+        reason: String,
     }
 }, {
     methods: {
-        isBanned() {
-            return this.ban.active;
+        isBanned(): boolean {
+            return this.ban?.active || false;
         }
     }
 });
 
-module.exports = model('players', player);
+export default model('players', schema);

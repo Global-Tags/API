@@ -1,22 +1,17 @@
-const { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } = require("discord.js");
+import { ButtonInteraction, CacheType, Message, GuildMember, User, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import Button from "../structs/Button";
 
-module.exports = {
-    id: `ban`,
+export default class Ban extends Button {
+    constructor() {
+        super("ban");
+    }
 
-    /**
-     * 
-     * @param {ButtonInteraction} interaction 
-     * @param {Message} message 
-     * @param {GuildMember} member 
-     * @param {User} user 
-     */
-
-    async execute(interaction, message, member, user) {
+    public trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
         const modal = new ModalBuilder()
         .setTitle(`Ban player`)
         .setCustomId(`ban`)
         .addComponents(
-            new ActionRowBuilder()
+            new ActionRowBuilder<TextInputBuilder>()
             .addComponents(
                 new TextInputBuilder()
                 .setLabel(`Reason`)

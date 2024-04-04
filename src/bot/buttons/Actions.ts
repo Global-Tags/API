@@ -1,18 +1,15 @@
-const { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle, ButtonStyle, ButtonBuilder } = require("discord.js");
+import { ButtonInteraction, CacheType, Message, GuildMember, User, ButtonStyle, ButtonBuilder, ActionRowBuilder, EmbedBuilder } from "discord.js";
+import Button from "../structs/Button";
+import * as config from "../../../config.json";
+import { colors } from "../bot";
 
-module.exports = {
-    id: `actions`,
+export default class Actions extends Button {
+    constructor() {
+        super("actions");
+    }
 
-    /**
-     * 
-     * @param {ButtonInteraction} interaction 
-     * @param {Message} message 
-     * @param {GuildMember} member 
-     * @param {User} user 
-     */
-
-    async execute(interaction, message, member, user) {
-        if(!bot.cfg.staff.includes(user.id)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ You don't have permissions!`)], ephemeral: true });
+    public trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
+        if(!config.bot.staff.includes(user.id)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You don't have permissions!`)], ephemeral: true });
         const uuid = message.embeds[0].fields[0].value.replaceAll(`\``, ``);
 
         const embed = new EmbedBuilder()
@@ -25,7 +22,7 @@ module.exports = {
         });
 
         const rows = [
-            new ActionRowBuilder()
+            new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
                 .setLabel(`Watch`)
@@ -36,7 +33,7 @@ module.exports = {
                 .setCustomId(`unwatch`)
                 .setStyle(ButtonStyle.Primary)
             ),
-            new ActionRowBuilder()
+            new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
                 .setLabel(`Ban`)
@@ -46,6 +43,13 @@ module.exports = {
                 .setLabel(`Clear tag`)
                 .setCustomId(`clearTag`)
                 .setStyle(ButtonStyle.Danger)
+            ),
+            new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(
+                new ButtonBuilder()
+                .setLabel(`Unban`)
+                .setCustomId(`unban`)
+                .setStyle(ButtonStyle.Success)
             )
         ]
 
