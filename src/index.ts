@@ -12,7 +12,7 @@ import checkRatelimit from "./middleware/RatelimitChecker";
 import { ip } from "./middleware/ObtainIP";
 
 // Elysia API
-export default new Elysia()
+export const elysia = new Elysia()
 .onRequest(checkDatabase)
 .onTransform(access)
 .onBeforeHandle(checkRatelimit)
