@@ -76,7 +76,3 @@ export default class Ratelimiter {
         };
     }
 }
-
-function getValueFromRegex(path: string, map: Map<string, Ratelimiter>) {
-    
-  }
