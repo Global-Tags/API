@@ -10,11 +10,11 @@ import checkDatabase from "./middleware/DatabaseChecker";
 import Ratelimiter from "./libs/Ratelimiter";
 import checkRatelimit from "./middleware/RatelimitChecker";
 import { ip } from "./middleware/ObtainIP";
-import { Language, getLocales, getPath } from "./libs/I18n";
+import { getLocales, getPath, load } from "./libs/I18n";
 
 // Elysia API
 export const elysia = new Elysia()
-// .onRequest(checkDatabase)
+.onRequest(checkDatabase)
 .onTransform(access)
 .onBeforeHandle(checkRatelimit)
 .get(`/`, () => ({ version }), {
@@ -40,7 +40,7 @@ export const elysia = new Elysia()
 .use(ip({ checkHeaders: config.ipHeaders }))
 .use((app) => {
     return app.derive({ as: 'global' }, ({ headers }) => {
-        const header = headers[`X-Minecraft-Language`] || `en-US`;
+        const header = headers[`x-minecraft-language`] || `en-US`;
         const locales = getLocales(header);
         return {
             i18n: (path: string) => getPath(path, locales)
@@ -77,8 +77,10 @@ export const elysia = new Elysia()
 .onStart(() => {
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
+    // Load languages
+    load();
 
-    // connect(config.srv);
+    connect(config.srv);
 }).onError(({ code, set, error }) => {
     if(code == 'VALIDATION') {
         set.status = 422;
