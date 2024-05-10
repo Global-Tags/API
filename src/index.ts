@@ -41,7 +41,7 @@ export const elysia = new Elysia()
 .use(ip({ checkHeaders: config.ipHeaders }))
 .use((app) => {
     return app.derive({ as: 'global' }, ({ headers }) => {
-        const header = headers[`x-minecraft-language`] || `en-US`;
+        const header = headers[`x-minecraft-language`] || `en_us`;
         const locales = getLocales(header);
         return {
             i18n: (path: string) => getPath(path, locales)
