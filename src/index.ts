@@ -11,6 +11,7 @@ import Ratelimiter from "./libs/Ratelimiter";
 import checkRatelimit from "./middleware/RatelimitChecker";
 import { ip } from "./middleware/ObtainIP";
 import { getLocales, getPath, load } from "./libs/I18n";
+import { CronJob } from "cron";
 
 // Elysia API
 export const elysia = new Elysia()
@@ -78,7 +79,8 @@ export const elysia = new Elysia()
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
     // Load languages
-    load();
+    load(false);
+    new CronJob(`0 */6 * * *`, () => load(true), null, true);
 
     connect(config.srv);
 }).onError(({ code, set, error }) => {
