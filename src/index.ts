@@ -83,17 +83,17 @@ export const elysia = new Elysia()
     new CronJob(`0 */6 * * *`, () => load(true), null, true);
 
     connect(config.srv);
-}).onError(({ code, set, error }) => {
+}).onError(({ code, set, error, i18n }) => {
     if(code == 'VALIDATION') {
         set.status = 422;
-        return { error: error.message };
+        return { error: i18n(error.message) };
     } else if(code == 'NOT_FOUND') {
         set.status = 404;
-        return { error: `Not Found` };
+        return { error: i18n(`errors.notFound`) };
     } else {
         set.status = 500;
         Logger.error(error.message);
-        return { error: `An unknown error ocurred! Please try again later` };
+        return { error: i18n(`errors.unknownError`) };
     }
 })
 .listen(config.port);
