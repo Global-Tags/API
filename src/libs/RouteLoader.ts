@@ -3,7 +3,7 @@ import { readdirSync } from "fs";
 import { join } from "path";
 import Logger from "./Logger";
 
-export async function getRouter(prefix: string, dirname: string): Promise<Elysia> {
+export async function getRouter(prefix: string, dirname: string) {
     const app = new Elysia({ prefix });
     const directory = join(dirname, 'routes')
     for(const file of readdirSync(directory)) {
