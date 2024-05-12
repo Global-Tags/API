@@ -26,8 +26,8 @@ export async function load(refetch: boolean) {
         const id = file.replace(`.json`, '');
         const locales = await import(join(localeDir, file)) as Language;
         languages.set(id, locales);
-        Logger.debug(`Loaded language ${id}`);
     }
+    Logger.debug(`Loaded ${languages.size} languages`);
 }
 
 export function getLocales(language: string): Language {
