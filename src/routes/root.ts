@@ -4,25 +4,26 @@ import Logger from "../libs/Logger";
 import { sendMessage, NotificationType } from "../libs/DiscordNotifier";
 import { validJWTSession } from "../libs/SessionValidator";
 import * as config from "../../config.json";
+import fetchI18n from "../middleware/FetchI18n";
 
 const colorCodeRegex = /(&|§)[0-9A-FK-ORX]/gi;
 
 export default new Elysia()
-.get(`/`, async ({ error, params, headers }) => { // Get player info
+.use(fetchI18n).get(`/`, async ({ error, params, headers, i18n }) => { // Get player info
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
     const authenticated = authorization && validJWTSession(authorization, uuid, false);
 
-    if(authorization == `0`) return error(401, { error: `You need a premium account to use this feature!` });
-    if(config.requireSessionIds && !authenticated) return error(401, { error: `You're not allowed to perform that request!` });
+    if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
+    if(config.requireSessionIds && !authenticated) return error(401, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: `This player does not have a tag!` });
-    if(player.isBanned()) return error(403, { error: `This player is banned!` });
+    if(!player) return error(404, { error: i18n(`error.playerNoTag`) });
+    if(player.isBanned()) return error(403, { error: i18n(`getInfo.banned`) });
 
     return {
         uuid: player.uuid,
-        tag: player.tag!,
+        tag: player.tag || null,
         position: player.position,
         icon: player.icon,
         admin: player.admin
@@ -33,7 +34,7 @@ export default new Elysia()
         description: `Get another players' tag info`
     },
     response: {
-        200: t.Object({ uuid: t.String(), tag: t.Optional(t.String()), position: t.String(), icon: t.String(), admin: t.Boolean({ default: false }) }, { description: `You received the tag data.` }),
+        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.String(), admin: t.Boolean({ default: false }) }, { description: `You received the tag data.` }),
         401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
         403: t.Object({ error: t.String() }, { description: `The player is banned.` }),
         404: t.Object({ error: t.String() }, { description: `The player is not in the database.` }),
@@ -42,21 +43,21 @@ export default new Elysia()
     },
     params: t.Object({ uuid: t.String({ description: `The uuid of the player you want to fetch the info of` }) }),
     headers: t.Object({ authorization: config.requireSessionIds ? t.String({ error: `You're not authorized!`, description: `Your LabyConnect JWT` }) : t.Optional(t.String({ description: `Your LabyConnect JWT` })) }, { error: `You're not authorized!` }),
-}).post(`/`, async ({ error, params, headers, body }) => { // Change tag
+}).post(`/`, async ({ error, params, headers, body, i18n }) => { // Change tag
     const uuid = params.uuid.replaceAll(`-`, ``);
     const tag = body.tag;
     const { authorization } = headers;
     const authenticated = authorization && validJWTSession(authorization, uuid, true);
 
-    if(authorization == `0`) return error(401, { error: `You need a premium account to set a global tag!` });
-    if(!authenticated) return error(401, { error: `You're not allowed to perform that request!` });
+    if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
+    if(!authenticated) return error(401, { error: i18n(`error.notAllowed`) });
     
     const player = await players.findOne({ uuid });
-    if(player && player.isBanned()) return error(403, { error: `You are banned from changing your tag!` });
+    if(player && player.isBanned()) return error(403, { error: i18n(`error.banned`) });
     const { blacklist, watchlist } = config.validation.tag;
-    if(tag.trim() == '') return error(422, { error: `The tag must not be empty!` });
+    if(tag.trim() == '') return error(422, { error: i18n(`setTag.empty`) });
     const blacklistedWord = blacklist.find((word) => tag.replace(colorCodeRegex, ``).toLowerCase().includes(word));
-    if(blacklistedWord) return error(422, { error: `You're not allowed to include "${blacklistedWord}" in your Global Tag!` });;
+    if(blacklistedWord) return error(422, { error: i18n(`setTag.blacklisted`).replaceAll(`<word>`, blacklistedWord) });
     const isWatched = (player && player.watchlist) || watchlist.some((word) => {
         if(tag.replace(colorCodeRegex, ``).toLowerCase().includes(word)) {
             Logger.warn(`Now watching ${uuid} for matching "${word}" in "${tag}".`);
@@ -74,7 +75,7 @@ export default new Elysia()
             history: [tag]
         }).save();
     } else {
-        if(player.tag == tag) return error(400, { error: `You already have this tag!` });
+        if(player.tag == tag) return error(400, { error: i18n(`setTag.sameTag`) });
 
         player.tag = tag;
         if(isWatched) player.watchlist = true;
@@ -83,7 +84,7 @@ export default new Elysia()
     }
 
     if(isWatched) sendMessage({ type: NotificationType.WatchlistTagUpdate, uuid, tag });
-    return { message: `Your tag was successfully updated!` };
+    return { message: i18n(`setTag.success`) };
 }, {
     detail: {
         tags: ['Settings'],
@@ -101,23 +102,23 @@ export default new Elysia()
     params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
     body: t.Object({ tag: t.String({ minLength: config.validation.tag.min, maxLength: config.validation.tag.max, error: `The tag has to be between ${config.validation.tag.min} and ${config.validation.tag.max} characters.` }) }, { error: `Missing field "tag".` }),
     headers: t.Object({ authorization: t.String({ error: `You're not authorized!`, description: `Your LabyConnect JWT` }) }, { error: `You're not authorized!` })
-}).delete(`/`, async ({ error, params, headers }) => { // Delete tag
+}).delete(`/`, async ({ error, params, headers, i18n }) => { // Delete tag
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
     const authenticated = authorization && validJWTSession(authorization, uuid, true);
 
-    if(authorization == `0`) return error(401, { error: `You need a premium account to use this feature!` });
-    if(!authenticated) return error(401, { error: `You're not allowed to perform that request!` });
+    if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
+    if(!authenticated) return error(401, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: `You don't have a tag!` });
-    if(player.isBanned()) return error(403, { error: `You are banned!` });
-    if(!player.tag) return error(404, { error: `You don't have a tag!` });
+    if(!player) return error(404, { error: i18n(`error.noTag`) });
+    if(player.isBanned()) return error(403, { error: i18n(`error.banned`) });
+    if(!player.tag) return error(404, { error: i18n(`error.noTag`) });
 
     player.tag = null;
     await player.save();
 
-    return { message: `Your tag was successfully reset!` };
+    return { message: i18n(`resetTag.success`) };
 }, {
     detail: {
         tags: ['Settings'],
