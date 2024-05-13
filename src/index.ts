@@ -10,44 +10,17 @@ import checkDatabase from "./middleware/DatabaseChecker";
 import Ratelimiter from "./libs/Ratelimiter";
 import checkRatelimit from "./middleware/RatelimitChecker";
 import { ip } from "./middleware/ObtainIP";
-import { getLocales, getPath, load } from "./libs/I18n";
+import { load } from "./libs/I18n";
 import { CronJob } from "cron";
+import fetchI18n from "./middleware/FetchI18n";
 
 // Elysia API
 export const elysia = new Elysia()
 .onRequest(checkDatabase)
 .onTransform(access)
 .onBeforeHandle(checkRatelimit)
-.get(`/`, () => ({ version }), {
-    detail: {
-        tags: [`API`],
-        description: `Returns the API version. Used by the /gt command of the addon.`
-    },
-    response: {
-        200: t.Object({ version: t.String() }, { description: `You received the version` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
-    }
-})
-.get(`/ping`, ({ error }: Context) => { return error(204, "") }, {
-    detail: {
-        tags: [`API`],
-        description: `Used by uptime checkers. This route is not being logged`
-    },
-    response: {
-        204: t.Any({ description: `The server is reachable` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
-    }
-})
 .use(ip({ checkHeaders: config.ipHeaders }))
-.use((app) => {
-    return app.derive({ as: 'global' }, ({ headers }) => {
-        const header = headers[`x-minecraft-language`] || `en_us`;
-        const locales = getLocales(header);
-        return {
-            i18n: (path: string) => getPath(path, locales)
-        };
-    })
-})
+.use(fetchI18n)
 .use(swagger({
     path: '/docs',
     autoDarkMode: true,
@@ -75,6 +48,26 @@ export const elysia = new Elysia()
     }
 }))
 .use(getRouter(`/players/:uuid`, __dirname))
+.get(`/`, ({ i18n }) => ({ version: i18n(`error.premiumAccount`) }), {
+    detail: {
+        tags: [`API`],
+        description: `Returns the API version. Used by the /gt command of the addon.`
+    },
+    response: {
+        200: t.Object({ version: t.String() }, { description: `You received the version` }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    }
+})
+.get(`/ping`, ({ error }: Context) => { return error(204, "") }, {
+    detail: {
+        tags: [`API`],
+        description: `Used by uptime checkers. This route is not being logged`
+    },
+    response: {
+        204: t.Any({ description: `The server is reachable` }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    }
+})
 .onStart(() => {
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
@@ -89,11 +82,11 @@ export const elysia = new Elysia()
         return { error: i18n(error.message) };
     } else if(code == 'NOT_FOUND') {
         set.status = 404;
-        return { error: i18n(`errors.notFound`) };
+        return { error: i18n(`error.notFound`) };
     } else {
         set.status = 500;
         Logger.error(error.message);
-        return { error: i18n(`errors.unknownError`) };
+        return { error: i18n(`error.unknownError`) };
     }
 })
 .listen(config.port);
