@@ -74,7 +74,7 @@ export const elysia = new Elysia()
     }, {});
 
     return {
-        time: new Date(),
+        time: Date.now(),
         users: users.length,
         tags,
         admins,
@@ -89,7 +89,7 @@ export const elysia = new Elysia()
     },
     response: {
         200: t.Object({
-            time: t.Date(),
+            time: t.Number({ default: Date.now() }),
             users: t.Number(),
             tags: t.Number(),
             admins: t.Number(),
