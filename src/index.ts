@@ -13,6 +13,7 @@ import { ip } from "./middleware/ObtainIP";
 import { load } from "./libs/I18n";
 import { CronJob } from "cron";
 import fetchI18n from "./middleware/FetchI18n";
+import players from "./database/schemas/players";
 
 // Elysia API
 export const elysia = new Elysia()
@@ -55,6 +56,47 @@ export const elysia = new Elysia()
     },
     response: {
         200: t.Object({ version: t.String() }, { description: `You received the version` }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    }
+})
+.get(`/metrics`, async () => {
+    const users = await players.find();
+    const tags = users.filter((user) => user.tag != null).length;
+    const admins = users.filter((user) => user.admin == true).length;
+    const bans = users.filter((user) => user.isBanned()).length;
+    const positions = (await players.distinct("position")).reduce((object: any, position) => {
+        object[position.toLowerCase()] = users.filter((user) => user.position.toUpperCase() == position.toUpperCase()).length;
+        return object;
+    }, {});
+    const icons = (await players.distinct("icon")).reduce((object: any, icon) => {
+        object[icon.toLowerCase()] = users.filter((user) => user.icon.toUpperCase() == icon.toUpperCase()).length;
+        return object;
+    }, {});
+
+    return {
+        time: new Date(),
+        users: users.length,
+        tags,
+        admins,
+        bans,
+        positions,
+        icons
+    }
+}, {
+    detail: {
+        tags: [`API`],
+        description: `Get API statistics`
+    },
+    response: {
+        200: t.Object({
+            time: t.Date(),
+            users: t.Number(),
+            tags: t.Number(),
+            admins: t.Number(),
+            bans: t.Number(),
+            positions: t.Object({}, { default: {}, additionalProperties: true, description: 'All position counts' }),
+            icons: t.Object({}, { default: {}, additionalProperties: true, description: 'All icon counts' })
+        }, { description: `The server is reachable` }),
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     }
 })
