@@ -10,22 +10,22 @@ enum LogLevel {
 
 export default class Logger {
     public static debug(text: any) {
-        if(LogLevel.Debug > this.getLoglevel()) return;
+        if(LogLevel.Debug > Logger.getLoglevel()) return;
         console.log(chalk.blueBright(`[DEBUG]`), text);
     }
 
     public static info(text: any) {
-        if(LogLevel.Info > this.getLoglevel()) return;
+        if(LogLevel.Info > Logger.getLoglevel()) return;
         console.log(chalk.blue(`[INFO]`), text);
     }
 
     public static warn(text: any) {
-        if(LogLevel.Warn > this.getLoglevel()) return;
+        if(LogLevel.Warn > Logger.getLoglevel()) return;
         console.log(chalk.yellow(`[WARN]`), text);
     }
 
     public static error(text: any) {
-        if(LogLevel.Error > this.getLoglevel()) return;
+        if(LogLevel.Error > Logger.getLoglevel()) return;
         console.log(chalk.red(`[ERROR]`), text);
     }
 

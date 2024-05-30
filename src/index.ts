@@ -13,6 +13,8 @@ import { ip } from "./middleware/ObtainIP";
 import { load } from "./libs/I18n";
 import { CronJob } from "cron";
 import fetchI18n from "./middleware/FetchI18n";
+import { initializeMetrics } from "./libs/Metrics";
+import Metrics from "./database/schemas/metrics";
 
 // Elysia API
 export const elysia = new Elysia()
@@ -58,6 +60,36 @@ export const elysia = new Elysia()
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     }
 })
+.get(`/metrics`, async () => {
+    const metrics = await Metrics.find();
+
+    return metrics.map((metric) => ({
+        time: new Date(metric.createdAt).getTime(),
+        users: metric.players,
+        tags: metric.tags,
+        admins: metric.admins,
+        bans: metric.admins,
+        positions: metric.positions,
+        icons: metric.icons
+    }));
+}, {
+    detail: {
+        tags: [`API`],
+        description: `Get API statistics`
+    },
+    response: {
+        200: t.Array(t.Object({
+            time: t.Number({ default: Date.now() }),
+            users: t.Number(),
+            tags: t.Number(),
+            admins: t.Number(),
+            bans: t.Number(),
+            positions: t.Object({}, { default: {}, additionalProperties: true, description: 'All position counts' }),
+            icons: t.Object({}, { default: {}, additionalProperties: true, description: 'All icon counts' })
+        }, { description: `The server is reachable` })),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    }
+})
 .get(`/ping`, ({ error }: Context) => { return error(204, "") }, {
     detail: {
         tags: [`API`],
@@ -71,6 +103,8 @@ export const elysia = new Elysia()
 .onStart(() => {
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
+    initializeMetrics();
+    
     // Load languages
     load(false);
     new CronJob(`0 */6 * * *`, () => load(true), null, true);
