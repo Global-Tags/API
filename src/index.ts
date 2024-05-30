@@ -68,7 +68,7 @@ export const elysia = new Elysia()
         users: metric.players,
         tags: metric.tags,
         admins: metric.admins,
-        bans: metric.admins,
+        bans: metric.bans,
         positions: metric.positions,
         icons: metric.icons
     }));
