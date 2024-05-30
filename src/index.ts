@@ -11,6 +11,8 @@ import Ratelimiter from "./libs/Ratelimiter";
 import checkRatelimit from "./middleware/RatelimitChecker";
 import { ip } from "./middleware/ObtainIP";
 import players from "./database/schemas/players";
+import { initializeMetrics } from "./libs/Metrics";
+import Metrics from "./database/schemas/metrics";
 
 // Elysia API
 export const elysia = new Elysia()
@@ -28,35 +30,24 @@ export const elysia = new Elysia()
     }
 })
 .get(`/metrics`, async () => {
-    const users = await players.find();
-    const tags = users.filter((user) => user.tag != null).length;
-    const admins = users.filter((user) => user.admin == true).length;
-    const bans = users.filter((user) => user.isBanned()).length;
-    const positions = (await players.distinct("position")).reduce((object: any, position) => {
-        object[position.toLowerCase()] = users.filter((user) => user.position.toUpperCase() == position.toUpperCase()).length;
-        return object;
-    }, {});
-    const icons = (await players.distinct("icon")).reduce((object: any, icon) => {
-        object[icon.toLowerCase()] = users.filter((user) => user.icon.toUpperCase() == icon.toUpperCase()).length;
-        return object;
-    }, {});
+    const metrics = await Metrics.find();
 
-    return {
-        time: Date.now(),
-        users: users.length,
-        tags,
-        admins,
-        bans,
-        positions,
-        icons
-    }
+    return metrics.map((metric) => ({
+        time: new Date(metric.createdAt).getTime(),
+        users: metric.players,
+        tags: metric.tags,
+        admins: metric.admins,
+        bans: metric.admins,
+        positions: metric.positions,
+        icons: metric.icons
+    }));
 }, {
     detail: {
         tags: [`API`],
         description: `Get API statistics`
     },
     response: {
-        200: t.Object({
+        200: t.Array(t.Object({
             time: t.Number({ default: Date.now() }),
             users: t.Number(),
             tags: t.Number(),
@@ -64,7 +55,7 @@ export const elysia = new Elysia()
             bans: t.Number(),
             positions: t.Object({}, { default: {}, additionalProperties: true, description: 'All position counts' }),
             icons: t.Object({}, { default: {}, additionalProperties: true, description: 'All icon counts' })
-        }, { description: `The server is reachable` }),
+        }, { description: `The server is reachable` })),
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     }
 })
@@ -109,6 +100,7 @@ export const elysia = new Elysia()
 .onStart(() => {
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
+    initializeMetrics();
 
     connect(config.srv);
 }).onError(({ code, set, error }) => {
