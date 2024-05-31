@@ -12,7 +12,7 @@ import checkRatelimit from "./middleware/RatelimitChecker";
 import { ip } from "./middleware/ObtainIP";
 import { load } from "./libs/I18n";
 import { CronJob } from "cron";
-import fetchI18n from "./middleware/FetchI18n";
+import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/FetchI18n";
 import { initializeMetrics } from "./libs/Metrics";
 import Metrics from "./database/schemas/metrics";
 
@@ -110,7 +110,9 @@ export const elysia = new Elysia()
     new CronJob(`0 */6 * * *`, () => load(true), null, true);
 
     connect(config.srv);
-}).onError(({ code, set, error, i18n }) => {
+}).onError(({ code, set, error, request }) => {
+    const i18n = getI18nFunctionByLanguage(request.headers.get('x-minecraft-language') || 'en_us')
+
     if(code == 'VALIDATION') {
         set.status = 422;
         return { error: i18n(error.message) };
