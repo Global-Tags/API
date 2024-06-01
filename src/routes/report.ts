@@ -55,7 +55,7 @@ export default new Elysia({
         429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },
-    body: t.Object({ reason: t.String({ minLength: 2, maxLength: 200, error: `Invalid reason.`, description: `Why do you want to report the player` }) }, { error: `error.invalidBody`, additionalProperties: true }),
+    body: t.Object({ reason: t.String({ minLength: 2, maxLength: 200, error: `report.validation;;[["min", "2"], ["max", "200"]]`, description: `Why do you want to report the player` }) }, { error: `error.invalidBody`, additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: `The UUID of the player you want to report` }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 });

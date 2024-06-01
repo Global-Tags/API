@@ -100,7 +100,7 @@ export default new Elysia()
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },
     params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
-    body: t.Object({ tag: t.String({ minLength: config.validation.tag.min, maxLength: config.validation.tag.max, error: `The tag has to be between ${config.validation.tag.min} and ${config.validation.tag.max} characters.` }) }, { error: `error.invalidBody`, additionalProperties: true }),
+    body: t.Object({ tag: t.String({ minLength: config.validation.tag.min, maxLength: config.validation.tag.max, error: `setTag.validation;;[["min", "${config.validation.tag.min}"], ["max", "${config.validation.tag.max}"]]` }) }, { error: `error.invalidBody`, additionalProperties: true }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 }).delete(`/`, async ({ error, params, headers, i18n }) => { // Delete tag
     const uuid = params.uuid.replaceAll(`-`, ``);
