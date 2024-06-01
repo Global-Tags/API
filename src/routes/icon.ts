@@ -2,29 +2,30 @@ import Elysia, { t } from "elysia";
 import { validJWTSession } from "../libs/SessionValidator";
 import players from "../database/schemas/players";
 import * as config from "../../config.json";
+import fetchI18n from "../middleware/FetchI18n";
 
 export default new Elysia({
     prefix: "/icon"
-}).post(`/`, async ({ error, params, headers, body }) => { // Change icon
+}).use(fetchI18n).post(`/`, async ({ error, params, headers, body, i18n }) => { // Change icon
     const uuid = params.uuid.replaceAll(`-`, ``);
     const icon = body.icon.toUpperCase();
     const { authorization } = headers;
     const authenticated = authorization && validJWTSession(authorization, uuid, true);
 
-    if(authorization == `0`) return error(401, { error: `You need a premium account to use this feature!` });
-    if(!authenticated) return error(401, { error: `You're not allowed to perform that request!` });
+    if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
+    if(!authenticated) return error(401, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: `You don't have a tag!` });
-    if(player.isBanned()) return error(403, { error: `You are banned!` });
-    if(!player.tag) return error(404, { error: `Please set a tag first!` });
-    if(icon == player.icon) return error(400, { error: `You already chose this icon!` });
-    if(config.validation.icon.blacklist.includes(icon.toLowerCase())) return error(422, { error: `You're not allowed to choose this icon!` });
+    if(!player) return error(404, { error: i18n(`error.noTag`) });
+    if(player.isBanned()) return error(403, { error: i18n(`error.banned`) });
+    if(!player.tag) return error(404, { error: i18n(`error.noTag`) });
+    if(icon == player.icon) return error(400, { error: i18n(`icon.sameIcon`) });
+    if(config.validation.icon.blacklist.includes(icon.toLowerCase())) return error(403, { error: i18n(`icon.notAllowed`) });
 
     player.icon = icon;
     await player.save();
 
-    return { message: `Your icon was successfully set!` };
+    return { message: i18n(`icon.success`) };
 }, {
     detail: {
         tags: ['Settings'],
@@ -40,7 +41,7 @@ export default new Elysia({
         429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },
-    body: t.Object({ icon: t.String({ error: `Missing field "icon".` }) }, { error: `Missing field "icon".` }),
+    body: t.Object({ icon: t.String({ error: `error.missingField;;[["field", "icon"]]` }) }, { error: `error.invalidBody`, additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
-    headers: t.Object({ authorization: t.String({ error: `You're not authorized!`, description: `Your LabyConnect JWT` }) }, { error: `You're not authorized!` })
+    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 });

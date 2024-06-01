@@ -10,7 +10,9 @@ import checkDatabase from "./middleware/DatabaseChecker";
 import Ratelimiter from "./libs/Ratelimiter";
 import checkRatelimit from "./middleware/RatelimitChecker";
 import { ip } from "./middleware/ObtainIP";
-import players from "./database/schemas/players";
+import { load } from "./libs/I18n";
+import { CronJob } from "cron";
+import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/FetchI18n";
 import { initializeMetrics } from "./libs/Metrics";
 import Metrics from "./database/schemas/metrics";
 
@@ -19,7 +21,36 @@ export const elysia = new Elysia()
 .onRequest(checkDatabase)
 .onTransform(access)
 .onBeforeHandle(checkRatelimit)
-.get(`/`, () => ({ version }), {
+.use(ip({ checkHeaders: config.ipHeaders }))
+.use(fetchI18n)
+.use(swagger({
+    path: '/docs',
+    autoDarkMode: true,
+    exclude: [
+        `/players/{uuid}/ban/`,
+        `/docs`,
+        `/docs/json`
+    ],
+    documentation: {
+        info: {
+            version,
+            title: `GlobalTags API`,
+            description: `This documentation is for the API of the GlobalTags addon for the LabyMod Minecraft client.`,
+            contact: {
+                name: `RappyTV`,
+                url: `https://www.rappytv.com`,
+                email: `contact@rappytv.com`
+            }
+        },
+        tags: [
+            { name: `API`, description: `Get info about the API` },
+            { name: `Interactions`, description: `Interact with other players` },
+            { name: `Settings`, description: `Modify the settings of your global tag` }
+        ]
+    }
+}))
+.use(getRouter(`/players/:uuid`, __dirname))
+.get(`/`, ({ i18n }) => ({ version: i18n(`error.premiumAccount`) }), {
     detail: {
         tags: [`API`],
         description: `Returns the API version. Used by the /gt command of the addon.`
@@ -69,51 +100,41 @@ export const elysia = new Elysia()
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     }
 })
-.use(ip({ checkHeaders: config.ipHeaders }))
-.use(swagger({
-    path: '/docs',
-    autoDarkMode: true,
-    exclude: [
-        `/players/{uuid}/ban/`,
-        `/docs`,
-        `/docs/json`
-    ],
-    documentation: {
-        info: {
-            version,
-            title: `GlobalTags API`,
-            description: `This documentation is for the API of the GlobalTags addon for the LabyMod Minecraft client.`,
-            contact: {
-                name: `RappyTV`,
-                url: `https://www.rappytv.com`,
-                email: `contact@rappytv.com`
-            }
-        },
-        tags: [
-            { name: `API`, description: `Get info about the API` },
-            { name: `Interactions`, description: `Interact with other players` },
-            { name: `Settings`, description: `Modify the settings of your global tag` }
-        ]
-    }
-}))
-.use(getRouter(`/players/:uuid`, __dirname))
 .onStart(() => {
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
     initializeMetrics();
+    
+    // Load languages
+    load();
+    new CronJob(`0 */6 * * *`, () => load(true), null, true);
 
     connect(config.srv);
-}).onError(({ code, set, error }) => {
+}).onError(({ code, set, error: { message: error }, request }) => {
+    const i18n = getI18nFunctionByLanguage(request.headers.get('x-minecraft-language'));
+
     if(code == 'VALIDATION') {
         set.status = 422;
-        return { error: error.message };
+        error = i18n(error);
+        const errorParts = error.split(';;');
+        error = i18n(errorParts[0]);
+        if(errorParts.length > 1) {
+            try {
+                const args: string[][] = JSON.parse(errorParts[1]);
+                for(const argument of args)
+                    error = error.replaceAll(`<${argument[0]}>`, argument[1]);
+            } catch(error) {
+                Logger.error(`Failed to apply arguments "${errorParts[1]}": ${error}`);
+            }
+        }
+        return { error: error.trim() };
     } else if(code == 'NOT_FOUND') {
         set.status = 404;
-        return { error: `Not Found` };
+        return { error: i18n(`error.notFound`) };
     } else {
         set.status = 500;
-        Logger.error(error.message);
-        return { error: `An unknown error ocurred! Please try again later` };
+        Logger.error(error);
+        return { error: i18n(`error.unknownError`) };
     }
 })
 .listen(config.port);

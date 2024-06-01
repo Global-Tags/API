@@ -21,31 +21,31 @@
         "routes": [
             {
                 "method": "GET",
-                "regex": "\/players\/[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}\/?",
+                "regex": "\/players\/\\w+\/?",
                 "max": 1000,
                 "seconds": 60
             },
             {
                 "method": "POST",
-                "regex": "^\/players\/[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}\/?$",
+                "regex": "^\/players\/\\w+\/?$",
                 "max": 5,
                 "seconds": 60
             },
             {
                 "method": "POST",
-                "regex": "\/players\/[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}/position\/?",
+                "regex": "\/players\/\\w+/position\/?",
                 "max": 5,
                 "seconds": 60
             },
             {
                 "method": "POST",
-                "regex": "\/players\/[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}/icon\/?",
+                "regex": "\/players\/\\w+/icon\/?",
                 "max": 5,
                 "seconds": 60
             },
             {
                 "method": "POST",
-                "regex": "\/players\/[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}/report\/?",
+                "regex": "\/players\/\\w+/report\/?",
                 "max": 5,
                 "seconds": 60
             }
