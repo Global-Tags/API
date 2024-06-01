@@ -110,18 +110,27 @@ export const elysia = new Elysia()
     new CronJob(`0 */6 * * *`, () => load(true), null, true);
 
     connect(config.srv);
-}).onError(({ code, set, error, request }) => {
-    const i18n = getI18nFunctionByLanguage(request.headers.get('x-minecraft-language') || 'en_us')
+}).onError(({ code, set, error: { message: error }, request }) => {
+    const i18n = getI18nFunctionByLanguage(request.headers.get('x-minecraft-language') || 'en_us');
 
     if(code == 'VALIDATION') {
         set.status = 422;
-        return { error: i18n(error.message) };
+        error = i18n(error);
+        const argText = error.split(';;')[1];
+        if(argText) {
+            try {
+                const args: string[][] = JSON.parse(argText);
+                for(const argument of args)
+                    error = error.replaceAll(`<${argument[0]}>`, argument[1]);
+            } catch {}
+        }
+        return { error };
     } else if(code == 'NOT_FOUND') {
         set.status = 404;
         return { error: i18n(`error.notFound`) };
     } else {
         set.status = 500;
-        Logger.error(error.message);
+        Logger.error(error);
         return { error: i18n(`error.unknownError`) };
     }
 })

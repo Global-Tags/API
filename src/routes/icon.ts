@@ -41,7 +41,7 @@ export default new Elysia({
         429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },
-    body: t.Object({ icon: t.String({ error: `Missing field "icon".` }) }, { error: `Missing field "icon".` }),
+    body: t.Object({ icon: t.String({ error: `Missing field "icon".` }) }, { error: `error.invalidBody`, additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
-    headers: t.Object({ authorization: t.String({ error: `You're not authorized!`, description: `Your LabyConnect JWT` }) }, { error: `You're not authorized!` })
+    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 });

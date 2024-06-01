@@ -42,7 +42,7 @@ export default new Elysia()
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },
     params: t.Object({ uuid: t.String({ description: `The uuid of the player you want to fetch the info of` }) }),
-    headers: t.Object({ authorization: config.requireSessionIds ? t.String({ error: `You're not authorized!`, description: `Your LabyConnect JWT` }) : t.Optional(t.String({ description: `Your LabyConnect JWT` })) }, { error: `You're not authorized!` }),
+    headers: t.Object({ authorization: config.requireSessionIds ? t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) : t.Optional(t.String({ description: `Your LabyConnect JWT` })) }, { error: `error.notAllowed` }),
 }).post(`/`, async ({ error, params, headers, body, i18n }) => { // Change tag
     const uuid = params.uuid.replaceAll(`-`, ``);
     const tag = body.tag;
@@ -100,8 +100,8 @@ export default new Elysia()
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },
     params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
-    body: t.Object({ tag: t.String({ minLength: config.validation.tag.min, maxLength: config.validation.tag.max, error: `The tag has to be between ${config.validation.tag.min} and ${config.validation.tag.max} characters.` }) }, { error: `Missing field "tag".` }),
-    headers: t.Object({ authorization: t.String({ error: `You're not authorized!`, description: `Your LabyConnect JWT` }) }, { error: `You're not authorized!` })
+    body: t.Object({ tag: t.String({ minLength: config.validation.tag.min, maxLength: config.validation.tag.max, error: `The tag has to be between ${config.validation.tag.min} and ${config.validation.tag.max} characters.` }) }, { error: `error.invalidBody`, additionalProperties: true }),
+    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 }).delete(`/`, async ({ error, params, headers, i18n }) => { // Delete tag
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
@@ -133,5 +133,5 @@ export default new Elysia()
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },
     params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
-    headers: t.Object({ authorization: t.String({ error: `You're not authorized!`, description: `Your LabyConnect JWT` }) }, { error: `You're not authorized!` })
+    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 });
