@@ -50,7 +50,7 @@ export const elysia = new Elysia()
     }
 }))
 .use(getRouter(`/players/:uuid`, __dirname))
-.get(`/`, ({ i18n }) => ({ version: i18n(`error.premiumAccount`) }), {
+.get(`/`, () => ({ version }), {
     detail: {
         tags: [`API`],
         description: `Returns the API version. Used by the /gt command of the addon.`
