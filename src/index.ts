@@ -106,7 +106,7 @@ export const elysia = new Elysia()
     initializeMetrics();
     
     // Load languages
-    load(false);
+    load();
     new CronJob(`0 */6 * * *`, () => load(true), null, true);
 
     connect(config.srv);
@@ -116,15 +116,18 @@ export const elysia = new Elysia()
     if(code == 'VALIDATION') {
         set.status = 422;
         error = i18n(error);
-        const argText = error.split(';;')[1];
-        if(argText) {
+        const errorParts = error.split(';;');
+        error = i18n(errorParts[0]);
+        if(errorParts.length > 1) {
             try {
-                const args: string[][] = JSON.parse(argText);
+                const args: string[][] = JSON.parse(errorParts[1]);
                 for(const argument of args)
                     error = error.replaceAll(`<${argument[0]}>`, argument[1]);
-            } catch {}
+            } catch(error) {
+                Logger.error(`Failed to apply arguments "${errorParts[1]}": ${error}`);
+            }
         }
-        return { error };
+        return { error: error.trim() };
     } else if(code == 'NOT_FOUND') {
         set.status = 404;
         return { error: i18n(`error.notFound`) };
