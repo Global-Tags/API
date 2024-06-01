@@ -1,8 +1,10 @@
 import { Context } from "elysia";
 import Ratelimiter from "../libs/Ratelimiter";
+import { I18nFunction } from "../libs/I18n";
 
 export type IpContext = Context & {
-    ip: string
+    ip: string,
+    i18n: I18nFunction
 };
 
 export default function checkRatelimit(ctx: Context) {

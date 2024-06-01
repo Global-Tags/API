@@ -5,6 +5,7 @@ import Logger from "./Logger";
 import { $ } from "bun";
 
 export type Language = typeof english;
+export type I18nFunction = (path: string) => string;
 
 const languages = new Map<string, Language>();
 
@@ -17,7 +18,7 @@ export async function pullTranslations() {
     });
 }
 
-export async function load(refetch: boolean) {
+export async function load(refetch: boolean = false) {
     if(refetch) await pullTranslations();
     languages.clear();
     const localeDir = join(__dirname, '..', '..', 'locales');

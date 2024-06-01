@@ -3,11 +3,11 @@ import { getLocales, getPath } from "../libs/I18n";
 
 export default function fetchI18n(app: Elysia) {
     return app.derive({ as: 'global' }, ({ headers }) => ({
-        i18n: getI18nFunctionByLanguage(headers[`x-minecraft-language`] || `en_us`)
+        i18n: getI18nFunctionByLanguage(headers[`x-minecraft-language`])
     }));
 }
 
-export function getI18nFunctionByLanguage(language: string) {
-    const locales = getLocales(language);
+export function getI18nFunctionByLanguage(language: string | null = null) {
+    const locales = getLocales(language || 'en_us');
     return (path: string) => getPath(path, locales);
 }
