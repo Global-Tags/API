@@ -50,56 +50,6 @@ export const elysia = new Elysia()
     }
 }))
 .use(getRouter(`/players/:uuid`, __dirname))
-.get(`/`, () => ({ version }), {
-    detail: {
-        tags: [`API`],
-        description: `Returns the API version. Used by the /gt command of the addon.`
-    },
-    response: {
-        200: t.Object({ version: t.String() }, { description: `You received the version` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
-    }
-})
-.get(`/metrics`, async () => {
-    const metrics = await Metrics.find();
-
-    return metrics.map((metric) => ({
-        time: new Date(metric.createdAt).getTime(),
-        users: metric.players,
-        tags: metric.tags,
-        admins: metric.admins,
-        bans: metric.bans,
-        positions: metric.positions,
-        icons: metric.icons
-    }));
-}, {
-    detail: {
-        tags: [`API`],
-        description: `Get API statistics`
-    },
-    response: {
-        200: t.Array(t.Object({
-            time: t.Number({ default: Date.now() }),
-            users: t.Number(),
-            tags: t.Number(),
-            admins: t.Number(),
-            bans: t.Number(),
-            positions: t.Object({}, { default: {}, additionalProperties: true, description: 'All position counts' }),
-            icons: t.Object({}, { default: {}, additionalProperties: true, description: 'All icon counts' })
-        }, { description: `The server is reachable` })),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
-    }
-})
-.get(`/ping`, ({ error }: Context) => { return error(204, "") }, {
-    detail: {
-        tags: [`API`],
-        description: `Used by uptime checkers. This route is not being logged`
-    },
-    response: {
-        204: t.Any({ description: `The server is reachable` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
-    }
-})
 .onStart(() => {
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
@@ -110,7 +60,8 @@ export const elysia = new Elysia()
     new CronJob(`0 */6 * * *`, () => load(true), null, true);
 
     connect(config.srv);
-}).onError(({ code, set, error: { message: error }, request }) => {
+})
+.onError(({ code, set, error: { message: error }, request }) => {
     const i18n = getI18nFunctionByLanguage(request.headers.get('x-minecraft-language'));
 
     if(code == 'VALIDATION') {
@@ -135,6 +86,62 @@ export const elysia = new Elysia()
         set.status = 500;
         Logger.error(error);
         return { error: i18n(`error.unknownError`) };
+    }
+})
+.get(`/`, () => ({ version }), {
+    detail: {
+        tags: [`API`],
+        description: `Returns the API version. Used by the /gt command of the addon.`
+    },
+    response: {
+        200: t.Object({ version: t.String() }, { description: `You received the version` }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    }
+})
+.get(`/metrics`, async ({ query: { latest }}) => {
+    const metrics = await Metrics.find();
+
+    return metrics.filter((doc) => {
+        if(latest != 'true') return true;
+        return doc.id == (metrics.at(-1)?.id ?? 0);
+    }).map((metric) => ({
+        time: new Date(metric.createdAt).getTime(),
+        users: metric.players,
+        tags: metric.tags,
+        admins: metric.admins,
+        bans: metric.bans,
+        positions: metric.positions,
+        icons: metric.icons
+    }));
+}, {
+    detail: {
+        tags: [`API`],
+        description: `Get API statistics`
+    },
+    response: {
+        200: t.Array(t.Object({
+            time: t.Number({ default: Date.now() }),
+            users: t.Number(),
+            tags: t.Number(),
+            admins: t.Number(),
+            bans: t.Number(),
+            positions: t.Object({}, { default: {}, additionalProperties: true, description: 'All position counts' }),
+            icons: t.Object({}, { default: {}, additionalProperties: true, description: 'All icon counts' })
+        }, { description: `The server is reachable` })),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    },
+    query: t.Object({
+        latest: t.Optional(t.String({ error: 'error.wrongType;;[["field", "element"], ["type", "string"]]' }))
+    }, { additionalProperties: true })
+})
+.get(`/ping`, ({ error }: Context) => { return error(204, "") }, {
+    detail: {
+        tags: [`API`],
+        description: `Used by uptime checkers. This route is not being logged`
+    },
+    response: {
+        204: t.Any({ description: `The server is reachable` }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     }
 })
 .listen(config.port);
