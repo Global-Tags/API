@@ -110,6 +110,8 @@ export const elysia = new Elysia()
         tags: metric.tags,
         admins: metric.admins,
         bans: metric.bans,
+        downloads: metric.downloads,
+        rating: metric.rating,
         positions: metric.positions,
         icons: metric.icons
     }));
