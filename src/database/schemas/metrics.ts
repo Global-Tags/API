@@ -10,6 +10,8 @@ const schema = new Schema({
     tags: requiredNumber,
     admins: requiredNumber,
     bans: requiredNumber,
+    downloads: requiredNumber,
+    rating: requiredNumber,
     positions: {
         type: Object,
         required: true
@@ -17,7 +19,7 @@ const schema = new Schema({
     icons: {
         type: Object,
         required: true
-    },
+    }
 }, {
     timestamps: true
 });
