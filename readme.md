@@ -31,7 +31,7 @@ $ bun dev
 # Install pm2
 $ npm install pm2 -g && pm2 install pm2-logrotate
 
-# Run the API it daemonized
+# Run the API daemonized
 $ pm2 start src/index.ts --interpreter ~/.bun/bin/bun --name GlobalTagAPI
 ```
 ### 🐋 Docker
