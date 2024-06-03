@@ -23,12 +23,16 @@ export default class PlayerInfo extends Command {
     }
 
     async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, user: User) {
+        await interaction.deferReply();
         let name, uuid = options.getString(`player`)!;
         if(!regex.test(uuid)) {
             try {
                 const res = await axios({
                     method: `get`,
                     url: `https://api.mojang.com/users/profiles/minecraft/${uuid}`,
+                    headers: {
+                        'Accept-Encoding': 'gzip'
+                    }
                 });
 
                 uuid = res.data.id;
@@ -40,8 +44,8 @@ export default class PlayerInfo extends Command {
         }
         const data = await players.findOne({ uuid: uuid.replaceAll(`-`, ``) });
 
-        if(!data) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ This player is not in our records!`)], ephemeral: true });
-        interaction.reply({
+        if(!data) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ This player is not in our records!`)] });
+        interaction.editReply({
             embeds: [
                 new EmbedBuilder()
                 .setColor(bot.colors.standart)
