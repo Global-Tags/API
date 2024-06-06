@@ -11,9 +11,8 @@ const languages = new Map<string, Language>();
 
 export async function pullTranslations() {
     return new Promise<void>(async (resolve) => {
-        const { stderr, stdout } = await $`"${join(__dirname, '..', '..', 'sync.sh')}"`;
-        if(stderr) Logger.error(stderr);
-        if(stdout) Logger.debug(stdout);
+        await $`bash "${join(__dirname, '..', '..', 'sync.sh')}"`.quiet();
+        Logger.debug(`New translations were pulled.`);
         resolve();
     });
 }
