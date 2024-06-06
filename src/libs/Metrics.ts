@@ -34,6 +34,7 @@ type Addon = {
 }
 
 export function initializeMetrics() {
+    Logger.debug(`Metric initialized.`);
     new CronJob(`0 0 * * *`, saveMetrics, null, true);
 }
 
@@ -62,6 +63,7 @@ async function saveMetrics() {
         positions,
         icons
     }).save();
+    Logger.debug(`New metric saved!`);
 }
 
 async function fetchAddon(namespace: string): Promise<Addon | null> {
