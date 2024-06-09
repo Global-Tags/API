@@ -54,7 +54,7 @@ export default new Elysia()
     if(!session.equal && !session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
     
     const player = await players.findOne({ uuid });
-    if(player && player.isBanned()) return error(403, { error: i18n(`error.banned`) });
+    if(player && player.isBanned()) return error(403, { error: i18n(`error.${session.equal ? 'b' : 'playerB'}anned`) });
     const { blacklist, watchlist } = config.validation.tag;
     if(tag == '') return error(422, { error: i18n(`setTag.empty`) });
     const blacklistedWord = blacklist.find((word) => tag.replace(colorCodeRegex, ``).toLowerCase().includes(word));
@@ -103,6 +103,37 @@ export default new Elysia()
     params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
     body: t.Object({ tag: t.String({ minLength: config.validation.tag.min, maxLength: config.validation.tag.max, error: `setTag.validation;;[["min", "${config.validation.tag.min}"], ["max", "${config.validation.tag.max}"]]` }) }, { error: `error.invalidBody`, additionalProperties: true }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
+}).post(`/admin`, async ({ error, params, headers, i18n }) => { // Change tag
+    const uuid = params.uuid.replaceAll(`-`, ``);
+    const { authorization } = headers;
+    if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
+    const session = await getJWTSession(authorization, uuid);
+    if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
+    
+    const player = await players.findOne({ uuid });
+    if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
+
+    player.admin = !player.admin;
+    await player.save();
+
+    return { message: i18n(`toggleAdmin.${player.admin ? 'on' : 'off'}`) };
+}, {
+    detail: {
+        tags: ['Settings'],
+        description: `Change your global tag`
+    },
+    response: {
+        200: t.Object({ message: t.String() }, { description: `The player's admin status has changed.` }),
+        400: t.Object({ error: t.String() }, { description: `You already have this tag.` }),
+        401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
+        403: t.Object({ error: t.String() }, { description: `You're not an admin.` }),
+        404: t.Object({ error: t.String() }, { description: `The player was not found.` }),
+        422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
+        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    },
+    params: t.Object({ uuid: t.String({ description: `The player's UUID` }) }),
+    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 }).delete(`/`, async ({ error, params, headers, i18n }) => { // Delete tag
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
@@ -112,7 +143,7 @@ export default new Elysia()
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.noTag`) });
-    if(player.isBanned()) return error(403, { error: i18n(`error.banned`) });
+    if(player.isBanned()) return error(403, { error: i18n(`error.${session.equal ? 'b' : 'playerB'}anned`) });
     if(!player.tag) return error(404, { error: i18n(`error.noTag`) });
 
     player.tag = null;
