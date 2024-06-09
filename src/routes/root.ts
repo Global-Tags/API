@@ -2,7 +2,7 @@ import Elysia, { t } from "elysia";
 import players from "../database/schemas/players";
 import Logger from "../libs/Logger";
 import { sendMessage, NotificationType } from "../libs/DiscordNotifier";
-import { validJWTSession } from "../libs/SessionValidator";
+import { getJWTSession } from "../libs/SessionValidator";
 import * as config from "../../config.json";
 import fetchI18n from "../middleware/FetchI18n";
 
@@ -12,21 +12,23 @@ export default new Elysia()
 .use(fetchI18n).get(`/`, async ({ error, params, headers, i18n }) => { // Get player info
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    const authenticated = authorization && validJWTSession(authorization, uuid, false);
-
     if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
-    if(config.requireSessionIds && !authenticated) return error(401, { error: i18n(`error.notAllowed`) });
+    const session = await getJWTSession(authorization, uuid);
+    if(config.requireSessionIds && !session.uuid) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNoTag`) });
-    if(player.isBanned()) return error(403, { error: i18n(`getInfo.banned`) });
 
     return {
         uuid: player.uuid,
-        tag: player.tag || null,
+        tag: player.isBanned() ? null : player.tag || null,
         position: player.position,
         icon: player.icon,
-        admin: player.admin
+        admin: player.admin,
+        ban: session.equal || session.isAdmin ? {
+            active: !!player.ban?.active,
+            reason: player.ban?.reason || null
+        } : null
     };
 }, {
     detail: {
@@ -34,7 +36,7 @@ export default new Elysia()
         description: `Get another players' tag info`
     },
     response: {
-        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.String(), admin: t.Boolean({ default: false }) }, { description: `You received the tag data.` }),
+        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.String(), admin: t.Boolean({ default: false }), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]) }), t.Null()]) }, { description: `You received the tag data.` }),
         401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
         403: t.Object({ error: t.String() }, { description: `The player is banned.` }),
         404: t.Object({ error: t.String() }, { description: `The player is not in the database.` }),
@@ -45,17 +47,16 @@ export default new Elysia()
     headers: t.Object({ authorization: config.requireSessionIds ? t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) : t.Optional(t.String({ description: `Your LabyConnect JWT` })) }, { error: `error.notAllowed` }),
 }).post(`/`, async ({ error, params, headers, body, i18n }) => { // Change tag
     const uuid = params.uuid.replaceAll(`-`, ``);
-    const tag = body.tag;
+    const tag = body.tag.trim();
     const { authorization } = headers;
-    const authenticated = authorization && validJWTSession(authorization, uuid, true);
-
     if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
-    if(!authenticated) return error(401, { error: i18n(`error.notAllowed`) });
+    const session = await getJWTSession(authorization, uuid);
+    if(!session.equal && !session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
     
     const player = await players.findOne({ uuid });
     if(player && player.isBanned()) return error(403, { error: i18n(`error.banned`) });
     const { blacklist, watchlist } = config.validation.tag;
-    if(tag.trim() == '') return error(422, { error: i18n(`setTag.empty`) });
+    if(tag == '') return error(422, { error: i18n(`setTag.empty`) });
     const blacklistedWord = blacklist.find((word) => tag.replace(colorCodeRegex, ``).toLowerCase().includes(word));
     if(blacklistedWord) return error(422, { error: i18n(`setTag.blacklisted`).replaceAll(`<word>`, blacklistedWord) });
     const isWatched = (player && player.watchlist) || watchlist.some((word) => {
@@ -84,7 +85,7 @@ export default new Elysia()
     }
 
     if(isWatched) sendMessage({ type: NotificationType.WatchlistTagUpdate, uuid, tag });
-    return { message: i18n(`setTag.success`) };
+    return { message: i18n(`setTag.success.${session.equal ? 'self' : 'admin'}`) };
 }, {
     detail: {
         tags: ['Settings'],
@@ -105,10 +106,9 @@ export default new Elysia()
 }).delete(`/`, async ({ error, params, headers, i18n }) => { // Delete tag
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    const authenticated = authorization && validJWTSession(authorization, uuid, true);
-
     if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
-    if(!authenticated) return error(401, { error: i18n(`error.notAllowed`) });
+    const session = await getJWTSession(authorization, uuid);
+    if(!session.equal && !session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.noTag`) });
@@ -118,7 +118,7 @@ export default new Elysia()
     player.tag = null;
     await player.save();
 
-    return { message: i18n(`resetTag.success`) };
+    return { message: i18n(`resetTag.success.${session.equal ? 'self' : 'admin'}`) };
 }, {
     detail: {
         tags: ['Settings'],

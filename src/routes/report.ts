@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import { getUuidByJWT, validJWTSession } from "../libs/SessionValidator";
+import { getUuidByJWT, getJWTSession } from "../libs/SessionValidator";
 import players from "../database/schemas/players";
 import { NotificationType, sendMessage } from "../libs/DiscordNotifier";
 import fetchI18n from "../middleware/FetchI18n";
@@ -9,10 +9,9 @@ export default new Elysia({
 }).use(fetchI18n).post(`/`, async ({ error, params, headers, body, i18n }) => { // Report player
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    const authenticated = authorization && validJWTSession(authorization, uuid, false);
-
     if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
-    if(!authenticated) return error(401, { error: i18n(`error.notAllowed`) });
+    const session = await getJWTSession(authorization, uuid);
+    if(!session.uuid) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNoTag`) });
