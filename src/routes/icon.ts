@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import { validJWTSession } from "../libs/SessionValidator";
+import { getJWTSession } from "../libs/SessionValidator";
 import players from "../database/schemas/players";
 import * as config from "../../config.json";
 import fetchI18n from "../middleware/FetchI18n";
@@ -10,10 +10,8 @@ export default new Elysia({
     const uuid = params.uuid.replaceAll(`-`, ``);
     const icon = body.icon.toUpperCase();
     const { authorization } = headers;
-    const authenticated = authorization && validJWTSession(authorization, uuid, true);
-
-    if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
-    if(!authenticated) return error(401, { error: i18n(`error.notAllowed`) });
+    const session = await getJWTSession(authorization, uuid);
+    if(!session.equal && !session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.noTag`) });
@@ -25,7 +23,7 @@ export default new Elysia({
     player.icon = icon;
     await player.save();
 
-    return { message: i18n(`icon.success`) };
+    return { message: i18n(`icon.success.${session.equal ? 'self' : 'admin'}`) };
 }, {
     detail: {
         tags: ['Settings'],

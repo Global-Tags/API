@@ -40,16 +40,20 @@ export default class Actions extends Button {
                 .setCustomId(`ban`)
                 .setStyle(ButtonStyle.Danger),
                 new ButtonBuilder()
-                .setLabel(`Clear tag`)
-                .setCustomId(`clearTag`)
-                .setStyle(ButtonStyle.Danger)
+                .setLabel(`Unban`)
+                .setCustomId(`unban`)
+                .setStyle(ButtonStyle.Success)
             ),
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
-                .setLabel(`Unban`)
-                .setCustomId(`unban`)
-                .setStyle(ButtonStyle.Success)
+                .setLabel(`Clear tag`)
+                .setCustomId(`clearTag`)
+                .setStyle(ButtonStyle.Danger),
+                new ButtonBuilder()
+                .setLabel(`Set tag`)
+                .setCustomId(`setTag`)
+                .setStyle(ButtonStyle.Primary)
             )
         ]
 

@@ -33,6 +33,12 @@
             },
             {
                 "method": "POST",
+                "regex": "\/players\/\\w+\/admin/?",
+                "max": 2,
+                "seconds": 30
+            },
+            {
+                "method": "POST",
                 "regex": "\/players\/\\w+/position\/?",
                 "max": 5,
                 "seconds": 60

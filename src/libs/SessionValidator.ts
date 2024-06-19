@@ -1,10 +1,23 @@
 import { verify } from "jsonwebtoken";
+import players from "../database/schemas/players";
 const publicKey = "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAt3rCKqrQYcmSEE8zyQTA7flKIe1pr7GHY58lTF74Pw/ZZYzxmScYteXp8XBvrQfPj4U/v9Vum8IPg6GHOv1Gde3rY5ydfunEKi/w4ibVN5buPpndzcNaMoQvEJ/B5VLIzCvLc5HepFKbKFOGu8XoFz8NZY0lUfGLR0rcDsHWZLHPhqYsIsUd9snkWkHaIKD7l9xTd77PpLZiBwCPnVhh3invFY2OnCL6BfiJhhud/aDaAzFW981J9EhyACbuac2qu6Uz2bKX/7Af01gUs48MbKUx8YirBWLD7j/CJMWorTT467It4mAvDlw43s3Py9IvxCzEFnOIftIv+7wwv1RjVQIDAQAB\n-----END PUBLIC KEY-----";
 
-export function validJWTSession(token: string, uuid: string, equal: boolean): boolean {
+type SessionData = {
+    uuid: string | null,
+    equal: boolean,
+    isAdmin: boolean
+}
+
+export async function getJWTSession(token: string, uuid: string): Promise<SessionData> {
     const tokenUuid = getUuidByJWT(token);
-    if(equal) return tokenUuid === uuid;
-    else return !!tokenUuid;
+    if(!tokenUuid) return { uuid: tokenUuid, equal: tokenUuid == uuid, isAdmin: false };
+    const data = await players.findOne({ uuid: tokenUuid });
+    if(!data) return { uuid: tokenUuid, equal: tokenUuid == uuid, isAdmin: false };
+    return {
+        uuid: tokenUuid,
+        equal: uuid == tokenUuid,
+        isAdmin: data.admin
+    }
 }
 
 type LabyPayload = {
