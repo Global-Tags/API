@@ -9,7 +9,6 @@ export default new Elysia({
 }).use(fetchI18n).post(`/`, async ({ error, params, headers, body, i18n }) => { // Report player
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
     const session = await getJWTSession(authorization, uuid);
     if(!session.uuid) return error(403, { error: i18n(`error.notAllowed`) });
 

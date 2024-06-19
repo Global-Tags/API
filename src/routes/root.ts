@@ -12,7 +12,6 @@ export default new Elysia()
 .use(fetchI18n).get(`/`, async ({ error, params, headers, i18n }) => { // Get player info
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
     const session = await getJWTSession(authorization, uuid);
     if(config.requireSessionIds && !session.uuid) return error(403, { error: i18n(`error.notAllowed`) });
 
@@ -49,7 +48,6 @@ export default new Elysia()
     const uuid = params.uuid.replaceAll(`-`, ``);
     const tag = body.tag.trim();
     const { authorization } = headers;
-    if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
     const session = await getJWTSession(authorization, uuid);
     if(!session.equal && !session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
     
@@ -103,10 +101,9 @@ export default new Elysia()
     params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
     body: t.Object({ tag: t.String({ minLength: config.validation.tag.min, maxLength: config.validation.tag.max, error: `setTag.validation;;[["min", "${config.validation.tag.min}"], ["max", "${config.validation.tag.max}"]]` }) }, { error: `error.invalidBody`, additionalProperties: true }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).post(`/admin`, async ({ error, params, headers, i18n }) => { // Change tag
+}).post(`/admin`, async ({ error, params, headers, i18n }) => { // Toggle admin
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
     const session = await getJWTSession(authorization, uuid);
     if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
     
@@ -137,7 +134,6 @@ export default new Elysia()
 }).delete(`/`, async ({ error, params, headers, i18n }) => { // Delete tag
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
     const session = await getJWTSession(authorization, uuid);
     if(!session.equal && !session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
 

@@ -9,7 +9,6 @@ export default new Elysia({
     const uuid = params.uuid.replaceAll(`-`, ``);
     const position = body.position.toUpperCase();
     const { authorization } = headers;
-    if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
     const session = await getJWTSession(authorization, uuid);
     if(!session.equal && !session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
 

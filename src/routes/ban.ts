@@ -8,7 +8,6 @@ export default new Elysia({
 }).use(fetchI18n).get(`/`, async ({ error, params, headers, i18n }) => { // Get ban info
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
     const session = await getJWTSession(authorization, uuid);
     if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
 
@@ -22,7 +21,6 @@ export default new Elysia({
 }).post(`/`, async ({ error, params, headers, body, i18n }) => { // Ban player
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
     const session = await getJWTSession(authorization, uuid);
     if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
 
@@ -44,7 +42,6 @@ export default new Elysia({
 }).delete(`/`, async ({ error, params, headers, i18n }) => { // Unban player
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    if(authorization == `0`) return error(401, { error: i18n(`error.premiumAccount`) });
     const session = await getJWTSession(authorization, uuid);
     if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
 
