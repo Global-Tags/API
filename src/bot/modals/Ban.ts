@@ -13,10 +13,7 @@ export default class Ban extends Modal {
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
         if(player.ban?.active) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player is already banned!`)], ephemeral: true });
 
-        player.ban = {
-            active: true,
-            reason: fields.getTextInputValue(`reason`)
-        };
+        player.banPlayer(fields.getTextInputValue(`reason`));
         player.save();
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The player was successfully banned!`)], ephemeral: true });

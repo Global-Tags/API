@@ -29,8 +29,7 @@ export default new Elysia({
     if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
     if(player.isBanned()) return error(409, { error: i18n(`ban.alreadyBanned`) });
 
-    player.ban!.active = true;
-    player.ban!.reason = body.reason || i18n(`ban.noReason`);
+    player.banPlayer(body.reason || i18n(`ban.noReason`));
     await player.save();
 
     return { message: i18n(`ban.success`) };
@@ -73,10 +72,7 @@ export default new Elysia({
     if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
     if(!player.isBanned()) return error(409, { error: i18n(`unban.notBanned`) });
 
-    player.ban!.active = false;
-    player.ban!.reason = null;
-    player.ban!.appealable = true;
-    player.ban!.appealed = false;
+    player.unban();
     await player.save();
 
     return { message: i18n(`unban.success`) };
