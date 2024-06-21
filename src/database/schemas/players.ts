@@ -51,6 +51,11 @@ const schema = new Schema({
             default: false
         },
         reason: String,
+        appealable: {
+            type: Boolean,
+            required: true,
+            default: true
+        }
     }
 }, {
     methods: {
