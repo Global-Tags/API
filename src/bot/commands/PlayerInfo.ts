@@ -77,12 +77,12 @@ export default class PlayerInfo extends Command {
                     },
                     {
                         name: `Banned`,
-                        value: `\`\`\`ansi\n${translateColors(data.ban?.active ? `&cYes` : `&aNo`)}\`\`\``,
+                        value: `\`\`\`ansi\n${translateColors(data.isBanned() ? `&cYes` : `&aNo`)}\`\`\``,
                         inline: true
                     },
                     {
                         name: `Ban reason`,
-                        value: `\`\`\`${data.ban?.active ? data.ban?.reason || `--` : `--`}\`\`\``,
+                        value: `\`\`\`${data.isBanned() ? data.ban?.reason || `--` : `--`}\`\`\``,
                         inline: true
                     }
                 ])
