@@ -49,6 +49,15 @@ export default new Elysia({
     if(!player.ban?.appealable) return error(403, { error: i18n(`appeal.notAppealable`) });
     if(player.ban?.appealed) return error(403, { error: i18n(`appeal.alreadyAppealed`) });
 
+    player.ban!.appealed = true;
+    player.save();
+
+    sendMessage({
+        type: NotificationType.Appeal,
+        uuid,
+        reason
+    });
+
     return { message: i18n(`appeal.success`) };
 }, {
     body: t.Object({ reason: t.String() }, { error: `error.invalidBody`, additionalProperties: true }),
@@ -66,6 +75,8 @@ export default new Elysia({
 
     player.ban!.active = false;
     player.ban!.reason = null;
+    player.ban!.appealable = true;
+    player.ban!.appealed = false;
     await player.save();
 
     return { message: i18n(`unban.success`) };
