@@ -55,6 +55,11 @@ const schema = new Schema({
             type: Boolean,
             required: true,
             default: true
+        },
+        appealed: {
+            type: Boolean,
+            required: true,
+            default: false
         }
     }
 }, {
