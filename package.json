@@ -1,6 +1,6 @@
 {
   "name": "globaltags",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "module": "src/index.js",
   "scripts": {
     "dev": "bun --watch src/index.ts",
@@ -17,7 +17,7 @@
     "chalk": "^5.3.0",
     "cron": "^3.1.7",
     "discord.js": "^14.14.1",
-    "elysia": "^1.0.10",
+    "elysia": "^1.0.25",
     "jsonwebtoken": "^9.0.1",
     "moment": "^2.29.4",
     "mongoose": "latest"

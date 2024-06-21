@@ -25,8 +25,9 @@ export default new Elysia()
         icon: player.icon,
         admin: player.admin,
         ban: session.equal || session.isAdmin ? {
-            active: !!player.ban?.active,
-            reason: player.ban?.reason || null
+            active: player.isBanned(),
+            reason: player.ban?.reason || null,
+            appealable: player.ban!.appealable
         } : null
     };
 }, {

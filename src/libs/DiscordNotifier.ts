@@ -5,21 +5,27 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel
 export enum NotificationType {
     Report,
     WatchlistAdd,
-    WatchlistTagUpdate
+    WatchlistTagUpdate,
+    Appeal
 }
 
 type NotificationData = {
-    uuid: string,
-    tag: string
+    uuid: string
 } & ({
     type: NotificationType.Report,
     reporterUuid: string,
-    reason: string
+    reason: string,
+    tag: string
 } | {
     type: NotificationType.WatchlistAdd,
-    word: string
+    word: string,
+    tag: string
 } | { 
-    type: NotificationType.WatchlistTagUpdate
+    type: NotificationType.WatchlistTagUpdate,
+    tag: string
+} | {
+    type: NotificationType.Appeal,
+    reason: string
 });
 
 export function sendMessage(data: NotificationData) {
@@ -89,6 +95,25 @@ export function sendMessage(data: NotificationData) {
                 {
                     name: `New tag`,
                     value: `\`\`\`${data.tag}\`\`\``
+                }
+            ])
+        );
+    } else if(data.type == NotificationType.Appeal) {
+        _sendMessage(
+            config.bot.appeals.channel,
+            config.bot.appeals.content,
+            new EmbedBuilder()
+            .setColor(0x5865f2)
+            .setThumbnail(`https://laby.net/texture/profile/head/${data.uuid}.png?size=1024&overlay`)
+            .setTitle(`New ban appeal`)
+            .addFields([
+                {
+                    name: `UUID`,
+                    value: `\`\`\`${data.uuid}\`\`\``
+                },
+                {
+                    name: `Reason`,
+                    value: `\`\`\`${data.reason}\`\`\``
                 }
             ])
         );

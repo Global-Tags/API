@@ -51,11 +51,35 @@ const schema = new Schema({
             default: false
         },
         reason: String,
+        appealable: {
+            type: Boolean,
+            required: true,
+            default: true
+        },
+        appealed: {
+            type: Boolean,
+            required: true,
+            default: false
+        }
     }
 }, {
     methods: {
         isBanned(): boolean {
             return this.ban?.active || false;
+        },
+
+        banPlayer(reason: string, appealable: boolean = true) {
+            this.ban!.active = true;
+            this.ban!.reason = reason;
+            this.ban!.appealable = appealable;
+            this.ban!.appealed = false;
+        },
+
+        unban() {
+            this.ban!.active = false;
+            this.ban!.reason = null;
+            this.ban!.appealable = true;
+            this.ban!.appealed = false;
         }
     }
 });
