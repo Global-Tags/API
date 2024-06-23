@@ -1,7 +1,7 @@
 import Elysia, { t } from "elysia";
 import players from "../database/schemas/players";
 import Logger from "../libs/Logger";
-import { sendMessage, NotificationType } from "../libs/DiscordNotifier";
+import { sendMessage, NotificationType, ModLogType } from "../libs/DiscordNotifier";
 import { getJWTSession } from "../libs/SessionValidator";
 import * as config from "../../config.json";
 import fetchI18n from "../middleware/FetchI18n";
@@ -74,8 +74,28 @@ export default new Elysia()
             watchlist: isWatched,
             history: [tag]
         }).save();
+        if(!session.equal) {
+            sendMessage({
+                type: NotificationType.ModLog,
+                logType: ModLogType.ChangeTag,
+                uuid: uuid,
+                staff: session.uuid || 'Unknown',
+                oldTag: 'None',
+                newTag: tag
+            });
+        }
     } else {
         if(player.tag == tag) return error(400, { error: i18n(`setTag.sameTag`) });
+        if(!session.equal) {
+            sendMessage({
+                type: NotificationType.ModLog,
+                logType: ModLogType.ChangeTag,
+                uuid: uuid,
+                staff: session.uuid || 'Unknown',
+                oldTag: player.tag || 'None',
+                newTag: tag
+            });
+        }
 
         player.tag = tag;
         if(isWatched) player.watchlist = true;
@@ -113,6 +133,14 @@ export default new Elysia()
 
     player.admin = !player.admin;
     await player.save();
+    if(!session.equal) {
+        sendMessage({
+            type: NotificationType.ModLog,
+            logType: player.admin ? ModLogType.MakeAdmin : ModLogType.RemoveAdmin,
+            uuid: uuid,
+            staff: session.uuid || 'Unknown'
+        });
+    }
 
     return { message: i18n(`toggleAdmin.${player.admin ? 'on' : 'off'}`) };
 }, {
@@ -145,6 +173,14 @@ export default new Elysia()
 
     player.tag = null;
     await player.save();
+    if(!session.equal) {
+        sendMessage({
+            type: NotificationType.ModLog,
+            logType: ModLogType.ClearTag,
+            uuid: uuid,
+            staff: session.uuid || 'Unknown'
+        });
+    }
 
     return { message: i18n(`resetTag.success.${session.equal ? 'self' : 'admin'}`) };
 }, {

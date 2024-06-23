@@ -102,7 +102,7 @@ export default class PlayerInfo extends Command {
     }
 }
 
-function translateColors(text: string): string {
+export function translateColors(text: string): string {
     return text
         .replaceAll(/(&|§)0/gi, `[0;30m`)
         .replaceAll(/(&|§)7/gi, `[0;30m`)
