@@ -2,7 +2,7 @@ import Elysia, { t } from "elysia";
 import { getUuidByJWT, getJWTSession } from "../libs/SessionValidator";
 import players from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
-import { NotificationType, sendMessage } from "../libs/DiscordNotifier";
+import { ModLogType, NotificationType, sendMessage } from "../libs/DiscordNotifier";
 
 export default new Elysia({
     prefix: `/ban`
@@ -31,6 +31,13 @@ export default new Elysia({
 
     player.banPlayer(body.reason || i18n(`ban.noReason`));
     await player.save();
+    sendMessage({
+        type: NotificationType.ModLog,
+        logType: ModLogType.Ban,
+        uuid: uuid,
+        staff: session.uuid || 'Unknown',
+        reason: body.reason
+    });
 
     return { message: i18n(`ban.success`) };
 }, {
@@ -74,6 +81,12 @@ export default new Elysia({
 
     player.unban();
     await player.save();
+    sendMessage({
+        type: NotificationType.ModLog,
+        logType: ModLogType.Unban,
+        uuid: uuid,
+        staff: session.uuid || 'Unknown'
+    });
 
     return { message: i18n(`unban.success`) };
 }, {
