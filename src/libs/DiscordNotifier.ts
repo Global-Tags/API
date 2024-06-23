@@ -1,12 +1,23 @@
 import * as bot from "../bot/bot";
 import * as config from "../../config.json";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
+import { translateColors } from "../bot/commands/PlayerInfo";
 
 export enum NotificationType {
     Report,
     WatchlistAdd,
     WatchlistTagUpdate,
-    Appeal
+    Appeal,
+    ModLog
+}
+
+export enum ModLogType {
+    ChangeTag,
+    ClearTag,
+    Ban,
+    Unban,
+    MakeAdmin,
+    RemoveAdmin
 }
 
 type NotificationData = {
@@ -26,10 +37,17 @@ type NotificationData = {
 } | {
     type: NotificationType.Appeal,
     reason: string
+} | {
+    type: NotificationType.ModLog,
+    logType: ModLogType,
+    staff: string,
+    oldTag?: string,
+    newTag?: string,
+    reason?: string
 });
 
 export function sendMessage(data: NotificationData) {
-    if(data.type == NotificationType.Report) {
+    if(data.type == NotificationType.Report && config.bot.reports.active) {
         _sendMessage(
             config.bot.reports.channel,
             config.bot.reports.content,
@@ -56,7 +74,7 @@ export function sendMessage(data: NotificationData) {
                 }
             ])
         )
-    } else if(data.type == NotificationType.WatchlistAdd) {
+    } else if(data.type == NotificationType.WatchlistAdd && config.bot.watchlist.active) {
         _sendMessage(
             config.bot.watchlist.channel,
             config.bot.watchlist.content,
@@ -79,7 +97,7 @@ export function sendMessage(data: NotificationData) {
                 }
             ])
         );
-    } else if(data.type == NotificationType.WatchlistTagUpdate) {
+    } else if(data.type == NotificationType.WatchlistTagUpdate && config.bot.watchlist.active) {
         _sendMessage(
             config.bot.watchlist.channel,
             config.bot.watchlist.content,
@@ -98,7 +116,7 @@ export function sendMessage(data: NotificationData) {
                 }
             ])
         );
-    } else if(data.type == NotificationType.Appeal) {
+    } else if(data.type == NotificationType.Appeal && config.bot.appeals.active) {
         _sendMessage(
             config.bot.appeals.channel,
             config.bot.appeals.content,
@@ -117,15 +135,22 @@ export function sendMessage(data: NotificationData) {
                 }
             ])
         );
+    } else if(data.type == NotificationType.ModLog && config.bot.mod_log.active) {
+        _sendMessage(
+            config.bot.mod_log.channel,
+            `[**${ModLogType[data.logType]}**] [\`${data.staff}\`](<https://laby.net/${data.staff}>) → [\`${data.uuid}\`](<https://laby.net/${data.staff}>)${data.logType == ModLogType.ChangeTag ? `: \`${data.oldTag}\` → \`${data.newTag}\`` : data.logType == ModLogType.Ban ? `: \`${data.reason || 'No reason'}\`` : ''}`,
+            null,
+            false
+        );
     }
 }
 
-function _sendMessage(channel: string, content: string, embed: EmbedBuilder) {
+function _sendMessage(channel: string, content: string, embed: EmbedBuilder | null, actionButton: boolean = true) {
     if(!config.bot.enabled) return;
     (bot.client.channels.cache.get(channel) as TextChannel).send({
         content,
-        embeds: [embed],
-        components: [
+        embeds: embed == null ? [] : [embed],
+        components: actionButton ? [
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
@@ -137,6 +162,6 @@ function _sendMessage(channel: string, content: string, embed: EmbedBuilder) {
                 .setCustomId(`finishAction`)
                 .setStyle(ButtonStyle.Success),
             )
-        ]
+        ] : []
     });
 }
