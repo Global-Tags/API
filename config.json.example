@@ -75,6 +75,10 @@
             "active": true,
             "channel": "",
             "content": ""
+        },
+        "mod_log": {
+            "active": true,
+            "channel": ""
         }
     }
 }
