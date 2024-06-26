@@ -138,7 +138,7 @@ export function sendMessage(data: NotificationData) {
     } else if(data.type == NotificationType.ModLog && config.bot.mod_log.active) {
         _sendMessage(
             config.bot.mod_log.channel,
-            `[**${ModLogType[data.logType]}**] [\`${data.staff}\`](<https://laby.net/${data.staff}>) → [\`${data.uuid}\`](<https://laby.net/${data.staff}>)${data.logType == ModLogType.ChangeTag ? `: \`${data.oldTag}\` → \`${data.newTag}\`` : data.logType == ModLogType.Ban ? `: \`${data.reason || 'No reason'}\`` : ''}`,
+            `[**${ModLogType[data.logType]}**] [\`${data.staff}\`](<https://laby.net/${data.staff}>) → [\`${data.uuid}\`](<https://laby.net/${data.uuid}>)${data.logType == ModLogType.ChangeTag ? `: \`${data.oldTag}\` → \`${data.newTag}\`` : data.logType == ModLogType.Ban ? `: \`${data.reason || 'No reason'}\`` : ''}`,
             null,
             false
         );
