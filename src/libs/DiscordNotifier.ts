@@ -16,6 +16,7 @@ export enum ModLogType {
     ClearTag,
     Ban,
     Unban,
+    EditBan,
     MakeAdmin,
     RemoveAdmin
 }
@@ -43,7 +44,8 @@ type NotificationData = {
     staff: string,
     oldTag?: string,
     newTag?: string,
-    reason?: string
+    reason?: string,
+    appealable?: boolean
 });
 
 export function sendMessage(data: NotificationData) {
@@ -136,13 +138,23 @@ export function sendMessage(data: NotificationData) {
             ])
         );
     } else if(data.type == NotificationType.ModLog && config.bot.mod_log.active) {
+        const description = modlogDescription(data);
         _sendMessage(
             config.bot.mod_log.channel,
-            `[**${ModLogType[data.logType]}**] [\`${data.staff}\`](<https://laby.net/${data.staff}>) → [\`${data.uuid}\`](<https://laby.net/${data.uuid}>)${data.logType == ModLogType.ChangeTag ? `: \`${data.oldTag}\` → \`${data.newTag}\`` : data.logType == ModLogType.Ban ? `: \`${data.reason || 'No reason'}\`` : ''}`,
+            `[**${ModLogType[data.logType]}**] [\`${data.staff}\`](<https://laby.net/${data.staff}>) → [\`${data.uuid}\`](<https://laby.net/${data.uuid}>)${description ? `: ${description}` : ''}`,
             null,
             false
         );
     }
+}
+
+function modlogDescription(data: NotificationData): string | null {
+    if(data.type != NotificationType.ModLog) return null;
+    const { logType: type, oldTag, newTag, reason, appealable } = data;
+    if(type == ModLogType.ChangeTag) return `\`${oldTag}\` → \`${newTag}\``;
+    else if(type == ModLogType.Ban) return `**Reason**: \`${reason || 'No reason'}\``;
+    else if(type == ModLogType.EditBan) return `**Appealable**: \`${appealable ? `❌` : `✅`}\`. **Reason**: \`${reason}\``;
+    return null;
 }
 
 function _sendMessage(channel: string, content: string, embed: EmbedBuilder | null, actionButton: boolean = true) {
