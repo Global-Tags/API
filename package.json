@@ -1,6 +1,6 @@
 {
   "name": "globaltags",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "module": "src/index.js",
   "scripts": {
     "dev": "bun --watch src/index.ts",
