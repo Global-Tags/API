@@ -16,12 +16,14 @@ import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/FetchI18n";
 import { initializeMetrics } from "./libs/Metrics";
 import Metrics from "./database/schemas/metrics";
 import handleErrors from "./libs/ErrorHandler";
+import { verifyVersion } from "./middleware/VersionVerification";
 
 handleErrors();
 
 // Elysia API
 export const elysia = new Elysia()
 .onRequest(checkDatabase)
+.onRequest(verifyVersion)
 .onTransform(access)
 .onBeforeHandle(checkRatelimit)
 .use(ip({ checkHeaders: config.ipHeaders }))
