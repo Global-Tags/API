@@ -4,6 +4,7 @@ import axios from "axios";
 import players from "../../database/schemas/players";
 import * as bot from "../bot";
 import * as config from "../../../config.json";
+import { translateToAnsi } from "../../libs/ChatColor";
 const regex = /[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}|[a-f0-9]{8}(?:[a-f0-9]{4}){4}[a-f0-9]{8}/;
 
 export default class PlayerInfo extends Command {
@@ -39,7 +40,7 @@ export default class PlayerInfo extends Command {
                 name = res.data.name;
             } catch(err: any) {
                 console.log(`[ERROR] Mojang API error: ${err?.response?.data || `Undefined data`}`);
-                return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ ${err?.response?.data.errorMessage || `An error ocurred with the request to mojang`}`)], ephemeral: true });
+                return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ ${err?.response?.data.errorMessage || `An error ocurred with the request to mojang`}`)] });
             }
         }
         const data = await players.findOne({ uuid: uuid.replaceAll(`-`, ``) });
@@ -58,7 +59,7 @@ export default class PlayerInfo extends Command {
                     },
                     {
                         name: `Tag`,
-                        value: `\`\`\`ansi\n${translateColors(data.ban?.active ? `Hidden because user is banned` : data.tag || `--`)}\`\`\``
+                        value: `\`\`\`ansi\n${translateToAnsi(data.ban?.active ? `Hidden because user is banned` : data.tag || `--`)}\`\`\``
                     },
                     {
                         name: `Position`,
@@ -72,12 +73,12 @@ export default class PlayerInfo extends Command {
                     },
                     {
                         name: `Admin`,
-                        value: `\`\`\`ansi\n${translateColors(data.admin ? `&aYes` : `&cNo`)}\`\`\``,
+                        value: `\`\`\`ansi\n${translateToAnsi(data.admin ? `&aYes` : `&cNo`)}\`\`\``,
                         inline: true
                     },
                     {
                         name: `Banned`,
-                        value: `\`\`\`ansi\n${translateColors(data.isBanned() ? `&cYes` : `&aNo`)}\`\`\``,
+                        value: `\`\`\`ansi\n${translateToAnsi(data.isBanned() ? `&cYes` : `&aNo`)}\`\`\``,
                         inline: true
                     },
                     {
@@ -100,26 +101,4 @@ export default class PlayerInfo extends Command {
             ]
         });
     }
-}
-
-export function translateColors(text: string): string {
-    return text
-        .replaceAll(/(&|§)0/gi, `[0;30m`)
-        .replaceAll(/(&|§)7/gi, `[0;30m`)
-        .replaceAll(/(&|§)8/gi, `[0;30m`)
-        .replaceAll(/(&|§)4/gi, `[0;31m`)
-        .replaceAll(/(&|§)c/gi, `[0;31m`)
-        .replaceAll(/(&|§)2/gi, `[0;32m`)
-        .replaceAll(/(&|§)a/gi, `[0;32m`)
-        .replaceAll(/(&|§)6/gi, `[0;33m`)
-        .replaceAll(/(&|§)e/gi, `[0;33m`)
-        .replaceAll(/(&|§)1/gi, `[0;34m`)
-        .replaceAll(/(&|§)9/gi, `[0;34m`)
-        .replaceAll(/(&|§)5/gi, `[0;35m`)
-        .replaceAll(/(&|§)d/gi, `[0;35m`)
-        .replaceAll(/(&|§)3/gi, `[0;36m`)
-        .replaceAll(/(&|§)b/gi, `[0;36m`)
-        .replaceAll(/(&|§)f/gi, `[0;37m`)
-        .replaceAll(/(&|§)r/gi, `[0;37m`)
-        .replace(/(&|§)[0-9A-FK-ORX]/gi, ``);
 }
