@@ -25,6 +25,6 @@ export default class MakeAdmin extends Button {
             discord: true
         });
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The player is now being watched!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The player is now an admin!`)], ephemeral: true });
     }
 }

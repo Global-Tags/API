@@ -12,7 +12,7 @@ export default class RemoveAdmin extends Button {
     async trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll(`\``, ``) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
-        if(!player.admin) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player is not on the watchlist!`)], ephemeral: true });
+        if(!player.admin) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player is not an admin!`)], ephemeral: true });
 
         player.admin = false;
         player.save();
@@ -25,6 +25,6 @@ export default class RemoveAdmin extends Button {
             discord: true
         });
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The player is not being watched anymore!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The player is not an admin anymore!`)], ephemeral: true });
     }
 }
