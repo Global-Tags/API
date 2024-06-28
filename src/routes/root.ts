@@ -75,33 +75,24 @@ export default new Elysia()
             watchlist: isWatched,
             history: [tag]
         }).save();
-        if(!session.equal) {
-            sendMessage({
-                type: NotificationType.ModLog,
-                logType: ModLogType.ChangeTag,
-                uuid: uuid,
-                staff: session.uuid || 'Unknown',
-                oldTag: 'None',
-                newTag: tag
-            });
-        }
     } else {
         if(player.tag == tag) return error(400, { error: i18n(`setTag.sameTag`) });
-        if(!session.equal) {
-            sendMessage({
-                type: NotificationType.ModLog,
-                logType: ModLogType.ChangeTag,
-                uuid: uuid,
-                staff: session.uuid || 'Unknown',
-                oldTag: player.tag || 'None',
-                newTag: tag
-            });
-        }
 
         player.tag = tag;
         if(isWatched) player.watchlist = true;
         if(player.history[player.history.length - 1] != tag) player.history.push(tag);
         await player.save();
+    }
+    
+    if(!session.equal) {
+        sendMessage({
+            type: NotificationType.ModLog,
+            logType: ModLogType.ChangeTag,
+            uuid: uuid,
+            staff: session.uuid || 'Unknown',
+            oldTag: player?.tag || 'None',
+            newTag: tag
+        });
     }
 
     if(isWatched) sendMessage({ type: NotificationType.WatchlistTagUpdate, uuid, tag });
