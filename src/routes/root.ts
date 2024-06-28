@@ -5,8 +5,7 @@ import { sendMessage, NotificationType, ModLogType } from "../libs/DiscordNotifi
 import { getJWTSession } from "../libs/SessionValidator";
 import * as config from "../../config.json";
 import fetchI18n from "../middleware/FetchI18n";
-
-const colorCodeRegex = /(&|§)[0-9A-FK-ORX]/gi;
+import { stripColors } from "../libs/ChatColor";
 
 export default new Elysia()
 .use(fetchI18n).get(`/`, async ({ error, params, headers, i18n }) => { // Get player info
@@ -54,12 +53,14 @@ export default new Elysia()
     
     const player = await players.findOne({ uuid });
     if(player && player.isBanned()) return error(403, { error: i18n(`error.${session.equal ? 'b' : 'playerB'}anned`) });
-    const { blacklist, watchlist } = config.validation.tag;
-    if(tag == '') return error(422, { error: i18n(`setTag.empty`) });
-    const blacklistedWord = blacklist.find((word) => tag.replace(colorCodeRegex, ``).toLowerCase().includes(word));
+    const { min, max, blacklist, watchlist } = config.validation.tag;
+    const strippedTag = stripColors(tag).trim();
+    if(strippedTag == '') return error(422, { error: i18n(`setTag.empty`) });
+    if(strippedTag.length < min || strippedTag.length > max) return error(422, { error: i18n(`setTag.validation`).replace('<min>', String(min)).replace('<max>', String(max)) });
+    const blacklistedWord = blacklist.find((word) => strippedTag.toLowerCase().includes(word));
     if(blacklistedWord) return error(422, { error: i18n(`setTag.blacklisted`).replaceAll(`<word>`, blacklistedWord) });
     const isWatched = (player && player.watchlist) || watchlist.some((word) => {
-        if(tag.replace(colorCodeRegex, ``).toLowerCase().includes(word)) {
+        if(strippedTag.toLowerCase().includes(word)) {
             Logger.warn(`Now watching ${uuid} for matching "${word}" in "${tag}".`);
             sendMessage({ type: NotificationType.WatchlistAdd, uuid, tag, word });
             return true;
@@ -74,33 +75,24 @@ export default new Elysia()
             watchlist: isWatched,
             history: [tag]
         }).save();
-        if(!session.equal) {
-            sendMessage({
-                type: NotificationType.ModLog,
-                logType: ModLogType.ChangeTag,
-                uuid: uuid,
-                staff: session.uuid || 'Unknown',
-                oldTag: 'None',
-                newTag: tag
-            });
-        }
     } else {
         if(player.tag == tag) return error(400, { error: i18n(`setTag.sameTag`) });
-        if(!session.equal) {
-            sendMessage({
-                type: NotificationType.ModLog,
-                logType: ModLogType.ChangeTag,
-                uuid: uuid,
-                staff: session.uuid || 'Unknown',
-                oldTag: player.tag || 'None',
-                newTag: tag
-            });
-        }
 
         player.tag = tag;
         if(isWatched) player.watchlist = true;
         if(player.history[player.history.length - 1] != tag) player.history.push(tag);
         await player.save();
+    }
+    
+    if(!session.equal) {
+        sendMessage({
+            type: NotificationType.ModLog,
+            logType: ModLogType.ChangeTag,
+            uuid: uuid,
+            staff: session.uuid || 'Unknown',
+            oldTag: player?.tag || 'None',
+            newTag: tag
+        });
     }
 
     if(isWatched) sendMessage({ type: NotificationType.WatchlistTagUpdate, uuid, tag });
@@ -120,7 +112,7 @@ export default new Elysia()
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },
     params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
-    body: t.Object({ tag: t.String({ minLength: config.validation.tag.min, maxLength: config.validation.tag.max, error: `setTag.validation;;[["min", "${config.validation.tag.min}"], ["max", "${config.validation.tag.max}"]]` }) }, { error: `error.invalidBody`, additionalProperties: true }),
+    body: t.Object({ tag: t.String({ error: `error.wrongType;;[["field", "tag"], ["type", "string"]]` }) }, { error: `error.invalidBody`, additionalProperties: true }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 }).post(`/admin`, async ({ error, params, headers, i18n }) => { // Toggle admin
     const uuid = params.uuid.replaceAll(`-`, ``);

@@ -2,6 +2,7 @@ import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder 
 import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
+import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 
 export default class ClearTag extends Button {
     constructor() {
@@ -15,6 +16,14 @@ export default class ClearTag extends Button {
 
         player.tag = null;
         player.save();
+
+        sendMessage({
+            type: NotificationType.ModLog,
+            logType: ModLogType.ClearTag,
+            uuid: player.uuid,
+            staff: user.id,
+            discord: true
+        });
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The tag was successfully deleted!`)], ephemeral: true });
     }

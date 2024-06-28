@@ -25,13 +25,24 @@ export default class Actions extends Button {
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
-                .setLabel(`Watch`)
-                .setCustomId(`watch`)
-                .setStyle(ButtonStyle.Primary),
+                .setLabel(`Make Admin`)
+                .setCustomId(`makeAdmin`)
+                .setStyle(ButtonStyle.Success),
+                new ButtonBuilder()
+                .setLabel(`Remove Admin`)
+                .setCustomId(`removeAdmin`)
+                .setStyle(ButtonStyle.Danger)
+            ),
+            new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(
                 new ButtonBuilder()
                 .setLabel(`Unwatch`)
                 .setCustomId(`unwatch`)
-                .setStyle(ButtonStyle.Primary)
+                .setStyle(ButtonStyle.Success),
+                new ButtonBuilder()
+                .setLabel(`Watch`)
+                .setCustomId(`watch`)
+                .setStyle(ButtonStyle.Danger)
             ),
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
@@ -47,13 +58,13 @@ export default class Actions extends Button {
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
-                .setLabel(`Clear tag`)
-                .setCustomId(`clearTag`)
-                .setStyle(ButtonStyle.Danger),
-                new ButtonBuilder()
                 .setLabel(`Set tag`)
                 .setCustomId(`setTag`)
-                .setStyle(ButtonStyle.Primary)
+                .setStyle(ButtonStyle.Primary),
+                new ButtonBuilder()
+                .setLabel(`Clear tag`)
+                .setCustomId(`clearTag`)
+                .setStyle(ButtonStyle.Danger)
             )
         ]
 

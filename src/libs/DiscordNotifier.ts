@@ -1,7 +1,6 @@
 import * as bot from "../bot/bot";
 import * as config from "../../config.json";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
-import { translateColors } from "../bot/commands/PlayerInfo";
 
 export enum NotificationType {
     Report,
@@ -18,7 +17,9 @@ export enum ModLogType {
     Unban,
     EditBan,
     MakeAdmin,
-    RemoveAdmin
+    RemoveAdmin,
+    Watch,
+    Unwatch
 }
 
 type NotificationData = {
@@ -45,7 +46,8 @@ type NotificationData = {
     oldTag?: string,
     newTag?: string,
     reason?: string,
-    appealable?: boolean
+    appealable?: boolean,
+    discord?: boolean
 });
 
 export function sendMessage(data: NotificationData) {
@@ -141,7 +143,7 @@ export function sendMessage(data: NotificationData) {
         const description = modlogDescription(data);
         _sendMessage(
             config.bot.mod_log.channel,
-            `[**${ModLogType[data.logType]}**] [\`${data.staff}\`](<https://laby.net/${data.staff}>) → [\`${data.uuid}\`](<https://laby.net/${data.uuid}>)${description ? `: ${description}` : ''}`,
+            `[**${ModLogType[data.logType]}**] [\`${data.staff}\`](<${data.discord ? `discord://-/users/${data.staff}` : `https://laby.net/${data.staff}`}>) → [\`${data.uuid}\`](<https://laby.net/${data.uuid}>)${description ? `: ${description}` : ''}`,
             null,
             false
         );

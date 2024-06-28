@@ -2,6 +2,7 @@ import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder 
 import Button from "../structs/Button";
 import { colors } from "../bot";
 import players from "../../database/schemas/players";
+import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 
 export default class Unwatch extends Button {
     constructor() {
@@ -15,6 +16,14 @@ export default class Unwatch extends Button {
 
         player.watchlist = false;
         player.save();
+
+        sendMessage({
+            type: NotificationType.ModLog,
+            logType: ModLogType.Unwatch,
+            uuid: player.uuid,
+            staff: user.id,
+            discord: true
+        });
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The player is not being watched anymore!`)], ephemeral: true });
     }

@@ -1,4 +1,4 @@
-import { Context, PreContext } from "elysia";
+import { Context } from "elysia";
 import Logger from "../libs/Logger";
 import moment = require("moment");
 import { logTimeFormat } from "../../config.json";

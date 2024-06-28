@@ -2,6 +2,7 @@ import { CacheType, Message, GuildMember, User, EmbedBuilder, ModalSubmitInterac
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import Modal from "../structs/Modal";
+import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 
 export default class SetTag extends Modal {
     constructor() {
@@ -11,8 +12,19 @@ export default class SetTag extends Modal {
     async submit(interaction: ModalSubmitInteraction<CacheType>, message: Message<boolean>, fields: ModalSubmitFields, member: GuildMember, user: User) {
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll(`\``, ``) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
+        const tag = fields.getTextInputValue('tag');
 
-        player.tag = fields.getTextInputValue('tag');
+        sendMessage({
+            type: NotificationType.ModLog,
+            logType: ModLogType.ChangeTag,
+            uuid: player.uuid,
+            staff: user.id,
+            oldTag: player.tag || 'None',
+            newTag: tag,
+            discord: true
+        });
+
+        player.tag = tag;
         player.save();
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The tag was successfully set!`)], ephemeral: true });
