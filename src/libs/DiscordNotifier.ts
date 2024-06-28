@@ -1,7 +1,6 @@
 import * as bot from "../bot/bot";
 import * as config from "../../config.json";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
-import { translateColors } from "../bot/commands/PlayerInfo";
 
 export enum NotificationType {
     Report,
