@@ -47,13 +47,13 @@ export default class Actions extends Button {
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
-                .setLabel(`Ban`)
-                .setCustomId(`ban`)
-                .setStyle(ButtonStyle.Danger),
-                new ButtonBuilder()
                 .setLabel(`Unban`)
                 .setCustomId(`unban`)
-                .setStyle(ButtonStyle.Success)
+                .setStyle(ButtonStyle.Success),
+                new ButtonBuilder()
+                .setLabel(`Ban`)
+                .setCustomId(`ban`)
+                .setStyle(ButtonStyle.Danger)
             ),
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
