@@ -45,7 +45,7 @@ export default new Elysia({
     body: t.Object({ reason: t.Optional(t.String()) }, { error: `error.invalidBody`, additionalProperties: true }),
     params: t.Object({ uuid: t.String() }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed` }) }, { error: `error.notAllowed` })
-}).put(`/`, async ({ error, params, headers, body, i18n }) => { // Update ban info
+}).put(`/`, async ({ error, params, headers, body, i18n }) => { // Update ban info - I need to use put here bc labymod's Request system doesn't support PATCH
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
     const session = await getJWTSession(authorization, uuid);
