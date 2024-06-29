@@ -17,6 +17,7 @@ export default new Elysia({
     if(!player) return error(404, { error: i18n(`error.noTag`) });
     if(player.isBanned()) return error(403, { error: i18n(`error.banned`) });
     if(player.connections!.discord!.id) return error(400, { error: i18n(`connections.discord.alreadyConnected`) });
+    if(player.connections!.discord!.code) return { code: player.connections!.discord!.code };
 
     const code = Date.now().toString(36);
     player.connections!.discord!.code = code;
