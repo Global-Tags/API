@@ -16,7 +16,6 @@ export default new Elysia({
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.noTag`) });
     if(player.isBanned()) return error(403, { error: i18n(`error.banned`) });
-    if(!player.tag) return error(404, { error: i18n(`error.noTag`) });
     if(icon == player.icon) return error(400, { error: i18n(`icon.sameIcon`) });
     if(config.validation.icon.blacklist.includes(icon.toLowerCase())) return error(403, { error: i18n(`icon.notAllowed`) });
 
