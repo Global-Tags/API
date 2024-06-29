@@ -46,7 +46,6 @@ export default new Elysia({
     },
     response: {
         200: t.Object({ message: t.String() }, { description: `The player was successfully reported` }),
-        401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
         403: t.Object({ error: t.String() }, { description: `You have tried to report someone whom you are not allowed to report.` }),
         404: t.Object({ error: t.String() }, { description: `The player you tried to report does not have a tag.` }),
         422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),

@@ -31,7 +31,6 @@ export default new Elysia({
     response: {
         200: t.Object({ message: t.String() }, { description: `The icon was successfully changed` }),
         400: t.Object({ error: t.String() }, { description: `You tried chose an icon that you're already using.` }),
-        401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
         403: t.Object({ error: t.String() }, { description: `You're banned.` }),
         404: t.Object({ error: t.String() }, { description: `You don't have a tag to change the icon of.` }),
         422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),

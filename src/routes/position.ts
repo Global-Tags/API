@@ -30,7 +30,6 @@ export default new Elysia({
     response: {
         200: t.Object({ message: t.String() }, { description: `The tag position was successfully changed` }),
         400: t.Object({ error: t.String() }, { description: `You provided an invalid position.` }),
-        401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
         403: t.Object({ error: t.String() }, { description: `You're banned.` }),
         404: t.Object({ error: t.String() }, { description: `You don't have a tag to change the position of.` }),
         406: t.Object({ error: t.String() }, { description: `You tried to change your tag to the position it's already set to.` }),
