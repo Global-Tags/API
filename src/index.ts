@@ -54,7 +54,8 @@ export const elysia = new Elysia()
             { name: `API`, description: `Get info about the API` },
             { name: `Interactions`, description: `Interact with other players` },
             { name: `Settings`, description: `Modify the settings of your global tag` },
-            { name: `Bans`, description: `Manage and appeal bans` }
+            { name: `Bans`, description: `Manage and appeal bans` },
+            { name: `Connections`, description: `Manage account connections` }
         ]
     }
 }))
