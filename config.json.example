@@ -79,6 +79,11 @@
         "mod_log": {
             "active": true,
             "channel": ""
+        },
+        "connection": {
+            "active": true,
+            "role": "",
+            "log": ""
         }
     }
 }
