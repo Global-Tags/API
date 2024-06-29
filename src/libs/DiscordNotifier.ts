@@ -169,7 +169,7 @@ export function sendMessage(data: NotificationData) {
         const description = modlogDescription(data);
         _sendMessage(
             config.bot.mod_log.channel,
-            `[**${ModLogType[data.logType]}**] [\`${data.staff}\`](<${data.discord ? `discord://-/users/${data.staff}` : `https://laby.net/${data.staff}`}>) → [\`${data.uuid}\`](<https://laby.net/${data.uuid}>)${description ? `: ${description}` : ''}`,
+            `[**${ModLogType[data.logType]}**] [\`${data.staff}\`](<https://laby.net/${data.staff}>)${data.discord ? ' [**D**]' : ''} → [\`${data.uuid}\`](<https://laby.net/${data.uuid}>)${description ? `: ${description}` : ''}`,
             null,
             false
         );
