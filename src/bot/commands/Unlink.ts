@@ -24,6 +24,7 @@ export default class PlayerInfo extends Command {
         player.connections!.discord!.id = null;
         player.connections!.discord!.code = null;
         player.save();
+        member.roles.remove(bot.connection.role);
 
         sendMessage({
             type: NotificationType.DiscordLink,

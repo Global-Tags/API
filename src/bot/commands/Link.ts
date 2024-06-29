@@ -35,6 +35,7 @@ export default class PlayerInfo extends Command {
         player.connections!.discord!.id = user.id;
         player.connections!.discord!.code = null;
         player.save();
+        member.roles.add(bot.connection.role);
 
         sendMessage({
             type: NotificationType.DiscordLink,
