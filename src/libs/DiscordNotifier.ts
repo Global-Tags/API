@@ -7,7 +7,8 @@ export enum NotificationType {
     WatchlistAdd,
     WatchlistTagUpdate,
     Appeal,
-    ModLog
+    ModLog,
+    DiscordLink
 }
 
 export enum ModLogType {
@@ -39,6 +40,11 @@ type NotificationData = {
 } | {
     type: NotificationType.Appeal,
     reason: string
+} | {
+    type: NotificationType.DiscordLink,
+    connected: boolean,
+    userId: string,
+    uuid: string
 } | {
     type: NotificationType.ModLog,
     logType: ModLogType,
@@ -139,11 +145,31 @@ export function sendMessage(data: NotificationData) {
                 }
             ])
         );
+    } else if(data.type == NotificationType.DiscordLink && config.bot.connection.active) {
+        _sendMessage(
+            config.bot.connection.log,
+            undefined,
+            new EmbedBuilder()
+            .setColor(0x5865f2)
+            .setThumbnail(`https://laby.net/texture/profile/head/${data.uuid}.png?size=1024&overlay`)
+            .setTitle(data.connected ? 'New discord connection' : 'Discord connection removed')
+            .addFields([
+                {
+                    name: `UUID`,
+                    value: `[\`${data.uuid}\`](https://laby.net/@${data.uuid})`
+                },
+                {
+                    name: `User ID`,
+                    value: `[\`${data.userId}\`](discord://-/users/${data.userId})`
+                }
+            ]),
+            false
+        );
     } else if(data.type == NotificationType.ModLog && config.bot.mod_log.active) {
         const description = modlogDescription(data);
         _sendMessage(
             config.bot.mod_log.channel,
-            `[**${ModLogType[data.logType]}**] [\`${data.staff}\`](<${data.discord ? `discord://-/users/${data.staff}` : `https://laby.net/${data.staff}`}>) → [\`${data.uuid}\`](<https://laby.net/${data.uuid}>)${description ? `: ${description}` : ''}`,
+            `[**${ModLogType[data.logType]}**] [\`${data.staff}\`](<https://laby.net/${data.staff}>)${data.discord ? ' [**D**]' : ''} → [\`${data.uuid}\`](<https://laby.net/${data.uuid}>)${description ? `: ${description}` : ''}`,
             null,
             false
         );
@@ -159,7 +185,7 @@ function modlogDescription(data: NotificationData): string | null {
     return null;
 }
 
-function _sendMessage(channel: string, content: string, embed: EmbedBuilder | null, actionButton: boolean = true) {
+function _sendMessage(channel: string, content: string | undefined, embed: EmbedBuilder | null, actionButton: boolean = true) {
     if(!config.bot.enabled) return;
     (bot.client.channels.cache.get(channel) as TextChannel).send({
         content,

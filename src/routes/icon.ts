@@ -16,7 +16,6 @@ export default new Elysia({
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.noTag`) });
     if(player.isBanned()) return error(403, { error: i18n(`error.banned`) });
-    if(!player.tag) return error(404, { error: i18n(`error.noTag`) });
     if(icon == player.icon) return error(400, { error: i18n(`icon.sameIcon`) });
     if(config.validation.icon.blacklist.includes(icon.toLowerCase())) return error(403, { error: i18n(`icon.notAllowed`) });
 
@@ -32,7 +31,6 @@ export default new Elysia({
     response: {
         200: t.Object({ message: t.String() }, { description: `The icon was successfully changed` }),
         400: t.Object({ error: t.String() }, { description: `You tried chose an icon that you're already using.` }),
-        401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
         403: t.Object({ error: t.String() }, { description: `You're banned.` }),
         404: t.Object({ error: t.String() }, { description: `You don't have a tag to change the icon of.` }),
         422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),

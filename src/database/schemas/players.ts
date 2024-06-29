@@ -61,6 +61,12 @@ const schema = new Schema({
             required: true,
             default: false
         }
+    },
+    connections: {
+        discord: {
+            id: String,
+            code: String
+        }
     }
 }, {
     methods: {

@@ -32,7 +32,6 @@ export const elysia = new Elysia()
     path: '/docs',
     autoDarkMode: true,
     exclude: [
-        `/players/{uuid}/ban/`,
         `/docs`,
         `/docs/json`
     ],
@@ -41,6 +40,10 @@ export const elysia = new Elysia()
             version,
             title: `GlobalTags API`,
             description: `This documentation is for the API of the GlobalTags addon for the LabyMod Minecraft client.`,
+            license: {
+                name: 'MIT',
+                url: 'https://github.com/RappyLabyAddons/GlobalTagAPI/blob/master/LICENSE'
+            },
             contact: {
                 name: `RappyTV`,
                 url: `https://www.rappytv.com`,
@@ -50,7 +53,9 @@ export const elysia = new Elysia()
         tags: [
             { name: `API`, description: `Get info about the API` },
             { name: `Interactions`, description: `Interact with other players` },
-            { name: `Settings`, description: `Modify the settings of your global tag` }
+            { name: `Settings`, description: `Modify the settings of your global tag` },
+            { name: `Bans`, description: `Manage and appeal bans` },
+            { name: `Connections`, description: `Manage account connections` }
         ]
     }
 }))

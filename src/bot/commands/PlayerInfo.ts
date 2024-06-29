@@ -46,6 +46,7 @@ export default class PlayerInfo extends Command {
         const data = await players.findOne({ uuid: uuid.replaceAll(`-`, ``) });
 
         if(!data) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ This player is not in our records!`)] });
+        const staff = await players.findOne({ "connections.discord.id": user.id, admin: true });
         interaction.editReply({
             embeds: [
                 new EmbedBuilder()
@@ -90,7 +91,7 @@ export default class PlayerInfo extends Command {
                 .setImage(`https://cdn.rappytv.com/bots/placeholder.png`)
                 .setFooter({ text: `© RappyTV, ${new Date().getFullYear()}`})
             ],
-            components: !(config.bot.staff as Array<string>).includes(user.id) ? [] : [
+            components: !!staff ? [] : [
                 new ActionRowBuilder<ButtonBuilder>()
                     .addComponents(
                         new ButtonBuilder()

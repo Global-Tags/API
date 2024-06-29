@@ -36,7 +36,6 @@ export default new Elysia()
     },
     response: {
         200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.String(), admin: t.Boolean({ default: false }), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]) }), t.Null()]) }, { description: `You received the tag data.` }),
-        401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
         403: t.Object({ error: t.String() }, { description: `The player is banned.` }),
         404: t.Object({ error: t.String() }, { description: `The player is not in the database.` }),
         429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
@@ -105,7 +104,6 @@ export default new Elysia()
     response: {
         200: t.Object({ message: t.String() }, { description: `The player was successfully reported` }),
         400: t.Object({ error: t.String() }, { description: `You already have this tag.` }),
-        401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
         403: t.Object({ error: t.String() }, { description: `You're banned.` }),
         422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
         429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
@@ -143,7 +141,6 @@ export default new Elysia()
     response: {
         200: t.Object({ message: t.String() }, { description: `The player's admin status has changed.` }),
         400: t.Object({ error: t.String() }, { description: `You already have this tag.` }),
-        401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
         403: t.Object({ error: t.String() }, { description: `You're not an admin.` }),
         404: t.Object({ error: t.String() }, { description: `The player was not found.` }),
         422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
@@ -182,7 +179,6 @@ export default new Elysia()
     },
     response: {
         200: t.Object({ message: t.String() }, { description: `The player was successfully reported` }),
-        401: t.Object({ error: t.String() }, { description: `You're not authenticated with LabyConnect.` }),
         403: t.Object({ error: t.String() }, { description: `You're banned.` }),
         404: t.Object({ error: t.String() }, { description: `You don't have a tag.` }),
         429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
