@@ -13,7 +13,7 @@ export default class PlayerInfo extends Command {
             [
                 {
                     name: `code`,
-                    description: `The code you got from executing '/gt link discord' in minecraft.`,
+                    description: `The code you got from executing '/gt link' in minecraft.`,
                     required: true,
                     type: ApplicationCommandOptionType.String
                 }
