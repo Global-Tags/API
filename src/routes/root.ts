@@ -135,12 +135,86 @@ export default new Elysia()
     return { message: i18n(`toggleAdmin.${player.admin ? 'on' : 'off'}`) };
 }, {
     detail: {
-        tags: ['Settings'],
-        description: `Change your global tag`
+        tags: ['Admin'],
+        description: `Toggle the admin status of a player`
     },
     response: {
         200: t.Object({ message: t.String() }, { description: `The player's admin status has changed.` }),
         400: t.Object({ error: t.String() }, { description: `You already have this tag.` }),
+        403: t.Object({ error: t.String() }, { description: `You're not an admin.` }),
+        404: t.Object({ error: t.String() }, { description: `The player was not found.` }),
+        422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
+        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    },
+    params: t.Object({ uuid: t.String({ description: `The player's UUID` }) }),
+    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
+}).post(`/watch`, async ({ error, params, headers, i18n }) => { // Watch player
+    const uuid = params.uuid.replaceAll(`-`, ``);
+    const { authorization } = headers;
+    const session = await getJWTSession(authorization, uuid);
+    if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
+    
+    const player = await players.findOne({ uuid });
+    if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
+    if(player.watchlist) return error(400, { error: i18n(`watch.alreadyWatched`) });
+
+    player.watchlist = true;
+    await player.save();
+    
+    sendMessage({
+        type: NotificationType.ModLog,
+        logType: ModLogType.Watch,
+        uuid: uuid,
+        staff: session.uuid || 'Unknown'
+    });
+
+    return { message: i18n(`watch.success`) };
+}, {
+    detail: {
+        tags: ['Admin'],
+        description: `Watch a player`
+    },
+    response: {
+        200: t.Object({ message: t.String() }, { description: `The player is on the watchlist now.` }),
+        400: t.Object({ error: t.String() }, { description: `The player is already on the watchlist.` }),
+        403: t.Object({ error: t.String() }, { description: `You're not an admin.` }),
+        404: t.Object({ error: t.String() }, { description: `The player was not found.` }),
+        422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
+        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    },
+    params: t.Object({ uuid: t.String({ description: `The player's UUID` }) }),
+    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
+}).post(`/unwatch`, async ({ error, params, headers, i18n }) => { // Unwatch player
+    const uuid = params.uuid.replaceAll(`-`, ``);
+    const { authorization } = headers;
+    const session = await getJWTSession(authorization, uuid);
+    if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
+    
+    const player = await players.findOne({ uuid });
+    if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
+    if(!player.watchlist) return error(400, { error: i18n(`unwatch.notWatched`) });
+
+    player.watchlist = false;
+    await player.save();
+    
+    sendMessage({
+        type: NotificationType.ModLog,
+        logType: ModLogType.Unwatch,
+        uuid: uuid,
+        staff: session.uuid || 'Unknown'
+    });
+
+    return { message: i18n(`unwatch.success`) };
+}, {
+    detail: {
+        tags: ['Admin'],
+        description: `Unwatch a player`
+    },
+    response: {
+        200: t.Object({ message: t.String() }, { description: `The player is no longer on the watchlist.` }),
+        400: t.Object({ error: t.String() }, { description: `The player is not on the watchlist.` }),
         403: t.Object({ error: t.String() }, { description: `You're not an admin.` }),
         404: t.Object({ error: t.String() }, { description: `The player was not found.` }),
         422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
