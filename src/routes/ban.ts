@@ -18,7 +18,7 @@ export default new Elysia({
     return { banned: player.isBanned(), reason: player.isBanned() ? player.ban?.reason || null : null, appealable: player.ban?.appealable || false };
 }, {
     detail: {
-        tags: ['Bans'],
+        tags: ['Admin'],
         description: `Get info about the ban of a specific player`
     },
     response: {
@@ -52,7 +52,7 @@ export default new Elysia({
     return { message: i18n(`ban.success`) };
 }, {
     detail: {
-        tags: ['Bans'],
+        tags: ['Admin'],
         description: `Ban a player`
     },
     response: {
@@ -90,7 +90,7 @@ export default new Elysia({
     return { message: i18n(`editBan.success`) };
 }, {
     detail: {
-        tags: ['Bans'],
+        tags: ['Admin'],
         description: `Edit the ban info of a player`
     },
     response: {
@@ -125,7 +125,7 @@ export default new Elysia({
     return { message: i18n(`appeal.success`) };
 }, {
     detail: {
-        tags: ['Bans'],
+        tags: ['Admin'],
         description: `Request to be unbanned by the admins`
     },
     response: {
@@ -158,7 +158,7 @@ export default new Elysia({
     return { message: i18n(`unban.success`) };
 }, {
     detail: {
-        tags: ['Bans'],
+        tags: ['Admin'],
         description: `Unban a player`
     },
     response: {
