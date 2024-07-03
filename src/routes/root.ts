@@ -20,8 +20,8 @@ export default new Elysia()
     return {
         uuid: player.uuid,
         tag: player.isBanned() ? null : player.tag || null,
-        position: player.position,
-        icon: player.icon,
+        position: player.position || "ABOVE",
+        icon: player.icon || "NONE",
         admin: player.admin,
         ban: session.equal || session.isAdmin ? {
             active: player.isBanned(),
