@@ -73,6 +73,11 @@ export default class PlayerInfo extends Command {
                         inline: true
                     },
                     {
+                        name: `Font`,
+                        value: `\`\`\`${capitalize(data.font)}\`\`\``,
+                        inline: false
+                    },
+                    {
                         name: `Admin`,
                         value: `\`\`\`ansi\n${translateToAnsi(data.admin ? `&aYes` : `&cNo`)}\`\`\``,
                         inline: true
