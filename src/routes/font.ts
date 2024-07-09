@@ -1,12 +1,11 @@
 import Elysia, { t } from "elysia";
 import { getJWTSession } from "../libs/SessionValidator";
 import players from "../database/schemas/players";
-import * as config from "../../config.json";
 import fetchI18n from "../middleware/FetchI18n";
 
 export default new Elysia({
     prefix: "/font"
-}).use(fetchI18n).post(`/`, async ({ error, params, headers, body, i18n }) => { // Change icon
+}).use(fetchI18n).post(`/`, async ({ error, params, headers, body, i18n }) => { // Change font
     const uuid = params.uuid.replaceAll(`-`, ``);
     const font = body.font.toUpperCase();
     const { authorization } = headers;
