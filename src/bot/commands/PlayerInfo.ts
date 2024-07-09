@@ -64,13 +64,18 @@ export default class PlayerInfo extends Command {
                     },
                     {
                         name: `Position`,
-                        value: `\`\`\`${data.position.charAt(0).toUpperCase() + data.position.substring(1).toLowerCase()}\`\`\``,
+                        value: `\`\`\`${capitalize(data.position)}\`\`\``,
                         inline: true
                     },
                     {
                         name: `Icon`,
-                        value: `\`\`\`${data.icon.charAt(0).toUpperCase() + data.icon.substring(1).toLowerCase()}\`\`\``,
+                        value: `\`\`\`${capitalize(data.icon)}\`\`\``,
                         inline: true
+                    },
+                    {
+                        name: `Font`,
+                        value: `\`\`\`${capitalize(data.font)}\`\`\``,
+                        inline: false
                     },
                     {
                         name: `Admin`,
@@ -102,4 +107,8 @@ export default class PlayerInfo extends Command {
             ]
         });
     }
+}
+
+function capitalize(text: string): string {
+    return text.charAt(0).toUpperCase() + text.substring(1).toLowerCase();
 }

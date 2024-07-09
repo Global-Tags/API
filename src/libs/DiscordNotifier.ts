@@ -68,7 +68,7 @@ export function sendMessage(data: NotificationData) {
             .addFields([
                 {
                     name: `Reported UUID`,
-                    value: `\`\`\`${data.uuid}\`\`\``
+                    value: `[\`${data.uuid}\`](https://laby.net/@${data.uuid})`
                 },
                 {
                     name: `Reported Tag`,
@@ -76,7 +76,7 @@ export function sendMessage(data: NotificationData) {
                 },
                 {
                     name: `Reporter UUID`,
-                    value: `\`\`\`${data.reporterUuid}\`\`\``
+                    value: `[\`${data.reporterUuid}\`](https://laby.net/@${data.reporterUuid})`
                 },
                 {
                     name: `Reason`,
@@ -95,7 +95,7 @@ export function sendMessage(data: NotificationData) {
             .addFields([
                 {
                     name: `Watched UUID`,
-                    value: `\`\`\`${data.uuid}\`\`\``
+                    value: `[\`${data.uuid}\`](https://laby.net/@${data.uuid})`
                 },
                 {
                     name: `New tag`,
@@ -118,7 +118,7 @@ export function sendMessage(data: NotificationData) {
             .addFields([
                 {
                     name: `Watched UUID`,
-                    value: `\`\`\`${data.uuid}\`\`\``
+                    value: `[\`${data.uuid}\`](https://laby.net/@${data.uuid})`
                 },
                 {
                     name: `New tag`,
@@ -137,7 +137,7 @@ export function sendMessage(data: NotificationData) {
             .addFields([
                 {
                     name: `UUID`,
-                    value: `\`\`\`${data.uuid}\`\`\``
+                    value: `[\`${data.uuid}\`](https://laby.net/@${data.uuid})`
                 },
                 {
                     name: `Reason`,
@@ -169,7 +169,7 @@ export function sendMessage(data: NotificationData) {
         const description = modlogDescription(data);
         _sendMessage(
             config.bot.mod_log.channel,
-            `[**${ModLogType[data.logType]}**] [\`${data.staff}\`](<https://laby.net/${data.staff}>)${data.discord ? ' [**D**]' : ''} → [\`${data.uuid}\`](<https://laby.net/${data.uuid}>)${description ? `: ${description}` : ''}`,
+            `[**${ModLogType[data.logType]}**] [\`${data.staff}\`](<https://laby.net/@${data.staff}>)${data.discord ? ' [**D**]' : ''} → [\`${data.uuid}\`](<https://laby.net/@${data.uuid}>)${description ? `: ${description}` : ''}`,
             null,
             false
         );

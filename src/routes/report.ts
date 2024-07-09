@@ -19,13 +19,19 @@ export default new Elysia({
     if(!player.tag) return error(404, { error: i18n(`report.noTag`) });
 
     const reporterUuid = getUuidByJWT(authorization)!;
-    if(reporterUuid == uuid) return error(403, { error: i18n(`report.self`) });
-    if(player.reports.some((report) => report.by == reporterUuid && report.reportedName == player.tag)) return error(403, { error: i18n(`report.alreadyReported`) });
+    const reporter = await players.findOneAndUpdate({ uuid: reporterUuid }, {
+        $set: {
+            uuid: reporterUuid
+        }
+    }, { upsert: true, new: true })!;
+    if(reporter.isBanned()) return error(403, { error: i18n('error.banned') });
+    if(reporter.uuid == uuid) return error(403, { error: i18n(`report.self`) });
+    if(player.reports.some((report) => report.by == reporter.uuid && report.reportedName == player.tag)) return error(403, { error: i18n(`report.alreadyReported`) });
     const { reason } = body;
     if(reason.trim() == ``) return error(422, { error: i18n(`report.invalidReason`) });
 
     player.reports.push({
-        by: reporterUuid,
+        by: reporter.uuid,
         reportedName: player.tag,
         reason
     });
