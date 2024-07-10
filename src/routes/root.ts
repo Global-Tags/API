@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import players from "../database/schemas/players";
+import players, { Role } from "../database/schemas/players";
 import Logger from "../libs/Logger";
 import { sendMessage, NotificationType, ModLogType } from "../libs/DiscordNotifier";
 import { getJWTSession } from "../libs/SessionValidator";
@@ -23,7 +23,7 @@ export default new Elysia()
         font: player.font || "DEFAULT",
         position: player.position || "ABOVE",
         icon: player.icon || "NONE",
-        admin: player.admin,
+        roles: player.roles,
         ban: session.equal || session.isAdmin ? {
             active: player.isBanned(),
             reason: player.ban?.reason || null,
@@ -36,7 +36,7 @@ export default new Elysia()
         description: `Get another players' tag info`
     },
     response: {
-        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), font: t.String(), position: t.String(), icon: t.String(), admin: t.Boolean({ default: false }), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]) }), t.Null()]) }, { description: `You received the tag data.` }),
+        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), font: t.String(), position: t.String(), icon: t.String(), roles: t.Array(t.String()), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]) }), t.Null()]) }, { description: `You received the tag data.` }),
         403: t.Object({ error: t.String() }, { description: `The player is banned.` }),
         404: t.Object({ error: t.String() }, { description: `The player is not in the database.` }),
         429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
@@ -122,18 +122,25 @@ export default new Elysia()
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
 
-    player.admin = !player.admin;
+    const role = Role[Role.ADMIN];
+    const nowAdmin = !player.roles.includes(role);
+    if(nowAdmin) player.roles.push(role);
+    else player.roles.splice(player.roles.indexOf(role), 1);
     await player.save();
     if(!session.equal) {
         sendMessage({
             type: NotificationType.ModLog,
-            logType: player.admin ? ModLogType.MakeAdmin : ModLogType.RemoveAdmin,
+            logType: ModLogType.EditRoles,
             uuid: uuid,
-            staff: session.uuid || 'Unknown'
+            staff: session.uuid || 'Unknown',
+            roles: {
+                added: nowAdmin ? [role] : [],
+                removed: !nowAdmin ? [role] : []
+            }
         });
     }
 
-    return { message: i18n(`toggleAdmin.${player.admin ? 'on' : 'off'}`) };
+    return { message: i18n(`toggleAdmin.${nowAdmin ? 'on' : 'off'}`) };
 }, {
     detail: {
         tags: ['Admin'],
