@@ -1,8 +1,8 @@
 import { ButtonInteraction, CacheType, Message, GuildMember, User, ButtonStyle, ButtonBuilder, ActionRowBuilder, EmbedBuilder } from "discord.js";
 import Button from "../structs/Button";
-import * as config from "../../../config.json";
 import { colors } from "../bot";
 import players from "../../database/schemas/players";
+import { uuidRegex } from "../commands/PlayerInfo";
 
 export default class Actions extends Button {
     constructor() {
@@ -13,7 +13,8 @@ export default class Actions extends Button {
         const staff = await players.findOne({ "connections.discord.id": user.id });
         if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You need to link your Minecraft account with \`/link\`!`)], ephemeral: true });
         if(!staff.admin) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to perform this action!`)], ephemeral: true });
-        const uuid = message.embeds[0].fields[0].value.replaceAll(`\``, ``);
+        const uuid = message.embeds[0].fields[0].value.replaceAll(`\``, ``).match(uuidRegex)?.[1];
+        if(!uuid) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
 
         const embed = new EmbedBuilder()
         .setColor(0x5865f2)
