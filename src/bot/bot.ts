@@ -6,6 +6,7 @@ import Command from "./structs/Command";
 import Modal from "./structs/Modal";
 import Button from "./structs/Button";
 import * as config from "../../config.json";
+import SelectMenu from "./structs/SelectMenu";
 
 export const client = new Client({
     intents: [
@@ -27,12 +28,14 @@ export const colors = {
 
 export const commands = new Collection<string, Command>();
 export const buttons = new Collection<string, Button>();
+export const menus = new Collection<string, SelectMenu>();
 export const modals = new Collection<string, Modal>();
 
 (async () => {
     const eventDir = join(__dirname, `events`);
     const commandDir = join(__dirname, `commands`);
     const buttonDir = join(__dirname, `buttons`);
+    const menuDir = join(__dirname, `menus`);
     const modalDir = join(__dirname, `modals`);
     if(existsSync(eventDir)) readdirSync(eventDir).filter(file => file.endsWith(`.ts`)).forEach(async file => {
         const event = new (await import(join(eventDir, file))).default as Event;
@@ -52,6 +55,11 @@ export const modals = new Collection<string, Modal>();
         const btn = new (await import(join(buttonDir, file))).default as Button;
 
         buttons.set(btn.id, btn);
+    });
+    if(existsSync(menuDir)) readdirSync(menuDir).filter(file => file.endsWith(`.ts`)).forEach(async file => {
+        const menu = new (await import(join(menuDir, file))).default as SelectMenu;
+
+        menus.set(menu.id, menu);
     });
     if(existsSync(modalDir)) readdirSync(modalDir).filter(file => file.endsWith(`.ts`)).forEach(async file => {
         const modal = new (await import(join(modalDir, file))).default as Modal;

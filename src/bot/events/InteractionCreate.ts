@@ -30,6 +30,17 @@ export default class InteractionCreate extends Event {
             } catch(err: any) {
                 if(!interaction.replied) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setTitle(`❌ An error ocurred!`).setDescription(err)], ephemeral: true });
             }
+        } else if(interaction.isStringSelectMenu()) {
+            const { member, user, customId, values, message } = interaction;
+            const menu = bot.menus.get(customId);
+
+            if(!menu) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ Unknown menu!`)], ephemeral: true });
+
+            try {
+                menu.selection(interaction, message!, values, member as GuildMember, user);
+            } catch(err: any) {
+                if(!interaction.replied) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setTitle(`❌ An error ocurred!`).setDescription(err)], ephemeral: true });
+            }
         } else if(interaction.isModalSubmit()) {
             const { member, user, customId, fields, message } = interaction;
             const modal = bot.modals.get(customId);
