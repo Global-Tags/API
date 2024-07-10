@@ -18,22 +18,23 @@ export default class EditRoles extends SelectMenu {
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
         if(player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player is already banned!`)], ephemeral: true });
 
+        const roles = [ ...player.roles ];
         const added: string[] = [];
         const removed: string[] = [];
 
-        for(const role of player.roles) {
-            if(values.includes(role)) added.push(role);
-            else removed.push(role);
-        }
-
-        player.roles.length = 0;
+        player.roles = [];
         for(const role of values) {
+            if(!roles.includes(role)) added.push(role);
             player.roles.push(role);
         }
+        for(const role of roles) {
+            if(!values.includes(role)) removed.push(role);
+        }
+        await player.save();
 
         sendMessage({
             type: NotificationType.ModLog,
-            logType: ModLogType.Ban,
+            logType: ModLogType.EditRoles,
             uuid: player.uuid,
             staff: staff.uuid,
             roles: {
