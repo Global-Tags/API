@@ -75,7 +75,7 @@ export default class PlayerInfo extends Command {
                     {
                         name: `Font`,
                         value: `\`\`\`${capitalize(data.font)}\`\`\``,
-                        inline: false
+                        inline: true
                     },
                     {
                         name: `Admin`,
