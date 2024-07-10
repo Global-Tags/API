@@ -1,8 +1,7 @@
-import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, Role } from "discord.js";
+import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } from "discord.js";
 import Button from "../structs/Button";
-import players from "../../database/schemas/players";
+import players, { Role } from "../../database/schemas/players";
 import { colors } from "../bot";
-import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { capitalize } from "../commands/PlayerInfo";
 
 export default class EditRoles extends Button {
@@ -36,6 +35,6 @@ export default class EditRoles extends Button {
             .setOptions(options)
         ]);
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setURL(player.uuid).setTitle('Edit roles')], components: [row], ephemeral: true });
+        interaction.reply({ embeds: [EmbedBuilder.from(message.embeds[0]).setTitle('Edit roles')], components: [row], ephemeral: true });
     }
 }
