@@ -109,7 +109,7 @@ export default class PlayerInfo extends Command {
     }
 }
 
-function capitalize(text: string): string {
+export function capitalize(text: string): string {
     const parts = text.split('_');
     if(parts.length > 1) {
         const capitalized = [];
