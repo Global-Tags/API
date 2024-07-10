@@ -85,12 +85,12 @@ export default class PlayerInfo extends Command {
                     {
                         name: `Ban reason`,
                         value: `\`\`\`${data.isBanned() ? data.ban?.reason || `--` : `--`}\`\`\``,
-                        inline: false
+                        inline: true
                     },
                     {
                         name: `Roles [${data.roles.length}]`,
                         value: `\`\`\`${data.roles.length > 0 ? data.roles.map((role) => `- ${capitalize(role)}`).join('\n') : `--`}\`\`\``,
-                        inline: true
+                        inline: false
                     }
                 ])
                 .setImage(`https://cdn.rappytv.com/bots/placeholder.png`)
