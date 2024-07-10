@@ -1,5 +1,12 @@
 import { Schema, model } from "mongoose";
 
+export enum Role {
+    ADMIN,
+    DEVELOPER,
+    MODERATOR,
+    SUPPORTER
+}
+
 const schema = new Schema({
     uuid: {
         type: String,
@@ -44,10 +51,10 @@ const schema = new Schema({
         required: true,
         default: []
     },
-    admin: {
-        type: Boolean,
+    roles: {
+        type: [String],
         required: true,
-        default: false
+        default: []
     },
     ban: {
         active: {
@@ -75,6 +82,10 @@ const schema = new Schema({
     }
 }, {
     methods: {
+        isAdmin(): boolean {
+            return this.roles.includes(Role[Role.ADMIN]);
+        },
+
         isBanned(): boolean {
             return this.ban?.active || false;
         },
