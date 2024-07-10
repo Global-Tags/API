@@ -3,9 +3,8 @@ import Command from "../structs/Command";
 import axios from "axios";
 import players from "../../database/schemas/players";
 import * as bot from "../bot";
-import * as config from "../../../config.json";
 import { translateToAnsi } from "../../libs/ChatColor";
-const regex = /[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}|[a-f0-9]{8}(?:[a-f0-9]{4}){4}[a-f0-9]{8}/;
+export const uuidRegex = /[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}|[a-f0-9]{8}(?:[a-f0-9]{4}){4}[a-f0-9]{8}/;
 
 export default class PlayerInfo extends Command {
     constructor() {
@@ -26,7 +25,7 @@ export default class PlayerInfo extends Command {
     async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, user: User) {
         await interaction.deferReply();
         let name, uuid = options.getString(`player`)!;
-        if(!regex.test(uuid)) {
+        if(!uuidRegex.test(uuid)) {
             try {
                 const res = await axios({
                     method: `get`,
@@ -52,6 +51,7 @@ export default class PlayerInfo extends Command {
                 new EmbedBuilder()
                 .setColor(bot.colors.standart)
                 .setThumbnail(`https://laby.net/texture/profile/head/${uuid.replaceAll(`-`, ``)}.png?size=1024&overlay`)
+                .setURL(`https://laby.net/${uuid}`)
                 .setTitle(`Playerdata${!!name ? ` of ${name}` : ``}`)
                 .addFields([
                     {
