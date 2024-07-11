@@ -7,11 +7,6 @@ const schema = new Schema({
         unique: true
     },
     tag: String,
-    font: {
-        type: String,
-        required: true,
-        default: 'DEFAULT'
-    },
     position: {
         type: String,
         enum: [`ABOVE`, `BELOW`, `RIGHT`, `LEFT`],
