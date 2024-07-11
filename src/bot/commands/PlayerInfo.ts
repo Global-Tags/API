@@ -45,7 +45,7 @@ export default class PlayerInfo extends Command {
         const data = await players.findOne({ uuid: uuid.replaceAll(`-`, ``) });
 
         if(!data) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ This player is not in our records!`)] });
-        const staff = await players.findOne({ "connections.discord.id": user.id, admin: true });
+        const staff = await players.findOne({ "connections.discord.id": user.id });
         interaction.editReply({
             embeds: [
                 new EmbedBuilder()
@@ -74,7 +74,7 @@ export default class PlayerInfo extends Command {
                     },
                     {
                         name: `Admin`,
-                        value: `\`\`\`ansi\n${translateToAnsi(data.admin ? `&aYes` : `&cNo`)}\`\`\``,
+                        value: `\`\`\`ansi\n${translateToAnsi(data.isAdmin() ? `&aYes` : `&cNo`)}\`\`\``,
                         inline: true
                     },
                     {
@@ -86,12 +86,17 @@ export default class PlayerInfo extends Command {
                         name: `Ban reason`,
                         value: `\`\`\`${data.isBanned() ? data.ban?.reason || `--` : `--`}\`\`\``,
                         inline: true
+                    },
+                    {
+                        name: `Roles [${data.roles.length}]`,
+                        value: `\`\`\`${data.roles.length > 0 ? data.roles.map((role) => `- ${capitalize(role)}`).join('\n') : `--`}\`\`\``,
+                        inline: false
                     }
                 ])
                 .setImage(`https://cdn.rappytv.com/bots/placeholder.png`)
                 .setFooter({ text: `© RappyTV, ${new Date().getFullYear()}`})
             ],
-            components: !staff ? [] : [
+            components: !staff?.isAdmin() ? [] : [
                 new ActionRowBuilder<ButtonBuilder>()
                     .addComponents(
                         new ButtonBuilder()
@@ -104,6 +109,15 @@ export default class PlayerInfo extends Command {
     }
 }
 
-function capitalize(text: string): string {
+export function capitalize(text: string): string {
+    const parts = text.split('_');
+    if(parts.length > 1) {
+        const capitalized = [];
+        
+        for(const part of parts) {
+            capitalized.push(capitalize(part));
+        }
+        return capitalized.join(' ');
+    }
     return text.charAt(0).toUpperCase() + text.substring(1).toLowerCase();
 }

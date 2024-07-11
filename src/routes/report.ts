@@ -15,7 +15,7 @@ export default new Elysia({
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNoTag`) });
     if(player.isBanned()) return error(403, { error: i18n(`ban.alreadyBanned`) });
-    if(player.admin) return error(403, { error: i18n(`report.admin`) });
+    if(player.isAdmin()) return error(403, { error: i18n(`report.admin`) });
     if(!player.tag) return error(404, { error: i18n(`report.noTag`) });
 
     const reporterUuid = getUuidByJWT(authorization)!;

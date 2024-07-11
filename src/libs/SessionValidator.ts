@@ -16,7 +16,7 @@ export async function getJWTSession(token: string, uuid: string): Promise<Sessio
     return {
         uuid: tokenUuid,
         equal: uuid == tokenUuid,
-        isAdmin: data.admin
+        isAdmin: data.isAdmin()
     }
 }
 

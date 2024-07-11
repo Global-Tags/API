@@ -1,6 +1,7 @@
 import * as bot from "../bot/bot";
 import * as config from "../../config.json";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
+import { capitalize } from "../bot/commands/PlayerInfo";
 
 export enum NotificationType {
     Report,
@@ -17,8 +18,7 @@ export enum ModLogType {
     Ban,
     Unban,
     EditBan,
-    MakeAdmin,
-    RemoveAdmin,
+    EditRoles,
     Watch,
     Unwatch
 }
@@ -53,7 +53,8 @@ type NotificationData = {
     newTag?: string,
     reason?: string,
     appealable?: boolean,
-    discord?: boolean
+    discord?: boolean,
+    roles?: { added: string[], removed: string[] }
 });
 
 export function sendMessage(data: NotificationData) {
@@ -182,6 +183,7 @@ function modlogDescription(data: NotificationData): string | null {
     if(type == ModLogType.ChangeTag) return `\`${oldTag}\` → \`${newTag}\``;
     else if(type == ModLogType.Ban) return `**Reason**: \`${reason || 'No reason'}\``;
     else if(type == ModLogType.EditBan) return `**Appealable**: \`${appealable ? `❌` : `✅`}\`. **Reason**: \`${reason}\``;
+    else if(type == ModLogType.EditRoles) return `\n\`\`\`diff\n${data.roles!.added.map((role) => `+ ${capitalize(role)}`).join('\n')}${data.roles!.added.length > 0 && data.roles!.removed.length > 0 ? '\n' : ''}${data.roles!.removed.map((role) => `- ${capitalize(role)}`).join('\n')}\`\`\``;
     return null;
 }
 
