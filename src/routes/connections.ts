@@ -1,16 +1,17 @@
 import Elysia, { t } from "elysia";
-import { getJWTSession } from "../libs/SessionValidator";
 import players from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
 import { bot } from "../../config.json";
+import getAuthProvider from "../middleware/GetAuthProvider";
 
 export default new Elysia({
     prefix: "/connections"
-}).use(fetchI18n).post(`/discord`, async ({ error, params, headers, body, i18n }) => { // Get a linking code
+}).use(fetchI18n).use(getAuthProvider).post(`/discord`, async ({ error, params, headers, body, i18n, provider }) => { // Get a linking code
     if(!bot.connection.active) return error(409, { error: i18n('connections.discord.disabled') });
+    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    const session = await getJWTSession(authorization, uuid);
+    const session = await provider.getSession(authorization, uuid);
     if(!session.equal) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
@@ -32,6 +33,7 @@ export default new Elysia({
     response: {
         200: t.Object({ code: t.String() }, { description: `You received a linking code.` }),
         400: t.Object({ error: t.String() }, { description: `You already have a Discord account connected.` }),
+        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
         403: t.Object({ error: t.String() }, { description: `You're banned.` }),
         404: t.Object({ error: t.String() }, { description: `You don't have a GlobalTags account.` }),
         409: t.Object({ error: t.String() }, { description: `Account linking is deactivated.` }),
@@ -41,11 +43,12 @@ export default new Elysia({
     },
     params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).delete(`/discord`, async ({ error, params, headers, body, i18n }) => { // Change icon
+}).delete(`/discord`, async ({ error, params, headers, body, i18n, provider }) => { // Change icon
     if(!bot.connection.active) return error(409, { error: i18n('connections.discord.disabled') });
+    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    const session = await getJWTSession(authorization, uuid);
+    const session = await provider.getSession(authorization, uuid);
     if(!session.equal) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
@@ -66,6 +69,7 @@ export default new Elysia({
     response: {
         200: t.Object({ message: t.String() }, { description: `Your account was successfully unlinked.` }),
         400: t.Object({ error: t.String() }, { description: `You don't have a Discord account connected.` }),
+        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
         403: t.Object({ error: t.String() }, { description: `You're banned.` }),
         404: t.Object({ error: t.String() }, { description: `You don't have a GlobalTags account.` }),
         409: t.Object({ error: t.String() }, { description: `Account linking is deactivated.` }),

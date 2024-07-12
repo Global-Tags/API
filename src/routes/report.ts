@@ -1,15 +1,16 @@
 import Elysia, { t } from "elysia";
-import { getUuidByJWT, getJWTSession } from "../libs/SessionValidator";
 import players from "../database/schemas/players";
 import { NotificationType, sendMessage } from "../libs/DiscordNotifier";
 import fetchI18n from "../middleware/FetchI18n";
+import getAuthProvider from "../middleware/GetAuthProvider";
 
 export default new Elysia({
     prefix: "/report"
-}).use(fetchI18n).post(`/`, async ({ error, params, headers, body, i18n }) => { // Report player
+}).use(fetchI18n).use(getAuthProvider).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Report player
+    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    const session = await getJWTSession(authorization, uuid);
+    const session = await provider.getSession(authorization, uuid);
     if(!session.uuid) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
@@ -18,10 +19,9 @@ export default new Elysia({
     if(player.isAdmin()) return error(403, { error: i18n(`report.admin`) });
     if(!player.tag) return error(404, { error: i18n(`report.noTag`) });
 
-    const reporterUuid = getUuidByJWT(authorization)!;
-    const reporter = await players.findOneAndUpdate({ uuid: reporterUuid }, {
+    const reporter = await players.findOneAndUpdate({ uuid: session.uuid }, {
         $set: {
-            uuid: reporterUuid
+            uuid: session.uuid
         }
     }, { upsert: true, new: true })!;
     if(reporter.isBanned()) return error(403, { error: i18n('error.banned') });
@@ -40,7 +40,7 @@ export default new Elysia({
     sendMessage({
         type: NotificationType.Report,
         uuid,
-        reporterUuid,
+        reporterUuid: session.uuid,
         reason,
         tag: player.tag
     });
@@ -52,6 +52,7 @@ export default new Elysia({
     },
     response: {
         200: t.Object({ message: t.String() }, { description: `The player was successfully reported` }),
+        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
         403: t.Object({ error: t.String() }, { description: `You have tried to report someone whom you are not allowed to report.` }),
         404: t.Object({ error: t.String() }, { description: `The player you tried to report does not have a tag.` }),
         422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
