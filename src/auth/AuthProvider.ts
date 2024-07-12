@@ -18,7 +18,7 @@ export default abstract class AuthProvider {
     }
 
     public async getSession(token: string, uuid: string) {
-        const tokenUuid = await this.getUUID(token);
+        const tokenUuid = await this.getUUID(token.split(/ /).slice(1).join(' '));
         if(!tokenUuid) return { uuid: tokenUuid, equal: tokenUuid == uuid, isAdmin: false };
         const data = await players.findOne({ uuid: tokenUuid });
         if(!data) return { uuid: tokenUuid, equal: tokenUuid == uuid, isAdmin: false };
