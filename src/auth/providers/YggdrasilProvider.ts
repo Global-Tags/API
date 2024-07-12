@@ -1,4 +1,4 @@
-import AuthProvider, { SessionData } from "../AuthProvider";
+import AuthProvider from "../AuthProvider";
 import axios from "axios";
 
 export default class LabyConnectProvider extends AuthProvider {
