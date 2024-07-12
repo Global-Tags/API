@@ -9,10 +9,9 @@ import getAuthProvider from "../middleware/GetAuthProvider";
 
 export default new Elysia()
 .use(fetchI18n).use(getAuthProvider).get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get player info
-    // TODO: Rename requireSessionIds to strictAuth
     const uuid = params.uuid.replaceAll(`-`, ``);
     let showBan = false;
-    if(config.requireSessionIds) {
+    if(config.strictAuth) {
         if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
         const { authorization } = headers;
         const session = await provider.getSession(authorization, uuid);
@@ -49,7 +48,7 @@ export default new Elysia()
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },
     params: t.Object({ uuid: t.String({ description: `The uuid of the player you want to fetch the info of` }) }),
-    headers: t.Object({ authorization: config.requireSessionIds ? t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) : t.Optional(t.String({ description: `Your LabyConnect JWT` })) }, { error: `error.notAllowed` }),
+    headers: t.Object({ authorization: config.strictAuth ? t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) : t.Optional(t.String({ description: `Your LabyConnect JWT` })) }, { error: `error.notAllowed` }),
 }).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Change tag
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
