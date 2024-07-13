@@ -6,7 +6,7 @@ export default function getAuthProvider(app: Elysia) {
         const header = headers['authorization'];
         if(!header) return { provider: null };
         const provider = AuthProvider.getProvider(header);
-        if(!provider) return { provder: null };
+        if(!provider) return { provider: null };
         return { provider };
     });
 }
