@@ -8,15 +8,13 @@ export default class LabyConnectProvider extends AuthProvider {
 
     async getUUID(token: string): Promise<string | null> {
         try {
-            // TODO: Fix request
-            const response = await axios({
-                method: 'GET',
-                url: '...',
-                data: {
-
+            const response = await axios.get('https://api.minecraftservices.com/minecraft/profile', {
+                headers: {
+                    Authorization: `Bearer ${this.trimTokenType(token)}`
                 }
             });
-            return response.data.uuid as string;
+
+            return response.data.id as string;
         } catch(err) {
             return null;
         }
