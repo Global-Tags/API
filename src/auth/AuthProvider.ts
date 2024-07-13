@@ -18,7 +18,7 @@ export default abstract class AuthProvider {
     }
 
     public async getSession(token: string, uuid: string) {
-        const tokenUuid = await this.getUUID(token.split(/ /).slice(1).join(' '));
+        const tokenUuid = await this.getUUID(this.trimTokenType(token));
         if(!tokenUuid) return { uuid: tokenUuid, equal: tokenUuid == uuid, isAdmin: false };
         const data = await players.findOne({ uuid: tokenUuid });
         if(!data) return { uuid: tokenUuid, equal: tokenUuid == uuid, isAdmin: false };
@@ -29,6 +29,10 @@ export default abstract class AuthProvider {
         }
     }
     public abstract getUUID(token: string): Promise<string | null>;
+
+    public trimTokenType(token: string): string {
+        return token.split(/ /).slice(1).join(' ');
+    }
 
     static async loadProviders() {
         const directory = join(__dirname, `providers`);
