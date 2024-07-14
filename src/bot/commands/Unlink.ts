@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, User } from "discord.js";
+import { CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, User } from "discord.js";
 import Command from "../structs/Command";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";

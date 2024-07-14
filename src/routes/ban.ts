@@ -1,15 +1,16 @@
 import Elysia, { t } from "elysia";
-import { getUuidByJWT, getJWTSession } from "../libs/SessionValidator";
 import players from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
 import { ModLogType, NotificationType, sendMessage } from "../libs/DiscordNotifier";
+import getAuthProvider from "../middleware/GetAuthProvider";
 
 export default new Elysia({
     prefix: `/ban`
-}).use(fetchI18n).get(`/`, async ({ error, params, headers, i18n }) => { // Get ban info
+}).use(fetchI18n).use(getAuthProvider).get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get ban info
+    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    const session = await getJWTSession(authorization, uuid);
+    const session = await provider.getSession(authorization, uuid);
     if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
@@ -23,15 +24,17 @@ export default new Elysia({
     },
     response: {
         200: t.Object({ banned: t.Boolean(), reason: t.Union([t.String(), t.Null()], { default: "…" }), appealable: t.Boolean() }, { description: 'The ban object.' }),
+        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
         403: t.Object({ error: t.String() }, { description: "You're not an admin." }),
         404: t.Object({ error: t.String() }, { description: "The player you searched for was not found." })
     },
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to get the ban of.' }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).post(`/`, async ({ error, params, headers, body, i18n }) => { // Ban player
+}).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Ban player
+    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    const session = await getJWTSession(authorization, uuid);
+    const session = await provider.getSession(authorization, uuid);
     if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
@@ -58,16 +61,18 @@ export default new Elysia({
     response: {
         200: t.Object({ message: t.String() }, { description: 'The player was successfully banned.' }),
         400: t.Object({ error: t.String() }, { description: "The player is already banned." }),
+        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
         403: t.Object({ error: t.String() }, { description: "You're not an admin." }),
         404: t.Object({ error: t.String() }, { description: "The player you tried to ban was not found." })
     },
     body: t.Object({ reason: t.Optional(t.String()) }, { error: `error.invalidBody`, additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to ban.' }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).put(`/`, async ({ error, params, headers, body, i18n }) => { // Update ban info - I need to use put here bc labymod's Request system doesn't support PATCH
+}).put(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Update ban info - I need to use put here bc labymod's Request system doesn't support PATCH
+    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    const session = await getJWTSession(authorization, uuid);
+    const session = await provider.getSession(authorization, uuid);
     if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
@@ -96,16 +101,18 @@ export default new Elysia({
     response: {
         200: t.Object({ message: t.String() }, { description: 'The ban info was successfully edited.' }),
         400: t.Object({ error: t.String() }, { description: "The player is not banned." }),
+        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
         403: t.Object({ error: t.String() }, { description: "You're not an admin." }),
         404: t.Object({ error: t.String() }, { description: "The player you tried to edit the ban info of was not found." })
     },
     body: t.Object({ reason: t.Optional(t.String()), appealable: t.Boolean({ error: 'error.wrongType;;[["field", "appealable"], ["type", "boolean"]]' }) }, { error: `error.invalidBody`, additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to edit the ban of.' }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).post(`/appeal`, async ({ error, params, headers, body: { reason }, i18n }) => { // Ban player
+}).post(`/appeal`, async ({ error, params, headers, body: { reason }, i18n, provider }) => { // Ban player
+    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    const session = await getJWTSession(authorization, uuid);
+    const session = await provider.getSession(authorization, uuid);
     if(!session.equal) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
@@ -130,16 +137,18 @@ export default new Elysia({
     },
     response: {
         200: t.Object({ message: t.String() }, { description: 'Your appeal was successfully sent.' }),
+        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
         403: t.Object({ error: t.String() }, { description: "You're not allowed to appeal or have already sent an appeal." }),
         404: t.Object({ error: t.String() }, { description: "You're not banned." })
     },
     body: t.Object({ reason: t.String() }, { error: `error.invalidBody`, additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'Your UUID.' }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).delete(`/`, async ({ error, params, headers, i18n }) => { // Unban player
+}).delete(`/`, async ({ error, params, headers, i18n, provider }) => { // Unban player
+    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
-    const session = await getJWTSession(authorization, uuid);
+    const session = await provider.getSession(authorization, uuid);
     if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
@@ -164,6 +173,7 @@ export default new Elysia({
     response: {
         200: t.Object({ message: t.String() }, { description: 'The player was successfully unbanned.' }),
         400: t.Object({ error: t.String() }, { description: "The player is not banned." }),
+        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
         403: t.Object({ error: t.String() }, { description: "You're not an admin." }),
         404: t.Object({ error: t.String() }, { description: "The player you tried to unban was not found." })
     },

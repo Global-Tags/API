@@ -51,6 +51,11 @@ const schema = new Schema({
         required: true,
         default: []
     },
+    api_keys: {
+        type: [String],
+        required: true,
+        default: []
+    },
     ban: {
         active: {
             type: Boolean,

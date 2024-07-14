@@ -17,6 +17,8 @@ import { initializeMetrics } from "./libs/Metrics";
 import Metrics from "./database/schemas/metrics";
 import handleErrors from "./libs/ErrorHandler";
 import { verifyVersion } from "./middleware/VersionVerification";
+import AuthProvider from "./auth/AuthProvider";
+import getAuthProvider from "./middleware/GetAuthProvider";
 
 handleErrors();
 
@@ -28,6 +30,7 @@ export const elysia = new Elysia()
 .onBeforeHandle(checkRatelimit)
 .use(ip({ checkHeaders: config.ipHeaders }))
 .use(fetchI18n)
+.use(getAuthProvider)
 .use(swagger({
     path: '/docs',
     autoDarkMode: true,
@@ -63,6 +66,7 @@ export const elysia = new Elysia()
 .onStart(() => {
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
+    AuthProvider.loadProviders();
     initializeMetrics();
     
     // Load languages

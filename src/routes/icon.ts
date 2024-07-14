@@ -1,16 +1,17 @@
 import Elysia, { t } from "elysia";
-import { getJWTSession } from "../libs/SessionValidator";
 import players from "../database/schemas/players";
 import * as config from "../../config.json";
 import fetchI18n from "../middleware/FetchI18n";
+import getAuthProvider from "../middleware/GetAuthProvider";
 
 export default new Elysia({
     prefix: "/icon"
-}).use(fetchI18n).post(`/`, async ({ error, params, headers, body, i18n }) => { // Change icon
+}).use(fetchI18n).use(getAuthProvider).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Change icon
+    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const icon = body.icon.toUpperCase();
     const { authorization } = headers;
-    const session = await getJWTSession(authorization, uuid);
+    const session = await provider.getSession(authorization, uuid);
     if(!session.equal && !session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
@@ -31,6 +32,7 @@ export default new Elysia({
     response: {
         200: t.Object({ message: t.String() }, { description: `The icon was successfully changed` }),
         400: t.Object({ error: t.String() }, { description: `You tried chose an icon that you're already using.` }),
+        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
         403: t.Object({ error: t.String() }, { description: `You're banned.` }),
         404: t.Object({ error: t.String() }, { description: `You don't have a tag to change the icon of.` }),
         422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),

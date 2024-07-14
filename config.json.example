@@ -1,7 +1,7 @@
 {
     "port": 5000,
     "ipHeaders": ["x-real-ip"],
-    "requireSessionIds": true,
+    "strictAuth": true,
     "logLevel": "Info", // Error, Warn, Info or Debug
     "logTimeFormat": "YYYY-MM-DD HH:mm:ss",
     "srv": "",
