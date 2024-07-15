@@ -2,16 +2,17 @@ import Elysia, { t } from "elysia";
 import players, { Role } from "../database/schemas/players";
 import Logger from "../libs/Logger";
 import { sendMessage, NotificationType, ModLogType } from "../libs/DiscordNotifier";
-import * as config from "../../config.json";
 import fetchI18n from "../middleware/FetchI18n";
 import { stripColors } from "../libs/ChatColor";
 import getAuthProvider from "../middleware/GetAuthProvider";
+import { strictAuth, validation } from "../../config.json";
+const { min, max, blacklist, watchlist } = validation.tag;
 
 export default new Elysia()
 .use(fetchI18n).use(getAuthProvider).get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get player info
     const uuid = params.uuid.replaceAll(`-`, ``);
     let showBan = false;
-    if(config.strictAuth) {
+    if(strictAuth) {
         if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
         const { authorization } = headers;
         const session = await provider.getSession(authorization, uuid);
@@ -48,7 +49,36 @@ export default new Elysia()
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },
     params: t.Object({ uuid: t.String({ description: `The uuid of the player you want to fetch the info of` }) }),
-    headers: t.Object({ authorization: config.strictAuth ? t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) : t.Optional(t.String({ description: `Your LabyConnect JWT` })) }, { error: `error.notAllowed` }),
+    headers: t.Object({ authorization: strictAuth ? t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) : t.Optional(t.String({ description: `Your LabyConnect JWT` })) }, { error: `error.notAllowed` }),
+}).get(`/history`, async ({ error, params, headers, i18n, provider }) => { // Get player's tag history
+    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
+    const uuid = params.uuid.replaceAll(`-`, ``);
+    const { authorization } = headers;
+    const session = await provider.getSession(authorization, uuid);
+    if(!session.equal && !session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
+
+    const player = await players.findOne({ uuid });
+    if(!player) return error(404, { error: i18n(`error.playerNoTag`) });
+
+    return player.history.map((tag) => ({
+        tag,
+        flaggedWords: watchlist.filter((entry) => stripColors(tag).trim().toLowerCase().includes(entry))
+    }));
+}, {
+    detail: {
+        tags: ['Interactions'],
+        description: `Get another players' tag history`
+    },
+    response: {
+        200: t.Array(t.Object({ tag: t.String(), flaggedWords: t.Array(t.String()) }), { description: `You received the tag history.` }),
+        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
+        403: t.Object({ error: t.String() }, { description: `The player is banned.` }),
+        404: t.Object({ error: t.String() }, { description: `The player is not in the database.` }),
+        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    },
+    params: t.Object({ uuid: t.String({ description: `The uuid of the player you want to fetch the info of` }) }),
+    headers: t.Object({ authorization: strictAuth ? t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) : t.Optional(t.String({ description: `Your LabyConnect JWT` })) }, { error: `error.notAllowed` }),
 }).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Change tag
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
@@ -59,7 +89,6 @@ export default new Elysia()
     
     const player = await players.findOne({ uuid });
     if(player && player.isBanned()) return error(403, { error: i18n(`error.${session.equal ? 'b' : 'playerB'}anned`) });
-    const { min, max, blacklist, watchlist } = config.validation.tag;
     const strippedTag = stripColors(tag).trim();
     if(strippedTag == '') return error(422, { error: i18n(`setTag.empty`) });
     if(strippedTag.length < min || strippedTag.length > max) return error(422, { error: i18n(`setTag.validation`).replace('<min>', String(min)).replace('<max>', String(max)) });
