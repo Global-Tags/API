@@ -12,7 +12,7 @@ export default class Actions extends Button {
     async trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
         const staff = await players.findOne({ "connections.discord.id": user.id });
         if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You need to link your Minecraft account with \`/link\`!`)], ephemeral: true });
-        if(!staff.isAdmin()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to perform this action!`)], ephemeral: true });
+        if(!(await staff.hasRoughPermissions())) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to perform this action!`)], ephemeral: true });
         const uuid = message.embeds[0].fields[0].value.replaceAll(`\``, ``).match(uuidRegex)?.[0]?.replaceAll('-', '');
         if(!uuid) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
 
