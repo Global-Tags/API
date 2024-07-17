@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import players, { Role } from "../database/schemas/players";
+import players, { Permission } from "../database/schemas/players";
 import Logger from "../libs/Logger";
 import { sendMessage, NotificationType, ModLogType } from "../libs/DiscordNotifier";
 import fetchI18n from "../middleware/FetchI18n";
@@ -17,7 +17,7 @@ export default new Elysia()
         const { authorization } = headers;
         const session = await provider.getSession(authorization, uuid);
         if(!session.uuid) return error(403, { error: i18n(`error.notAllowed`) });
-        showBan = session.equal || session.isAdmin;
+        showBan = session.equal || session.hasPermission(Permission.ManageBans);
     }
 
     const player = await players.findOne({ uuid });
@@ -28,7 +28,7 @@ export default new Elysia()
         tag: player.isBanned() ? null : player.tag || null,
         position: player.position || "ABOVE",
         icon: player.icon || "NONE",
-        roles: player.roles,
+        roles: await player.getRoles(),
         referred: player.referred,
         referrals: player.referrals.length,
         ban: showBan ? {
@@ -57,7 +57,7 @@ export default new Elysia()
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
-    if(!session.equal && !session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
+    if(!session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNoTag`) });
@@ -87,7 +87,7 @@ export default new Elysia()
     const tag = body.tag.trim();
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
-    if(!session.equal && !session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
+    if(!session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n(`error.notAllowed`) });
     
     const player = await players.findOne({ uuid });
     if(player && player.isBanned()) return error(403, { error: i18n(`error.${session.equal ? 'b' : 'playerB'}anned`) });
@@ -151,58 +151,12 @@ export default new Elysia()
     params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
     body: t.Object({ tag: t.String({ error: `error.wrongType;;[["field", "tag"], ["type", "string"]]` }) }, { error: `error.invalidBody`, additionalProperties: true }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).post(`/admin`, async ({ error, params, headers, i18n, provider }) => { // Toggle admin
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
-    
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
-
-    const role = Role[Role.ADMIN];
-    const nowAdmin = !player.roles.includes(role);
-    if(nowAdmin) player.roles.push(role);
-    else player.roles.splice(player.roles.indexOf(role), 1);
-    await player.save();
-    if(!session.equal) {
-        sendMessage({
-            type: NotificationType.ModLog,
-            logType: ModLogType.EditRoles,
-            uuid: uuid,
-            staff: session.uuid || 'Unknown',
-            roles: {
-                added: nowAdmin ? [role] : [],
-                removed: !nowAdmin ? [role] : []
-            }
-        });
-    }
-
-    return { message: i18n(`toggleAdmin.${nowAdmin ? 'on' : 'off'}`) };
-}, {
-    detail: {
-        tags: ['Admin'],
-        description: `Toggle the admin status of a player`
-    },
-    response: {
-        200: t.Object({ message: t.String() }, { description: `The player's admin status has changed.` }),
-        400: t.Object({ error: t.String() }, { description: `You already have this tag.` }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: `You're not an admin.` }),
-        404: t.Object({ error: t.String() }, { description: `The player was not found.` }),
-        422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
-        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
-    },
-    params: t.Object({ uuid: t.String({ description: `The player's UUID` }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 }).post(`/watch`, async ({ error, params, headers, i18n, provider }) => { // Watch player
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
-    if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
+    if(!session.hasPermission(Permission.ManageWatchlist)) return error(403, { error: i18n(`error.notAllowed`) });
     
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
@@ -241,7 +195,7 @@ export default new Elysia()
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
-    if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
+    if(!session.hasPermission(Permission.ManageWatchlist)) return error(403, { error: i18n(`error.notAllowed`) });
     
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
@@ -280,7 +234,7 @@ export default new Elysia()
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
-    if(!session.equal && !session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
+    if(!session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.noTag`) });
