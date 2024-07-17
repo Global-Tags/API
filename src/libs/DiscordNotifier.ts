@@ -43,7 +43,7 @@ type NotificationData = {
     reason: string
 } | {
     type: NotificationType.Referral,
-    inviter: string
+    invited: string
 } | {
     type: NotificationType.DiscordLink,
     connected: boolean,
@@ -172,7 +172,7 @@ export function sendMessage(data: NotificationData) {
     } else if(data.type == NotificationType.Referral && config.bot.referral.active) {
         _sendMessage(
             config.bot.referral.channel,
-            `[\`${data.inviter}\`](<https://laby.net/@${data.inviter}>) has invited [\`${data.uuid}\`](<https://laby.net/@${data.uuid}>).`,
+            `[\`${data.uuid}\`](<https://laby.net/@${data.uuid}>) has invited [\`${data.invited}\`](<https://laby.net/@${data.invited}>).`,
             null,
             false
         );
