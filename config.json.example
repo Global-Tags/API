@@ -80,6 +80,10 @@
             "active": true,
             "channel": ""
         },
+        "referral": {
+            "active": true,
+            "channel": ""
+        },
         "connection": {
             "active": true,
             "role": "",
