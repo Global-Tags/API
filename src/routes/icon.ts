@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import players from "../database/schemas/players";
+import players, { Permission } from "../database/schemas/players";
 import * as config from "../../config.json";
 import fetchI18n from "../middleware/FetchI18n";
 import getAuthProvider from "../middleware/GetAuthProvider";
@@ -12,7 +12,7 @@ export default new Elysia({
     const icon = body.icon.toUpperCase();
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
-    if(!session.equal && !session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
+    if(!session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.noTag`) });

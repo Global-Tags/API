@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import players from "../database/schemas/players";
+import players, { Permission } from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
 import { ModLogType, NotificationType, sendMessage } from "../libs/DiscordNotifier";
 import getAuthProvider from "../middleware/GetAuthProvider";
@@ -11,7 +11,7 @@ export default new Elysia({
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
-    if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
+    if(!session.hasPermission(Permission.ManageBans)) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
@@ -35,7 +35,7 @@ export default new Elysia({
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
-    if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
+    if(!session.hasPermission(Permission.ManageBans)) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
@@ -73,7 +73,7 @@ export default new Elysia({
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
-    if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
+    if(!session.hasPermission(Permission.ManageBans)) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
@@ -149,7 +149,7 @@ export default new Elysia({
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
-    if(!session.isAdmin) return error(403, { error: i18n(`error.notAllowed`) });
+    if(!session.hasPermission(Permission.ManageBans)) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
