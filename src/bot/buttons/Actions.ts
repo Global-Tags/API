@@ -1,7 +1,7 @@
 import { ButtonInteraction, CacheType, Message, GuildMember, User, ButtonStyle, ButtonBuilder, ActionRowBuilder, EmbedBuilder } from "discord.js";
 import Button from "../structs/Button";
 import { colors } from "../bot";
-import players from "../../database/schemas/players";
+import players, { Permission } from "../../database/schemas/players";
 import { uuidRegex } from "../commands/PlayerInfo";
 
 export default class Actions extends Button {
@@ -32,39 +32,46 @@ export default class Actions extends Button {
                 .setLabel(`Edit roles`)
                 .setCustomId(`editRoles`)
                 .setStyle(ButtonStyle.Primary)
+                .setDisabled(!staff.hasPermission(Permission.ManageRoles))
             ),
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
                 .setLabel(`Unwatch`)
                 .setCustomId(`unwatch`)
-                .setStyle(ButtonStyle.Success),
+                .setStyle(ButtonStyle.Success)
+                .setDisabled(!staff.hasPermission(Permission.ManageWatchlist)),
                 new ButtonBuilder()
                 .setLabel(`Watch`)
                 .setCustomId(`watch`)
                 .setStyle(ButtonStyle.Danger)
+                .setDisabled(!staff.hasPermission(Permission.ManageWatchlist))
             ),
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
                 .setLabel(`Unban`)
                 .setCustomId(`unban`)
-                .setStyle(ButtonStyle.Success),
+                .setStyle(ButtonStyle.Success)
+                .setDisabled(!staff.hasPermission(Permission.ManageBans)),
                 new ButtonBuilder()
                 .setLabel(`Ban`)
                 .setCustomId(`ban`)
                 .setStyle(ButtonStyle.Danger)
+                .setDisabled(!staff.hasPermission(Permission.ManageBans))
             ),
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
                 .setLabel(`Set tag`)
                 .setCustomId(`setTag`)
-                .setStyle(ButtonStyle.Primary),
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(!staff.hasPermission(Permission.ManageTags)),
                 new ButtonBuilder()
                 .setLabel(`Clear tag`)
                 .setCustomId(`clearTag`)
                 .setStyle(ButtonStyle.Danger)
+                .setDisabled(!staff.hasPermission(Permission.ManageTags))
             )
         ]
 
