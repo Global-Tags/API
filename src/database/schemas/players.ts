@@ -8,7 +8,8 @@ export type Role = {
         ManageBans: boolean,
         ManageRoles: boolean,
         ManageTags: boolean,
-        ManageWatchlist: boolean
+        ManageWatchlist: boolean,
+        ReportImmunity: boolean
     }
 }
 
@@ -16,7 +17,8 @@ export enum Permission {
     ManageBans,
     ManageRoles,
     ManageTags,
-    ManageWatchlist
+    ManageWatchlist,
+    ReportImmunity
 }
 
 export interface IPlayer {

@@ -64,7 +64,8 @@
                 "ManageBans": true,
                 "ManageRoles": true,
                 "ManageTags": true,
-                "ManageWatchlist": true
+                "ManageWatchlist": true,
+                "ReportImmunity": true
             }
         },
         {
@@ -73,7 +74,8 @@
                 "ManageBans": false,
                 "ManageRoles": false,
                 "ManageTags": false,
-                "ManageWatchlist": false
+                "ManageWatchlist": false,
+                "ReportImmunity": true
             }
         },
         {
@@ -82,7 +84,8 @@
                 "ManageBans": false,
                 "ManageRoles": false,
                 "ManageTags": false,
-                "ManageWatchlist": false
+                "ManageWatchlist": false,
+                "ReportImmunity": true
             }
         },
         {
@@ -91,7 +94,8 @@
                 "ManageBans": false,
                 "ManageRoles": false,
                 "ManageTags": false,
-                "ManageWatchlist": false
+                "ManageWatchlist": false,
+                "ReportImmunity": false
             }
         }
     ],
