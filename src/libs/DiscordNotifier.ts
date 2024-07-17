@@ -9,7 +9,8 @@ export enum NotificationType {
     WatchlistTagUpdate,
     Appeal,
     ModLog,
-    DiscordLink
+    DiscordLink,
+    Referral
 }
 
 export enum ModLogType {
@@ -41,10 +42,12 @@ type NotificationData = {
     type: NotificationType.Appeal,
     reason: string
 } | {
+    type: NotificationType.Referral,
+    invited: string
+} | {
     type: NotificationType.DiscordLink,
     connected: boolean,
-    userId: string,
-    uuid: string
+    userId: string
 } | {
     type: NotificationType.ModLog,
     logType: ModLogType,
@@ -164,6 +167,13 @@ export function sendMessage(data: NotificationData) {
                     value: `[\`${data.userId}\`](discord://-/users/${data.userId})`
                 }
             ]),
+            false
+        );
+    } else if(data.type == NotificationType.Referral && config.bot.referral.active) {
+        _sendMessage(
+            config.bot.referral.channel,
+            `[\`${data.uuid}\`](<https://laby.net/@${data.uuid}>) has invited [\`${data.invited}\`](<https://laby.net/@${data.invited}>).`,
+            null,
             false
         );
     } else if(data.type == NotificationType.ModLog && config.bot.mod_log.active) {

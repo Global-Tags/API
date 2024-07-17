@@ -35,6 +35,25 @@ const schema = new Schema({
         required: true,
         default: false
     },
+    referred: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    referrals: {
+        type: [{
+            uuid: {
+                type: String,
+                required: true
+            },
+            timestamp: {
+                type: Number,
+                required: true
+            }
+        }],
+        required: true,
+        default: []
+    },
     reports: {
         type: [
             {
