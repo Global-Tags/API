@@ -40,7 +40,7 @@ const schema = new Schema({
         required: true,
         default: false
     },
-    invites: {
+    referrals: {
         type: [{
             uuid: {
                 type: String,
