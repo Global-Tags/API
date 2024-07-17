@@ -60,7 +60,52 @@
     "bot": {
         "enabled": true,
         "token": "",
-        "staff": [],
+        "synced_roles": {
+            "enabled": true,
+            "guild": "",
+            "roles": [
+                {
+                    "name": "ADMIN",
+                    "ids": [],
+                    "permissions": {
+                        "manageBans": true,
+                        "manageWatchlist": true,
+                        "manageAdmins": true,
+                        "manageTags": true
+                    }
+                },
+                {
+                    "name": "DEVELOPER",
+                    "ids": [],
+                    "permissions": {
+                        "manageBans": false,
+                        "manageWatchlist": false,
+                        "manageAdmins": false,
+                        "manageTags": false
+                    }
+                },
+                {
+                    "name": "MODERATOR",
+                    "ids": [],
+                    "permissions": {
+                        "manageBans": false,
+                        "manageWatchlist": false,
+                        "manageAdmins": false,
+                        "manageTags": false
+                    }
+                },
+                {
+                    "name": "SUPPORTER",
+                    "ids": [],
+                    "permissions": {
+                        "manageBans": false,
+                        "manageWatchlist": false,
+                        "manageAdmins": false,
+                        "manageTags": false
+                    }
+                }
+            ]
+        },
         "reports": {
             "active": true,
             "channel": "",
