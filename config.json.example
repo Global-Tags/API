@@ -61,8 +61,8 @@
         {
             "name": "ADMIN",
             "permissions": {
-                "ManageAdmins": true,
                 "ManageBans": true,
+                "ManageRoles": true,
                 "ManageTags": true,
                 "ManageWatchlist": true
             }
@@ -70,8 +70,8 @@
         {
             "name": "DEVELOPER",
             "permissions": {
-                "ManageAdmins": false,
                 "ManageBans": false,
+                "ManageRoles": false,
                 "ManageTags": false,
                 "ManageWatchlist": false
             }
@@ -79,8 +79,8 @@
         {
             "name": "MODERATOR",
             "permissions": {
-                "ManageAdmins": false,
                 "ManageBans": false,
+                "ManageRoles": false,
                 "ManageTags": false,
                 "ManageWatchlist": false
             }
@@ -88,8 +88,8 @@
         {
             "name": "SUPPORTER",
             "permissions": {
-                "ManageAdmins": false,
                 "ManageBans": false,
+                "ManageRoles": false,
                 "ManageTags": false,
                 "ManageWatchlist": false
             }

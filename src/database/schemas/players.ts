@@ -5,16 +5,16 @@ import { client } from "../../bot/bot";
 export type Role = {
     name: string,
     permissions: {
-        ManageAdmins: boolean,
         ManageBans: boolean,
+        ManageRoles: boolean,
         ManageTags: boolean,
         ManageWatchlist: boolean
     }
 }
 
 export enum Permission {
-    ManageAdmins,
     ManageBans,
+    ManageRoles,
     ManageTags,
     ManageWatchlist
 }
