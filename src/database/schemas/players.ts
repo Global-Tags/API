@@ -7,7 +7,29 @@ export enum Role {
     SUPPORTER
 }
 
-const schema = new Schema({
+export interface IPlayer {
+    uuid: string,
+    tag?: string | null,
+    position: string,
+    icon: string,
+    history: string[],
+    watchlist: boolean,
+    referred: boolean,
+    referrals: { uuid: string, timestamp: number }[],
+    reports: { by: String, reportedName: String, reason: String }[],
+    roles: string[],
+    api_keys: string[],
+    ban: { active: boolean, reason?: string | null, appealable: boolean, appealed: boolean },
+    connections: {
+        discord?: { id?: string | null, code?: string | null }
+    },
+    isAdmin(): boolean,
+    isBanned(): boolean,
+    banPlayer(reason: string, appealable?: boolean): void,
+    unban(): void
+}
+
+const schema = new Schema<IPlayer>({
     uuid: {
         type: String,
         required: true,
@@ -125,4 +147,4 @@ const schema = new Schema({
     }
 });
 
-export default model('players', schema);
+export default model<IPlayer>('players', schema);
