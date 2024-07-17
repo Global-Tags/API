@@ -22,11 +22,10 @@ export default abstract class AuthProvider {
         if(!tokenUuid) return { uuid: tokenUuid, equal: tokenUuid == uuid, hasPermission: (permission: Permission) => false };
         const data = await players.findOne({ uuid: tokenUuid });
         if(!data) return { uuid: tokenUuid, equal: tokenUuid == uuid, hasPermission: (permission: Permission) => false };
-        const permissions = await data.getPermissions();
         return {
             uuid: tokenUuid,
             equal: uuid == tokenUuid,
-            hasPermission: (permission: Permission) => permissions[Permission[permission]]
+            hasPermission: (permission: Permission) => data.hasPermission(permission)
         }
     }
     public abstract getUUID(token: string): Promise<string | null>;

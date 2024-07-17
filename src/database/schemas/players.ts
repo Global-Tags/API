@@ -37,10 +37,10 @@ export interface IPlayer {
     connections: {
         discord?: { id?: string | null, code?: string | null }
     },
-    getRoles(): Promise<string[]>,
-    getPermissions(): Promise<{ [key: string]: boolean }>,
-    hasPermission(permission: Permission): Promise<boolean>,
-    hasRoughPermissions(): Promise<boolean>,
+    getRoles(): string[],
+    getPermissions(): { [key: string]: boolean },
+    hasPermission(permission: Permission): boolean,
+    hasRoughPermissions(): boolean,
     isBanned(): boolean,
     banPlayer(reason: string, appealable?: boolean): void,
     unban(): void
@@ -140,13 +140,19 @@ const schema = new Schema<IPlayer>({
     }
 }, {
     methods: {
-        async getRoles() {
+        getRoles() {
             if(!bot.synced_roles.enabled) return roles.filter((role) => this.roles.some((name) => name.toUpperCase() == role.name.toUpperCase())).map((role) => role.name);
             if(!this.connections?.discord?.id) return [];
-            const guild = await client.guilds.fetch(bot.synced_roles.guild);
-            if(!guild) return [];
-            const member = await guild.members.fetch(this.connections.discord.id);
-            if(!member) return [];
+            const guild = client.guilds.cache.get(bot.synced_roles.guild);
+            if(!guild) {
+                client.guilds.fetch(bot.synced_roles.guild);
+                return [];
+            }
+            const member = guild.members.cache.get(this.connections.discord.id);
+            if(!member) {
+                guild.members.fetch(this.connections.discord.id);
+                return [];
+            }
             return Object
                 .keys(bot.synced_roles.roles)
                 .filter((key) => {
@@ -159,8 +165,8 @@ const schema = new Schema<IPlayer>({
                 .map((role) => role);
         },
 
-        async getPermissions() {
-            const localRoles = await this.getRoles();
+        getPermissions() {
+            const localRoles = this.getRoles();
             const permissions: { [key: string]: boolean } = {};
             for(const permission of Object.keys(Permission).filter(key => isNaN(Number(key)))) {
                 permissions[permission] = localRoles.some((key) => {
@@ -172,13 +178,13 @@ const schema = new Schema<IPlayer>({
             return permissions;
         },
 
-        async hasPermission(permission: Permission) {
-            const permissions = await this.getPermissions();
+        hasPermission(permission: Permission) {
+            const permissions = this.getPermissions();
             return permissions[Permission[permission]];
         },
 
-        async hasRoughPermissions() {
-            const permissions = await this.getPermissions();
+        hasRoughPermissions() {
+            const permissions = this.getPermissions();
             return [
                 Permission.ManageBans,
                 Permission.ManageRoles,
