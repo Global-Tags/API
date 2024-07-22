@@ -18,7 +18,7 @@ export default new Elysia({
     if(!player) return error(404, { error: i18n(`error.noTag`) });
     if(player.isBanned()) return error(403, { error: i18n(`error.banned`) });
     if(icon == player.icon) return error(400, { error: i18n(`icon.sameIcon`) });
-    if(config.validation.icon.blacklist.includes(icon.toLowerCase())) return error(403, { error: i18n(`icon.notAllowed`) });
+    if(!session.hasPermission(Permission.BypassValidation) && config.validation.icon.blacklist.includes(icon.toLowerCase())) return error(403, { error: i18n(`icon.notAllowed`) });
 
     player.icon = icon;
     await player.save();

@@ -1,6 +1,6 @@
 import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import Button from "../structs/Button";
-import players from "../../database/schemas/players";
+import players, { Permission } from "../../database/schemas/players";
 import { validation } from "../../../config.json";
 import { colors } from "../bot";
 
@@ -18,8 +18,6 @@ export default class SetTag extends Button {
         .setCustomId(`tag`)
         .setPlaceholder(`Enter a tag`)
         .setRequired(true)
-        .setMinLength(validation.tag.min)
-        .setMaxLength(validation.tag.max)
         .setStyle(TextInputStyle.Short);
 
         if(player.tag) input.setValue(player.tag);

@@ -91,19 +91,25 @@ export default new Elysia()
     
     const player = await players.findOne({ uuid });
     if(player && player.isBanned()) return error(403, { error: i18n(`error.${session.equal ? 'b' : 'playerB'}anned`) });
-    const strippedTag = stripColors(tag).trim();
-    if(strippedTag == '') return error(422, { error: i18n(`setTag.empty`) });
-    if(strippedTag.length < min || strippedTag.length > max) return error(422, { error: i18n(`setTag.validation`).replace('<min>', String(min)).replace('<max>', String(max)) });
-    const blacklistedWord = blacklist.find((word) => strippedTag.toLowerCase().includes(word));
-    if(blacklistedWord) return error(422, { error: i18n(`setTag.blacklisted`).replaceAll(`<word>`, blacklistedWord) });
-    const isWatched = (player && player.watchlist) || watchlist.some((word) => {
-        if(strippedTag.toLowerCase().includes(word)) {
-            Logger.warn(`Now watching ${uuid} for matching "${word}" in "${tag}".`);
-            sendMessage({ type: NotificationType.WatchlistAdd, uuid, tag, word });
-            return true;
-        }
-        return false;
-    });
+    
+    let isWatched = false;
+    let notifyWatch = true;
+    if(!session.hasPermission(Permission.BypassValidation)) {
+        const strippedTag = stripColors(tag);
+        if(strippedTag == '') return error(422, { error: i18n(`setTag.empty`) });
+        if(strippedTag.length < min || strippedTag.length > max) return error(422, { error: i18n(`setTag.validation`).replace('<min>', String(min)).replace('<max>', String(max)) });
+        const blacklistedWord = blacklist.find((word) => strippedTag.toLowerCase().includes(word));
+        if(blacklistedWord) return error(422, { error: i18n(`setTag.blacklisted`).replaceAll(`<word>`, blacklistedWord) });
+        isWatched = (player && player.watchlist) || watchlist.some((word) => {
+            if(strippedTag.toLowerCase().includes(word)) {
+                Logger.warn(`Now watching ${uuid} for matching "${word}" in "${tag}".`);
+                sendMessage({ type: NotificationType.WatchlistAdd, uuid, tag, word });
+                notifyWatch = false;
+                return true;
+            }
+            return false;
+        });
+    }
 
     if(!player) {
         await new players({
@@ -132,7 +138,7 @@ export default new Elysia()
         });
     }
 
-    if(isWatched) sendMessage({ type: NotificationType.WatchlistTagUpdate, uuid, tag });
+    if(isWatched && notifyWatch) sendMessage({ type: NotificationType.WatchlistTagUpdate, uuid, tag });
     return { message: i18n(`setTag.success.${session.equal ? 'self' : 'admin'}`) };
 }, {
     detail: {
