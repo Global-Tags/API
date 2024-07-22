@@ -61,6 +61,7 @@
         {
             "name": "ADMIN",
             "permissions": {
+                "BypassValidation": true,
                 "ManageBans": true,
                 "ManageRoles": true,
                 "ManageTags": true,
@@ -71,6 +72,7 @@
         {
             "name": "DEVELOPER",
             "permissions": {
+                "BypassValidation": true,
                 "ManageBans": false,
                 "ManageRoles": false,
                 "ManageTags": false,
@@ -81,6 +83,7 @@
         {
             "name": "MODERATOR",
             "permissions": {
+                "BypassValidation": false,
                 "ManageBans": false,
                 "ManageRoles": false,
                 "ManageTags": false,
@@ -91,6 +94,7 @@
         {
             "name": "SUPPORTER",
             "permissions": {
+                "BypassValidation": false,
                 "ManageBans": false,
                 "ManageRoles": false,
                 "ManageTags": false,
