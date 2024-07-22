@@ -28,7 +28,7 @@ export default new Elysia()
         tag: player.isBanned() ? null : player.tag || null,
         position: player.position || "ABOVE",
         icon: player.icon || "NONE",
-        roles: await player.getRoles(),
+        roles: player.getRoles(),
         referred: player.referred,
         referrals: player.referrals.length,
         ban: showBan ? {
