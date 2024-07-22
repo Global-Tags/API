@@ -1,12 +1,12 @@
 import { existsSync, readdirSync } from "fs";
 import { join } from "path";
 import Logger from "../libs/Logger";
-import players from "../database/schemas/players";
+import players, { Permission } from "../database/schemas/players";
 
 export type SessionData = {
     uuid: string | null,
     equal: boolean,
-    isAdmin: boolean
+    permissions: boolean
 }
 
 export default abstract class AuthProvider {
@@ -19,13 +19,13 @@ export default abstract class AuthProvider {
 
     public async getSession(token: string, uuid: string) {
         const tokenUuid = await this.getUUID(token);
-        if(!tokenUuid) return { uuid: tokenUuid, equal: tokenUuid == uuid, isAdmin: false };
+        if(!tokenUuid) return { uuid: tokenUuid, equal: tokenUuid == uuid, hasPermission: (permission: Permission) => false };
         const data = await players.findOne({ uuid: tokenUuid });
-        if(!data) return { uuid: tokenUuid, equal: tokenUuid == uuid, isAdmin: false };
+        if(!data) return { uuid: tokenUuid, equal: tokenUuid == uuid, hasPermission: (permission: Permission) => false };
         return {
             uuid: tokenUuid,
             equal: uuid == tokenUuid,
-            isAdmin: data.isAdmin()
+            hasPermission: (permission: Permission) => data.hasPermission(permission)
         }
     }
     public abstract getUUID(token: string): Promise<string | null>;

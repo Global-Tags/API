@@ -1,13 +1,54 @@
 import { Schema, model } from "mongoose";
+import { bot, roles } from "../../../config.json";
+import { client } from "../../bot/bot";
 
-export enum Role {
-    ADMIN,
-    DEVELOPER,
-    MODERATOR,
-    SUPPORTER
+export type Role = {
+    name: string,
+    permissions: {
+        BypassValidation: boolean,
+        ManageBans: boolean,
+        ManageRoles: boolean,
+        ManageTags: boolean,
+        ManageWatchlist: boolean,
+        ReportImmunity: boolean
+    }
 }
 
-const schema = new Schema({
+export enum Permission {
+    BypassValidation,
+    ManageBans,
+    ManageRoles,
+    ManageTags,
+    ManageWatchlist,
+    ReportImmunity
+}
+
+export interface IPlayer {
+    uuid: string,
+    tag?: string | null,
+    position: string,
+    icon: string,
+    history: string[],
+    watchlist: boolean,
+    referred: boolean,
+    referrals: { uuid: string, timestamp: number }[],
+    reports: { by: String, reportedName: String, reason: String }[],
+    roles: string[],
+    api_keys: string[],
+    ban: { active: boolean, reason?: string | null, appealable: boolean, appealed: boolean },
+    connections: {
+        discord?: { id?: string | null, code?: string | null }
+    },
+    getRoles(): string[],
+    getPermissions(): { [key: string]: boolean },
+    hasPermission(permission: Permission): boolean,
+    hasRoughPermissions(): boolean,
+    isBanned(): boolean,
+    banPlayer(reason: string, appealable?: boolean): void,
+    unban(): void
+}
+
+const schema = new Schema<IPlayer>({
     uuid: {
         type: String,
         required: true,
@@ -101,8 +142,57 @@ const schema = new Schema({
     }
 }, {
     methods: {
-        isAdmin(): boolean {
-            return this.roles.includes(Role[Role.ADMIN]);
+        getRoles() {
+            if(!bot.synced_roles.enabled) return roles.filter((role) => this.roles.some((name) => name.toUpperCase() == role.name.toUpperCase())).map((role) => role.name);
+            if(!this.connections?.discord?.id) return [];
+            const guild = client.guilds.cache.get(bot.synced_roles.guild);
+            if(!guild) {
+                client.guilds.fetch(bot.synced_roles.guild);
+                return [];
+            }
+            const member = guild.members.cache.get(this.connections.discord.id);
+            if(!member) {
+                guild.members.fetch(this.connections.discord.id);
+                return [];
+            }
+            return Object
+                .keys(bot.synced_roles.roles)
+                .filter((key) => {
+                    const role = roles.find((role) => role.name.toUpperCase() == key.toUpperCase());
+                    if(!role) return false;
+                    const roleIds = bot.synced_roles.roles[role.name as keyof typeof bot.synced_roles.roles];
+                    if(!roleIds) return false;
+                    return roleIds.some((id) => member.roles.cache.has(id));
+                })
+                .map((role) => role);
+        },
+
+        getPermissions() {
+            const localRoles = this.getRoles();
+            const permissions: { [key: string]: boolean } = {};
+            for(const permission of Object.keys(Permission).filter(key => isNaN(Number(key)))) {
+                permissions[permission] = localRoles.some((key) => {
+                    const role = roles.find((r) => r.name == key)!;
+                    if(!role) return false;
+                    return role.permissions[permission as keyof typeof role.permissions];
+                });
+            }
+            return permissions;
+        },
+
+        hasPermission(permission: Permission) {
+            const permissions = this.getPermissions();
+            return permissions[Permission[permission]];
+        },
+
+        hasRoughPermissions() {
+            const permissions = this.getPermissions();
+            return [
+                Permission.ManageBans,
+                Permission.ManageRoles,
+                Permission.ManageTags,
+                Permission.ManageWatchlist
+            ].some((permission) => permissions[Permission[permission]]);
         },
 
         isBanned(): boolean {
@@ -125,4 +215,4 @@ const schema = new Schema({
     }
 });
 
-export default model('players', schema);
+export default model<IPlayer>('players', schema);

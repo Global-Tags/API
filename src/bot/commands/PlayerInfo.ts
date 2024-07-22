@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, User } from "discord.js";
 import Command from "../structs/Command";
 import axios from "axios";
-import players from "../../database/schemas/players";
+import players, { Permission } from "../../database/schemas/players";
 import * as bot from "../bot";
 import { translateToAnsi } from "../../libs/ChatColor";
 export const uuidRegex = /[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}|[a-f0-9]{8}(?:[a-f0-9]{4}){4}[a-f0-9]{8}/;
@@ -43,6 +43,7 @@ export default class PlayerInfo extends Command {
             }
         }
         const data = await players.findOne({ uuid: uuid.replaceAll(`-`, ``) });
+        const roles = data?.getRoles() || [];
 
         if(!data) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ This player is not in our records!`)] });
         const staff = await players.findOne({ "connections.discord.id": user.id });
@@ -73,11 +74,6 @@ export default class PlayerInfo extends Command {
                         inline: true
                     },
                     {
-                        name: `Admin`,
-                        value: `\`\`\`ansi\n${translateToAnsi(data.isAdmin() ? `&aYes` : `&cNo`)}\`\`\``,
-                        inline: true
-                    },
-                    {
                         name: `Banned`,
                         value: `\`\`\`ansi\n${translateToAnsi(data.isBanned() ? `&cYes` : `&aNo`)}\`\`\``,
                         inline: true
@@ -85,18 +81,18 @@ export default class PlayerInfo extends Command {
                     {
                         name: `Ban reason`,
                         value: `\`\`\`${data.isBanned() ? data.ban?.reason || `--` : `--`}\`\`\``,
-                        inline: true
+                        inline: false
                     },
                     {
-                        name: `Roles [${data.roles.length}]`,
-                        value: `\`\`\`${data.roles.length > 0 ? data.roles.map((role) => `- ${capitalize(role)}`).join('\n') : `--`}\`\`\``,
+                        name: `Roles [${roles.length}]`,
+                        value: `\`\`\`${roles.length > 0 ? roles.map((role) => `- ${capitalize(role)}`).join('\n') : `--`}\`\`\``,
                         inline: false
                     }
                 ])
                 .setImage(`https://cdn.rappytv.com/bots/placeholder.png`)
                 .setFooter({ text: `© RappyTV, ${new Date().getFullYear()}`})
             ],
-            components: !staff?.isAdmin() ? [] : [
+            components: staff && staff.hasRoughPermissions() ? [
                 new ActionRowBuilder<ButtonBuilder>()
                     .addComponents(
                         new ButtonBuilder()
@@ -104,7 +100,7 @@ export default class PlayerInfo extends Command {
                         .setCustomId(`actions`)
                         .setStyle(ButtonStyle.Primary)
                     )
-            ]
+            ] : []
         });
     }
 }

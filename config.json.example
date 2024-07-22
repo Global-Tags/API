@@ -57,10 +57,65 @@
             }
         ]
     },
+    "roles": [
+        {
+            "name": "ADMIN",
+            "permissions": {
+                "BypassValidation": true,
+                "ManageBans": true,
+                "ManageRoles": true,
+                "ManageTags": true,
+                "ManageWatchlist": true,
+                "ReportImmunity": true
+            }
+        },
+        {
+            "name": "DEVELOPER",
+            "permissions": {
+                "BypassValidation": true,
+                "ManageBans": false,
+                "ManageRoles": false,
+                "ManageTags": false,
+                "ManageWatchlist": false,
+                "ReportImmunity": true
+            }
+        },
+        {
+            "name": "MODERATOR",
+            "permissions": {
+                "BypassValidation": false,
+                "ManageBans": false,
+                "ManageRoles": false,
+                "ManageTags": false,
+                "ManageWatchlist": false,
+                "ReportImmunity": true
+            }
+        },
+        {
+            "name": "SUPPORTER",
+            "permissions": {
+                "BypassValidation": false,
+                "ManageBans": false,
+                "ManageRoles": false,
+                "ManageTags": false,
+                "ManageWatchlist": false,
+                "ReportImmunity": false
+            }
+        }
+    ],
     "bot": {
         "enabled": true,
         "token": "",
-        "staff": [],
+        "synced_roles": {
+            "enabled": true,
+            "guild": "",
+            "roles": {
+                "ADMIN": [],
+                "DEVELOPER": [],
+                "MODERATOR": [],
+                "SUPPORTER": []
+            }
+        },
         "reports": {
             "active": true,
             "channel": "",
