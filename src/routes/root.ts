@@ -111,6 +111,8 @@ export default new Elysia()
         });
     }
 
+    const oldTag = player?.tag;
+
     if(!player) {
         await new players({
             uuid,
@@ -133,7 +135,7 @@ export default new Elysia()
             logType: ModLogType.ChangeTag,
             uuid: uuid,
             staff: session.uuid || 'Unknown',
-            oldTag: player?.tag || 'None',
+            oldTag: oldTag || 'None',
             newTag: tag
         });
     }
