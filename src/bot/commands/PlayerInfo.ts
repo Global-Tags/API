@@ -75,7 +75,7 @@ export default class PlayerInfo extends Command {
                     },
                     {
                         name: `Referrals`,
-                        value: `\`\`\`${data.referrals}\`\`\``,
+                        value: `\`\`\`${data.referrals.length}\`\`\``,
                         inline: true
                     },
                     {
