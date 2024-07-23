@@ -74,6 +74,11 @@ export default class PlayerInfo extends Command {
                         inline: true
                     },
                     {
+                        name: `Referrals`,
+                        value: `\`\`\`${data.referrals}\`\`\``,
+                        inline: true
+                    },
+                    {
                         name: `Banned`,
                         value: `\`\`\`ansi\n${translateToAnsi(data.isBanned() ? `&cYes` : `&aNo`)}\`\`\``,
                         inline: true
@@ -81,7 +86,7 @@ export default class PlayerInfo extends Command {
                     {
                         name: `Ban reason`,
                         value: `\`\`\`${data.isBanned() ? data.ban?.reason || `--` : `--`}\`\`\``,
-                        inline: false
+                        inline: true
                     },
                     {
                         name: `Roles [${roles.length}]`,
