@@ -76,7 +76,7 @@ export const elysia = new Elysia()
     connect(config.srv);
 })
 .onError(({ code, set, error: { message: error }, request }) => {
-    const i18n = getI18nFunctionByLanguage(request.headers.get('x-minecraft-language'));
+    const i18n = getI18nFunctionByLanguage(request.headers.get('x-language'));
 
     if(code == 'VALIDATION') {
         set.status = 422;
