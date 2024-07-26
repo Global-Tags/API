@@ -97,7 +97,7 @@ export default class PlayerInfo extends Command {
                 .setImage(`https://cdn.rappytv.com/bots/placeholder.png`)
                 .setFooter({ text: `© RappyTV, ${new Date().getFullYear()}`})
             ],
-            components: staff && staff.hasRoughPermissions() ? [
+            components: staff && staff.hasAnyElevatedPermission() ? [
                 new ActionRowBuilder<ButtonBuilder>()
                     .addComponents(
                         new ButtonBuilder()
