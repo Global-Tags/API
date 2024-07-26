@@ -42,7 +42,7 @@ export interface IPlayer {
     getRoles(): string[],
     getPermissions(): { [key: string]: boolean },
     hasPermission(permission: Permission): boolean,
-    hasRoughPermissions(): boolean,
+    hasAnyElevatedPermission(): boolean,
     isBanned(): boolean,
     banPlayer(reason: string, appealable?: boolean): void,
     unban(): void
@@ -185,7 +185,7 @@ const schema = new Schema<IPlayer>({
             return permissions[Permission[permission]];
         },
 
-        hasRoughPermissions() {
+        hasAnyElevatedPermission() {
             const permissions = this.getPermissions();
             return [
                 Permission.ManageBans,
