@@ -41,7 +41,7 @@ export function initializeMetrics() {
 async function saveMetrics() {
     const users = await players.find();
     const tags = users.filter((user) => user.tag != null).length;
-    const admins = users.filter((user) => user.isAdmin()).length;
+    const staff = users.filter((user) => user.hasAnyElevatedPermission()).length;
     const bans = users.filter((user) => user.isBanned()).length;
     const positions = (await players.distinct("position")).reduce((object: any, position) => {
         object[position.toLowerCase()] = users.filter((user) => user.position.toUpperCase() == position.toUpperCase()).length;
@@ -56,7 +56,7 @@ async function saveMetrics() {
     new metrics({
         players: users.length,
         tags,
-        admins,
+        admins: staff,
         bans,
         downloads: addon?.downloads ?? -1,
         rating: addon?.rating.rating ?? -1,
