@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
 import { bot, roles } from "../../../config.json";
 import { client } from "../../bot/bot";
+import Logger from "../../libs/Logger";
 
 export enum GlobalPosition {
     Above,
@@ -34,12 +35,12 @@ export enum GlobalIcon {
     Soundcloud,
     Spotify,
     Star,
+    Statsfm,
     Steam,
     Telegram,
     Threads,
     Tiktok,
     Twitch,
-    Statsfm,
     X,
     Xbox,
     Youtube
@@ -189,12 +190,12 @@ const schema = new Schema<IPlayer>({
             if(!this.connections?.discord?.id) return [];
             const guild = client.guilds.cache.get(bot.synced_roles.guild);
             if(!guild) {
-                client.guilds.fetch(bot.synced_roles.guild);
+                client.guilds.fetch(bot.synced_roles.guild).catch(() => Logger.error(`Couldn't fetch guild ${bot.synced_roles.guild}`));
                 return [];
             }
             const member = guild.members.cache.get(this.connections.discord.id);
             if(!member) {
-                guild.members.fetch(this.connections.discord.id);
+                guild.members.fetch(this.connections.discord.id).catch(() => Logger.error(`Couldn't fetch member ${this.connections.discord!.id}`));
                 return [];
             }
             return Object
