@@ -1,7 +1,11 @@
 import Elysia, { t } from "elysia";
-import players, { Permission } from "../database/schemas/players";
+import players, { GlobalPosition, Permission } from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
 import getAuthProvider from "../middleware/GetAuthProvider";
+
+const positions = Object.keys(GlobalPosition)
+    .filter((pos) => isNaN(Number(pos)))
+    .map((pos) => pos.toUpperCase());
 
 export default new Elysia({
     prefix: "/position"
@@ -16,7 +20,7 @@ export default new Elysia({
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.noTag`) });
     if(player.isBanned()) return error(403, { error: i18n(`error.banned`) });
-    if(![`ABOVE`, `BELOW`, `RIGHT`, `LEFT`].includes(position)) return error(422, { error: i18n(`position.invalid`) });
+    if(!positions.includes(position)) return error(422, { error: i18n(`position.invalid`) });
     if(position == player.position) return error(400, { error: i18n(`position.samePosition`) });
 
     player.position = position as "ABOVE" | "BELOW" | "RIGHT" | "LEFT";
