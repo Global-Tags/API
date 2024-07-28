@@ -2,6 +2,49 @@ import { Schema, model } from "mongoose";
 import { bot, roles } from "../../../config.json";
 import { client } from "../../bot/bot";
 
+export enum GlobalPosition {
+    Above,
+    Below,
+    Right,
+    Left
+}
+
+export enum GlobalIcon {
+    None,
+    Android,
+    Apple,
+    Bereal,
+    Crown,
+    Discord,
+    Duolingo,
+    Ebio,
+    Epicgames,
+    Gamescom,
+    Github,
+    Gitlab,
+    Heart,
+    Instagram,
+    Kick,
+    Labynet,
+    Paypal,
+    Pinterest,
+    Playstation,
+    Reddit,
+    Snapchat,
+    Soundcloud,
+    Spotify,
+    Star,
+    Steam,
+    Telegram,
+    Threads,
+    Tiktok,
+    Twitch,
+    Statsfm,
+    X,
+    Xbox,
+    Youtube
+}
+
 export type Role = {
     name: string,
     permissions: {
@@ -57,7 +100,6 @@ const schema = new Schema<IPlayer>({
     tag: String,
     position: {
         type: String,
-        enum: [`ABOVE`, `BELOW`, `RIGHT`, `LEFT`],
         required: true,
         default: `ABOVE`
     },
