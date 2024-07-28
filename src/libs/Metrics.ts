@@ -1,8 +1,16 @@
 import { CronJob } from "cron";
 import metrics from "../database/schemas/metrics";
-import players from "../database/schemas/players";
+import players, { GlobalIcon, GlobalPosition } from "../database/schemas/players";
 import Logger from "./Logger";
 import axios from "axios";
+
+const positionList = Object.keys(GlobalPosition)
+    .filter((pos) => isNaN(Number(pos)))
+    .map((pos) => pos.toUpperCase());
+
+const iconList = Object.keys(GlobalIcon)
+    .filter((pos) => isNaN(Number(pos)))
+    .map((pos) => pos.toUpperCase());
 
 type Addon = {
     id: number,
@@ -43,14 +51,14 @@ async function saveMetrics() {
     const tags = users.filter((user) => user.tag != null).length;
     const staff = users.filter((user) => user.hasAnyElevatedPermission()).length;
     const bans = users.filter((user) => user.isBanned()).length;
-    const positions = (await players.distinct("position")).reduce((object: any, position) => {
+    const positions = positionList.reduce((object: any, position) => {
         object[position.toLowerCase()] = users.filter((user) => user.position.toUpperCase() == position.toUpperCase()).length;
         return object;
     }, {});
-    const icons = (await players.distinct("icon")).reduce((object: any, icon) => {
-        object[icon.toLowerCase()] = users.filter((user) => user.icon.toUpperCase() == icon.toUpperCase()).length;
-        return object;
-    }, {});
+    const icons = iconList.reduce((object: any, icon) => {
+            object[icon.toLowerCase()] = users.filter((user) => user.icon.toUpperCase() == icon.toUpperCase()).length;
+            return object;
+        }, {});
     const addon = await fetchAddon('globaltags');
     
     new metrics({
