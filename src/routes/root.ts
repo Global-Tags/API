@@ -6,6 +6,7 @@ import fetchI18n from "../middleware/FetchI18n";
 import { stripColors } from "../libs/ChatColor";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { strictAuth, validation } from "../../config.json";
+import { constantCase } from "change-case";
 const { min, max, blacklist, watchlist } = validation.tag;
 
 export default new Elysia()
@@ -29,6 +30,7 @@ export default new Elysia()
         position: player.position || "ABOVE",
         icon: player.icon || "NONE",
         roles: player.getRoles(),
+        permissions: Object.keys(player.getPermissions()).filter((perm) => player.getPermissions()[perm]).map((permission) => constantCase(permission)),
         referred: player.referred,
         referrals: player.referrals.length,
         ban: showBan ? {
@@ -43,7 +45,7 @@ export default new Elysia()
         description: `Get another players' tag info`
     },
     response: {
-        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.String(), referred: t.Boolean(), referrals: t.Integer(), roles: t.Array(t.String()), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]) }), t.Null()]) }, { description: `You received the tag data.` }),
+        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.String(), referred: t.Boolean(), referrals: t.Integer(), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]) }), t.Null()]) }, { description: `You received the tag data.` }),
         401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
         403: t.Object({ error: t.String() }, { description: `The player is banned.` }),
         404: t.Object({ error: t.String() }, { description: `The player is not in the database.` }),
