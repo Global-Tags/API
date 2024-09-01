@@ -16,6 +16,10 @@
             "blacklist": []
         }
     },
+    "sentry": {
+        "enabled": false,
+        "dsn": ""
+    },
     "ratelimit": {
         "active": true,
         "routes": [
