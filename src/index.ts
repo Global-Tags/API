@@ -15,12 +15,13 @@ import { CronJob } from "cron";
 import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/FetchI18n";
 import { initializeMetrics } from "./libs/Metrics";
 import Metrics from "./database/schemas/metrics";
-import handleErrors from "./libs/ErrorHandler";
 import { verifyVersion } from "./middleware/VersionVerification";
 import AuthProvider from "./auth/AuthProvider";
 import getAuthProvider from "./middleware/GetAuthProvider";
+import { handleErrors, initializeSentry } from "./libs/ErrorHandler";
 
 handleErrors();
+if(config.sentry.enabled) initializeSentry(config.sentry.dsn);
 
 // Elysia API
 export const elysia = new Elysia()
