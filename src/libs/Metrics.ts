@@ -3,6 +3,8 @@ import metrics from "../database/schemas/metrics";
 import players, { GlobalIcon, GlobalPosition } from "../database/schemas/players";
 import Logger from "./Logger";
 import axios from "axios";
+import { client } from "../bot/bot";
+import * as config from "../../config.json";
 
 const positionList = Object.keys(GlobalPosition)
     .filter((pos) => isNaN(Number(pos)))
@@ -47,6 +49,7 @@ export function initializeMetrics() {
 }
 
 async function saveMetrics() {
+    if(config.bot.synced_roles.enabled) await client.guilds.cache.get(config.bot.synced_roles.guild)?.members.fetch();
     const users = await players.find();
     const tags = users.filter((user) => user.tag != null).length;
     const staff = users.filter((user) => user.hasAnyElevatedPermission()).length;
