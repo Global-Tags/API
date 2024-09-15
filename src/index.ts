@@ -13,7 +13,7 @@ import { ip } from "./middleware/ObtainIP";
 import { load } from "./libs/I18n";
 import { CronJob } from "cron";
 import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/FetchI18n";
-import { initializeMetrics } from "./libs/Metrics";
+import { getRequests, initializeMetrics } from "./libs/Metrics";
 import Metrics from "./database/schemas/metrics";
 import { verifyVersion } from "./middleware/VersionVerification";
 import AuthProvider from "./auth/AuthProvider";
@@ -103,13 +103,13 @@ export const elysia = new Elysia()
         return { error: i18n(`error.unknownError`) };
     }
 })
-.get(`/`, () => ({ version }), {
+.get(`/`, () => ({ version, requests: getRequests() }), {
     detail: {
         tags: [`API`],
-        description: `Returns the API version. Used by the /gt command of the addon.`
+        description: `Returns some basic info about the API.`
     },
     response: {
-        200: t.Object({ version: t.String() }, { description: `You received the version` }),
+        200: t.Object({ version: t.String(), requests: t.Number() }, { description: `Some basic API info` }),
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     }
 })
