@@ -6,6 +6,16 @@ import axios from "axios";
 import { client } from "../bot/bot";
 import * as config from "../../config.json";
 
+let requests = 0;
+
+export function recordRequest() {
+    requests++;
+}
+
+export function getRequests(): number {
+    return requests;
+}
+
 const positionList = Object.keys(GlobalPosition)
     .filter((pos) => isNaN(Number(pos)))
     .map((pos) => pos.toUpperCase());
@@ -71,9 +81,11 @@ async function saveMetrics() {
         bans,
         downloads: addon?.downloads ?? -1,
         rating: addon?.rating.rating ?? -1,
+        dailyRequests: getRequests(),
         positions,
         icons
     }).save();
+    requests = 0;
     Logger.debug(`New metric saved!`);
 }
 
