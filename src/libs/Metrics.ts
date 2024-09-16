@@ -5,8 +5,14 @@ import Logger from "./Logger";
 import axios from "axios";
 import { client } from "../bot/bot";
 import * as config from "../../config.json";
+import { args } from "..";
 
-let requests = 0;
+let requests: number;
+
+export function loadRequests() {
+    const defaultValue = Number(args["requests"]);
+    requests = !isNaN(defaultValue) ? defaultValue : 0;
+}
 
 export function recordRequest() {
     requests++;
