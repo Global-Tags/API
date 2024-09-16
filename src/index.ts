@@ -127,6 +127,7 @@ export const elysia = new Elysia()
         bans: metric.bans,
         downloads: metric.downloads,
         rating: metric.rating,
+        dailyRequests: metric.dailyRequests ?? 0,
         positions: metric.positions,
         icons: metric.icons
     }));
