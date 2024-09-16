@@ -13,15 +13,19 @@ import { ip } from "./middleware/ObtainIP";
 import { load } from "./libs/I18n";
 import { CronJob } from "cron";
 import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/FetchI18n";
-import { getRequests, initializeMetrics } from "./libs/Metrics";
+import { getRequests, initializeMetrics, loadRequests } from "./libs/Metrics";
 import Metrics from "./database/schemas/metrics";
 import { verifyVersion } from "./middleware/VersionVerification";
 import AuthProvider from "./auth/AuthProvider";
 import getAuthProvider from "./middleware/GetAuthProvider";
 import { handleErrors, initializeSentry } from "./libs/ErrorHandler";
+import minimist from "minimist";
 
 handleErrors();
 if(config.sentry.enabled) initializeSentry(config.sentry.dsn);
+
+export const args = minimist(process.argv.slice(2));
+loadRequests();
 
 // Elysia API
 export const elysia = new Elysia()
