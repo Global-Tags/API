@@ -69,9 +69,9 @@ async function saveMetrics() {
         return object;
     }, {});
     const icons = iconList.reduce((object: any, icon) => {
-            object[icon.toLowerCase()] = users.filter((user) => user.icon.toUpperCase() == icon.toUpperCase()).length;
-            return object;
-        }, {});
+        object[icon.toLowerCase()] = users.filter((user) => user.icon.toUpperCase() == icon.toUpperCase()).length;
+        return object;
+    }, {});
     const addon = await fetchAddon('globaltags');
     
     new metrics({
