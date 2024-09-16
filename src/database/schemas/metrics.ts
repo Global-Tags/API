@@ -12,6 +12,7 @@ const schema = new Schema({
     bans: requiredNumber,
     downloads: requiredNumber,
     rating: requiredNumber,
+    dailyRequests: requiredNumber,
     positions: {
         type: Object,
         required: true
