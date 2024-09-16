@@ -3,6 +3,7 @@
       "strict": true,
       "resolveJsonModule": true,
       "lib": ["es2023"],
-      "downlevelIteration": true
+      "downlevelIteration": true,
+      "esModuleInterop": true
     }
 }
