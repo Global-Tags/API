@@ -20,6 +20,7 @@ import AuthProvider from "./auth/AuthProvider";
 import getAuthProvider from "./middleware/GetAuthProvider";
 import { handleErrors, initializeSentry } from "./libs/ErrorHandler";
 import minimist from "minimist";
+import cors from "@elysiajs/cors";
 
 handleErrors();
 if(config.sentry.enabled) initializeSentry(config.sentry.dsn);
@@ -34,6 +35,7 @@ export const elysia = new Elysia()
 .onTransform(access)
 .onBeforeHandle(checkRatelimit)
 .use(ip({ checkHeaders: config.ipHeaders }))
+.use(cors())
 .use(fetchI18n)
 .use(getAuthProvider)
 .use(swagger({

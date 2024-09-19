@@ -12,6 +12,7 @@
   "author": "RappyTV",
   "license": "MIT",
   "dependencies": {
+    "@elysiajs/cors": "^1.1.1",
     "@elysiajs/swagger": "^1.0.3",
     "@sentry/bun": "^8.27.0",
     "@types/minimist": "^1.2.5",
