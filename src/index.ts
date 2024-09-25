@@ -14,7 +14,6 @@ import { load } from "./libs/I18n";
 import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/FetchI18n";
 import { getRequests, initializeMetrics, loadRequests } from "./libs/Metrics";
 import Metrics from "./database/schemas/metrics";
-import { verifyVersion } from "./middleware/VersionVerification";
 import AuthProvider from "./auth/AuthProvider";
 import getAuthProvider from "./middleware/GetAuthProvider";
 import { handleErrors, initializeSentry } from "./libs/ErrorHandler";
@@ -30,7 +29,6 @@ loadRequests();
 // Elysia API
 export const elysia = new Elysia()
 .onRequest(checkDatabase)
-.onRequest(verifyVersion)
 .onTransform(access)
 .onBeforeHandle(checkRatelimit)
 .use(ip({ checkHeaders: config.ipHeaders }))
