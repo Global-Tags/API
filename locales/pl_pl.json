@@ -1,0 +1,98 @@
+{
+  "error": {
+    "notFound": "Nie znaleziono!",
+    "unknownError": "Wystąpił nieznany błąd! Spróbuj ponownie później",
+    "update": "Używasz przestarzałej wersji GlobalTags. Poczekaj, aż aktualizacja zostanie przesłana do sklepu!",
+    "invalidBody": "Treść żądania musi być obiektem JSON!",
+    "notAllowed": "Nie masz uprawnień do wykonania tego polecenia!",
+    "database": "Baza danych nie jest połączona. Spróbuj ponownie później!",
+    "missingField": "Brak pola \"<field>\".",
+    "playerNotFound": "Nie ma takiego gracza w naszych rejestrach!",
+    "ratelimit": "Masz ograniczenie prędkości! Spróbuj ponownie za <seconds> sekund!",
+    "banned": "Jesteś zbanowany!",
+    "wrongType": "Pole „<field>” musi być typu <type>!",
+    "noTag": "Proszę najpierw ustawić tag!",
+    "playerNoTag": "Ten gracz nie ma tagu!",
+    "playerBanned": "Ten gracz jest zbanowany!",
+    "malformedAuthHeader": "Wprowadzono nieprawidłowy nagłówek autoryzacyjny!"
+  },
+  "ban": {
+    "alreadyBanned": "Ten gracz już został zbanowany!",
+    "noReason": "Nie podano powodu",
+    "success": "Gracz został pomyślnie zbanowany!"
+  },
+  "unban": {
+    "notBanned": "Ten gracz nie jest zbanowany!",
+    "success": "Gracz został pomyślnie odbanowany!"
+  },
+  "icon": {
+    "sameIcon": "Już wybrałeś tę ikonę!",
+    "notAllowed": "Nie masz uprawnień, aby wybrać tę ikonę!",
+    "success": {
+      "self": "Ikona została pomyślnie ustawiona!",
+      "admin": "Ikona gracza została ustawiona pomyślnie!"
+    }
+  },
+  "position": {
+    "samePosition": "Twój tag jest już w tej pozycji!",
+    "invalid": "Proszę podać ważną pozycję!",
+    "success": {
+      "self": "Pozycja Twojego tagu została pomyślnie ustawiona!",
+      "admin": "Pozycja tagu gracza została pomyślnie ustawiona!"
+    }
+  },
+  "editBan": {
+    "success": "Ban został zaktualizowany!"
+  },
+  "appeal": {
+    "notBanned": "Nie zbanowano ciebie!",
+    "notAppealable": "Od Twojego bana nie można się odwołać!",
+    "alreadyAppealed": "Już wysłałeś odwołanie od bana!",
+    "success": "Odwołanie od bana zostało pomyślnie wysłane!"
+  },
+  "report": {
+    "self": "Nie możesz zgłosić samego siebie!",
+    "alreadyReported": "Już zgłosiłeś tag tego gracza!",
+    "validation": "Wartość pola „powód” powinna mieścić się w przedziale od <min> do <max> znaków.",
+    "invalidReason": "Musisz podać ważny powód!",
+    "success": "Gracz został pomyślnie zgłoszony!",
+    "immune": "Tego gracza nie można zgłosić!"
+  },
+  "setTag": {
+    "empty": "Tag nie może być pusty!",
+    "sameTag": "Masz już ten tag!",
+    "blacklisted": "Nie możesz umieszczać „<word>” w swoim globalnym tagu!",
+    "validation": "Wartość pola „tag” powinna mieścić się w przedziale od <min> do <max> znaków.",
+    "success": {
+      "self": "Twój tag został pomyślnie zaktualizowany!",
+      "admin": "Tag gracza został pomyślnie zaktualizowany!"
+    }
+  },
+  "referral": {
+    "self": "Nie możesz polecić samego siebie!",
+    "alreadyReferred": "Już poleciłeś gracza!",
+    "success": "Pomyślnie polecono gracza!"
+  },
+  "resetTag": {
+    "success": {
+      "self": "Twój tag został pomyślnie zresetowany!",
+      "admin": "Tag gracza został pomyślnie zresetowany!"
+    }
+  },
+  "connections": {
+    "discord": {
+      "disabled": "Łączenie kont jest wyłączone!",
+      "alreadyConnected": "Masz już połączone konto Discord. Użyj '/gt unlink', aby je odłączyć!",
+      "notConnected": "Nie masz połączonego konta Discord. Użyj '/gt link', aby połączyć konto!",
+      "unlinked": "Konto Discord zostało pomyślnie odłączone!"
+    }
+  },
+  "watch": {
+    "alreadyWatched": "Ten gracz jest już na liście obserwowanych!",
+    "success": "Gracz jest teraz na liście obserwowanych!"
+  },
+  "unwatch": {
+    "notWatched": "Nie ma tego gracza na liście obserwowanych!",
+    "success": "Gracz nie znajduje się już na liście obserwowanych!"
+  }
+}

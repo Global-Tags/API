@@ -1,0 +1,98 @@
+{
+  "error": {
+    "notFound": "Not found!",
+    "update": "You're using an outdated version of GlobalTags. Please wait for an update to be pushed to the store!",
+    "unknownError": "An unknown error occurred! Please try again later",
+    "invalidBody": "Request body needs to be a json object!",
+    "notAllowed": "You're not allowed to perform that request!",
+    "database": "The database is not connected. Please try again later!",
+    "missingField": "Missing field \"<field>\".",
+    "playerNotFound": "There is no such player in our records!",
+    "wrongType": "Field \"<field>\" needs to be of type <type>!",
+    "banned": "You are banned!",
+    "ratelimit": "You're being ratelimited! Please try again in <seconds> seconds!",
+    "noTag": "Please set a tag first!",
+    "playerNoTag": "This player does not have a tag!",
+    "playerBanned": "This player is banned!",
+    "malformedAuthHeader": "You've entered a malformed authorization header!"
+  },
+  "ban": {
+    "alreadyBanned": "This player is already banned!",
+    "noReason": "No reason provided",
+    "success": "The player was successfully banned!"
+  },
+  "unban": {
+    "notBanned": "This player is not banned!",
+    "success": "The player was successfully unbanned!"
+  },
+  "icon": {
+    "sameIcon": "You already chose this icon!",
+    "notAllowed": "You're not allowed to choose this icon!",
+    "success": {
+      "self": "Your icon was successfully set!",
+      "admin": "The player's icon was successfully set!"
+    }
+  },
+  "position": {
+    "samePosition": "Your tag is already in this position!",
+    "invalid": "Please provide a valid position!",
+    "success": {
+      "self": "Your tag position was successfully set!",
+      "admin": "The player's tag position was successfully set!"
+    }
+  },
+  "editBan": {
+    "success": "The ban was updated!"
+  },
+  "report": {
+    "self": "You can't report yourself!",
+    "alreadyReported": "You've already reported this player's tag!",
+    "invalidReason": "You have to provide a valid reason!",
+    "validation": "Keep the \"reason\" field between <min> and <max> characters.",
+    "success": "The player was successfully reported!",
+    "immune": "This player cannot be reported!"
+  },
+  "appeal": {
+    "notBanned": "You're not banned!",
+    "notAppealable": "Your ban is not appealable!",
+    "alreadyAppealed": "You've already sent a ban appeal!",
+    "success": "The ban appeal was successfully sent!"
+  },
+  "setTag": {
+    "empty": "The tag must not be empty!",
+    "sameTag": "You already have this tag!",
+    "blacklisted": "You're not allowed to include \"<word>\" in your Global Tag!",
+    "validation": "Keep the \"tag\" field between <min> and <max> characters.",
+    "success": {
+      "self": "Your tag was successfully updated!",
+      "admin": "The player's tag was successfully updated!"
+    }
+  },
+  "referral": {
+    "self": "You can't refer yourself!",
+    "alreadyReferred": "You have already referred a player!",
+    "success": "You have successfully referred the player!"
+  },
+  "resetTag": {
+    "success": {
+      "self": "Your tag was successfully reset!",
+      "admin": "The player's tag was successfully reset!"
+    }
+  },
+  "connections": {
+    "discord": {
+      "disabled": "Account linking is deactivated!",
+      "alreadyConnected": "You already have a Discord account linked. Please use '/gt unlink' to unlink!",
+      "notConnected": "You don't have a Discord account linked. Use '/gt link' to link an account!",
+      "unlinked": "The discord account was successfully unlinked!"
+    }
+  },
+  "watch": {
+    "alreadyWatched": "This player is already on the watchlist!",
+    "success": "The player is now on the watchlist!"
+  },
+  "unwatch": {
+    "notWatched": "This player is not on the watchlist!",
+    "success": "The player is no longer on the watchlist!"
+  }
+}

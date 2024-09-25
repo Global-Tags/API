@@ -1,0 +1,98 @@
+{
+  "error": {
+    "notFound": "Nicht gefunden!",
+    "update": "Du benutzt eine veraltete Version von GlobalTags. Bitte warte bis ein Update in den Store kommt.",
+    "unknownError": "Ein unbekannter Fehler ist aufgetreten! Bitte versuche es später erneut",
+    "invalidBody": "Der Request body muss ein JSON Objekt sein!",
+    "missingField": "Fehlendes JSON Feld \"<field>\".",
+    "notAllowed": "Darauf hast du keinen Zugriff!",
+    "database": "Die Datenbank ist nicht verbunden. Bitte versuche es später erneut!",
+    "playerNotFound": "Dieser Spieler befindet sich nicht in unserer Datenbank!",
+    "wrongType": "Das Feld \"<field>\" muss von Typ <type> sein!",
+    "ratelimit": "Du bist geratelimited! Bitte versuche es in <seconds> Sekunden erneut!",
+    "banned": "Du bist gebannt!",
+    "noTag": "Du musst erst einen Tag auswählen!",
+    "playerNoTag": "Dieser Spieler hat keinen Tag!",
+    "playerBanned": "Dieser Spieler ist gebannt!",
+    "malformedAuthHeader": "Du hast einen ungültigen Authorization Header übergeben!"
+  },
+  "ban": {
+    "alreadyBanned": "Dieser Spieler ist bereits gebannt!",
+    "noReason": "Kein Grund angegeben",
+    "success": "Der Spieler wurde erfolgreich gebannt!"
+  },
+  "unban": {
+    "notBanned": "Dieser Spieler ist nicht gebannt!",
+    "success": "Der Spieler wurde erfolgreich entbannt!"
+  },
+  "icon": {
+    "sameIcon": "Du hast dieses Icon bereits ausgewählt!",
+    "notAllowed": "Du darfst dieses Icon nicht auswählen!",
+    "success": {
+      "self": "Dein Icon wurde erfolgreich ausgewählt!",
+      "admin": "Das Icon des Spielers wurde erfolgreich geändert!"
+    }
+  },
+  "position": {
+    "samePosition": "Dein Tag ist bereits in dieser Position!",
+    "invalid": "Bitte gib eine gültige Position an!",
+    "success": {
+      "self": "Deine Tag-Position wurde erfolgreich ausgewählt!",
+      "admin": "Die Tag-Position des Spielers wurde erfolgreich geändert!"
+    }
+  },
+  "editBan": {
+    "success": "Der Ban wurde aktualisiert!"
+  },
+  "report": {
+    "self": "Du kannst dich nicht selbst melden!",
+    "alreadyReported": "Du hast den Tag dieses Spielers bereits gemeldet!",
+    "validation": "Das \"reason\" Feld darf nur zwischen <min> und <max> Zeichen lang sein.",
+    "invalidReason": "Du musst einen gültigen Grund angeben!",
+    "success": "Der Spieler wurde erfolgreich gemeldet!",
+    "immune": "Dieser Spieler kann nicht gemeldet werden!"
+  },
+  "appeal": {
+    "notBanned": "Du bist nicht gebannt!",
+    "notAppealable": "Dein Ban ist nicht anfechtbar!",
+    "alreadyAppealed": "Du hast bereits einen Entbannungsantrag gesendet!",
+    "success": "Der Entbannungsantrag wurde erfolgreich gesendet!"
+  },
+  "setTag": {
+    "empty": "Der Tag darf nicht leer sein!",
+    "sameTag": "Du hast diesen Tag bereits!",
+    "blacklisted": "Das Wort \"<word>\" darf nicht in deinem Global Tag vorkommen!",
+    "validation": "Das \"tag\" Feld darf nur zwischen <min> und <max> Zeichen lang sein.",
+    "success": {
+      "self": "Dein Tag wurde erfolgreich geändert!",
+      "admin": "Der Tag des Spielers wurde erfolgreich geändert!"
+    }
+  },
+  "referral": {
+    "self": "Du kannst dich nicht selber vermitteln!",
+    "alreadyReferred": "Du hast bereits einen Spieler vermittelt!",
+    "success": "Du hast den Spieler erfolgreich vermittelt!"
+  },
+  "resetTag": {
+    "success": {
+      "self": "Dein Tag wurde erfolgreich gelöscht!",
+      "admin": "Der Tag des Spielers wurde erfolgreich gelöscht!"
+    }
+  },
+  "watch": {
+    "alreadyWatched": "Dieser Spieler ist bereits auf der Watchlist",
+    "success": "Der Spieler ist jetzt auf der Watchlist!"
+  },
+  "connections": {
+    "discord": {
+      "disabled": "Account-Verbindungen sind deaktiviert!",
+      "alreadyConnected": "Du hast bereits einen Discord Account verbunden. Bitte nutze '/gt unlink' um ihn zu entfernen!",
+      "notConnected": "Du hast keinen Discord Account verbunden. Nutze '/gt link' um einen zu verbinden!",
+      "unlinked": "Dein Discord Account wurde erfolgreich entfernt!"
+    }
+  },
+  "unwatch": {
+    "notWatched": "Dieser Spieler ist nicht auf der Watchlist!",
+    "success": "Der Spieler ist nicht mehr auf der Watchlist!"
+  }
+}
