@@ -1,44 +1,8 @@
 # :label: GlobalTag API
 This repository contains the backend API of the GlobalTagDB for the Minecraft modification GlobalTags.
 
-## 💪 Prerequisites
-* [Git](https://git-scm.com/downloads) (Windows only)
-* A [MongoDB](https://mongodb.com) instance
-* [Bun](https://bun.sh)
-* [Docker](https://www.docker.com)
-  * [Docker Compose](https://docs.docker.com/compose/) *(Optional)*
-
-## :package: Installation
-```bash
-# Clone the repository
-$ git clone https://github.com/Global-Tags/API gtapi
-$ cd gtapi
-
-# Copy the config
-$ cp config.json.example config.json # Edit the config to your liking.
-```
-### 🍞 Run with Bun (that rhymes)
-```bash
-# Install the required dependencies
-$ bun i
-
-# Try running it
-$ bun dev
-
-# Install pm2
-$ npm install pm2 -g && pm2 install pm2-logrotate
-
-# Run the API daemonized
-$ pm2 start src/index.ts --interpreter ~/.bun/bin/bun --name GlobalTagAPI
-```
-### 🐋 Run with Docker
-```bash
-# Option 1: With docker compose
-$ docker compose up -d
-
-# Option 2: Without docker compose
-$ docker run -p 5000:5000 $(docker build -q .)
-```
+## ✨ Selfhosting
+See [Selfhosting the GlobalTagsAPI](https://docs.globaltags.xyz/api/self-hosting/)
 
 ## 🤝 Contributing
 See [CONTRIBUTING.md](CONTRIBUTING.md)
