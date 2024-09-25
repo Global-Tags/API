@@ -16,11 +16,6 @@ $ cd gtapi
 
 # Copy the config
 $ cp config.json.example config.json # Edit the config to your liking.
-
-# Install the accent cli and pull the translation files
-$ bun i -g accent-cli
-$ chmod +x sync.sh
-$ ./sync.sh
 ```
 ### 🍞 Run with Bun (that rhymes)
 ```bash
