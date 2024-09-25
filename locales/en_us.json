@@ -1,11 +1,10 @@
 {
   "error": {
+    "unknownError": "An unknown error occurred! Please try again later!",
     "notFound": "Not found!",
-    "update": "You're using an outdated version of GlobalTags. Please wait for an update to be pushed to the store!",
-    "unknownError": "An unknown error occurred! Please try again later",
     "invalidBody": "Request body needs to be a json object!",
-    "notAllowed": "You're not allowed to perform that request!",
     "database": "The database is not connected. Please try again later!",
+    "notAllowed": "You're not allowed to perform that request!",
     "missingField": "Missing field \"<field>\".",
     "playerNotFound": "There is no such player in our records!",
     "wrongType": "Field \"<field>\" needs to be of type <type>!",
@@ -47,8 +46,8 @@
   "report": {
     "self": "You can't report yourself!",
     "alreadyReported": "You've already reported this player's tag!",
-    "invalidReason": "You have to provide a valid reason!",
     "validation": "Keep the \"reason\" field between <min> and <max> characters.",
+    "invalidReason": "You have to provide a valid reason!",
     "success": "The player was successfully reported!",
     "immune": "This player cannot be reported!"
   },
@@ -79,6 +78,10 @@
       "admin": "The player's tag was successfully reset!"
     }
   },
+  "watch": {
+    "alreadyWatched": "This player is already on the watchlist!",
+    "success": "The player is now on the watchlist!"
+  },
   "connections": {
     "discord": {
       "disabled": "Account linking is deactivated!",
@@ -86,10 +89,6 @@
       "notConnected": "You don't have a Discord account linked. Use '/gt link' to link an account!",
       "unlinked": "The discord account was successfully unlinked!"
     }
-  },
-  "watch": {
-    "alreadyWatched": "This player is already on the watchlist!",
-    "success": "The player is now on the watchlist!"
   },
   "unwatch": {
     "notWatched": "This player is not on the watchlist!",
