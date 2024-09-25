@@ -11,7 +11,6 @@ import Ratelimiter from "./libs/Ratelimiter";
 import checkRatelimit from "./middleware/RatelimitChecker";
 import { ip } from "./middleware/ObtainIP";
 import { load } from "./libs/I18n";
-import { CronJob } from "cron";
 import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/FetchI18n";
 import { getRequests, initializeMetrics, loadRequests } from "./libs/Metrics";
 import Metrics from "./database/schemas/metrics";
