@@ -147,6 +147,9 @@ export const elysia = new Elysia()
             tags: t.Number(),
             admins: t.Number(),
             bans: t.Number(),
+            downloads: t.Number(),
+            rating: t.Number(),
+            dailyRequests: t.Number(),
             positions: t.Object({}, { default: {}, additionalProperties: true, description: 'All position counts' }),
             icons: t.Object({}, { default: {}, additionalProperties: true, description: 'All icon counts' })
         }, { description: `The server is reachable` })),
