@@ -1,16 +1,15 @@
 {
   "error": {
     "notFound": "Nicht gefunden!",
-    "update": "Du benutzt eine veraltete Version von GlobalTags. Bitte warte bis ein Update in den Store kommt.",
-    "unknownError": "Ein unbekannter Fehler ist aufgetreten! Bitte versuche es später erneut",
+    "unknownError": "Ein unbekannter Fehler ist aufgetreten! Bitte versuche es später erneut!",
     "invalidBody": "Der Request body muss ein JSON Objekt sein!",
+    "database": "Die Datenbank ist nicht verbunden. Bitte versuche es später erneut!",
     "missingField": "Fehlendes JSON Feld \"<field>\".",
     "notAllowed": "Darauf hast du keinen Zugriff!",
-    "database": "Die Datenbank ist nicht verbunden. Bitte versuche es später erneut!",
     "playerNotFound": "Dieser Spieler befindet sich nicht in unserer Datenbank!",
-    "wrongType": "Das Feld \"<field>\" muss von Typ <type> sein!",
     "ratelimit": "Du bist geratelimited! Bitte versuche es in <seconds> Sekunden erneut!",
     "banned": "Du bist gebannt!",
+    "wrongType": "Das Feld \"<field>\" muss von Typ <type> sein!",
     "noTag": "Du musst erst einen Tag auswählen!",
     "playerNoTag": "Dieser Spieler hat keinen Tag!",
     "playerBanned": "Dieser Spieler ist gebannt!",
@@ -47,8 +46,8 @@
   "report": {
     "self": "Du kannst dich nicht selbst melden!",
     "alreadyReported": "Du hast den Tag dieses Spielers bereits gemeldet!",
-    "validation": "Das \"reason\" Feld darf nur zwischen <min> und <max> Zeichen lang sein.",
     "invalidReason": "Du musst einen gültigen Grund angeben!",
+    "validation": "Das \"reason\" Feld darf nur zwischen <min> und <max> Zeichen lang sein.",
     "success": "Der Spieler wurde erfolgreich gemeldet!",
     "immune": "Dieser Spieler kann nicht gemeldet werden!"
   },
@@ -79,10 +78,6 @@
       "admin": "Der Tag des Spielers wurde erfolgreich gelöscht!"
     }
   },
-  "watch": {
-    "alreadyWatched": "Dieser Spieler ist bereits auf der Watchlist",
-    "success": "Der Spieler ist jetzt auf der Watchlist!"
-  },
   "connections": {
     "discord": {
       "disabled": "Account-Verbindungen sind deaktiviert!",
@@ -90,6 +85,10 @@
       "notConnected": "Du hast keinen Discord Account verbunden. Nutze '/gt link' um einen zu verbinden!",
       "unlinked": "Dein Discord Account wurde erfolgreich entfernt!"
     }
+  },
+  "watch": {
+    "alreadyWatched": "Dieser Spieler ist bereits auf der Watchlist",
+    "success": "Der Spieler ist jetzt auf der Watchlist!"
   },
   "unwatch": {
     "notWatched": "Dieser Spieler ist nicht auf der Watchlist!",

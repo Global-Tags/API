@@ -2,11 +2,10 @@
   "error": {
     "notFound": "Not found!",
     "unknownError": "An unknown error ocurred! Please try again later",
-    "update": "You're using an outdated version of GlobalTags. Please wait for an update to be pushed to the store!",
     "invalidBody": "Request body needs to be a json object!",
     "missingField": "Missing field \"<field>\".",
-    "notAllowed": "You're not allowed to perform that request!",
     "database": "The database is not connected. Please try again later!",
+    "notAllowed": "You're not allowed to perform that request!",
     "playerNotFound": "There is no such player in our records!",
     "ratelimit": "You're being ratelimited! Please try again in <seconds> seconds!",
     "wrongType": "Field \"<field>\" needs to be of type <type>!",

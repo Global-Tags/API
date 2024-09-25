@@ -1,16 +1,15 @@
 {
   "error": {
     "notFound": "Nie znaleziono!",
-    "unknownError": "Wystąpił nieznany błąd! Spróbuj ponownie później",
-    "update": "Używasz przestarzałej wersji GlobalTags. Poczekaj, aż aktualizacja zostanie przesłana do sklepu!",
+    "unknownError": "Wystąpił nieznany błąd! Spróbuj ponownie później!",
     "invalidBody": "Treść żądania musi być obiektem JSON!",
-    "notAllowed": "Nie masz uprawnień do wykonania tego polecenia!",
-    "database": "Baza danych nie jest połączona. Spróbuj ponownie później!",
     "missingField": "Brak pola \"<field>\".",
+    "database": "Baza danych nie jest połączona. Spróbuj ponownie później!",
+    "notAllowed": "Nie masz uprawnień do wykonania tego polecenia!",
     "playerNotFound": "Nie ma takiego gracza w naszych rejestrach!",
-    "ratelimit": "Masz ograniczenie prędkości! Spróbuj ponownie za <seconds> sekund!",
-    "banned": "Jesteś zbanowany!",
     "wrongType": "Pole „<field>” musi być typu <type>!",
+    "banned": "Jesteś zbanowany!",
+    "ratelimit": "Masz ograniczenie prędkości! Spróbuj ponownie za <seconds> sekund!",
     "noTag": "Proszę najpierw ustawić tag!",
     "playerNoTag": "Ten gracz nie ma tagu!",
     "playerBanned": "Ten gracz jest zbanowany!",
@@ -44,12 +43,6 @@
   "editBan": {
     "success": "Ban został zaktualizowany!"
   },
-  "appeal": {
-    "notBanned": "Nie zbanowano ciebie!",
-    "notAppealable": "Od Twojego bana nie można się odwołać!",
-    "alreadyAppealed": "Już wysłałeś odwołanie od bana!",
-    "success": "Odwołanie od bana zostało pomyślnie wysłane!"
-  },
   "report": {
     "self": "Nie możesz zgłosić samego siebie!",
     "alreadyReported": "Już zgłosiłeś tag tego gracza!",
@@ -57,6 +50,12 @@
     "invalidReason": "Musisz podać ważny powód!",
     "success": "Gracz został pomyślnie zgłoszony!",
     "immune": "Tego gracza nie można zgłosić!"
+  },
+  "appeal": {
+    "notBanned": "Nie zbanowano ciebie!",
+    "notAppealable": "Od Twojego bana nie można się odwołać!",
+    "alreadyAppealed": "Już wysłałeś odwołanie od bana!",
+    "success": "Odwołanie od bana zostało pomyślnie wysłane!"
   },
   "setTag": {
     "empty": "Tag nie może być pusty!",
@@ -79,6 +78,10 @@
       "admin": "Tag gracza został pomyślnie zresetowany!"
     }
   },
+  "watch": {
+    "alreadyWatched": "Ten gracz jest już na liście obserwowanych!",
+    "success": "Gracz jest teraz na liście obserwowanych!"
+  },
   "connections": {
     "discord": {
       "disabled": "Łączenie kont jest wyłączone!",
@@ -86,10 +89,6 @@
       "notConnected": "Nie masz połączonego konta Discord. Użyj '/gt link', aby połączyć konto!",
       "unlinked": "Konto Discord zostało pomyślnie odłączone!"
     }
-  },
-  "watch": {
-    "alreadyWatched": "Ten gracz jest już na liście obserwowanych!",
-    "success": "Gracz jest teraz na liście obserwowanych!"
   },
   "unwatch": {
     "notWatched": "Nie ma tego gracza na liście obserwowanych!",
