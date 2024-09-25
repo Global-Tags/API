@@ -9,16 +9,7 @@ export type I18nFunction = (path: string) => string;
 
 const languages = new Map<string, Language>();
 
-export async function pullTranslations() {
-    return new Promise<void>(async (resolve) => {
-        await $`bash "${join(__dirname, '..', '..', 'sync.sh')}"`.quiet();
-        Logger.debug(`New translations were pulled.`);
-        resolve();
-    });
-}
-
-export async function load(refetch: boolean = false) {
-    if(refetch) await pullTranslations();
+export async function load() {
     languages.clear();
     const localeDir = join(__dirname, '..', '..', 'locales');
     if(!existsSync(localeDir)) return Logger.error(`Locales directory not found!`);

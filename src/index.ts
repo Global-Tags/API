@@ -78,7 +78,6 @@ export const elysia = new Elysia()
     
     // Load languages
     load();
-    new CronJob(`0 */6 * * *`, () => load(true), null, true);
 
     connect(config.srv);
 })
