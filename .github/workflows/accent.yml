@@ -16,7 +16,7 @@ jobs:
             -   uses: actions/setup-node@v3
                 with:
                     node-version: 16
-            -   run: npm install -g accent-cli
+            -   run: npm install -g accent-cli@0.14.1
             -   run: accent sync --add-translations --merge-type=passive
             -   uses: peter-evans/create-pull-request@v4
                 with:
