@@ -3,6 +3,7 @@ import players from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
 import { bot } from "../../config.json";
 import getAuthProvider from "../middleware/GetAuthProvider";
+import { send as sendEmail } from "../libs/Mailer";
 
 const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
 
@@ -96,7 +97,15 @@ export default new Elysia({
     player.connections.email.code = code;
     await player.save();
 
-    // Send email
+    sendEmail({
+        recipient: email,
+        subject: i18n('email.verification.subject'),
+        template: 'verification',
+        variables: [
+            ['code', code],
+            ['title', i18n('email.verification.title')]
+        ]
+    });
 
     return { message: i18n('connections.email.verificationSent') };
 }, {
@@ -127,11 +136,19 @@ export default new Elysia({
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.noTag`) });
     if(player.isEmailVerified()) return error(400, { error: i18n(`connections.email.alreadyConnected`) });
+    if(player.connections.email.code !== params.code) return error(403, { error: i18n(`connections.email.invalidCode`) });
 
     player.connections.email.code = null;
     await player.save();
 
-    // Send email
+    sendEmail({
+        recipient: player.connections.email.address!,
+        subject: i18n('email.verified.subject'),
+        template: 'verified',
+        variables: [
+            ['title', i18n('email.verified.title')]
+        ]
+    });
 
     return { message: i18n('connections.email.verified') };
 }, {
