@@ -3,6 +3,7 @@ import players, { Permission } from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
 import { ModLogType, NotificationType, sendMessage } from "../libs/DiscordNotifier";
 import getAuthProvider from "../middleware/GetAuthProvider";
+import { sendBanEmail, sendEmail, sendUnbanEmail } from "../libs/Mailer";
 
 export default new Elysia({
     prefix: `/ban`
@@ -16,7 +17,7 @@ export default new Elysia({
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
 
-    return { banned: player.isBanned(), reason: player.isBanned() ? player.ban?.reason || null : null, appealable: player.ban?.appealable || false };
+    return { banned: player.isBanned(), reason: player.isBanned() ? player.ban.reason || null : null, appealable: player.ban.appealable || false };
 }, {
     detail: {
         tags: ['Admin'],
@@ -40,7 +41,7 @@ export default new Elysia({
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
     if(player.isBanned()) return error(400, { error: i18n(`ban.alreadyBanned`) });
-    const reason = body.reason || i18n(`ban.noReason`);
+    const { reason } = body;
 
     player.banPlayer(reason);
     await player.save();
@@ -51,6 +52,10 @@ export default new Elysia({
         staff: session.uuid || 'Unknown',
         reason: reason
     });
+
+    if(player.isEmailVerified()) {
+        sendBanEmail(player.connections.email.address!, reason || '---');
+    }
 
     return { message: i18n(`ban.success`) };
 }, {
@@ -65,7 +70,7 @@ export default new Elysia({
         403: t.Object({ error: t.String() }, { description: "You're not an admin." }),
         404: t.Object({ error: t.String() }, { description: "The player you tried to ban was not found." })
     },
-    body: t.Object({ reason: t.Optional(t.String()) }, { error: `error.invalidBody`, additionalProperties: true }),
+    body: t.Object({ reason: t.String() }, { error: `error.invalidBody`, additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to ban.' }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 }).put(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Update ban info - I need to use put here bc labymod's Request system doesn't support PATCH
@@ -80,8 +85,8 @@ export default new Elysia({
     if(!player.isBanned()) return error(400, { error: i18n(`unban.notBanned`) });
     const reason = body.reason || i18n(`ban.noReason`);
 
-    player.ban!.reason = reason;
-    player.ban!.appealable = body.appealable;
+    player.ban.reason = reason;
+    player.ban.appealable = body.appealable;
     await player.save();
     sendMessage({
         type: NotificationType.ModLog,
@@ -117,11 +122,11 @@ export default new Elysia({
 
     const player = await players.findOne({ uuid });
     if(!player || !player.isBanned()) return error(404, { error: i18n(`appeal.notBanned`) });
-    if(!player.ban?.appealable) return error(403, { error: i18n(`appeal.notAppealable`) });
-    if(player.ban?.appealed) return error(403, { error: i18n(`appeal.alreadyAppealed`) });
+    if(!player.ban.appealable) return error(403, { error: i18n(`appeal.notAppealable`) });
+    if(player.ban.appealed) return error(403, { error: i18n(`appeal.alreadyAppealed`) });
 
-    player.ban!.appealed = true;
-    player.save();
+    player.ban.appealed = true;
+    await player.save();
 
     sendMessage({
         type: NotificationType.Appeal,
@@ -163,6 +168,10 @@ export default new Elysia({
         uuid: uuid,
         staff: session.uuid || 'Unknown'
     });
+
+    if(player.isEmailVerified()) {
+        sendUnbanEmail(player.connections.email.address!);
+    }
 
     return { message: i18n(`unban.success`) };
 }, {

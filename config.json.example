@@ -20,6 +20,20 @@
         "enabled": false,
         "dsn": ""
     },
+    "mailer": {
+        "enabled": false,
+        "host": "",
+        "port": 465,
+        "secure": true,
+        "auth": {
+            "username": "",
+            "password": ""
+        },
+        "sender": {
+            "address": "",
+            "name": ""
+        }
+    },
     "ratelimit": {
         "active": true,
         "routes": [

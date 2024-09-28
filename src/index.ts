@@ -19,6 +19,7 @@ import getAuthProvider from "./middleware/GetAuthProvider";
 import { handleErrors, initializeSentry } from "./libs/ErrorHandler";
 import minimist from "minimist";
 import cors from "@elysiajs/cors";
+import { verify as verifyMailOptions } from "./libs/Mailer";
 
 handleErrors();
 if(config.sentry.enabled) initializeSentry(config.sentry.dsn);
@@ -72,6 +73,9 @@ export const elysia = new Elysia()
     Ratelimiter.initialize();
     AuthProvider.loadProviders();
     initializeMetrics();
+    if(config.mailer.enabled) {
+        verifyMailOptions();
+    }
     
     // Load languages
     load();

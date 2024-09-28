@@ -81,8 +81,10 @@ export interface IPlayer {
     api_keys: string[],
     ban: { active: boolean, reason?: string | null, appealable: boolean, appealed: boolean },
     connections: {
-        discord?: { id?: string | null, code?: string | null }
+        discord: { id?: string | null, code?: string | null },
+        email: { address?: string | null, code?: string | null }
     },
+    isEmailVerified(): boolean,
     getRoles(): string[],
     getPermissions(): { [key: string]: boolean },
     hasPermission(permission: Permission): boolean,
@@ -181,10 +183,18 @@ const schema = new Schema<IPlayer>({
         discord: {
             id: String,
             code: String
+        },
+        email: {
+            address: String,
+            code: String
         }
     }
 }, {
     methods: {
+        isEmailVerified() {
+            return this.connections.email.address && !this.connections.email.code;
+        },
+
         getRoles() {
             if(!bot.synced_roles.enabled) return roles.filter((role) => this.roles.some((name) => name.toUpperCase() == role.name.toUpperCase())).map((role) => role.name);
             if(!this.connections?.discord?.id) return [];
