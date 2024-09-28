@@ -173,7 +173,6 @@ export default new Elysia({
         429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },
-    body: t.Object({ email: t.String({ error: 'connections.email.invalidEmail', format: 'email' }) }, { error: `error.invalidBody`, additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: `Your UUID` }), code: t.String({ description: 'Your verification code' }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 }).delete(`/email`, async ({ error, params, headers, body, i18n, provider }) => { // Change icon
