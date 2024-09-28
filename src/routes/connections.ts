@@ -102,8 +102,13 @@ export default new Elysia({
         subject: i18n('email.verification.subject'),
         template: 'verification',
         variables: [
+            ['title', i18n('email.verification.title')],
+            ['greeting', i18n('email.verification.greeting')],
+            ['description', i18n('email.verification.description')],
             ['code', code],
-            ['title', i18n('email.verification.title')]
+            ['button', i18n('email.verification.button')],
+            ['note', i18n('email.verification.note')],
+            ['footer', i18n('email.footer')],
         ]
     });
 
@@ -146,7 +151,11 @@ export default new Elysia({
         subject: i18n('email.verified.subject'),
         template: 'verified',
         variables: [
-            ['title', i18n('email.verified.title')]
+            ['title', i18n('email.verified.title')],
+            ['success', i18n('email.verified.success')],
+            ['questions', i18n('email.verified.questions')],
+            ['link', 'https://globaltags.xyz/discord'],
+            ['footer', i18n('email.footer')],
         ]
     });
 
