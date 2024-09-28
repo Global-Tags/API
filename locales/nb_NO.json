@@ -4,12 +4,12 @@
     "unknownError": "Det oppstod en ukjent feil! Prøv igjen senere!",
     "invalidBody": "Forespørselsteksten må være et json-objekt!",
     "notAllowed": "Du har ikke tillatelse til å utføre denne forspørsel!",
-    "database": "Databasen er ikke tilkoblet. Vennligst prøv igjen senere!",
     "missingField": "Manglende felt \"<field>\".",
+    "database": "Databasen er ikke tilkoblet. Vennligst prøv igjen senere!",
     "playerNotFound": "Det er ingen slik spiller i våre rulleblad!",
-    "wrongType": "Feltet \"<field>\" må være av typen <type>!",
-    "ratelimit": "Du blir ratebegrenset! Vennligst prøv igjen om <seconds> sekunder!",
     "banned": "Du er utstengt!",
+    "ratelimit": "Du blir ratebegrenset! Vennligst prøv igjen om <seconds> sekunder!",
+    "wrongType": "Feltet \"<field>\" må være av typen <type>!",
     "noTag": "Vennligst sett en tag først!",
     "playerNoTag": "Denne spiller ikke har en tag!",
     "playerBanned": "Denne spilleren er utstengt!",
@@ -52,8 +52,8 @@
   "report": {
     "self": "Du kan ikke melde deg selv!",
     "alreadyReported": "Du har allerede meldt inn denne spillerens tag!",
-    "validation": "Hold \"årsak\"-feltet mellom <min> og <max> tegn.",
     "invalidReason": "Du må oppgi en gyldig årsak!",
+    "validation": "Hold \"årsak\"-feltet mellom <min> og <max> tegn.",
     "success": "Spilleren ble meldt inn!",
     "immune": "Denne spilleren kan ikke bli meldt inn!"
   },
@@ -88,10 +88,62 @@
       "alreadyConnected": "Du har allerede en Discord-konto tilkoblet. Vennligst bruk '/gt unlink' for å frakoble!",
       "notConnected": "Du ikke har en Discord-konto tilkoblet. Bruk '/gt link' for å tilkoble en konto!",
       "unlinked": "Discord-konto ble frakoblet!"
+    },
+    "email": {
+      "disabled": "Email linking is deactivated!",
+      "alreadyConnected": "You already have an email address linked. Please use '/gt unlink email' to unlink!",
+      "notConnected": "You don't have an email address linked. Use '/gt link email' to link an account!",
+      "unlinked": "The email address was successfully removed!",
+      "invalidEmail": "The \"email\" field needs to be a valid email address!",
+      "verificationSent": "A verification email was sent to you. Please also check the spam folder!",
+      "invalidCode": "The code is invalid!",
+      "verified": "Your email was successfully verified!"
     }
   },
   "unwatch": {
     "notWatched": "Denne spilleren er ikke på overvåkningslisten!",
     "success": "Spilleren er ikke lenger på overvåkningslisten!"
+  },
+  "email": {
+    "footer": "Thank you for using GlobalTags!",
+    "greeting": "Hey!",
+    "banned": {
+      "subject": "Your GlobalTags account was banned",
+      "title": "Account Banned",
+      "description": "Your account has been banned from GlobalTags for the following reason:",
+      "appeal": "You can appeal your ban ingame."
+    },
+    "tagChanged": {
+      "subject": "Your GlobalTag was changed by staff",
+      "title": "Your tag was changed by staff",
+      "description": "Your GlobalTag was changed by a staff member.",
+      "previous": "Your previous tag was:",
+      "new": "Your new tag is:",
+      "warning": "Depending on what your tag was, you may consider this as a warning."
+    },
+    "tagCleared": {
+      "subject": "Your GlobalTag was cleared",
+      "title": "Your tag was cleared",
+      "description": "Your tag <span class=\"tag-box\">[tag]</span> has been cleared from your account.",
+      "warning": "Consider this a warning, we won't give you a second chance."
+    },
+    "unbanned": {
+      "subject": "Your GlobalTags account was unbanned",
+      "title": "Account Unbanned 🎉",
+      "unbanned": "We're happy to inform you that your GlobalTags account was unbanned!",
+      "access": "You can now access GlobalTags again. Welcome back!"
+    },
+    "verification": {
+      "subject": "Verify your GlobalTags email address",
+      "title": "GlobalTags email verification",
+      "description": "Please verify your email. You can find the verification code below:",
+      "note": "If you did not request this, please ignore this email."
+    },
+    "verified": {
+      "subject": "GlobalTags verification successful",
+      "title": "Welcome to GlobalTags!",
+      "success": "Your email was successfully verified! We're excited to have you on board!",
+      "questions": "You will now receive any important account updates. If you have any questions, feel free to reach out to us on our <a href=\"[link]\" target=\"_blank\">Discord</a>."
+    }
   }
 }
