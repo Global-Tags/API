@@ -3,6 +3,7 @@ import Modal from "../structs/Modal";
 import players, { Permission } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { sendBanEmail } from "../../libs/Mailer";
 
 export default class Ban extends Modal {
     constructor() {
@@ -30,6 +31,10 @@ export default class Ban extends Modal {
             reason: reason,
             discord: true
         });
+
+        if(player.isEmailVerified()) {
+            sendBanEmail(player.connections.email.address!, reason || '---');
+        }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The player was successfully banned!`)], ephemeral: true });
     }

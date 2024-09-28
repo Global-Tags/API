@@ -3,6 +3,7 @@ import Button from "../structs/Button";
 import players, { Permission } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { sendTagClearEmail } from "../../libs/Mailer";
 
 export default class ClearTag extends Button {
     constructor() {
@@ -17,6 +18,7 @@ export default class ClearTag extends Button {
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll(`\``, ``) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
         if(!player.tag) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player does not have a tag!`)], ephemeral: true });
+        const oldTag = player.tag;
 
         player.tag = null;
         player.save();
@@ -28,6 +30,10 @@ export default class ClearTag extends Button {
             staff: staff.uuid,
             discord: true
         });
+
+        if(player.isEmailVerified()) {
+            sendTagClearEmail(player.connections.email.address!, oldTag);
+        }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The tag was successfully deleted!`)], ephemeral: true });
     }

@@ -3,6 +3,7 @@ import Button from "../structs/Button";
 import { colors } from "../bot";
 import players from "../../database/schemas/players";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { sendUnbanEmail } from "../../libs/Mailer";
 
 export default class Ban extends Button {
     constructor() {
@@ -28,6 +29,10 @@ export default class Ban extends Button {
             staff: staff.uuid,
             discord: true
         });
+
+        if(player.isEmailVerified()) {
+            sendUnbanEmail(player.connections.email.address!);
+        }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The player was successfully unbanned!`)], ephemeral: true });
     }

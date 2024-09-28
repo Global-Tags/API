@@ -7,6 +7,7 @@ import { stripColors } from "../libs/ChatColor";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { strictAuth, validation } from "../../config.json";
 import { constantCase } from "change-case";
+import { sendTagChangeEmail, sendTagClearEmail } from "../libs/Mailer";
 const { min, max, blacklist, watchlist } = validation.tag;
 
 export default new Elysia()
@@ -140,6 +141,10 @@ export default new Elysia()
             oldTag: oldTag || 'None',
             newTag: tag
         });
+
+        if(player?.isEmailVerified()) {
+            sendTagChangeEmail(player.connections.email.address!, oldTag || '---', tag);
+        }
     }
 
     if(isWatched && notifyWatch) sendMessage({ type: NotificationType.WatchlistTagUpdate, uuid, tag });
@@ -250,6 +255,7 @@ export default new Elysia()
     if(!player) return error(404, { error: i18n(`error.noTag`) });
     if(player.isBanned()) return error(403, { error: i18n(`error.${session.equal ? 'b' : 'playerB'}anned`) });
     if(!player.tag) return error(404, { error: i18n(`error.noTag`) });
+    const oldTag = player.tag;
 
     player.tag = null;
     await player.save();
@@ -260,6 +266,7 @@ export default new Elysia()
             uuid: uuid,
             staff: session.uuid || 'Unknown'
         });
+        sendTagClearEmail(player.connections.email.address!, oldTag);
     }
 
     return { message: i18n(`resetTag.success.${session.equal ? 'self' : 'admin'}`) };

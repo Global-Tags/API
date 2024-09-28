@@ -3,6 +3,7 @@ import players, { Permission } from "../../database/schemas/players";
 import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { sendTagChangeEmail } from "../../libs/Mailer";
 
 export default class SetTag extends Modal {
     constructor() {
@@ -17,6 +18,7 @@ export default class SetTag extends Modal {
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll(`\``, ``) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
         const tag = fields.getTextInputValue('tag');
+        const oldTag = player.tag;
 
         sendMessage({
             type: NotificationType.ModLog,
@@ -30,6 +32,10 @@ export default class SetTag extends Modal {
 
         player.tag = tag;
         player.save();
+
+        if(player.isEmailVerified()) {
+            sendTagChangeEmail(player.connections.email.address!, oldTag || '---', tag);
+        }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The tag was successfully set!`)], ephemeral: true });
     }
