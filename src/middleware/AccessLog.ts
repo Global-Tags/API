@@ -1,6 +1,6 @@
 import { Context } from "elysia";
 import Logger from "../libs/Logger";
-import moment = require("moment");
+import moment from "moment";
 import { logTimeFormat } from "../../config.json";
 import AuthProvider from "../auth/AuthProvider";
 import { recordRequest } from "../libs/Metrics";
