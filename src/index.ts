@@ -74,7 +74,7 @@ export const elysia = new Elysia()
     AuthProvider.loadProviders();
     initializeMetrics();
     if(config.mailer.enabled) {
-        verifyMailOptions()
+        verifyMailOptions();
     }
     
     // Load languages
