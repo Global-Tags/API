@@ -1,15 +1,15 @@
 {
   "error": {
-    "unknownError": "An unknown error occurred! Please try again later!",
     "notFound": "Not found!",
+    "unknownError": "An unknown error occurred! Please try again later!",
     "invalidBody": "Request body needs to be a json object!",
-    "database": "The database is not connected. Please try again later!",
-    "notAllowed": "You're not allowed to perform that request!",
     "missingField": "Missing field \"<field>\".",
+    "notAllowed": "You're not allowed to perform that request!",
+    "database": "The database is not connected. Please try again later!",
     "playerNotFound": "There is no such player in our records!",
-    "wrongType": "Field \"<field>\" needs to be of type <type>!",
     "banned": "You are banned!",
     "ratelimit": "You're being ratelimited! Please try again in <seconds> seconds!",
+    "wrongType": "Field \"<field>\" needs to be of type <type>!",
     "noTag": "Please set a tag first!",
     "playerNoTag": "This player does not have a tag!",
     "playerBanned": "This player is banned!",
@@ -43,19 +43,19 @@
   "editBan": {
     "success": "The ban was updated!"
   },
-  "report": {
-    "self": "You can't report yourself!",
-    "alreadyReported": "You've already reported this player's tag!",
-    "validation": "Keep the \"reason\" field between <min> and <max> characters.",
-    "invalidReason": "You have to provide a valid reason!",
-    "success": "The player was successfully reported!",
-    "immune": "This player cannot be reported!"
-  },
   "appeal": {
     "notBanned": "You're not banned!",
     "notAppealable": "Your ban is not appealable!",
     "alreadyAppealed": "You've already sent a ban appeal!",
     "success": "The ban appeal was successfully sent!"
+  },
+  "report": {
+    "self": "You can't report yourself!",
+    "alreadyReported": "You've already reported this player's tag!",
+    "invalidReason": "You have to provide a valid reason!",
+    "validation": "Keep the \"reason\" field between <min> and <max> characters.",
+    "success": "The player was successfully reported!",
+    "immune": "This player cannot be reported!"
   },
   "setTag": {
     "empty": "The tag must not be empty!",
@@ -85,13 +85,65 @@
   "connections": {
     "discord": {
       "disabled": "Account linking is deactivated!",
-      "alreadyConnected": "You already have a Discord account linked. Please use '/gt unlink' to unlink!",
-      "notConnected": "You don't have a Discord account linked. Use '/gt link' to link an account!",
-      "unlinked": "The discord account was successfully unlinked!"
+      "unlinked": "The discord account was successfully unlinked!",
+      "alreadyConnected": "You already have a Discord account linked. Please use '/gt unlink discord' to unlink!",
+      "notConnected": "You don't have a Discord account linked. Use '/gt link discord' to link an account!"
+    },
+    "email": {
+      "disabled": "Email linking is deactivated!",
+      "alreadyConnected": "You already have an email address linked. Please use '/gt unlink email' to unlink!",
+      "notConnected": "You don't have an email address linked. Use '/gt link email' to link an account!",
+      "unlinked": "The email address was successfully removed!",
+      "invalidEmail": "The \"email\" field needs to be a valid email address!",
+      "verificationSent": "A verification email was sent to you. Please also check the spam folder!",
+      "invalidCode": "The code is invalid!",
+      "verified": "Your email was successfully verified!"
     }
   },
   "unwatch": {
     "notWatched": "This player is not on the watchlist!",
     "success": "The player is no longer on the watchlist!"
+  },
+  "email": {
+    "footer": "Thank you for using GlobalTags!",
+    "greeting": "Hey!",
+    "banned": {
+      "subject": "Your GlobalTags account was banned",
+      "title": "Account Banned",
+      "description": "Your account has been banned from GlobalTags for the following reason:",
+      "appeal": "You can appeal your ban ingame."
+    },
+    "tagChanged": {
+      "subject": "Your GlobalTag was changed by staff",
+      "title": "Your tag was changed by staff",
+      "description": "Your GlobalTag was changed by a staff member.",
+      "previous": "Your previous tag was:",
+      "new": "Your new tag is:",
+      "warning": "Depending on what your tag was, you may consider this as a warning."
+    },
+    "tagCleared": {
+      "subject": "Your GlobalTag was cleared",
+      "title": "Your tag was cleared",
+      "description": "Your tag <span class=\"tag-box\">[tag]</span> has been cleared from your account.",
+      "warning": "Consider this a warning, we won't give you a second chance."
+    },
+    "unbanned": {
+      "subject": "Your GlobalTags account was unbanned",
+      "title": "Account Unbanned 🎉",
+      "unbanned": "We're happy to inform you that your GlobalTags account was unbanned!",
+      "access": "You can now access GlobalTags again. Welcome back!"
+    },
+    "verification": {
+      "subject": "Verify your GlobalTags email address",
+      "title": "GlobalTags email verification",
+      "description": "Please verify your email. You can find the verification code below:",
+      "note": "If you did not request this, please ignore this email."
+    },
+    "verified": {
+      "subject": "GlobalTags verification successful",
+      "title": "Welcome to GlobalTags!",
+      "success": "Your email was successfully verified! We're excited to have you on board!",
+      "questions": "You will now receive any important account updates. If you have any questions, feel free to reach out to us on our <a href=\"[link]\" target=\"_blank\">Discord</a>."
+    }
   }
 }

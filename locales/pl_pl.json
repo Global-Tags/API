@@ -46,8 +46,8 @@
   "report": {
     "self": "Nie możesz zgłosić samego siebie!",
     "alreadyReported": "Już zgłosiłeś tag tego gracza!",
-    "validation": "Wartość pola „powód” powinna mieścić się w przedziale od <min> do <max> znaków.",
     "invalidReason": "Musisz podać ważny powód!",
+    "validation": "Wartość pola „powód” powinna mieścić się w przedziale od <min> do <max> znaków.",
     "success": "Gracz został pomyślnie zgłoszony!",
     "immune": "Tego gracza nie można zgłosić!"
   },
@@ -88,10 +88,62 @@
       "alreadyConnected": "Masz już połączone konto Discord. Użyj '/gt unlink', aby je odłączyć!",
       "notConnected": "Nie masz połączonego konta Discord. Użyj '/gt link', aby połączyć konto!",
       "unlinked": "Konto Discord zostało pomyślnie odłączone!"
+    },
+    "email": {
+      "disabled": "Email linking is deactivated!",
+      "alreadyConnected": "You already have an email address linked. Please use '/gt unlink email' to unlink!",
+      "notConnected": "You don't have an email address linked. Use '/gt link email' to link an account!",
+      "unlinked": "The email address was successfully removed!",
+      "invalidEmail": "The \"email\" field needs to be a valid email address!",
+      "verificationSent": "A verification email was sent to you. Please also check the spam folder!",
+      "invalidCode": "The code is invalid!",
+      "verified": "Your email was successfully verified!"
     }
   },
   "unwatch": {
     "notWatched": "Nie ma tego gracza na liście obserwowanych!",
     "success": "Gracz nie znajduje się już na liście obserwowanych!"
+  },
+  "email": {
+    "footer": "Thank you for using GlobalTags!",
+    "greeting": "Hey!",
+    "banned": {
+      "subject": "Your GlobalTags account was banned",
+      "title": "Account Banned",
+      "description": "Your account has been banned from GlobalTags for the following reason:",
+      "appeal": "You can appeal your ban ingame."
+    },
+    "tagChanged": {
+      "subject": "Your GlobalTag was changed by staff",
+      "title": "Your tag was changed by staff",
+      "description": "Your GlobalTag was changed by a staff member.",
+      "previous": "Your previous tag was:",
+      "new": "Your new tag is:",
+      "warning": "Depending on what your tag was, you may consider this as a warning."
+    },
+    "tagCleared": {
+      "subject": "Your GlobalTag was cleared",
+      "title": "Your tag was cleared",
+      "description": "Your tag <span class=\"tag-box\">[tag]</span> has been cleared from your account.",
+      "warning": "Consider this a warning, we won't give you a second chance."
+    },
+    "unbanned": {
+      "subject": "Your GlobalTags account was unbanned",
+      "title": "Account Unbanned 🎉",
+      "unbanned": "We're happy to inform you that your GlobalTags account was unbanned!",
+      "access": "You can now access GlobalTags again. Welcome back!"
+    },
+    "verification": {
+      "subject": "Verify your GlobalTags email address",
+      "title": "GlobalTags email verification",
+      "description": "Please verify your email. You can find the verification code below:",
+      "note": "If you did not request this, please ignore this email."
+    },
+    "verified": {
+      "subject": "GlobalTags verification successful",
+      "title": "Welcome to GlobalTags!",
+      "success": "Your email was successfully verified! We're excited to have you on board!",
+      "questions": "You will now receive any important account updates. If you have any questions, feel free to reach out to us on our <a href=\"[link]\" target=\"_blank\">Discord</a>."
+    }
   }
 }

@@ -4,12 +4,12 @@
     "unknownError": "Ein unbekannter Fehler ist aufgetreten! Bitte versuche es später erneut!",
     "invalidBody": "Der Request body muss ein JSON Objekt sein!",
     "database": "Die Datenbank ist nicht verbunden. Bitte versuche es später erneut!",
-    "missingField": "Fehlendes JSON Feld \"<field>\".",
     "notAllowed": "Darauf hast du keinen Zugriff!",
+    "missingField": "Fehlendes JSON Feld \"<field>\".",
     "playerNotFound": "Dieser Spieler befindet sich nicht in unserer Datenbank!",
+    "wrongType": "Das Feld \"<field>\" muss von Typ <type> sein!",
     "ratelimit": "Du bist geratelimited! Bitte versuche es in <seconds> Sekunden erneut!",
     "banned": "Du bist gebannt!",
-    "wrongType": "Das Feld \"<field>\" muss von Typ <type> sein!",
     "noTag": "Du musst erst einen Tag auswählen!",
     "playerNoTag": "Dieser Spieler hat keinen Tag!",
     "playerBanned": "Dieser Spieler ist gebannt!",
@@ -46,8 +46,8 @@
   "report": {
     "self": "Du kannst dich nicht selbst melden!",
     "alreadyReported": "Du hast den Tag dieses Spielers bereits gemeldet!",
-    "invalidReason": "Du musst einen gültigen Grund angeben!",
     "validation": "Das \"reason\" Feld darf nur zwischen <min> und <max> Zeichen lang sein.",
+    "invalidReason": "Du musst einen gültigen Grund angeben!",
     "success": "Der Spieler wurde erfolgreich gemeldet!",
     "immune": "Dieser Spieler kann nicht gemeldet werden!"
   },
@@ -81,9 +81,19 @@
   "connections": {
     "discord": {
       "disabled": "Account-Verbindungen sind deaktiviert!",
-      "alreadyConnected": "Du hast bereits einen Discord Account verbunden. Bitte nutze '/gt unlink' um ihn zu entfernen!",
-      "notConnected": "Du hast keinen Discord Account verbunden. Nutze '/gt link' um einen zu verbinden!",
+      "alreadyConnected": "Du hast bereits einen Discord Account verbunden. Bitte nutze '/gt unlink discord' um ihn zu entfernen!",
+      "notConnected": "Du hast keinen Discord Account verbunden. Nutze '/gt link discord' um einen zu verbinden!",
       "unlinked": "Dein Discord Account wurde erfolgreich entfernt!"
+    },
+    "email": {
+      "disabled": "Emails verbindungen sind deaktiviert!",
+      "alreadyConnected": "Du hast bereits eine Email-Adresse verbunden. Bitte nutze '/gt unlink email' um sie zu entfernen!",
+      "notConnected": "Du hast keine Email-Adresse verbunden. Nutze '/gt link email' um eine zu verbinden!",
+      "unlinked": "Deine Email-Adresse wurde erfolgreich entfernt!",
+      "invalidEmail": "Das \"email\" Feld muss eine gültige Email-Adresse sein!",
+      "verificationSent": "Dir wurde eine Verifizierungsemail geschickt. Bitte überprüfe auch den Spam Ordner!",
+      "invalidCode": "Der Code ist ungültig!",
+      "verified": "Deine Email-Adresse wurde erfolgreich entfernt!"
     }
   },
   "watch": {
@@ -93,5 +103,47 @@
   "unwatch": {
     "notWatched": "Dieser Spieler ist nicht auf der Watchlist!",
     "success": "Der Spieler ist nicht mehr auf der Watchlist!"
+  },
+  "email": {
+    "footer": "Danke, dass du GlobalTags benutzt!",
+    "greeting": "Hey!",
+    "banned": {
+      "subject": "Dein GlobalTags Account wurde gebannt",
+      "title": "Account gebannt",
+      "description": "Dein GlobalTags Account wurde für den folgenden Grund gebannt:",
+      "appeal": "Du kannst ingame einen Entbannungsantrag stellen."
+    },
+    "tagChanged": {
+      "subject": "Dein GlobalTag wurde vom Team geändert",
+      "title": "Dein Tag wurde vom Team geändert",
+      "description": "Dein GlobalTag wurde von einem Teammitglied geändert!",
+      "previous": "Dein alter Tag war:",
+      "new": "Dein neuer Tag ist:",
+      "warning": "Abhängig davon, was dein Tag vorher war, könnte das hier eine Warnung sein."
+    },
+    "tagCleared": {
+      "subject": "Dein GlobalTag wurde gecleart",
+      "title": "Dein Tag wurde gecleart",
+      "description": "Dein Tag <span class=\"tag-box\">[tag]</span> wurde gecleart.",
+      "warning": "Sieh das als Warnung, wir werden dir keine zweite Chance geben."
+    },
+    "unbanned": {
+      "subject": "Dein GlobalTags Account wurde entbannt",
+      "title": "Account entbannt 🎉",
+      "unbanned": "Wir freuen uns, dir mitzuteilen, dass dein GlobalTags Account entbannt wurde!",
+      "access": "Du kannst GlobalTags nun wieder benutzen. Willkommen zurück!"
+    },
+    "verification": {
+      "subject": "Verifiziere deine GlobalTags Email-Adresse",
+      "title": "GlobalTags Email Verifizierung",
+      "description": "Bitte bestätige deine Email. Du findest den Verifizierungscode unten:",
+      "note": "Du warst das nicht? Dann kannst du diese Email einfach ignorieren."
+    },
+    "verified": {
+      "subject": "GlobalTags Verifizierung erfolgreich",
+      "title": "Willkommen bei GlobalTags!",
+      "success": "Deine email wurde erfolgreich verifiziert! Wir freuen uns, dich begrüßen zu dürfen!",
+      "questions": "Du wirst nun wichtige Account-Updates erhalten. Falls du irgendwelche Fragen hast, zögere nicht, uns auf dem <a href=\"[link]\" target=\"_blank\">Discord</a> zu kontaktieren."
+    }
   }
 }
