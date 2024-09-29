@@ -1,5 +1,5 @@
-# :label: GlobalTag API
-This repository contains the backend API of the GlobalTagDB for the Minecraft modification GlobalTags.
+# :label: GlobalTagsAPI
+This repository contains the backend API of the GlobalTagsDB for Minecraft GlobalTags mod implementations.
 
 ## ✨ Selfhosting
 See [Selfhosting the GlobalTagsAPI](https://docs.globaltags.xyz/api/self-hosting/)
