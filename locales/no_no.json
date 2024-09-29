@@ -1,0 +1,149 @@
+{
+  "error": {
+    "notFound": "Ikke funnet!",
+    "unknownError": "Det oppstod en ukjent feil! Prøv igjen senere!",
+    "invalidBody": "Forespørselsteksten må være et json-objekt!",
+    "notAllowed": "Du har ikke tillatelse til å utføre denne forspørsel!",
+    "missingField": "Manglende felt \"<field>\".",
+    "database": "Databasen er ikke tilkoblet. Vennligst prøv igjen senere!",
+    "playerNotFound": "Det er ingen slik spiller i våre rulleblad!",
+    "banned": "Du er utstengt!",
+    "ratelimit": "Du blir ratebegrenset! Vennligst prøv igjen om <seconds> sekunder!",
+    "wrongType": "Feltet \"<field>\" må være av typen <type>!",
+    "noTag": "Vennligst sett en tag først!",
+    "playerNoTag": "Denne spiller ikke har en tag!",
+    "playerBanned": "Denne spilleren er utstengt!",
+    "malformedAuthHeader": "Du har skrevet inn en feilaktig autorisasjonsoverskrift!"
+  },
+  "ban": {
+    "alreadyBanned": "Denne spiller er allerede utstengt!",
+    "noReason": "Ingen årsak oppgitt",
+    "success": "Spilleren ble utstengt!"
+  },
+  "unban": {
+    "notBanned": "Denne spilleren er ikke utestengt!",
+    "success": "Spilleren ble opphevet utestengelsen!"
+  },
+  "icon": {
+    "sameIcon": "Du har allerede valgt dette ikonet!",
+    "notAllowed": "Du har ikke tillatelse å velge dette ikonet!",
+    "success": {
+      "self": "Ikonet ditt ble satt!",
+      "admin": "Spillerens ikon ble satt!"
+    }
+  },
+  "position": {
+    "samePosition": "Taggen din er allerede i denne posisjonen!",
+    "invalid": "Vennligst oppgi en gyldig posisjon!",
+    "success": {
+      "self": "Tagposisjonen din ble satt!",
+      "admin": "Spillerens tagposisjon ble satt!"
+    }
+  },
+  "editBan": {
+    "success": "Forbudet ble oppdatert!"
+  },
+  "appeal": {
+    "notBanned": "Du er ikke utestengt!",
+    "notAppealable": "Ditt forbud kan ikke ankes!",
+    "alreadyAppealed": "Du har allerede sendt en forbudsappell!",
+    "success": "Forbudsappell ble sendt!"
+  },
+  "report": {
+    "self": "Du kan ikke melde deg selv!",
+    "alreadyReported": "Du har allerede meldt inn denne spillerens tag!",
+    "invalidReason": "Du må oppgi en gyldig årsak!",
+    "validation": "Hold \"årsak\"-feltet mellom <min> og <max> tegn.",
+    "success": "Spilleren ble meldt inn!",
+    "immune": "Denne spilleren kan ikke bli meldt inn!"
+  },
+  "setTag": {
+    "empty": "Taggen må ikke være tom!",
+    "sameTag": "Du har allerede denne taggen!",
+    "blacklisted": "Du har ikke tilattelse til å inkludere \"<word>\" i globale taggen din!",
+    "validation": "Hold \"tag\"-feltet mellom <min> og <max> tegn.",
+    "success": {
+      "self": "Taggen din ble oppdatert!",
+      "admin": "Spillerens tag ble oppdatert!"
+    }
+  },
+  "referral": {
+    "self": "Du kan ikke henvise deg selv!",
+    "alreadyReferred": "Du har allerede henvist en spiller!",
+    "success": "Du har henvist spilleren!"
+  },
+  "resetTag": {
+    "success": {
+      "self": "Taggen din ble tilbakestilt!",
+      "admin": "Spillerens tag ble tilbakestilt!"
+    }
+  },
+  "watch": {
+    "alreadyWatched": "Denne spilleren er allerede på overvåkningslisten!",
+    "success": "Spilleren er nå på overvåkningslisten!"
+  },
+  "connections": {
+    "discord": {
+      "disabled": "Konto tilkobling er deaktivert!",
+      "alreadyConnected": "Du har allerede en Discord-konto tilkoblet. Vennligst bruk '/gt unlink' for å frakoble!",
+      "notConnected": "Du ikke har en Discord-konto tilkoblet. Bruk '/gt link' for å tilkoble en konto!",
+      "unlinked": "Discord-konto ble frakoblet!"
+    },
+    "email": {
+      "disabled": "E-postkobling er deaktivert!",
+      "alreadyConnected": "Du har allerede en e-postadresse tilkoblet. Vennligst bruk '/gt unlink email' for å frakoble!",
+      "notConnected": "Du har ikke en e-postadresse tilkoblet. Bruk '/gt link email' for å tilkoble en konto!",
+      "unlinked": "E-postadresse ble fjernet!",
+      "invalidEmail": "\"E-post\"-feltet må være en gyldig e-postadresse!",
+      "verificationSent": "En bekreftelses-e-post ble sendt til deg. Sjekk også spam-mappen!",
+      "invalidCode": "Koden er ugyldig!",
+      "verified": "E-posten din ble bekreftet!"
+    }
+  },
+  "unwatch": {
+    "notWatched": "Denne spilleren er ikke på overvåkningslisten!",
+    "success": "Spilleren er ikke lenger på overvåkningslisten!"
+  },
+  "email": {
+    "footer": "Takk for å bruke GlobalTags!",
+    "greeting": "Hei!",
+    "banned": {
+      "subject": "Din GlobalTags konto ble utstengt",
+      "title": "Konto Utstengt",
+      "description": "Kontoen din ble utestengt fra GlobalTags av følgende grunn:",
+      "appeal": "Du kan anke forbudet ditt i spillet."
+    },
+    "tagChanged": {
+      "subject": "Din GlobalTag ble endret av lag-medlem",
+      "title": "Din tag ble endret av en lag-medlem",
+      "description": "Din GlobalTag ble endret av en lag-medlem.",
+      "previous": "Din forrige tag var:",
+      "new": "Din ny tag er:",
+      "warning": "Avhengig av hva taggen din var, kan du vurdere dette som en advarsel."
+    },
+    "tagCleared": {
+      "subject": "Din GlobalTag ble fjernet",
+      "title": "Din tag ble fjernet",
+      "description": "Taggen din <span class=\"tag-box\">[tag]</span> ble fjernet fra kontoen din.",
+      "warning": "Se på dette som en advarsel, vi vil ikke gi deg en ny sjanse."
+    },
+    "unbanned": {
+      "subject": "Din GlobalTags-konto utstengelse ble opphevet",
+      "title": "Konto-utstengelsen opphavet!",
+      "unbanned": "Vi er glade for å informere deg om at GlobalTags-konto utstengelsen ble opphevet!",
+      "access": "Du har nå tilgang til GlobalTags igjen. Velkommen tilbake!"
+    },
+    "verification": {
+      "subject": "Bekreft GlobalTags-e-postadressen din",
+      "title": "GlobalTags e-postbekreftelse",
+      "description": "Vennligst bekreft e-posten din. Du finner bekreftelseskoden nedenfor:",
+      "note": "Hvis du ikke har bedt om dette, kan du ignorere denne e-post."
+    },
+    "verified": {
+      "subject": "GlobalTags-verifiseringen var vellykket",
+      "title": "Velkommen til GlobalTags!",
+      "success": "E-posten din ble bekreftet! Vi er glade for å ha deg om bord!",
+      "questions": "Du vil nå motta viktige kontooppdateringer. Hvis du har spørsmål, kan du gjerne kontakte oss på vår <a href=\"[link]\" target=\"_blank\">Discord</a>."
+    }
+  }
+}
