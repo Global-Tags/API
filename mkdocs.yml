@@ -1,7 +1,7 @@
 site_name: GlobalTags Documentation
 repo_name: Global-Tags/API
 repo_url: https://github.com/Global-Tags/API
-edit_uri: https://github.com/Global-Tags/API/tree/master/docs/
+edit_uri: tree/master/docs/
 
 nav:
   - Home: index.md
@@ -69,3 +69,10 @@ extra_css:
 extra:
   generator: false
   homepage: https://www.globaltags.xyz
+  social:
+    - icon: fontawesome/brands/discord
+      link: https://globaltags.xyz/discord
+      name: GlobalTags Server
+    - icon: fontawesome/brands/github
+      link: https://github.com/Global-Tags
+      name: GlobalTags on GitHub
