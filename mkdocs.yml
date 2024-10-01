@@ -38,8 +38,7 @@ theme:
     text: Roboto
     code: JetBrains Mono
   favicon: 'assets/theme/images/icon.png'
-  icon:
-    logo: material/tag-text
+  logo: 'assets/theme/images/icon.png'
   features:
     - content.action.edit
     - content.code.annotate
