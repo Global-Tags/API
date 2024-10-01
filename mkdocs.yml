@@ -1,7 +1,7 @@
 site_name: GlobalTags Documentation
 repo_name: Global-Tags/API
 repo_url: https://github.com/Global-Tags/API
-edit_uri: https://github.com/Global-Tags/API/tree/master/docs/
+edit_uri: tree/master/docs/
 
 nav:
   - Home: index.md
@@ -32,6 +32,16 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
       emoji_index: !!python/name:material.extensions.emoji.twemoji
 
+plugins:
+  - search
+  - git-committers:
+      enabled: !ENV [CI, false]
+      repository: Global-Tags/API
+      branch: master
+  - git-revision-date-localized:
+      enabled: !ENV [CI, false]
+      enable_creation_date: true
+
 theme:
   name: material
   font:
@@ -45,6 +55,7 @@ theme:
     - content.code.copy
     - content.tabs.link
     - navigation.expand
+    - navigation.footer
     - search.share
   palette:
     # Palette toggle for dark mode
@@ -68,3 +79,10 @@ extra_css:
 extra:
   generator: false
   homepage: https://www.globaltags.xyz
+  social:
+    - icon: fontawesome/brands/discord
+      link: https://globaltags.xyz/discord
+      name: GlobalTags Server
+    - icon: fontawesome/brands/github
+      link: https://github.com/Global-Tags
+      name: GlobalTags on GitHub
