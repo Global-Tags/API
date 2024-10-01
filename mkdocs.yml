@@ -32,6 +32,12 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
       emoji_index: !!python/name:material.extensions.emoji.twemoji
 
+plugins:
+  - search
+  - git-revision-date-localized:
+      enabled: !ENV [CI, false]
+      enable_creation_date: true
+
 theme:
   name: material
   font:
