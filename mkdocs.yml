@@ -45,6 +45,7 @@ theme:
     - content.code.copy
     - content.tabs.link
     - navigation.expand
+    - navigation.footer
     - search.share
   palette:
     # Palette toggle for dark mode
