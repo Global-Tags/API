@@ -1,4 +1,4 @@
-name: Accent sync
+name: Pull translations
 
 on:
     schedule:
@@ -9,7 +9,7 @@ env:
     ACCENT_API_KEY: ${{ secrets.ACCENT_TOKEN }}
 
 jobs:
-    build:
+    sync:
         runs-on: ubuntu-latest
         steps:
             -   uses: actions/checkout@v3
