@@ -10,7 +10,8 @@ export enum NotificationType {
     Appeal,
     ModLog,
     DiscordLink,
-    Referral
+    Referral,
+    Entitlement
 }
 
 export enum ModLogType {
@@ -48,6 +49,10 @@ type NotificationData = {
     type: NotificationType.DiscordLink,
     connected: boolean,
     userId: string
+} | {
+    type: NotificationType.Entitlement,
+    description: string,
+    head: boolean
 } | {
     type: NotificationType.ModLog,
     logType: ModLogType,
@@ -176,6 +181,20 @@ export function sendMessage(data: NotificationData) {
             null,
             false
         );
+    } else if(data.type == NotificationType.Entitlement && config.bot.entitlements.enabled) {
+        const embed = new EmbedBuilder()
+        .setColor(bot.colors.standart)
+        .setTitle('💵 Entitlement update')
+        .setDescription(data.description);
+
+        if(data.head) embed.setThumbnail(`https://laby.net/texture/profile/head/${data.uuid}.png?size=1024&overlay`);
+
+        _sendMessage(
+            config.bot.entitlements.log,
+            undefined,
+            embed,
+            false
+        )
     } else if(data.type == NotificationType.ModLog && config.bot.mod_log.active) {
         const description = modlogDescription(data);
         _sendMessage(
