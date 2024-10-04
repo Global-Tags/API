@@ -161,6 +161,18 @@
             "active": true,
             "role": "",
             "log": ""
+        },
+        "entitlements": {
+            "enabled": false,
+            "log": "",
+            "skus": [
+                {
+                    "id": "",
+                    "name": "Financial Supporter",
+                    "role": "SUPPORTER",
+                    "discordRole": ""
+                }
+            ]
         }
     }
 }
