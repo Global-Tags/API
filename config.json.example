@@ -16,6 +16,11 @@
             "blacklist": []
         }
     },
+    "github": {
+        "owner": "Global-Tags",
+        "repository": "API",
+        "branch": "master"
+    },
     "sentry": {
         "enabled": false,
         "dsn": ""
