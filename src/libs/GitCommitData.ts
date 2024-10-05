@@ -10,5 +10,5 @@ export async function retrieveData() {
 }
 
 export function getLatestCommit(): string | null {
-    return null;
+    return commit;
 }
