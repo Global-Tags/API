@@ -143,7 +143,7 @@ export const elysia = new Elysia()
         admins: metric.admins,
         bans: metric.bans,
         downloads: metric.downloads,
-        rating: metric.rating,
+        ratings: metric.ratings,
         dailyRequests: metric.dailyRequests ?? 0,
         positions: metric.positions,
         icons: metric.icons
@@ -160,8 +160,8 @@ export const elysia = new Elysia()
             tags: t.Number(),
             admins: t.Number(),
             bans: t.Number(),
-            downloads: t.Number(),
-            rating: t.Number(),
+            downloads: t.Object({ flintmc: t.Number(), modrinth: t.Number() }, { additionalProperties: true }),
+            ratings: t.Object({ flintmc: t.Number() }, { additionalProperties: true }),
             dailyRequests: t.Number(),
             positions: t.Object({}, { default: {}, additionalProperties: true, description: 'All position counts' }),
             icons: t.Object({}, { default: {}, additionalProperties: true, description: 'All icon counts' })
