@@ -79,14 +79,20 @@ async function saveMetrics() {
         return object;
     }, {});
     const addon = await fetchAddon('globaltags');
+    const mod = await fetchMod('globaltags');
     
     new metrics({
         players: users.length,
         tags,
         admins: staff,
         bans,
-        downloads: addon?.downloads ?? -1,
-        rating: addon?.rating.rating ?? -1,
+        downloads: {
+            flintmc: addon?.downloads ?? 0,
+            modrinth: mod?.downloads ?? 0
+        },
+        rating: {
+            flintmc: addon?.rating.rating ?? 0
+        },
         dailyRequests: getRequests(),
         positions,
         icons
@@ -101,6 +107,16 @@ async function fetchAddon(namespace: string): Promise<Addon | null> {
         return data.data as Addon;
     } catch(error) {
         Logger.error(`Error while trying to fetch addon "${namespace}": ${error}`);
+        return null;
+    }
+}
+
+async function fetchMod(id: string): Promise<{ downloads: number } | null> {
+    try {
+        const data = await axios.get(`https://api.modrinth.com/v2/project/${id}`, { headers: { 'Accept-Encoding': 'gzip' } });
+        return data.data as { downloads: number };
+    } catch(error) {
+        Logger.error(`Error while trying to fetch mod "${id}": ${error}`);
         return null;
     }
 }
