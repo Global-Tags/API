@@ -4,6 +4,7 @@ import axios from "axios";
 import players, { Permission } from "../../database/schemas/players";
 import * as bot from "../bot";
 import { translateToAnsi } from "../../libs/ChatColor";
+import Logger from "../../libs/Logger";
 export const uuidRegex = /[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}|[a-f0-9]{8}(?:[a-f0-9]{4}){4}[a-f0-9]{8}/;
 
 export default class PlayerInfo extends Command {
@@ -38,7 +39,7 @@ export default class PlayerInfo extends Command {
                 uuid = res.data.id;
                 name = res.data.name;
             } catch(err: any) {
-                console.log(`[ERROR] Mojang API error: ${err?.response?.data || `Undefined data`}`);
+                Logger.error(`Mojang API error: ${err?.response?.data || `Undefined data`}`);
                 return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ ${err?.response?.data.errorMessage || `An error ocurred with the request to mojang`}`)] });
             }
         }
