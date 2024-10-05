@@ -10,8 +10,13 @@ const schema = new Schema({
     tags: requiredNumber,
     admins: requiredNumber,
     bans: requiredNumber,
-    downloads: requiredNumber,
-    rating: requiredNumber,
+    downloads: {
+        flintmc: requiredNumber,
+        modrinth: requiredNumber
+    },
+    ratings: {
+        flintmc: requiredNumber
+    },
     dailyRequests: requiredNumber,
     positions: {
         type: Object,
