@@ -20,12 +20,15 @@ import { handleErrors, initializeSentry } from "./libs/ErrorHandler";
 import minimist from "minimist";
 import cors from "@elysiajs/cors";
 import { verify as verifyMailOptions } from "./libs/Mailer";
+import { getLatestCommit, retrieveData } from "./libs/GitCommitData";
 
 handleErrors();
 if(config.sentry.enabled) initializeSentry(config.sentry.dsn);
 
 export const args = minimist(process.argv.slice(2));
 loadRequests();
+
+retrieveData();
 
 // Elysia API
 export const elysia = new Elysia()
@@ -109,13 +112,21 @@ export const elysia = new Elysia()
         return { error: i18n(`error.unknownError`) };
     }
 })
-.get(`/`, () => ({ version, requests: getRequests() }), {
+.get(`/`, () => ({
+    version,
+    requests: getRequests(),
+    commit: {
+        branch: config.github.branch,
+        sha: getLatestCommit(),
+        tree: getLatestCommit() ? `https://github.com/${config.github.owner}/${config.github.repository}/tree/${getLatestCommit()}` : null
+    }
+}), {
     detail: {
         tags: [`API`],
         description: `Returns some basic info about the API.`
     },
     response: {
-        200: t.Object({ version: t.String(), requests: t.Number() }, { description: `Some basic API info` }),
+        200: t.Object({ version: t.String(), requests: t.Number(), commit: t.Object({ branch: t.String(), sha: t.Union([t.String(), t.Null()]), tree: t.Union([t.String(), t.Null()]) }) }, { description: `Some basic API info` }),
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     }
 })
