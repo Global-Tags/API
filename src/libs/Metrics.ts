@@ -61,7 +61,7 @@ type Addon = {
 
 export function initializeMetrics() {
     Logger.debug(`Metric initialized.`);
-    new CronJob(`0 0 * * *`, saveMetrics, null, true, "Europe/Berlin", null, true);
+    new CronJob(`0 0 * * *`, saveMetrics, null, true, "Europe/Berlin");
 }
 
 async function saveMetrics() {
