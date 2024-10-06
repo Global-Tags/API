@@ -11,6 +11,44 @@
 | ![Purple](https://cdn.rappytv.com/globaltags/icons/role/blue.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Partner</p> |
 | ![Purple](https://cdn.rappytv.com/globaltags/icons/role/green.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Financial Supporter / Discord Booster</p> |
 
+### Which commands can I use?
+
+There are several commands to help manage your settings. The main command is `/globaltags`, or you can use the shorthand `/gt`. Here are the available subcommands:
+
+<div class="annotate" markdown>
+
+- **`/gt`** (1) - Displays the current API and Agent versions.
+    - **`/gt clearcache`** (2) – Instantly clears your cache.
+    - **`/gt renewcache`** (3) – Manually renews the cache.
+    - **`/gt link`** (4) – Links your Minecraft account to external connections.
+        - **`discord`** - Begins the process to link your Minecraft account with your Discord. Join our <a href="https://globaltags.xyz/discord" target="_blank">Discord Server</a> to complete the connection.
+        - **`email <email>`** - Adds an email to receive account-related updates. This is not a newsletter.
+    - **`/gt unlink`** (5) – Removes external connections from your Minecraft account.
+        - **`discord`** - Unlinks your Minecraft account from Discord.
+        - **`email <email>`** - Removes your email from the account.
+    - **`/gt verify`** (6) - Verifies specific connections.
+        - **`email <code>`** - Verifies your email by entering the confirmation code sent to your inbox.
+        
+</div>
+
+1. **Base Command**:
+    - Alias: `/globaltags`
+
+2. **Clear Cache**: 
+    - Alias: `/gt cc`
+
+3. **Renew Cache**:
+    - Aliases: `/gt renew`, `/gt rc`
+
+4. **Link Connection**: 
+    - No aliases
+
+5. **Unlink Connection**: 
+    - No aliases
+
+6. **Verify Connection**: 
+    - No aliases
+
 ## Tags
 
 ### How can I use colors in my Tag?
