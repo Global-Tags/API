@@ -39,30 +39,3 @@ If you've been banned, it's likely for a significant rule violation, and you'll 
 If the appeal button is clickable, a modal will pop up with an input field. Write your apology or the reason you believe the ban should be lifted, and click "Send appeal." Your appeal will be reviewed, and a decision will be made on whether to lift the ban.
 
 ![Appeal Modal](../assets/files/labymod/appeal_modal.png)
-
-## Commands
-
-The addon provides several commands for managing your settings. The primary command is `/globaltags` or its shorthand `/gt`, which includes the following subcommands:
-
-<div class="annotate" markdown>
-
-- **Base command** - Shows API and Addon version
-- `/gt clearcache` (1) – Quickly clears your cache.
-- **`/gt renewcache`** (2) – Refreshes the cache manually.
-- **`/gt link`** (3) – Initiates the process to link your Minecraft account with your Discord account. You'll need to join our <a href="https://globaltags.xyz/discord" target="">Discord Server</a> to complete the process.
-- **`/gt unlink`** (4) – Unlinks your Minecraft account from your Discord account.
-
-</div>
-
-1. **Clear Cache**: 
-    - `/gt cc`
-
-2. **Renew Cache**:
-    - `/gt renew`
-    - `/gt rc`
-
-3. **Link Account**: 
-    - No aliases
-
-4. **Unlink Account**: 
-    - No aliases
