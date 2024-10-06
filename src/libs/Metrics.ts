@@ -61,7 +61,7 @@ type Addon = {
 
 export function initializeMetrics() {
     Logger.debug(`Metric initialized.`);
-    new CronJob(`0 0 * * *`, saveMetrics, null, true, "Europe/Berlin");
+    new CronJob(`0 0 * * *`, saveMetrics, null, true, "Europe/Berlin", null, true);
 }
 
 async function saveMetrics() {
@@ -90,7 +90,7 @@ async function saveMetrics() {
             flintmc: addon?.downloads ?? 0,
             modrinth: mod?.downloads ?? 0
         },
-        rating: {
+        ratings: {
             flintmc: addon?.rating.rating ?? 0
         },
         dailyRequests: getRequests(),
