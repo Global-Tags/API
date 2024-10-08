@@ -5,7 +5,7 @@
 
 ## Installation
 
-You can easily install the addon by searching for "Global Tags" in the LabyMod Addon Store. It is available for all versions.
+You can easily install the addon by searching for "GlobalTags" in the LabyMod Addon Store. It is available for all versions.
 
 ![Addon Installation](../assets/files/labymod/search.png)
 
