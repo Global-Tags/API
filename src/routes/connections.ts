@@ -4,6 +4,11 @@ import fetchI18n from "../middleware/FetchI18n";
 import { bot } from "../../config.json";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { sendEmail } from "../libs/Mailer";
+import { randomBytes } from "crypto";
+
+function generateSecureCode(length: number = 10) {
+    return randomBytes(length).toString('hex').slice(0, length);
+}
 
 export default new Elysia({
     prefix: "/connections"
@@ -20,11 +25,10 @@ export default new Elysia({
     if(player.connections.discord.id) return error(400, { error: i18n(`connections.discord.alreadyConnected`) });
     if(player.connections.discord.code) return { code: player.connections.discord.code };
 
-    const code = Date.now().toString(36);
-    player.connections.discord.code = code;
+    player.connections.discord.code = generateSecureCode();
     await player.save();
 
-    return { code };
+    return { code: player.connections.discord.code };
 }, {
     detail: {
         tags: ['Connections'],
@@ -90,9 +94,8 @@ export default new Elysia({
     if(!player) return error(404, { error: i18n(`error.noTag`) });
     if(player.connections.email.address) return error(400, { error: i18n(`connections.email.alreadyConnected`) });
 
-    const code = Date.now().toString(36);
     player.connections.email.address = email;
-    player.connections.email.code = code;
+    player.connections.email.code = generateSecureCode();
     await player.save();
 
     sendEmail({
@@ -103,7 +106,7 @@ export default new Elysia({
             ['title', i18n('email.verification.title')],
             ['greeting', i18n('email.greeting')],
             ['description', i18n('email.verification.description')],
-            ['code', code],
+            ['code', player.connections.email.code],
             ['button', i18n('email.verification.button')],
             ['note', i18n('email.verification.note')],
             ['footer', i18n('email.footer')],
