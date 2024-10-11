@@ -43,7 +43,7 @@ export default new Elysia({
     if(player.isBanned()) return error(400, { error: i18n(`ban.alreadyBanned`) });
     const { reason } = body;
 
-    player.banPlayer(reason);
+    player.banPlayer(reason, session.uuid!);
     await player.save();
     sendMessage({
         type: NotificationType.ModLog,
