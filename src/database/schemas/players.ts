@@ -190,6 +190,10 @@ const schema = new Schema<IPlayer>({
         staff: {
             type: String,
             required: true
+        },
+        timestamp: {
+            type: Number,
+            required: true
         }
     }],
     connections: {
