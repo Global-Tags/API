@@ -258,7 +258,6 @@ export default new Elysia()
     const oldTag = player.tag;
 
     player.tag = null;
-    await player.save();
     if(!session.equal) {
         sendMessage({
             type: NotificationType.ModLog,
@@ -266,8 +265,10 @@ export default new Elysia()
             uuid: uuid,
             staff: session.uuid || 'Unknown'
         });
+        player.clearTag(session.uuid!);
         sendTagClearEmail(player.connections.email.address!, oldTag);
     }
+    await player.save();
 
     return { message: i18n(`resetTag.success.${session.equal ? 'self' : 'admin'}`) };
 }, {
