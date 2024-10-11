@@ -20,8 +20,8 @@ export default class ClearTag extends Button {
         if(!player.tag) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player does not have a tag!`)], ephemeral: true });
         const oldTag = player.tag;
 
-        player.tag = null;
-        player.save();
+        player.clearTag(staff.uuid);
+        await player.save();
 
         sendMessage({
             type: NotificationType.ModLog,

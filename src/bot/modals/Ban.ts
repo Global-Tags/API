@@ -20,7 +20,7 @@ export default class Ban extends Modal {
         if(player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player is already banned!`)], ephemeral: true });
         const reason = fields.getTextInputValue(`reason`);
 
-        player.banPlayer(reason);
+        player.banPlayer(reason, staff.uuid);
         player.save();
 
         sendMessage({
