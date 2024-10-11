@@ -79,7 +79,8 @@ export interface IPlayer {
     reports: { by: String, reportedName: String, reason: String }[],
     roles: string[],
     api_keys: string[],
-    ban: { active: boolean, reason?: string | null, appealable: boolean, appealed: boolean },
+    ban: { active: boolean, reason?: string | null, appealable: boolean, appealed: boolean, staff?: string | null },
+    clears: { currentTag: string, staff: string, timestamp: number }[],
     connections: {
         discord: { id?: string | null, code?: string | null },
         email: { address?: string | null, code?: string | null }
@@ -90,8 +91,9 @@ export interface IPlayer {
     hasPermission(permission: Permission): boolean,
     hasAnyElevatedPermission(): boolean,
     isBanned(): boolean,
-    banPlayer(reason: string, appealable?: boolean): void,
-    unban(): void
+    banPlayer(reason: string, staff: string, appealable?: boolean): void,
+    unban(): void,
+    clearTag(staff: string): void
 }
 
 const schema = new Schema<IPlayer>({
@@ -177,8 +179,19 @@ const schema = new Schema<IPlayer>({
             type: Boolean,
             required: true,
             default: false
-        }
+        },
+        staff: String
     },
+    clears: [{
+        currentTag: {
+            type: String,
+            required: true
+        },
+        staff: {
+            type: String,
+            required: true
+        }
+    }],
     connections: {
         discord: {
             id: String,
@@ -252,18 +265,29 @@ const schema = new Schema<IPlayer>({
             return this.ban?.active || false;
         },
 
-        banPlayer(reason: string, appealable: boolean = true) {
-            this.ban!.active = true;
-            this.ban!.reason = reason;
-            this.ban!.appealable = appealable;
-            this.ban!.appealed = false;
+        banPlayer(reason: string, staff: string, appealable: boolean = true) {
+            this.ban.active = true;
+            this.ban.reason = reason;
+            this.ban.appealable = appealable;
+            this.ban.appealed = false;
+            this.ban.staff = staff;
         },
 
         unban() {
-            this.ban!.active = false;
-            this.ban!.reason = null;
-            this.ban!.appealable = true;
-            this.ban!.appealed = false;
+            this.ban.active = false;
+            this.ban.reason = null;
+            this.ban.appealable = true;
+            this.ban.appealed = false;
+            this.ban.staff = null;
+        },
+
+        clearTag(staff: string) {
+            this.clears.push({
+                currentTag: this.tag || '--',
+                staff,
+                timestamp: new Date().getTime()
+            })
+            this.tag = null;
         }
     }
 });
