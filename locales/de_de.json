@@ -1,149 +1,149 @@
 {
-  "error": {
-    "notFound": "Nicht gefunden!",
-    "unknownError": "Ein unbekannter Fehler ist aufgetreten! Bitte versuche es später erneut!",
-    "invalidBody": "Der Request body muss ein JSON Objekt sein!",
-    "database": "Die Datenbank ist nicht verbunden. Bitte versuche es später erneut!",
-    "notAllowed": "Darauf hast du keinen Zugriff!",
-    "missingField": "Fehlendes JSON Feld \"<field>\".",
-    "playerNotFound": "Dieser Spieler befindet sich nicht in unserer Datenbank!",
-    "wrongType": "Das Feld \"<field>\" muss von Typ <type> sein!",
-    "ratelimit": "Du bist geratelimited! Bitte versuche es in <seconds> Sekunden erneut!",
-    "banned": "Du bist gebannt!",
-    "noTag": "Du musst erst einen Tag auswählen!",
-    "playerNoTag": "Dieser Spieler hat keinen Tag!",
-    "playerBanned": "Dieser Spieler ist gebannt!",
-    "malformedAuthHeader": "Du hast einen ungültigen Authorization Header übergeben!"
-  },
-  "ban": {
-    "alreadyBanned": "Dieser Spieler ist bereits gebannt!",
-    "noReason": "Kein Grund angegeben",
-    "success": "Der Spieler wurde erfolgreich gebannt!"
-  },
-  "unban": {
-    "notBanned": "Dieser Spieler ist nicht gebannt!",
-    "success": "Der Spieler wurde erfolgreich entbannt!"
-  },
-  "icon": {
-    "sameIcon": "Du hast dieses Icon bereits ausgewählt!",
-    "notAllowed": "Du darfst dieses Icon nicht auswählen!",
-    "success": {
-      "self": "Dein Icon wurde erfolgreich ausgewählt!",
-      "admin": "Das Icon des Spielers wurde erfolgreich geändert!"
-    }
-  },
-  "position": {
-    "samePosition": "Dein Tag ist bereits in dieser Position!",
-    "invalid": "Bitte gib eine gültige Position an!",
-    "success": {
-      "self": "Deine Tag-Position wurde erfolgreich ausgewählt!",
-      "admin": "Die Tag-Position des Spielers wurde erfolgreich geändert!"
-    }
-  },
-  "editBan": {
-    "success": "Der Ban wurde aktualisiert!"
-  },
-  "report": {
-    "self": "Du kannst dich nicht selbst melden!",
-    "alreadyReported": "Du hast den Tag dieses Spielers bereits gemeldet!",
-    "validation": "Das \"reason\" Feld darf nur zwischen <min> und <max> Zeichen lang sein.",
-    "invalidReason": "Du musst einen gültigen Grund angeben!",
-    "success": "Der Spieler wurde erfolgreich gemeldet!",
-    "immune": "Dieser Spieler kann nicht gemeldet werden!"
-  },
-  "appeal": {
-    "notBanned": "Du bist nicht gebannt!",
-    "notAppealable": "Dein Ban ist nicht anfechtbar!",
-    "alreadyAppealed": "Du hast bereits einen Entbannungsantrag gesendet!",
-    "success": "Der Entbannungsantrag wurde erfolgreich gesendet!"
-  },
-  "setTag": {
-    "empty": "Der Tag darf nicht leer sein!",
-    "sameTag": "Du hast diesen Tag bereits!",
-    "blacklisted": "Das Wort \"<word>\" darf nicht in deinem Global Tag vorkommen!",
-    "validation": "Das \"tag\" Feld darf nur zwischen <min> und <max> Zeichen lang sein.",
-    "success": {
-      "self": "Dein Tag wurde erfolgreich geändert!",
-      "admin": "Der Tag des Spielers wurde erfolgreich geändert!"
-    }
-  },
-  "referral": {
-    "self": "Du kannst dich nicht selber vermitteln!",
-    "alreadyReferred": "Du hast bereits einen Spieler vermittelt!",
-    "success": "Du hast den Spieler erfolgreich vermittelt!"
-  },
-  "resetTag": {
-    "success": {
-      "self": "Dein Tag wurde erfolgreich gelöscht!",
-      "admin": "Der Tag des Spielers wurde erfolgreich gelöscht!"
-    }
-  },
-  "connections": {
-    "discord": {
-      "disabled": "Account-Verbindungen sind deaktiviert!",
-      "alreadyConnected": "Du hast bereits einen Discord Account verbunden. Bitte nutze '/gt unlink discord' um ihn zu entfernen!",
-      "notConnected": "Du hast keinen Discord Account verbunden. Nutze '/gt link discord' um einen zu verbinden!",
-      "unlinked": "Dein Discord Account wurde erfolgreich entfernt!"
+    "error": {
+        "notFound": "Nicht gefunden!",
+        "unknownError": "Ein unbekannter Fehler ist aufgetreten! Bitte versuche es später erneut!",
+        "invalidBody": "Der Request body muss ein JSON Objekt sein!",
+        "database": "Die Datenbank ist nicht verbunden. Bitte versuche es später erneut!",
+        "notAllowed": "Darauf hast du keinen Zugriff!",
+        "missingField": "Fehlendes JSON Feld \"<field>\".",
+        "playerNotFound": "Dieser Spieler befindet sich nicht in unserer Datenbank!",
+        "wrongType": "Das Feld \"<field>\" muss von Typ <type> sein!",
+        "ratelimit": "Du bist geratelimited! Bitte versuche es in <seconds> Sekunden erneut!",
+        "banned": "Du bist gebannt!",
+        "noTag": "Du musst erst einen Tag auswählen!",
+        "playerNoTag": "Dieser Spieler hat keinen Tag!",
+        "playerBanned": "Dieser Spieler ist gebannt!",
+        "malformedAuthHeader": "Du hast einen ungültigen Authorization Header übergeben!"
+    },
+    "ban": {
+        "alreadyBanned": "Dieser Spieler ist bereits gebannt!",
+        "noReason": "Kein Grund angegeben",
+        "success": "Der Spieler wurde erfolgreich gebannt!"
+    },
+    "unban": {
+        "notBanned": "Dieser Spieler ist nicht gebannt!",
+        "success": "Der Spieler wurde erfolgreich entbannt!"
+    },
+    "icon": {
+        "sameIcon": "Du hast dieses Icon bereits ausgewählt!",
+        "notAllowed": "Du darfst dieses Icon nicht auswählen!",
+        "success": {
+            "self": "Dein Icon wurde erfolgreich ausgewählt!",
+            "admin": "Das Icon des Spielers wurde erfolgreich geändert!"
+        }
+    },
+    "position": {
+        "samePosition": "Dein Tag ist bereits in dieser Position!",
+        "invalid": "Bitte gib eine gültige Position an!",
+        "success": {
+            "self": "Deine Tag-Position wurde erfolgreich ausgewählt!",
+            "admin": "Die Tag-Position des Spielers wurde erfolgreich geändert!"
+        }
+    },
+    "editBan": {
+        "success": "Der Ban wurde aktualisiert!"
+    },
+    "report": {
+        "self": "Du kannst dich nicht selbst melden!",
+        "alreadyReported": "Du hast den Tag dieses Spielers bereits gemeldet!",
+        "validation": "Das \"reason\" Feld darf nur zwischen <min> und <max> Zeichen lang sein.",
+        "invalidReason": "Du musst einen gültigen Grund angeben!",
+        "success": "Der Spieler wurde erfolgreich gemeldet!",
+        "immune": "Dieser Spieler kann nicht gemeldet werden!"
+    },
+    "appeal": {
+        "notBanned": "Du bist nicht gebannt!",
+        "notAppealable": "Dein Ban ist nicht anfechtbar!",
+        "alreadyAppealed": "Du hast bereits einen Entbannungsantrag gesendet!",
+        "success": "Der Entbannungsantrag wurde erfolgreich gesendet!"
+    },
+    "setTag": {
+        "empty": "Der Tag darf nicht leer sein!",
+        "sameTag": "Du hast diesen Tag bereits!",
+        "blacklisted": "Das Wort \"<word>\" darf nicht in deinem Global Tag vorkommen!",
+        "validation": "Das \"tag\" Feld darf nur zwischen <min> und <max> Zeichen lang sein.",
+        "success": {
+            "self": "Dein Tag wurde erfolgreich geändert!",
+            "admin": "Der Tag des Spielers wurde erfolgreich geändert!"
+        }
+    },
+    "referral": {
+        "self": "Du kannst dich nicht selber vermitteln!",
+        "alreadyReferred": "Du hast bereits einen Spieler vermittelt!",
+        "success": "Du hast den Spieler erfolgreich vermittelt!"
+    },
+    "resetTag": {
+        "success": {
+            "self": "Dein Tag wurde erfolgreich gelöscht!",
+            "admin": "Der Tag des Spielers wurde erfolgreich gelöscht!"
+        }
+    },
+    "connections": {
+        "discord": {
+            "disabled": "Account-Verbindungen sind deaktiviert!",
+            "alreadyConnected": "Du hast bereits einen Discord Account verbunden. Bitte nutze '/gt unlink discord' um ihn zu entfernen!",
+            "notConnected": "Du hast keinen Discord Account verbunden. Nutze '/gt link discord' um einen zu verbinden!",
+            "unlinked": "Dein Discord Account wurde erfolgreich entfernt!"
+        },
+        "email": {
+            "disabled": "Emails verbindungen sind deaktiviert!",
+            "alreadyConnected": "Du hast bereits eine Email-Adresse verbunden. Bitte nutze '/gt unlink email' um sie zu entfernen!",
+            "notConnected": "Du hast keine Email-Adresse verbunden. Nutze '/gt link email' um eine zu verbinden!",
+            "unlinked": "Deine Email-Adresse wurde erfolgreich entfernt!",
+            "invalidEmail": "Das \"email\" Feld muss eine gültige Email-Adresse sein!",
+            "verificationSent": "Dir wurde eine Verifizierungsemail geschickt. Bitte überprüfe auch den Spam Ordner!",
+            "invalidCode": "Der Code ist ungültig!",
+            "verified": "Deine Email-Adresse wurde erfolgreich verifiziert!"
+        }
+    },
+    "watch": {
+        "alreadyWatched": "Dieser Spieler ist bereits auf der Watchlist!",
+        "success": "Der Spieler ist jetzt auf der Watchlist!"
+    },
+    "unwatch": {
+        "notWatched": "Dieser Spieler ist nicht auf der Watchlist!",
+        "success": "Der Spieler ist nicht mehr auf der Watchlist!"
     },
     "email": {
-      "disabled": "Emails verbindungen sind deaktiviert!",
-      "alreadyConnected": "Du hast bereits eine Email-Adresse verbunden. Bitte nutze '/gt unlink email' um sie zu entfernen!",
-      "notConnected": "Du hast keine Email-Adresse verbunden. Nutze '/gt link email' um eine zu verbinden!",
-      "unlinked": "Deine Email-Adresse wurde erfolgreich entfernt!",
-      "invalidEmail": "Das \"email\" Feld muss eine gültige Email-Adresse sein!",
-      "verificationSent": "Dir wurde eine Verifizierungsemail geschickt. Bitte überprüfe auch den Spam Ordner!",
-      "invalidCode": "Der Code ist ungültig!",
-      "verified": "Deine Email-Adresse wurde erfolgreich entfernt!"
+        "footer": "Danke, dass du GlobalTags benutzt!",
+        "greeting": "Hey!",
+        "banned": {
+            "subject": "Dein GlobalTags Account wurde gebannt",
+            "title": "Account gebannt",
+            "description": "Dein GlobalTags Account wurde für den folgenden Grund gebannt:",
+            "appeal": "Du kannst ingame einen Entbannungsantrag stellen."
+        },
+        "tagChanged": {
+            "subject": "Dein GlobalTag wurde vom Team geändert",
+            "title": "Dein Tag wurde vom Team geändert",
+            "description": "Dein GlobalTag wurde von einem Teammitglied geändert.",
+            "previous": "Dein alter Tag war:",
+            "new": "Dein neuer Tag ist:",
+            "warning": "Abhängig davon, was dein Tag vorher war, könnte das hier eine Warnung sein."
+        },
+        "tagCleared": {
+            "subject": "Dein GlobalTag wurde gecleart",
+            "title": "Dein Tag wurde gecleart",
+            "description": "Dein Tag <span class=\"tag-box\">[tag]</span> wurde gecleart.",
+            "warning": "Sieh das als Warnung, wir werden dir keine zweite Chance geben."
+        },
+        "unbanned": {
+            "subject": "Dein GlobalTags Account wurde entbannt",
+            "title": "Account entbannt 🎉",
+            "unbanned": "Wir freuen uns, dir mitzuteilen, dass dein GlobalTags Account entbannt wurde!",
+            "access": "Du kannst GlobalTags nun wieder benutzen. Willkommen zurück!"
+        },
+        "verification": {
+            "subject": "Verifiziere deine GlobalTags Email-Adresse",
+            "title": "GlobalTags Email Verifizierung",
+            "description": "Bitte bestätige deine Email. Du findest den Verifizierungscode unten:",
+            "note": "Du warst das nicht? Dann kannst du diese Email einfach ignorieren."
+        },
+        "verified": {
+            "subject": "GlobalTags Verifizierung erfolgreich",
+            "title": "Willkommen bei GlobalTags!",
+            "success": "Deine email wurde erfolgreich verifiziert! Wir freuen uns, dich begrüßen zu dürfen!",
+            "questions": "Du wirst nun wichtige Account-Updates erhalten. Falls du irgendwelche Fragen hast, zögere nicht, uns auf dem <a href=\"[link]\" target=\"_blank\">Discord</a> zu kontaktieren."
+        }
     }
-  },
-  "watch": {
-    "alreadyWatched": "Dieser Spieler ist bereits auf der Watchlist",
-    "success": "Der Spieler ist jetzt auf der Watchlist!"
-  },
-  "unwatch": {
-    "notWatched": "Dieser Spieler ist nicht auf der Watchlist!",
-    "success": "Der Spieler ist nicht mehr auf der Watchlist!"
-  },
-  "email": {
-    "footer": "Danke, dass du GlobalTags benutzt!",
-    "greeting": "Hey!",
-    "banned": {
-      "subject": "Dein GlobalTags Account wurde gebannt",
-      "title": "Account gebannt",
-      "description": "Dein GlobalTags Account wurde für den folgenden Grund gebannt:",
-      "appeal": "Du kannst ingame einen Entbannungsantrag stellen."
-    },
-    "tagChanged": {
-      "subject": "Dein GlobalTag wurde vom Team geändert",
-      "title": "Dein Tag wurde vom Team geändert",
-      "description": "Dein GlobalTag wurde von einem Teammitglied geändert!",
-      "previous": "Dein alter Tag war:",
-      "new": "Dein neuer Tag ist:",
-      "warning": "Abhängig davon, was dein Tag vorher war, könnte das hier eine Warnung sein."
-    },
-    "tagCleared": {
-      "subject": "Dein GlobalTag wurde gecleart",
-      "title": "Dein Tag wurde gecleart",
-      "description": "Dein Tag <span class=\"tag-box\">[tag]</span> wurde gecleart.",
-      "warning": "Sieh das als Warnung, wir werden dir keine zweite Chance geben."
-    },
-    "unbanned": {
-      "subject": "Dein GlobalTags Account wurde entbannt",
-      "title": "Account entbannt 🎉",
-      "unbanned": "Wir freuen uns, dir mitzuteilen, dass dein GlobalTags Account entbannt wurde!",
-      "access": "Du kannst GlobalTags nun wieder benutzen. Willkommen zurück!"
-    },
-    "verification": {
-      "subject": "Verifiziere deine GlobalTags Email-Adresse",
-      "title": "GlobalTags Email Verifizierung",
-      "description": "Bitte bestätige deine Email. Du findest den Verifizierungscode unten:",
-      "note": "Du warst das nicht? Dann kannst du diese Email einfach ignorieren."
-    },
-    "verified": {
-      "subject": "GlobalTags Verifizierung erfolgreich",
-      "title": "Willkommen bei GlobalTags!",
-      "success": "Deine email wurde erfolgreich verifiziert! Wir freuen uns, dich begrüßen zu dürfen!",
-      "questions": "Du wirst nun wichtige Account-Updates erhalten. Falls du irgendwelche Fragen hast, zögere nicht, uns auf dem <a href=\"[link]\" target=\"_blank\">Discord</a> zu kontaktieren."
-    }
-  }
 }
