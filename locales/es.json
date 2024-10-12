@@ -7,9 +7,9 @@
         "invalidBody": "Request body needs to be a json object!",
         "playerNotFound": "There is no such player in our records!",
         "malformedAuthHeader": "You've entered a malformed authorization header!",
-        "banned": "Tu eres baneado!",
+        "banned": "Tú eres baneado!",
         "notAllowed": "You're not allowed to perform that request!",
-        "playerBanned": "Este jugador esta baneado!",
+        "playerBanned": "Este jugador está baneado!",
         "database": "The database is not connected. Please try again later!",
         "playerNoTag": "Este jugador no tiene un tag!",
         "missingField": "Missing field \"<field>\".",
@@ -127,7 +127,7 @@
         }
     },
     "ban": {
-        "alreadyBanned": "Este jugador ya esta baneado!",
+        "alreadyBanned": "Este jugador ya está baneado!",
         "noReason": "No se da ninguna razón",
         "success": "The player was successfully banned!"
     },
