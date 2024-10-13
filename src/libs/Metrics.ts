@@ -68,7 +68,7 @@ async function saveMetrics() {
     if(config.bot.synced_roles.enabled) await client.guilds.cache.get(config.bot.synced_roles.guild)?.members.fetch();
     const users = await players.find();
     const tags = users.filter((user) => user.tag != null).length;
-    const staff = users.filter((user) => user.hasAnyElevatedPermission()).length;
+    const staff = users.filter((user) => user.hasAnyElevatedPermissionSync()).length;
     const bans = users.filter((user) => user.isBanned()).length;
     const positions = positionList.reduce((object: any, position) => {
         object[position.toLowerCase()] = users.filter((user) => user.position.toUpperCase() == position.toUpperCase()).length;

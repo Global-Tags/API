@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import players, { Permission } from "../database/schemas/players";
+import players, { GlobalIcon, Permission } from "../database/schemas/players";
 import Logger from "../libs/Logger";
 import { sendMessage, NotificationType, ModLogType } from "../libs/DiscordNotifier";
 import fetchI18n from "../middleware/FetchI18n";
@@ -30,8 +30,8 @@ export default new Elysia()
         tag: player.isBanned() ? null : player.tag || null,
         position: player.position || "ABOVE",
         icon: player.icon || "NONE",
-        roles: player.getRoles(),
-        permissions: Object.keys(player.getPermissions()).filter((perm) => player.getPermissions()[perm]).map((permission) => constantCase(permission)),
+        roles: player.getRolesSync(),
+        permissions: Object.keys(player.getPermissionsSync()).filter((perm) => player.getPermissionsSync()[perm]).map((permission) => constantCase(permission)),
         referred: player.referred,
         referrals: player.referrals.length,
         ban: showBan ? {
