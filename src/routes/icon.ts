@@ -12,11 +12,7 @@ const icons = Object.keys(GlobalIcon)
 export default new Elysia({
     prefix: "/icon"
 }).use(fetchI18n).use(getAuthProvider).get('/:hash', async ({ error, params, headers, i18n, provider }) => {
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.uuid) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.noTag`) });
@@ -33,15 +29,13 @@ export default new Elysia({
     },
     response: {
         200: t.File({ description: `Returns the icon` }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: `The player is banned or you're not authorized.` }),
+        403: t.Object({ error: t.String() }, { description: `The player is banned.` }),
         404: t.Object({ error: t.String() }, { description: `The icon was not found.` }),
         422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
         429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },
-    params: t.Object({ uuid: t.String({ description: `The uuid of the image owner` }), hash: t.String({ description: 'The image hash' }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
+    params: t.Object({ uuid: t.String({ description: `The uuid of the image owner` }), hash: t.String({ description: 'The image hash' }) })
 })
 .post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Change icon
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
