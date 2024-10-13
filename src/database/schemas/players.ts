@@ -12,6 +12,7 @@ export enum GlobalPosition {
 
 export enum GlobalIcon {
     None,
+    Custom,
     Android,
     Apple,
     Bereal,
@@ -46,20 +47,9 @@ export enum GlobalIcon {
     Youtube
 }
 
-export type Role = {
-    name: string,
-    permissions: {
-        BypassValidation: boolean,
-        ManageBans: boolean,
-        ManageRoles: boolean,
-        ManageTags: boolean,
-        ManageWatchlist: boolean,
-        ReportImmunity: boolean
-    }
-}
-
 export enum Permission {
     BypassValidation,
+    CustomIcon,
     ManageBans,
     ManageRoles,
     ManageTags,
@@ -244,7 +234,7 @@ const schema = new Schema<IPlayer>({
                 permissions[permission] = localRoles.some((key) => {
                     const role = roles.find((r) => r.name == key)!;
                     if(!role) return false;
-                    return role.permissions[permission as keyof typeof role.permissions];
+                    return role.permissions[permission as keyof typeof role.permissions] || false;
                 });
             }
             return permissions;
