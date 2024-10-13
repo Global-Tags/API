@@ -13,6 +13,7 @@
             "watchlist": []
         },
         "icon": {
+            "maxResolution": 512,
             "blacklist": []
         }
     },
@@ -182,6 +183,10 @@
                     "discordRole": ""
                 }
             ]
+        },
+        "custom_icons": {
+            "active": false,
+            "log": ""
         }
     }
 }
