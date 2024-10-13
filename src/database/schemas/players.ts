@@ -62,7 +62,10 @@ export interface IPlayer {
     uuid: string,
     tag?: string | null,
     position: string,
-    icon: string,
+    icon: {
+        name: string,
+        hash?: string | null
+    },
     history: string[],
     watchlist: boolean,
     referred: boolean,
@@ -104,9 +107,12 @@ const schema = new Schema<IPlayer>({
         default: `ABOVE`
     },
     icon: {
-        type: String,
-        required: true,
-        default: `NONE`
+        name: {
+            type: String,
+            required: true,
+            default: `NONE`
+        },
+        hash: String
     },
     history: {
         type: [String],
