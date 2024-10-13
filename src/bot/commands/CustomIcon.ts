@@ -88,7 +88,7 @@ export default class PlayerInfo extends Command {
                 hash: player.icon.hash
             });
 
-            interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ Your custom icon was successfully uploaded!\nYou may need to clear your cache ingame for the icon to be shown.`)] });
+            interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ Your custom icon was successfully uploaded!\nYou may need to clear your cache ingame for the icon to be shown.`).setThumbnail(`attachment://${file.name}`)], files: [file] });
         } else if(sub == 'unset') {
             player.icon.name = constantCase(GlobalIcon[GlobalIcon.None]);
             player.icon.hash = null;

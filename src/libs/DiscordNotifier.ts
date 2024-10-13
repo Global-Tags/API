@@ -204,10 +204,8 @@ export function sendMessage(data: NotificationData) {
         const embed = new EmbedBuilder()
         .setColor(bot.colors.standart)
         .setTitle(':frame_photo: New icon upload')
-        .setDescription(`UUID: [\`${data.uuid}\`](<https://laby.net/@${data.uuid}>)`)
-        .setImage(`${base}/players/${data.uuid}/icon/${data.hash}`);
-
-        if(data.uuid) embed.setThumbnail(`https://laby.net/texture/profile/head/${data.uuid}.png?size=1024&overlay`);
+        .setDescription(`UUID: [\`${data.uuid}\`](<https://laby.net/@${data.uuid}>)\nHash: [\`${data.hash}\`](<${base}/players/${data.uuid}/icon/${data.hash}>)`)
+        .setThumbnail(`${base}/players/${data.uuid}/icon/${data.hash}`);
 
         _sendMessage(
             config.bot.custom_icons.log,
