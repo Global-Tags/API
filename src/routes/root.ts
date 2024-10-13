@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import players, { GlobalIcon, Permission } from "../database/schemas/players";
+import players, { GlobalIcon, GlobalPosition, Permission } from "../database/schemas/players";
 import Logger from "../libs/Logger";
 import { sendMessage, NotificationType, ModLogType } from "../libs/DiscordNotifier";
 import fetchI18n from "../middleware/FetchI18n";
@@ -25,12 +25,19 @@ export default new Elysia()
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNoTag`) });
 
+    if(constantCase(player.icon) == constantCase(GlobalIcon[GlobalIcon.Custom])) {
+        if(!(await player.hasPermission(Permission.CustomIcon))) {
+            player.icon = constantCase(GlobalIcon[GlobalIcon.None]);
+            await player.save();
+        }
+    }
+
     return {
         uuid: player.uuid,
         tag: player.isBanned() ? null : player.tag || null,
-        position: player.position || "ABOVE",
-        icon: player.icon || "NONE",
-        roles: player.getRolesSync(),
+        position: constantCase(player.position || GlobalIcon[GlobalPosition.Above]),
+        icon: constantCase(player.icon || GlobalIcon[GlobalIcon.None]),
+        roles: player.getRolesSync().map((permission) => constantCase(permission)),
         permissions: Object.keys(player.getPermissionsSync()).filter((perm) => player.getPermissionsSync()[perm]).map((permission) => constantCase(permission)),
         referred: player.referred,
         referrals: player.referrals.length,
