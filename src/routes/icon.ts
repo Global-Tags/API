@@ -13,7 +13,7 @@ export default new Elysia({
 }).use(fetchI18n).use(getAuthProvider).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Change icon
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
-    const icon = body.icon.toUpperCase();
+    const icon = body.icon.trim().toUpperCase();
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
     if(!session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n(`error.notAllowed`) });
