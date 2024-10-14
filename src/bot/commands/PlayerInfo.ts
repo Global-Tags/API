@@ -44,7 +44,7 @@ export default class PlayerInfo extends Command {
             }
         }
         const data = await players.findOne({ uuid: uuid.replaceAll(`-`, ``) });
-        const roles = data?.getRoles() || [];
+        const roles = data?.getRolesSync() || [];
 
         if(!data) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ This player is not in our records!`)] });
         const staff = await players.findOne({ "connections.discord.id": user.id });
@@ -98,7 +98,7 @@ export default class PlayerInfo extends Command {
                 .setImage(`https://cdn.rappytv.com/bots/placeholder.png`)
                 .setFooter({ text: `© RappyTV, ${new Date().getFullYear()}`})
             ],
-            components: staff && staff.hasAnyElevatedPermission() ? [
+            components: staff && staff.hasAnyElevatedPermissionSync() ? [
                 new ActionRowBuilder<ButtonBuilder>()
                     .addComponents(
                         new ButtonBuilder()

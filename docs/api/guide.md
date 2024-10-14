@@ -52,6 +52,28 @@ Here's what happens next:
 
 Want to create your own custom authentication provider? [This guide](./custom-auth-provider.md) covers everything you need to know.
 
+## Image Serving
+
+Icons and role images play a key role in GlobalTags, so the API provides specific routes to serve these images. Below are the routes you can use to access the three types of icons.
+
+### Accessing Default Global Icons
+To load default icons, use the following URL format, replacing `<name>` with the lowercase name of the icon:
+```plaintext
+https://cdn.rappytv.com/globaltags/icons/<name>.png
+```
+
+### Accessing Custom Global Icons
+For custom per-player icons, you’ll need the `hash` value, which can be obtained by making a `GET` request to `/players/<uuid>` and retrieving the `icon.hash` key. Then, use the following URL format:
+```plaintext
+https://api.globaltags.xyz/players/<uuid>/icon/<hash>
+```
+
+### Accessing Role Icons
+To load role-specific icons, use the URL format below, replacing `<name>` with the role name:
+```plaintext
+https://cdn.rappytv.com/globaltags/icons/role/<name>.png
+```
+
 ## Troubleshooting
 
 ### 1. **Malformed authorization header**

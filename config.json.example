@@ -13,6 +13,7 @@
             "watchlist": []
         },
         "icon": {
+            "maxResolution": 512,
             "blacklist": []
         }
     },
@@ -85,6 +86,7 @@
             "name": "ADMIN",
             "permissions": {
                 "BypassValidation": true,
+                "CustomIcon": true,
                 "ManageBans": true,
                 "ManageRoles": true,
                 "ManageTags": true,
@@ -96,6 +98,7 @@
             "name": "DEVELOPER",
             "permissions": {
                 "BypassValidation": true,
+                "CustomIcon": false,
                 "ManageBans": false,
                 "ManageRoles": false,
                 "ManageTags": false,
@@ -107,6 +110,7 @@
             "name": "MODERATOR",
             "permissions": {
                 "BypassValidation": false,
+                "CustomIcon": false,
                 "ManageBans": false,
                 "ManageRoles": false,
                 "ManageTags": false,
@@ -118,6 +122,7 @@
             "name": "SUPPORTER",
             "permissions": {
                 "BypassValidation": false,
+                "CustomIcon": false,
                 "ManageBans": false,
                 "ManageRoles": false,
                 "ManageTags": false,
@@ -178,6 +183,10 @@
                     "discordRole": ""
                 }
             ]
+        },
+        "custom_icons": {
+            "active": false,
+            "log": ""
         }
     }
 }

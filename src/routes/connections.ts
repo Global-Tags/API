@@ -6,7 +6,7 @@ import getAuthProvider from "../middleware/GetAuthProvider";
 import { sendEmail } from "../libs/Mailer";
 import { randomBytes } from "crypto";
 
-function generateSecureCode(length: number = 10) {
+export function generateSecureCode(length: number = 10) {
     return randomBytes(length).toString('hex').slice(0, length);
 }
 
