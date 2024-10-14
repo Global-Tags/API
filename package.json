@@ -1,7 +1,7 @@
 {
   "name": "globaltags",
   "private": true,
-  "version": "1.4.6",
+  "version": "1.4.7",
   "module": "src/index.ts",
   "scripts": {
     "dev": "bun --watch src/index.ts",
