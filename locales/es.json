@@ -1,18 +1,18 @@
 {
     "error": {
-        "unknownError": "An unknown error occurred! Please try again later!",
-        "notFound": "Not found!",
-        "ratelimit": "You're being ratelimited! Please try again in <seconds> seconds!",
+        "unknownError": "¡Ha ocurrido un error desconocido! ¡Por favor, vuelva a intentarlo más tarde!",
+        "notFound": "¡No se ha encontrado!",
+        "ratelimit": "¡Estás siendo limitado por tasa! ¡Por favor, inténtelo de nuevo en <seconds> segundos!",
         "noTag": "Por favor, pongate un Tag primero!",
-        "invalidBody": "Request body needs to be a json object!",
-        "playerNotFound": "There is no such player in our records!",
-        "malformedAuthHeader": "You've entered a malformed authorization header!",
+        "invalidBody": "¡El cuerpo de la petición debe ser un objeto json!",
+        "playerNotFound": "¡No existe tal jugador en nuestros documentos!",
+        "malformedAuthHeader": "¡Has entrado un encabezado de autorización malformado!",
         "banned": "Tú eres baneado!",
-        "notAllowed": "You're not allowed to perform that request!",
+        "notAllowed": "¡No estás autorizado a realizar esa petición!",
         "playerBanned": "Este jugador está baneado!",
-        "database": "The database is not connected. Please try again later!",
+        "database": "La base de datos no está conectada. ¡Por favor, inténtelo de nuevo más tarde!",
         "playerNoTag": "Este jugador no tiene un tag!",
-        "missingField": "Missing field \"<field>\".",
+        "missingField": "Falta la clave \"<field>\".",
         "wrongType": "Propriedad \"<field>\" tiene que ser de tipo <type>!"
     },
     "setTag": {
@@ -73,16 +73,16 @@
         "greeting": "Hey!"
     },
     "unban": {
-        "notBanned": "This player is not banned!",
-        "success": "The player was successfully unbanned!"
+        "notBanned": "¡Este jugador no está baneado!",
+        "success": "¡El jugador ha sido desbaneado con éxito!"
     },
     "position": {
         "success": {
-            "admin": "The player's tag position was successfully set!",
-            "self": "Your tag position was successfully set!"
+            "admin": "¡La posición del tag del jugador se ha fijado con éxito.!",
+            "self": "¡La posición de tu tag se ha fijado con éxito!"
         },
-        "invalid": "Please provide a valid position!",
-        "samePosition": "Your tag is already in this position!"
+        "invalid": "Por favor, ¡ponga una posición válida!",
+        "samePosition": "¡Tu tag ya está en esta posición!"
     },
     "unwatch": {
         "notWatched": "This player is not on the watchlist!",
@@ -118,7 +118,7 @@
         "success": "The ban appeal was successfully sent!",
         "alreadyAppealed": "You've already sent a ban appeal!",
         "notAppealable": "Your ban is not appealable!",
-        "notBanned": "You're not banned!"
+        "notBanned": "¡No estás baneado!"
     },
     "resetTag": {
         "success": {
@@ -129,14 +129,14 @@
     "ban": {
         "alreadyBanned": "Este jugador ya está baneado!",
         "noReason": "No se da ninguna razón",
-        "success": "The player was successfully banned!"
+        "success": "¡El jugador fue baneado con éxito!"
     },
     "icon": {
-        "sameIcon": "You already chose this icon!",
-        "notAllowed": "You're not allowed to choose this icon!",
+        "sameIcon": "¡Ya has elegido este icono!",
+        "notAllowed": "¡No puedes elegir este icono!",
         "success": {
-            "self": "Your icon was successfully set!",
-            "admin": "The player's icon was successfully set!"
+            "self": "¡Tu icono se ha configurado con éxito!",
+            "admin": "¡El icono del jugador se ha configurado correctamente!"
         }
     },
     "watch": {
@@ -144,6 +144,6 @@
         "alreadyWatched": "This player is already on the watchlist!"
     },
     "editBan": {
-        "success": "The ban was updated!"
+        "success": "¡Se ha actualizado la suspensión!"
     }
 }
