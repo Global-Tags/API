@@ -47,20 +47,20 @@
         "greeting": "Hey!"
     },
     "error": {
-        "unknownError": "An unknown error occurred! Please try again later!",
-        "notFound": "Not found!",
-        "ratelimit": "You're being ratelimited! Please try again in <seconds> seconds!",
-        "noTag": "Please set a tag first!",
-        "playerNotFound": "There is no such player in our records!",
-        "invalidBody": "Request body needs to be a json object!",
+        "unknownError": "Ein unbekannter Fehler ist aufgetreten! Bitte versuche es später erneut!",
+        "notFound": "Wurde nicht gefunden!",
+        "ratelimit": "Du wurdest ratelimited! Versuche es in <seconds> Sekunden erneut!",
+        "noTag": "Bitte setze zuerst einen Tag!",
+        "playerNotFound": "Dieser Spieler ist nicht in unseren Aufzeichnungen!",
+        "invalidBody": "Request body muss ein JSON object sein!",
         "malformedAuthHeader": "You've entered a malformed authorization header!",
-        "banned": "You are banned!",
-        "notAllowed": "You're not allowed to perform that request!",
-        "playerBanned": "This player is banned!",
-        "database": "The database is not connected. Please try again later!",
-        "playerNoTag": "This player does not have a tag!",
-        "missingField": "Missing field \"<field>\".",
-        "wrongType": "Field \"<field>\" needs to be of type <type>!"
+        "banned": "Du wurdest gebannt!",
+        "notAllowed": "Du darfst diese Request nicht ausführen!",
+        "playerBanned": "Dieser Spieler ist gebannt!",
+        "database": "Die Datenbank ist nicht verbunden. Bitte versuche es später erneut!",
+        "playerNoTag": "Dieser Spieler hat keinen Tag!",
+        "missingField": "Fehlendes Feld \"<field>\".",
+        "wrongType": "Feld \"<field>\" muss ein Typ <type> sein!"
     },
     "setTag": {
         "empty": "The tag must not be empty!",
