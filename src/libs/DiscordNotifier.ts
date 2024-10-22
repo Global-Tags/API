@@ -2,6 +2,7 @@ import * as bot from "../bot/bot";
 import * as config from "../../config.json";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
 import { capitalize } from "../bot/commands/PlayerInfo";
+import { getProfileByUUID } from "./Mojang";
 import { base } from "../../config.json";
 
 export enum NotificationType {
@@ -70,27 +71,32 @@ type NotificationData = {
     roles?: { added: string[], removed: string[] }
 });
 
-export function sendMessage(data: NotificationData) {
+export async function sendMessage(data: NotificationData) {
+    const { username: user, uuid } = await getProfileByUUID(data.uuid);
+    const username = user || uuid;
+
     if(data.type == NotificationType.Report && config.bot.reports.active) {
+        const profile = await getProfileByUUID(data.reporterUuid);
+
         _sendMessage(
             config.bot.reports.channel,
             config.bot.reports.content,
             new EmbedBuilder()
             .setColor(0xff0000)
-            .setThumbnail(`https://laby.net/texture/profile/head/${data.uuid}.png?size=1024&overlay`)
+            .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
             .setTitle(`New report!`)
             .addFields([
                 {
-                    name: `Reported UUID`,
-                    value: `[\`${data.uuid}\`](https://laby.net/@${data.uuid})`
+                    name: `Reported player`,
+                    value: `[\`${username}\`](https://laby.net/@${uuid})`
                 },
                 {
                     name: `Reported Tag`,
                     value: `\`\`\`${data.tag}\`\`\``
                 },
                 {
-                    name: `Reporter UUID`,
-                    value: `[\`${data.reporterUuid}\`](https://laby.net/@${data.reporterUuid})`
+                    name: `Reporter`,
+                    value: `[\`${profile.username || profile.uuid}\`](https://laby.net/@${profile.uuid})`
                 },
                 {
                     name: `Reason`,
@@ -104,12 +110,12 @@ export function sendMessage(data: NotificationData) {
             config.bot.watchlist.content,
             new EmbedBuilder()
             .setColor(0x5865f2)
-            .setThumbnail(`https://laby.net/texture/profile/head/${data.uuid}.png?size=1024&overlay`)
+            .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
             .setTitle(`New watched player`)
             .addFields([
                 {
-                    name: `Watched UUID`,
-                    value: `[\`${data.uuid}\`](https://laby.net/@${data.uuid})`
+                    name: `Watched player`,
+                    value: `[\`${username}\`](https://laby.net/@${uuid})`
                 },
                 {
                     name: `New tag`,
@@ -127,12 +133,12 @@ export function sendMessage(data: NotificationData) {
             config.bot.watchlist.content,
             new EmbedBuilder()
             .setColor(0x5865f2)
-            .setThumbnail(`https://laby.net/texture/profile/head/${data.uuid}.png?size=1024&overlay`)
+            .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
             .setTitle(`New tag change`)
             .addFields([
                 {
-                    name: `Watched UUID`,
-                    value: `[\`${data.uuid}\`](https://laby.net/@${data.uuid})`
+                    name: `Watched player`,
+                    value: `[\`${username}\`](https://laby.net/@${uuid})`
                 },
                 {
                     name: `New tag`,
@@ -146,12 +152,12 @@ export function sendMessage(data: NotificationData) {
             config.bot.appeals.content,
             new EmbedBuilder()
             .setColor(0x5865f2)
-            .setThumbnail(`https://laby.net/texture/profile/head/${data.uuid}.png?size=1024&overlay`)
+            .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
             .setTitle(`New ban appeal`)
             .addFields([
                 {
-                    name: `UUID`,
-                    value: `[\`${data.uuid}\`](https://laby.net/@${data.uuid})`
+                    name: `Player`,
+                    value: `[\`${username}\`](https://laby.net/@${uuid})`
                 },
                 {
                     name: `Reason`,
@@ -165,12 +171,12 @@ export function sendMessage(data: NotificationData) {
             undefined,
             new EmbedBuilder()
             .setColor(0x5865f2)
-            .setThumbnail(`https://laby.net/texture/profile/head/${data.uuid}.png?size=1024&overlay`)
+            .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
             .setTitle(data.connected ? 'New discord connection' : 'Discord connection removed')
             .addFields([
                 {
-                    name: `UUID`,
-                    value: `[\`${data.uuid}\`](https://laby.net/@${data.uuid})`
+                    name: `Player`,
+                    value: `[\`${username}\`](https://laby.net/@${uuid})`
                 },
                 {
                     name: `User ID`,
@@ -180,9 +186,11 @@ export function sendMessage(data: NotificationData) {
             false
         );
     } else if(data.type == NotificationType.Referral && config.bot.referral.active) {
+        const profile = await getProfileByUUID(data.invited);
+
         _sendMessage(
             config.bot.referral.channel,
-            `[\`${data.uuid}\`](<https://laby.net/@${data.uuid}>) has invited [\`${data.invited}\`](<https://laby.net/@${data.invited}>).`,
+            `[\`${username}\`](<https://laby.net/@${uuid}>) has invited [\`${profile.username || profile.uuid}\`](<https://laby.net/@${profile.uuid}>).`,
             null,
             false
         );
@@ -192,7 +200,7 @@ export function sendMessage(data: NotificationData) {
         .setTitle('💵 Entitlement update')
         .setDescription(data.description);
 
-        if(data.head) embed.setThumbnail(`https://laby.net/texture/profile/head/${data.uuid}.png?size=1024&overlay`);
+        if(data.head) embed.setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`);
 
         _sendMessage(
             config.bot.entitlements.log,
@@ -214,10 +222,12 @@ export function sendMessage(data: NotificationData) {
             false
         )
     } else if(data.type == NotificationType.ModLog && config.bot.mod_log.active) {
+        const profile = await getProfileByUUID(data.staff);
+
         const description = modlogDescription(data);
         _sendMessage(
             config.bot.mod_log.channel,
-            `[**${ModLogType[data.logType]}**] [\`${data.staff}\`](<https://laby.net/@${data.staff}>)${data.discord ? ' [**D**]' : ''} → [\`${data.uuid}\`](<https://laby.net/@${data.uuid}>)${description ? `: ${description}` : ''}`,
+            `[**${ModLogType[data.logType]}**] [\`${profile.username || profile.uuid}\`](<https://laby.net/@${profile.uuid}>)${data.discord ? ' [**D**]' : ''} → [\`${username}\`](<https://laby.net/@${uuid}>)${description ? `: ${description}` : ''}`,
             null,
             false
         );
