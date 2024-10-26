@@ -5,6 +5,7 @@
     "logLevel": "Info", // Error, Warn, Info or Debug
     "logTimeFormat": "YYYY-MM-DD HH:mm:ss",
     "srv": "",
+    "base": "http://localhost:5000",
     "validation": {
         "tag": {
             "min": 1,
