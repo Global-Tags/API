@@ -36,10 +36,11 @@ export default new Elysia()
         uuid: player.uuid,
         tag: player.isBanned() ? null : player.tag || null,
         position: constantCase(player.position || GlobalIcon[GlobalPosition.Above]),
-        icon: {
-            type: constantCase(player.icon.name || GlobalIcon[GlobalIcon.None]),
-            hash: player.icon.hash || null
-        },
+        icon: constantCase(player.icon.name || GlobalIcon[GlobalIcon.None]), // Replace by line 40-43 as soon as addon is reviewed
+        // icon: {
+        //     type: constantCase(player.icon.name || GlobalIcon[GlobalIcon.None]),
+        //     hash: player.icon.hash || null
+        // },
         roles: player.getRolesSync().map((permission) => constantCase(permission)),
         permissions: Object.keys(player.getPermissionsSync()).filter((perm) => player.getPermissionsSync()[perm]).map((permission) => constantCase(permission)),
         referred: player.referred,
