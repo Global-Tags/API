@@ -1,4 +1,4 @@
-import { ActivityType, Client, REST, Routes } from "discord.js";
+import { ActivityType, REST, Routes } from "discord.js";
 import Logger from "../../libs/Logger";
 import Event from "../structs/Event";
 import players from "../../database/schemas/players";

@@ -3,7 +3,7 @@ import players, { Permission } from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
 import { ModLogType, NotificationType, sendMessage } from "../libs/DiscordNotifier";
 import getAuthProvider from "../middleware/GetAuthProvider";
-import { sendBanEmail, sendEmail, sendUnbanEmail } from "../libs/Mailer";
+import { sendBanEmail, sendUnbanEmail } from "../libs/Mailer";
 
 export default new Elysia({
     prefix: `/ban`
