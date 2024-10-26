@@ -4,6 +4,7 @@ import * as config from "../../config.json";
 import fetchI18n from "../middleware/FetchI18n";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { join } from "path";
+import { constantCase } from "change-case";
 
 const icons = Object.keys(GlobalIcon)
     .filter((pos) => isNaN(Number(pos)))
@@ -49,7 +50,10 @@ export default new Elysia({
     if(!player) return error(404, { error: i18n(`error.noTag`) });
     if(player.isBanned()) return error(403, { error: i18n(`error.banned`) });
     if(icon == player.icon.name) return error(400, { error: i18n(`icon.sameIcon`) });
-    if(!session.hasPermission(Permission.BypassValidation) && (!icons.includes(icon) || config.validation.icon.blacklist.includes(icon.toLowerCase()))) return error(403, { error: i18n(`icon.notAllowed`) });
+
+    const isCustomIconDisallowed = constantCase(icon) == constantCase(GlobalIcon[GlobalIcon.Custom]) && !session.hasPermission(Permission.CustomIcon);
+
+    if(!session.hasPermission(Permission.BypassValidation) && (isCustomIconDisallowed || !icons.includes(icon) || config.validation.icon.blacklist.includes(icon.toLowerCase()))) return error(403, { error: i18n(`icon.notAllowed`) });
 
     player.icon.name = icon;
     await player.save();
