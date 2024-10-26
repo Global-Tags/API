@@ -12,7 +12,7 @@ export default class Actions extends Button {
     async trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
         const staff = await players.findOne({ "connections.discord.id": user.id });
         if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You need to link your Minecraft account with \`/link\`!`)], ephemeral: true });
-        if(!staff.hasAnyElevatedPermission()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to perform this action!`)], ephemeral: true });
+        if(!staff.hasAnyElevatedPermissionSync()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to perform this action!`)], ephemeral: true });
         const uuid = message.embeds[0].fields[0].value.replaceAll(`\``, ``).match(uuidRegex)?.[0]?.replaceAll('-', '');
         if(!uuid) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
 
@@ -32,7 +32,7 @@ export default class Actions extends Button {
                 .setLabel(`Edit roles`)
                 .setCustomId(`editRoles`)
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(!staff.hasPermission(Permission.ManageRoles))
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageRoles))
             ),
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
@@ -40,12 +40,12 @@ export default class Actions extends Button {
                 .setLabel(`Unwatch`)
                 .setCustomId(`unwatch`)
                 .setStyle(ButtonStyle.Success)
-                .setDisabled(!staff.hasPermission(Permission.ManageWatchlist)),
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageWatchlist)),
                 new ButtonBuilder()
                 .setLabel(`Watch`)
                 .setCustomId(`watch`)
                 .setStyle(ButtonStyle.Danger)
-                .setDisabled(!staff.hasPermission(Permission.ManageWatchlist))
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageWatchlist))
             ),
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
@@ -53,12 +53,12 @@ export default class Actions extends Button {
                 .setLabel(`Unban`)
                 .setCustomId(`unban`)
                 .setStyle(ButtonStyle.Success)
-                .setDisabled(!staff.hasPermission(Permission.ManageBans)),
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageBans)),
                 new ButtonBuilder()
                 .setLabel(`Ban`)
                 .setCustomId(`ban`)
                 .setStyle(ButtonStyle.Danger)
-                .setDisabled(!staff.hasPermission(Permission.ManageBans))
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageBans))
             ),
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
@@ -66,12 +66,12 @@ export default class Actions extends Button {
                 .setLabel(`Set tag`)
                 .setCustomId(`setTag`)
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(!staff.hasPermission(Permission.ManageTags)),
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageTags)),
                 new ButtonBuilder()
                 .setLabel(`Clear tag`)
                 .setCustomId(`clearTag`)
                 .setStyle(ButtonStyle.Danger)
-                .setDisabled(!staff.hasPermission(Permission.ManageTags))
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageTags))
             )
         ]
 

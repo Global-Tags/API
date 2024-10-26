@@ -25,7 +25,7 @@ export default abstract class AuthProvider {
         return {
             uuid: tokenUuid,
             equal: uuid == tokenUuid,
-            hasPermission: (permission: Permission) => data.hasPermission(permission)
+            hasPermission: (permission: Permission) => data.hasPermissionSync(permission)
         }
     }
     public abstract getUUID(token: string): Promise<string | null>;

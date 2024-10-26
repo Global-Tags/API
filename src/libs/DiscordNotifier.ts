@@ -2,8 +2,8 @@ import * as bot from "../bot/bot";
 import * as config from "../../config.json";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
 import { capitalize } from "../bot/commands/PlayerInfo";
-import axios from "axios";
 import { getProfileByUUID } from "./Mojang";
+import { base } from "../../config.json";
 
 export enum NotificationType {
     Report,
@@ -13,7 +13,8 @@ export enum NotificationType {
     ModLog,
     DiscordLink,
     Referral,
-    Entitlement
+    Entitlement,
+    CustomIconUpload
 }
 
 export enum ModLogType {
@@ -51,6 +52,9 @@ type NotificationData = {
     type: NotificationType.DiscordLink,
     connected: boolean,
     userId: string
+} | {
+    type: NotificationType.CustomIconUpload,
+    hash: string
 } | {
     type: NotificationType.Entitlement,
     description: string,
@@ -200,6 +204,19 @@ export async function sendMessage(data: NotificationData) {
 
         _sendMessage(
             config.bot.entitlements.log,
+            undefined,
+            embed,
+            false
+        )
+    } else if(data.type == NotificationType.CustomIconUpload && config.bot.custom_icons.active) {
+        const embed = new EmbedBuilder()
+        .setColor(bot.colors.standart)
+        .setTitle(':frame_photo: New icon upload')
+        .setDescription(`UUID: [\`${data.uuid}\`](<https://laby.net/@${data.uuid}>)\nHash: [\`${data.hash}\`](<${base}/players/${data.uuid}/icon/${data.hash}>)`)
+        .setThumbnail(`${base}/players/${data.uuid}/icon/${data.hash}`);
+
+        _sendMessage(
+            config.bot.custom_icons.log,
             undefined,
             embed,
             false

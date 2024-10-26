@@ -2,7 +2,6 @@ import * as english from "../../locales/en_us.json";
 import { existsSync, readdirSync } from "fs";
 import { join } from "path";
 import Logger from "./Logger";
-import { $ } from "bun";
 
 export type Language = typeof english;
 export type I18nFunction = (path: string) => string;
