@@ -212,7 +212,7 @@ export async function sendMessage(data: NotificationData) {
         const embed = new EmbedBuilder()
         .setColor(bot.colors.standart)
         .setTitle(':frame_photo: New icon upload')
-        .setDescription(`UUID: [\`${data.uuid}\`](<https://laby.net/@${data.uuid}>)\nHash: [\`${data.hash}\`](<${base}/players/${data.uuid}/icon/${data.hash}>)`)
+        .setDescription(`Player: [\`${username}\`](<https://laby.net/@${uuid}>)\nHash: [\`${data.hash}\`](<${base}/players/${uuid}/icon/${data.hash}>)`)
         .setThumbnail(`${base}/players/${data.uuid}/icon/${data.hash}`);
 
         _sendMessage(
