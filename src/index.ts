@@ -21,6 +21,7 @@ import minimist from "minimist";
 import cors from "@elysiajs/cors";
 import { verify as verifyMailOptions } from "./libs/Mailer";
 import { getLatestCommit, retrieveData } from "./libs/GitCommitData";
+import { startJob } from "./libs/EntitlementExpiry";
 
 handleErrors();
 if(config.sentry.enabled) initializeSentry(config.sentry.dsn);
@@ -75,6 +76,7 @@ export const elysia = new Elysia()
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
     AuthProvider.loadProviders();
+    connect(config.srv);
     initializeMetrics();
     if(config.mailer.enabled) {
         verifyMailOptions();
@@ -82,8 +84,7 @@ export const elysia = new Elysia()
     
     // Load languages
     load();
-
-    connect(config.srv);
+    startJob();
 })
 .onError(({ code, set, error: { message: error }, request }) => {
     const i18n = getI18nFunctionByLanguage(request.headers.get('x-language'));

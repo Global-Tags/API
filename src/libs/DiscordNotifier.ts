@@ -244,9 +244,9 @@ function modlogDescription(data: NotificationData): string | null {
     return null;
 }
 
-function _sendMessage(channel: string, content: string | undefined, embed: EmbedBuilder | null, actionButton: boolean = true) {
+async function _sendMessage(channel: string, content: string | undefined, embed: EmbedBuilder | null, actionButton: boolean = true) {
     if(!config.bot.enabled) return;
-    (bot.client.channels.cache.get(channel) as TextChannel).send({
+    (await bot.client.channels.fetch(channel) as TextChannel)?.send({
         content,
         embeds: embed == null ? [] : [embed],
         components: actionButton ? [
