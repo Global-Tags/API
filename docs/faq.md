@@ -22,10 +22,10 @@ There are several commands to help manage your settings. The main command is `/g
     - **`/gt renewcache`** (3) – Manually renews the cache.
     - **`/gt link`** (4) – Links your Minecraft account to external connections.
         - **`discord`** - Begins the process to link your Minecraft account with your Discord. Join our <a href="https://globaltags.xyz/discord" target="_blank">Discord Server</a> to complete the connection.
-        - **`email <email>`** - Adds an email to receive account-related updates. This is not a newsletter.
+        - **`email <address>`** - Adds an email to receive account-related updates. This is not a newsletter.
     - **`/gt unlink`** (5) – Removes external connections from your Minecraft account.
         - **`discord`** - Unlinks your Minecraft account from Discord.
-        - **`email <email>`** - Removes your email from the account.
+        - **`email`** - Removes your email from the account.
     - **`/gt verify`** (6) - Verifies specific connections.
         - **`email <code>`** - Verifies your email by entering the confirmation code sent to your inbox.
         
