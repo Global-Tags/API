@@ -1,4 +1,4 @@
-import { Entitlement } from "discord.js";
+import { Entitlement, EntitlementType } from "discord.js";
 import Event from "../structs/Event";
 import { bot } from "../../../config.json";
 import { client } from "../bot";
@@ -13,7 +13,7 @@ export default class EntitlementDelete extends Event {
     }
 
     async fire(entitlement: Entitlement) {
-        if(!bot.entitlements.enabled) return;
+        if(!bot.entitlements.enabled || !entitlement.isTest()) return;
         const player = await players.findOne({ "connections.discord.id": entitlement.userId });
         const sku = bot.entitlements.skus.find((sku) => sku.id == entitlement.skuId);
         if(!sku) return;
