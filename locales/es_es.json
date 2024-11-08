@@ -1,0 +1,149 @@
+{
+    "unban": {
+        "notBanned": "¡Este jugador no está baneado!",
+        "success": "¡El jugador ha sido desbaneado con éxito!"
+    },
+    "position": {
+        "success": {
+            "admin": "¡La posición del tag del jugador se ha fijado con éxito.!",
+            "self": "¡La posición de tu tag se ha fijado con éxito!"
+        },
+        "invalid": "Por favor, ¡ponga una posición válida!",
+        "samePosition": "¡Tu tag ya está en esta posición!"
+    },
+    "appeal": {
+        "success": "¡El recurso de suspensión fue enviado con éxito!",
+        "alreadyAppealed": "¡Ya has enviado una apelación de suspensión!",
+        "notAppealable": "¡Tu suspensión es inapelable!",
+        "notBanned": "¡No estás baneado!"
+    },
+    "setTag": {
+        "empty": "¡El tag no debe estar vacío!",
+        "blacklisted": "¡No está permitido incluir «<palabra>» en tu GlobalTag!",
+        "sameTag": "¡Ya tienes este tag!",
+        "success": {
+            "self": "¡Tu tag se ha actualizado con éxito!",
+            "admin": "¡El tag del jugador se ha actualizado correctamente!"
+        },
+        "validation": "Mantenga la propriedad «tag» entre <min> y <max> caracteres."
+    },
+    "report": {
+        "invalidReason": "¡Tienes que dar una razón válida!",
+        "immune": "¡No puedes denunciar a este jugador!",
+        "alreadyReported": "¡Ya has denunciado el tag de este jugador!",
+        "validation": "Mantenga la propriedad «reason» entre <min> y <max> caracteres.",
+        "success": "¡El jugador fue denunciado con éxito!",
+        "self": "¡No puedes denunciarte a ti mismo!"
+    },
+    "email": {
+        "banned": {
+            "description": "Tu cuenta ha sido baneada de GlobalTags por la siguiente razón:",
+            "subject": "Tu cuenta de GlobalTags ha sido baneada",
+            "title": "Cuenta baneada",
+            "appeal": "Puedes apelar tu baneo dentro del juego."
+        },
+        "verification": {
+            "subject": "Verifica tu dirección de correo electrónico de GlobalTags",
+            "note": "Si no solicitaste esto, por favor ignora este correo electrónico.",
+            "title": "Verificación de correo electrónico de GlobalTags",
+            "description": "Por favor, verifica tu correo electrónico. Puedes encontrar el código de verificación a continuación:"
+        },
+        "unbanned": {
+            "subject": "Tu cuenta de GlobalTags ha sido desbaneada",
+            "unbanned": "¡Nos complace informarte que tu cuenta de GlobalTags ha sido desbaneada!",
+            "access": "Ahora puedes usar a GlobalTags nuevamente. ¡Bienvenido de vuelta!",
+            "title": "Cuenta desbaneada 🎉"
+        },
+        "tagCleared": {
+            "warning": "Considera esto como una advertencia, no te daremos una segunda oportunidad.",
+            "title": "Tu tag fue borrado",
+            "subject": "Tu GlobalTag fue borrado",
+            "description": "Tu tag <span class=\"tag-box\">[tag]</span> fue borrado de tu cuenta."
+        },
+        "tagChanged": {
+            "previous": "Tu tag anterior era:",
+            "subject": "Tu GlobalTag fue cambiado por el personal",
+            "warning": "Dependiendo de cuál fue tu tag, puedes considerar esto como una advertencia.",
+            "description": "Tu GlobalTag fue cambiado por un miembro del personal.",
+            "title": "Tu tag fue cambiado por el personal",
+            "new": "Tu nuevo tag es:"
+        },
+        "footer": "¡Gracias por usar GlobalTags!",
+        "verified": {
+            "subject": "Verificación de GlobalTags exitosa",
+            "questions": "Ahora recibirás cualquier actualización importante sobre tu cuenta. Si tienes alguna pregunta, no dudes en contactarnos en nuestro <a href=\"[link]\" target=\"_blank\">Discord</a>.",
+            "success": "¡Tu correo electrónico ha sido verificado con éxito! ¡Estamos emocionados de tenerte a bordo!",
+            "title": "¡Bienvenido a GlobalTags!"
+        },
+        "greeting": "Hey!"
+    },
+    "unwatch": {
+        "notWatched": "¡Este jugador no está en la lista de observación!",
+        "success": "¡El jugador fue eliminado de la lista de observación!"
+    },
+    "error": {
+        "unknownError": "¡Ha ocurrido un error desconocido! ¡Por favor, vuelva a intentarlo más tarde!",
+        "notFound": "¡No se ha encontrado!",
+        "ratelimit": "¡Estás siendo limitado por tasa! ¡Por favor, inténtelo de nuevo en <seconds> segundos!",
+        "noTag": "Por favor, pongate un Tag primero!",
+        "invalidBody": "¡El cuerpo de la petición debe ser un objeto json!",
+        "playerNotFound": "¡No existe tal jugador en nuestros documentos!",
+        "malformedAuthHeader": "¡Has entrado un encabezado de autorización malformado!",
+        "banned": "Tú eres baneado!",
+        "notAllowed": "¡No estás autorizado a realizar esa petición!",
+        "playerBanned": "Este jugador está baneado!",
+        "database": "La base de datos no está conectada. ¡Por favor, inténtelo de nuevo más tarde!",
+        "playerNoTag": "Este jugador no tiene un tag!",
+        "missingField": "Falta la clave \"<field>\".",
+        "wrongType": "Propriedad \"<field>\" tiene que ser de tipo <type>!"
+    },
+    "referral": {
+        "self": "¡No puedes referirte a ti mismo!",
+        "alreadyReferred": "¡Ya has referido a un jugador!",
+        "success": "¡Has referido a este jugador con éxito!"
+    },
+    "connections": {
+        "email": {
+            "invalidEmail": "¡La propriedad \"email\" debe ser una dirección de correo electrónico válida!",
+            "verificationSent": "Se te ha enviado un correo de verificación. ¡Por favor, revisa también la carpeta de spam!",
+            "verified": "¡Tu correo electrónico fue verificado con éxito!",
+            "notConnected": "No tienes una dirección de correo electrónico vinculada. Usa '/gt link email' para vincular una cuenta!",
+            "alreadyConnected": "Ya tienes una dirección de correo electrónico vinculada. Por favor, usa '/gt unlink email' para desvincularla!",
+            "disabled": "¡La vinculación por correo electrónico está desactivada!",
+            "unlinked": "¡La dirección de correo electrónico fue eliminada con éxito!",
+            "invalidCode": "¡El código no es válido!"
+        },
+        "discord": {
+            "disabled": "¡La vinculación de cuentas está desactivada!",
+            "alreadyConnected": "Ya tienes una cuenta de Discord vinculada. ¡Utiliza '/gt unlink discord' para desvincularla!",
+            "notConnected": "No tienes una cuenta de Discord vinculada. ¡Usa '/gt link discord' para vincular una cuenta!",
+            "unlinked": "¡La cuenta de discord ha sido desvinculada con éxito!"
+        }
+    },
+    "resetTag": {
+        "success": {
+            "self": "¡Tu tag se ha borrado con éxito!",
+            "admin": "¡El tag del jugador ha sido borrado con éxito!"
+        }
+    },
+    "ban": {
+        "alreadyBanned": "Este jugador ya está baneado!",
+        "noReason": "No se da ninguna razón",
+        "success": "¡El jugador fue baneado con éxito!"
+    },
+    "icon": {
+        "sameIcon": "¡Ya has elegido este icono!",
+        "notAllowed": "¡No puedes elegir este icono!",
+        "success": {
+            "self": "¡Tu icono se ha configurado con éxito!",
+            "admin": "¡El icono del jugador se ha configurado correctamente!"
+        }
+    },
+    "watch": {
+        "success": "¡El jugador fue añadido a la lista de observación!",
+        "alreadyWatched": "¡Este jugador ya está en la lista de observación!"
+    },
+    "editBan": {
+        "success": "¡Se ha actualizado la suspensión!"
+    }
+}

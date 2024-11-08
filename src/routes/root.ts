@@ -36,11 +36,10 @@ export default new Elysia()
         uuid: player.uuid,
         tag: player.isBanned() ? null : player.tag || null,
         position: constantCase(player.position || GlobalIcon[GlobalPosition.Above]),
-        icon: constantCase(player.icon.name || GlobalIcon[GlobalIcon.None]), // Replace by line 40-43 as soon as addon is reviewed
-        // icon: {
-        //     type: constantCase(player.icon.name || GlobalIcon[GlobalIcon.None]),
-        //     hash: player.icon.hash || null
-        // },
+        icon: {
+            type: constantCase(player.icon.name || GlobalIcon[GlobalIcon.None]),
+            hash: player.icon.hash || null
+        },
         roles: player.getRolesSync().map((permission) => constantCase(permission)),
         permissions: Object.keys(player.getPermissionsSync()).filter((perm) => player.getPermissionsSync()[perm]).map((permission) => constantCase(permission)),
         referred: player.referred,
@@ -57,7 +56,7 @@ export default new Elysia()
         description: `Get another players' tag info`
     },
     response: {
-        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: /*t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) })*/ t.String(), referred: t.Boolean(), referrals: t.Integer(), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]) }), t.Null()]) }, { description: `You received the tag data.` }),
+        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referred: t.Boolean(), referrals: t.Integer(), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]) }), t.Null()]) }, { description: `You received the tag data.` }),
         401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
         403: t.Object({ error: t.String() }, { description: `The player is banned.` }),
         404: t.Object({ error: t.String() }, { description: `The player is not in the database.` }),
