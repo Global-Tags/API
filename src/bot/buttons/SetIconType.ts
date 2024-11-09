@@ -1,16 +1,16 @@
 import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } from "discord.js";
 import Button from "../structs/Button";
-import players, { GlobalPosition, Permission } from "../../database/schemas/players";
+import players, { GlobalIcon, Permission } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { constantCase, pascalCase } from "change-case";
 
-const positions = Object.keys(GlobalPosition)
-    .filter((pos) => isNaN(Number(pos)))
-    .map((pos) => constantCase(pos));
+const icons = Object.keys(GlobalIcon)
+    .filter((icon) => isNaN(Number(icon)))
+    .map((icon) => constantCase(icon));
 
-export default class SetPosition extends Button {
+export default class SetIconType extends Button {
     constructor() {
-        super('setPosition')
+        super('setIconType')
     }
     
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, user: User) {
@@ -23,21 +23,21 @@ export default class SetPosition extends Button {
 
         const embed = new EmbedBuilder()
         .setColor(colors.standart)
-        .setTitle(`Set position`)
-        .setDescription(`The player's current position is \`${pascalCase(player.position)}\`.`)
+        .setTitle(`Set icon type`)
+        .setDescription(`The player's current icon type is \`${pascalCase(player.icon.name)}\`.`)
         .addFields(message.embeds[0].fields[0]);
 
         const menu = new StringSelectMenuBuilder()
-        .setCustomId('setPosition')
+        .setCustomId('setIconType')
         .setPlaceholder('Please select a role.')
         .setMinValues(1)
         .setMaxValues(1)
-        .setOptions(positions.map((position) => {
+        .setOptions(icons.map((icon) => {
             return new StringSelectMenuOptionBuilder()
-            .setLabel(pascalCase(position))
-            .setDefault(player.position == position)
-            .setValue(position)
-        }));
+            .setLabel(pascalCase(icon))
+            .setDefault(constantCase(player.icon.name) == icon)
+            .setValue(icon)
+        }).slice(0, 25));
 
         interaction.reply({ embeds: [embed], components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu)], ephemeral: true });
     }

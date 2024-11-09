@@ -5,9 +5,9 @@ import { colors } from "../bot";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { constantCase } from "change-case";
 
-export default class SetPosition extends SelectMenu {
+export default class SetIconType extends SelectMenu {
     constructor() {
-        super('setPosition');
+        super('setIconType');
     }
 
     async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, user: User) {
@@ -19,22 +19,28 @@ export default class SetPosition extends SelectMenu {
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
         if(player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player is already banned!`)], ephemeral: true });
 
-        const oldPosition = player.position;
-        player.position = constantCase(values[0]);
+        const oldIcon = { ...player.icon };
+        player.icon.name = constantCase(values[0]);
         await player.save();
 
         sendMessage({
             type: NotificationType.ModLog,
-            logType: ModLogType.EditPosition,
+            logType: ModLogType.ChangeIconType,
             uuid: player.uuid,
             staff: staff.uuid,
-            positions: {
-                old: oldPosition,
-                new: player.position
+            icons: {
+                old: {
+                    name: oldIcon.name,
+                    hash: oldIcon.hash
+                },
+                new: {
+                    name: player.icon.name,
+                    hash: player.icon.hash
+                }
             },
             discord: true
         });
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The players position was successfully updated!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The players icon type was successfully updated!`)], ephemeral: true });
     }
 }
