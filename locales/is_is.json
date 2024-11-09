@@ -13,7 +13,8 @@
         "noTag": "Please set a tag first!",
         "playerNoTag": "This player does not have a tag!",
         "playerBanned": "This player is banned!",
-        "malformedAuthHeader": "You've entered a malformed authorization header!"
+        "malformedAuthHeader": "You've entered a malformed authorization header!",
+        "noIcon": "The icon was not found!"
     },
     "ban": {
         "alreadyBanned": "This player is already banned!",
@@ -144,6 +145,28 @@
             "title": "Welcome to GlobalTags!",
             "success": "Your email was successfully verified! We're excited to have you on board!",
             "questions": "You will now receive any important account updates. If you have any questions, feel free to reach out to us on our <a href=\"[link]\" target=\"_blank\">Discord</a>."
+        },
+        "positionChanged": {
+            "subject": "Your GlobalTag position was changed by staff",
+            "warning": "Depending on what your position in combination with what your tag was, you may consider this as a warning.",
+            "title": "Your tag position was changed by staff",
+            "description": "Your GlobalTag position was changed by a staff member.",
+            "previous": "Your previous position was:",
+            "new": "Your new position is:"
+        },
+        "iconChanged": {
+            "warning": "Depending on what your icon in combination with what your tag was, you may consider this as a warning.",
+            "subject": "Your GlobalTag icon type was changed by staff",
+            "title": "Your tag icon type was changed by staff",
+            "description": "Your GlobalTag icon type was changed by a staff member.",
+            "previous": "Your previous icon type was:",
+            "new": "Your new icon type is:"
+        },
+        "iconCleared": {
+            "subject": "Your custom icon was cleared",
+            "title": "Your custom icon was cleared",
+            "description": "Your custom icon has been cleared from your account.",
+            "warning": "Consider this a warning, we won't give you a second chance."
         }
     }
 }
