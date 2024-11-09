@@ -13,7 +13,8 @@
         "noTag": "Du musst erst einen Tag auswählen!",
         "playerNoTag": "Dieser Spieler hat keinen Tag!",
         "playerBanned": "Dieser Spieler ist gebannt!",
-        "malformedAuthHeader": "Du hast einen ungültigen Authorization Header übergeben!"
+        "malformedAuthHeader": "Du hast einen ungültigen Authorization Header übergeben!",
+        "noIcon": "Das Icon wurde nicht gefunden!"
     },
     "ban": {
         "alreadyBanned": "Dieser Spieler ist bereits gebannt!",
@@ -144,6 +145,28 @@
             "title": "Willkommen bei GlobalTags!",
             "success": "Deine email wurde erfolgreich verifiziert! Wir freuen uns, dich begrüßen zu dürfen!",
             "questions": "Du wirst nun wichtige Account-Updates erhalten. Falls du irgendwelche Fragen hast, zögere nicht, uns auf dem <a href=\"[link]\" target=\"_blank\">Discord</a> zu kontaktieren."
+        },
+        "positionChanged": {
+            "subject": "Deine GlobalTags Position wurde von einem Teammitglied geändert",
+            "warning": "Abhängig davon, was deine Position in Kombination mit deinem Tag vorher war, könnte das hier eine Warnung sein.",
+            "previous": "Deine vorherige Position war:",
+            "title": "Deine Tag-Position wurde von einem Teammitglied geändert",
+            "description": "Deine GlobalTag-Position wurde von einem Teammitglied geändert.",
+            "new": "Deine neue Position ist:"
+        },
+        "iconChanged": {
+            "warning": "Abhängig davon, was dein Icontyp in Kombination mit deinem Tag vorher war, könnte das hier eine Warnung sein.",
+            "subject": "Dein GlobalTag-Icontyp wurde von einem Teammitglied geändert",
+            "title": "Dein Tag-Icontyp wurde von einem Teammitglied geändert",
+            "description": "Dein GlobalTag-Icontyp wurde von einem Teammitglied geändert.",
+            "previous": "Dein vorheriger Icontyp war:",
+            "new": "Dein neuer Icontyp ist:"
+        },
+        "iconCleared": {
+            "subject": "Dein custom Icon wurde gecleard",
+            "title": "Dein custom Icon wurde gecleard",
+            "description": "Dein custom Icon wurde von deinem Account gecleart.",
+            "warning": "Sie das als Warnung an, wir werden dir keine zweite Chance geben."
         }
     }
 }
