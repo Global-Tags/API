@@ -15,7 +15,37 @@ The **GlobalTags Java Wrapper** provides an easy-to-use class for interacting wi
 - Multilingual support for API responses.
 
 ## Dependency installation
-To use this wrapper in your Java project, you can add it via Maven or Gradle. The package includes all necessary dependencies and models required to integrate the GlobalTags API into your mod. You don't need to add a seperate repository as it's hosted on <a href="https://central.sonatype.com/artifact/com.rappytv.globaltags/GlobalTagsJava" target="_blank">Maven Central</a>.
+To use this wrapper in your Java project, you can add it via Maven or Gradle. The package includes all necessary dependencies and models required to integrate the GlobalTags API into your mod.
+
+### Adding the Repository
+=== ":octicons-file-code-16: Maven"
+
+    ```xml
+    <repository>
+        <id>rappytv</id>
+        <url>https://repo.rappytv.com/public</url>
+    </repository>
+    ```
+
+=== ":octicons-file-code-16: Gradle (Kotlin DSL)"
+
+    ```kotlin
+    maven {
+        name = "rappytv"
+        url = uri("https://repo.rappytv.com/public")
+    }
+    ```
+
+=== ":octicons-file-code-16: Gradle (Groovy)"
+
+    ```groovy
+    maven {
+        name "rappytv"
+        url "https://repo.rappytv.com/public"
+    }
+    ```
+
+### Adding the dependency
 
 ???+ warning
     You need to replace `VERSION` with the version you want to use. This is the latest stable tag: <a href="https://github.com/Global-Tags/Java/tags" target="_blank" style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">![GitHub Release](https://img.shields.io/github/v/tag/Global-Tags/Java?label=%20)</a>

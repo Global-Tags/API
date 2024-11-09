@@ -10,6 +10,10 @@ const icons = Object.keys(GlobalIcon)
     .filter((pos) => isNaN(Number(pos)))
     .map((pos) => pos.toUpperCase());
 
+export function getCustomIconUrl(uuid: string, hash: string) {
+    return `${config.base}/players/${uuid}/icon/${hash}`;
+}
+
 export default new Elysia({
     prefix: "/icon"
 }).use(fetchI18n).use(getAuthProvider).get('/:hash', async ({ error, params, headers, i18n, provider }) => {

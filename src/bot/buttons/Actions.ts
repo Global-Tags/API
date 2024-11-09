@@ -72,6 +72,19 @@ export default class Actions extends Button {
                 .setCustomId(`clearTag`)
                 .setStyle(ButtonStyle.Danger)
                 .setDisabled(!staff.hasPermissionSync(Permission.ManageTags))
+            ),
+            new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(
+                new ButtonBuilder()
+                .setLabel(`Set position`)
+                .setCustomId(`setPosition`)
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageTags)),
+                new ButtonBuilder()
+                .setLabel(`Manage icon`)
+                .setCustomId(`manageIcon`)
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageTags))
             )
         ]
 

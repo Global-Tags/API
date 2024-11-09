@@ -3,6 +3,7 @@ import { mailer } from "../../config.json";
 import { join } from "path";
 import Logger from "./Logger";
 import { getI18nFunctionByLanguage } from "../middleware/FetchI18n";
+import { pascalCase } from "change-case";
 
 type MailOptions = {
     recipient: string,
@@ -108,6 +109,59 @@ export function sendTagChangeEmail(address: string, oldTag: string, newTag: stri
             ['new', i18n('email.tagChanged.new')],
             ['new_tag', `"${newTag}"`],
             ['warning', i18n('email.tagChanged.warning')],
+            ['footer', i18n('email.footer')],
+        ]
+    });
+}
+
+export function sendPositionChangeEmail(address: string, oldPosition: string, newPosition: string) {
+    sendEmail({
+        recipient: address,
+        subject: i18n('email.positionChanged.subject'),
+        template: 'position_changed',
+        variables: [
+            ['title', i18n('email.positionChanged.title')],
+            ['greeting', i18n('email.greeting')],
+            ['description', i18n('email.positionChanged.description')],
+            ['previous', i18n('email.positionChanged.previous')],
+            ['old_position', pascalCase(oldPosition)],
+            ['new', i18n('email.positionChanged.new')],
+            ['new_position', pascalCase(newPosition)],
+            ['warning', i18n('email.positionChanged.warning')],
+            ['footer', i18n('email.footer')],
+        ]
+    });
+}
+
+export function sendIconTypeChangeEmail(address: string, oldIcon: string, newIcon: string) {
+    sendEmail({
+        recipient: address,
+        subject: i18n('email.iconChanged.subject'),
+        template: 'icon_changed',
+        variables: [
+            ['title', i18n('email.iconChanged.title')],
+            ['greeting', i18n('email.greeting')],
+            ['description', i18n('email.iconChanged.description')],
+            ['previous', i18n('email.iconChanged.previous')],
+            ['old_icon', pascalCase(oldIcon)],
+            ['new', i18n('email.iconChanged.new')],
+            ['new_icon', pascalCase(newIcon)],
+            ['warning', i18n('email.iconChanged.warning')],
+            ['footer', i18n('email.footer')],
+        ]
+    });
+}
+
+export function sendIconClearEmail(address: string) {
+    sendEmail({
+        recipient: address,
+        subject: i18n('email.iconCleared.subject'),
+        template: 'icon_cleared',
+        variables: [
+            ['title', i18n('email.iconCleared.title')],
+            ['greeting', i18n('email.greeting')],
+            ['description', i18n('email.iconCleared.description')],
+            ['warning', i18n('email.iconCleared.warning')],
             ['footer', i18n('email.footer')],
         ]
     });
