@@ -4,6 +4,7 @@ import players, { Permission } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { constantCase } from "change-case";
+import { sendPositionChangeEmail } from "../../libs/Mailer";
 
 export default class SetPosition extends SelectMenu {
     constructor() {
@@ -34,6 +35,10 @@ export default class SetPosition extends SelectMenu {
             },
             discord: true
         });
+
+        if(player.isEmailVerified()) {
+            sendPositionChangeEmail(player.connections.email.address!, oldPosition || '---', player.position);
+        }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The players position was successfully updated!`)], ephemeral: true });
     }

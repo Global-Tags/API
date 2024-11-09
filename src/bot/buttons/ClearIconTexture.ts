@@ -3,6 +3,7 @@ import Button from "../structs/Button";
 import players, { Permission } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { sendIconClearEmail } from "../../libs/Mailer";
 
 export default class ClearIconTexture extends Button {
     constructor() {
@@ -39,6 +40,10 @@ export default class ClearIconTexture extends Button {
             },
             discord: true
         });
+
+        if(player.isEmailVerified()) {
+            sendIconClearEmail(player.connections.email.address!);
+        }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The icon texture was successfully reset!`)], ephemeral: true });
     }

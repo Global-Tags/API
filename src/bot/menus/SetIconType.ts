@@ -4,6 +4,7 @@ import players, { Permission } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { constantCase } from "change-case";
+import { sendIconTypeChangeEmail } from "../../libs/Mailer";
 
 export default class SetIconType extends SelectMenu {
     constructor() {
@@ -40,6 +41,10 @@ export default class SetIconType extends SelectMenu {
             },
             discord: true
         });
+
+        if(player.isEmailVerified()) {
+            sendIconTypeChangeEmail(player.connections.email.address!, oldIcon.name, player.icon.name);
+        }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The players icon type was successfully updated!`)], ephemeral: true });
     }
