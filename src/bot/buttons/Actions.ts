@@ -15,6 +15,8 @@ export default class Actions extends Button {
         if(!staff.hasAnyElevatedPermissionSync()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to perform this action!`)], ephemeral: true });
         const uuid = message.embeds[0].fields[0].value.replaceAll(`\``, ``).match(uuidRegex)?.[0]?.replaceAll('-', '');
         if(!uuid) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
+        const player = await players.findOne({ uuid });
+        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
 
         const embed = new EmbedBuilder()
         .setColor(0x5865f2)
@@ -34,7 +36,7 @@ export default class Actions extends Button {
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(!staff.hasPermissionSync(Permission.ManageRoles)),
                 new ButtonBuilder()
-                .setLabel(`Notes`)
+                .setLabel(`Notes${player.notes.length > 0 ? ` (${player.notes.length})` : ''}`)
                 .setCustomId(`notes`)
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(!staff.hasPermissionSync(Permission.ManageNotes))
