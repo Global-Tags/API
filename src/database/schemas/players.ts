@@ -52,6 +52,7 @@ export enum Permission {
     BypassValidation,
     CustomIcon,
     ManageBans,
+    ManageNotes,
     ManageRoles,
     ManageTags,
     ManageWatchlist,
