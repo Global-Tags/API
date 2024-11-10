@@ -20,7 +20,7 @@ export default class ClearIconTexture extends Button {
         if(!player.icon.hash) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player does not have a custom icon!`)], ephemeral: true });
         const oldHash = player.icon.hash;
 
-        player.icon.hash = null;
+        player.clearIcon(staff.uuid);
         await player.save();
 
         sendMessage({
