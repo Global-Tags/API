@@ -3,6 +3,7 @@ import { bot, roles } from "../../../config.json";
 import { client } from "../../bot/bot";
 import Logger from "../../libs/Logger";
 import { GuildMember } from "discord.js";
+import { constantCase } from "change-case";
 
 export enum GlobalPosition {
     Above,
@@ -76,7 +77,7 @@ export interface IPlayer {
     api_keys: string[],
     notes: { text: string, author: string, createdAt: Date }[],
     ban: { active: boolean, reason?: string | null, appealable: boolean, appealed: boolean, staff?: string | null },
-    clears: { currentTag: string, staff: string, timestamp: number }[],
+    clears: { currentData: string, type: 'tag' | 'icon', staff: string, timestamp: number }[],
     connections: {
         discord: { id?: string | null, code?: string | null },
         email: { address?: string | null, code?: string | null }
@@ -93,7 +94,8 @@ export interface IPlayer {
     isBanned(): boolean,
     banPlayer(reason: string, staff: string, appealable?: boolean): void,
     unban(): void,
-    clearTag(staff: string): void
+    clearTag(staff: string): void,
+    clearIcon(staff: string): void
 }
 
 const schema = new Schema<IPlayer>({
@@ -200,8 +202,13 @@ const schema = new Schema<IPlayer>({
         staff: String
     },
     clears: [{
-        currentTag: {
+        currentData: {
             type: String,
+            required: true
+        },
+        type: {
+            type: String,
+            enum: ['tag', 'icon'],
             required: true
         },
         staff: {
@@ -301,11 +308,23 @@ const schema = new Schema<IPlayer>({
 
         clearTag(staff: string) {
             this.clears.push({
-                currentTag: this.tag || '--',
+                currentData: this.tag || '--',
+                type: 'tag',
                 staff,
                 timestamp: new Date().getTime()
             })
             this.tag = null;
+        },
+
+        clearIconTexture(staff: string) {
+            this.clears.push({
+                currentData: this.icon.hash || '--',
+                type: 'icon',
+                staff,
+                timestamp: new Date().getTime()
+            })
+            this.icon.name = constantCase(GlobalIcon[GlobalIcon.None]);
+            this.icon.hash = null;
         }
     }
 });
