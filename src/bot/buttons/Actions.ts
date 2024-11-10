@@ -32,7 +32,12 @@ export default class Actions extends Button {
                 .setLabel(`Edit roles`)
                 .setCustomId(`editRoles`)
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(!staff.hasPermissionSync(Permission.ManageRoles))
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageRoles)),
+                new ButtonBuilder()
+                .setLabel(`Notes`)
+                .setCustomId(`notes`)
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageNotes))
             ),
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
