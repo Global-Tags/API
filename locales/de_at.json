@@ -13,7 +13,8 @@
         "database": "The database is not connected. Please try again later!",
         "playerNoTag": "This player does not have a tag!",
         "missingField": "Missing field \"<field>\".",
-        "wrongType": "Field \"<field>\" needs to be of type <type>!"
+        "wrongType": "Field \"<field>\" needs to be of type <type>!",
+        "noIcon": "The icon was not found!"
     },
     "setTag": {
         "empty": "The tag must not be empty!",
@@ -70,7 +71,29 @@
             "success": "Your email was successfully verified! We're excited to have you on board!",
             "title": "Welcome to GlobalTags!"
         },
-        "greeting": "Hey!"
+        "greeting": "Hey!",
+        "positionChanged": {
+            "subject": "Your GlobalTag position was changed by staff",
+            "description": "Your GlobalTag position was changed by a staff member.",
+            "title": "Your tag position was changed by staff",
+            "previous": "Your previous position was:",
+            "new": "Your new position is:",
+            "warning": "Depending on what your position in combination with what your tag was, you may consider this as a warning."
+        },
+        "iconChanged": {
+            "description": "Your GlobalTag icon type was changed by a staff member.",
+            "subject": "Your GlobalTag icon type was changed by staff",
+            "title": "Your tag icon type was changed by staff",
+            "previous": "Your previous icon type was:",
+            "new": "Your new icon type is:",
+            "warning": "Depending on what your icon in combination with what your tag was, you may consider this as a warning."
+        },
+        "iconCleared": {
+            "description": "Your custom icon has been cleared from your account.",
+            "subject": "Your custom icon was cleared",
+            "title": "Your custom icon was cleared",
+            "warning": "Consider this a warning, we won't give you a second chance."
+        }
     },
     "unban": {
         "notBanned": "This player is not banned!",

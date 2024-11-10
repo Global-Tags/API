@@ -1,7 +1,7 @@
 {
   "name": "globaltags",
   "private": true,
-  "version": "1.4.9",
+  "version": "1.4.10",
   "module": "src/index.ts",
   "scripts": {
     "dev": "bun --watch src/index.ts",
@@ -14,23 +14,23 @@
   "dependencies": {
     "@elysiajs/cors": "^1.1.1",
     "@elysiajs/swagger": "^1.1.5",
-    "@sentry/bun": "^8.35.0",
+    "@sentry/bun": "^8.37.1",
     "axios": "^1.7.7",
     "chalk": "^5.3.0",
     "change-case": "^5.4.4",
-    "cron": "^3.1.7",
+    "cron": "^3.1.9",
     "discord.js": "^14.16.3",
     "elysia": "1.0.25",
     "jsonwebtoken": "^9.0.2",
     "minimist": "^1.2.8",
     "moment": "^2.30.1",
     "mongoose": "latest",
-    "nodemailer": "^6.9.15"
+    "nodemailer": "^6.9.16"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.7",
     "@types/minimist": "^1.2.5",
     "@types/nodemailer": "^6.4.16",
-    "bun-types": "^1.1.33"
+    "bun-types": "^1.1.34"
   }
 }

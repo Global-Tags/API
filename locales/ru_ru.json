@@ -74,19 +74,19 @@
         "greeting": "Hey!",
         "positionChanged": {
             "subject": "Your GlobalTag position was changed by staff",
-            "description": "Your GlobalTag position was changed by a staff member.",
             "title": "Your tag position was changed by staff",
+            "description": "Your GlobalTag position was changed by a staff member.",
             "previous": "Your previous position was:",
             "new": "Your new position is:",
             "warning": "Depending on what your position in combination with what your tag was, you may consider this as a warning."
         },
         "iconChanged": {
-            "description": "Your GlobalTag icon type was changed by a staff member.",
-            "previous": "Your previous icon type was:",
-            "warning": "Depending on what your icon in combination with what your tag was, you may consider this as a warning.",
             "subject": "Your GlobalTag icon type was changed by staff",
             "title": "Your tag icon type was changed by staff",
-            "new": "Your new icon type is:"
+            "description": "Your GlobalTag icon type was changed by a staff member.",
+            "previous": "Your previous icon type was:",
+            "new": "Your new icon type is:",
+            "warning": "Depending on what your icon in combination with what your tag was, you may consider this as a warning."
         },
         "iconCleared": {
             "subject": "Your custom icon was cleared",

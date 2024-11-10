@@ -4,6 +4,8 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel
 import { capitalize } from "../bot/commands/PlayerInfo";
 import { getProfileByUUID } from "./Mojang";
 import { base } from "../../config.json";
+import { getCustomIconUrl } from "../routes/icon";
+import { pascalCase } from "change-case";
 
 export enum NotificationType {
     Report,
@@ -24,8 +26,13 @@ export enum ModLogType {
     Unban,
     EditBan,
     EditRoles,
+    EditPosition,
+    ChangeIconType,
+    ClearIconTexture,
     Watch,
-    Unwatch
+    Unwatch,
+    CreateNote,
+    DeleteNote
 }
 
 type NotificationData = {
@@ -68,7 +75,10 @@ type NotificationData = {
     reason?: string,
     appealable?: boolean,
     discord?: boolean,
-    roles?: { added: string[], removed: string[] }
+    positions?: { old: string, new: string },
+    roles?: { added: string[], removed: string[] },
+    icons?: { old: { name: string, hash?: string | null }, new: { name: string, hash?: string | null } },
+    note?: string
 });
 
 export async function sendMessage(data: NotificationData) {
@@ -212,14 +222,20 @@ export async function sendMessage(data: NotificationData) {
         const embed = new EmbedBuilder()
         .setColor(bot.colors.standart)
         .setTitle(':frame_photo: New icon upload')
-        .setDescription(`Player: [\`${username}\`](<https://laby.net/@${uuid}>)\nHash: [\`${data.hash}\`](<${base}/players/${uuid}/icon/${data.hash}>)`)
-        .setThumbnail(`${base}/players/${data.uuid}/icon/${data.hash}`);
+        .setDescription(`Hash: [\`${data.hash}\`](<${getCustomIconUrl(data.uuid, data.hash)}>)`)
+        .addFields([
+            {
+                name: 'Player:',
+                value: `[\`${username}\`](<https://laby.net/@${uuid}>)`
+            }
+        ])
+        .setThumbnail(getCustomIconUrl(data.uuid, data.hash));
 
         _sendMessage(
             config.bot.custom_icons.log,
             undefined,
             embed,
-            false
+            true
         )
     } else if(data.type == NotificationType.ModLog && config.bot.mod_log.active) {
         const profile = await getProfileByUUID(data.staff);
@@ -236,11 +252,15 @@ export async function sendMessage(data: NotificationData) {
 
 function modlogDescription(data: NotificationData): string | null {
     if(data.type != NotificationType.ModLog) return null;
-    const { logType: type, oldTag, newTag, reason, appealable } = data;
+    const { logType: type, oldTag, newTag, reason, appealable, positions, icons, note } = data;
     if(type == ModLogType.ChangeTag) return `\`${oldTag}\` → \`${newTag}\``;
     else if(type == ModLogType.Ban) return `**Reason**: \`${reason || 'No reason'}\``;
     else if(type == ModLogType.EditBan) return `**Appealable**: \`${appealable ? `✅` : `❌`}\`. **Reason**: \`${reason}\``;
     else if(type == ModLogType.EditRoles) return `\n\`\`\`diff\n${data.roles!.added.map((role) => `+ ${capitalize(role)}`).join('\n')}${data.roles!.added.length > 0 && data.roles!.removed.length > 0 ? '\n' : ''}${data.roles!.removed.map((role) => `- ${capitalize(role)}`).join('\n')}\`\`\``;
+    else if(type == ModLogType.EditPosition) return `\`${pascalCase(positions!.old)}\` → \`${pascalCase(positions!.new)}\``;
+    else if(type == ModLogType.ChangeIconType) return `\`${pascalCase(icons!.old.name)}\` → \`${pascalCase(icons!.new.name)}\``;
+    else if(type == ModLogType.ClearIconTexture) return `[${icons!.old.hash}](${getCustomIconUrl(data.uuid, icons!.old.hash!)})`;
+    else if(type == ModLogType.CreateNote || type == ModLogType.DeleteNote) return `\`${note}\``;
     return null;
 }
 

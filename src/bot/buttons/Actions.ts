@@ -15,6 +15,8 @@ export default class Actions extends Button {
         if(!staff.hasAnyElevatedPermissionSync()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to perform this action!`)], ephemeral: true });
         const uuid = message.embeds[0].fields[0].value.replaceAll(`\``, ``).match(uuidRegex)?.[0]?.replaceAll('-', '');
         if(!uuid) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
+        const player = await players.findOne({ uuid });
+        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
 
         const embed = new EmbedBuilder()
         .setColor(0x5865f2)
@@ -32,7 +34,12 @@ export default class Actions extends Button {
                 .setLabel(`Edit roles`)
                 .setCustomId(`editRoles`)
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(!staff.hasPermissionSync(Permission.ManageRoles))
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageRoles)),
+                new ButtonBuilder()
+                .setLabel(`Notes${player.notes.length > 0 ? ` (${player.notes.length})` : ''}`)
+                .setCustomId(`notes`)
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageNotes))
             ),
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
@@ -71,6 +78,19 @@ export default class Actions extends Button {
                 .setLabel(`Clear tag`)
                 .setCustomId(`clearTag`)
                 .setStyle(ButtonStyle.Danger)
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageTags))
+            ),
+            new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(
+                new ButtonBuilder()
+                .setLabel(`Set position`)
+                .setCustomId(`setPosition`)
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageTags)),
+                new ButtonBuilder()
+                .setLabel(`Manage icon`)
+                .setCustomId(`manageIcon`)
+                .setStyle(ButtonStyle.Primary)
                 .setDisabled(!staff.hasPermissionSync(Permission.ManageTags))
             )
         ]
