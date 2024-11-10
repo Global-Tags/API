@@ -77,26 +77,26 @@
         },
         "greeting": "Hey!",
         "positionChanged": {
-            "subject": "Your GlobalTag position was changed by staff",
-            "warning": "Depending on what your position in combination with what your tag was, you may consider this as a warning.",
-            "title": "Your tag position was changed by staff",
-            "description": "Your GlobalTag position was changed by a staff member.",
-            "previous": "Your previous position was:",
-            "new": "Your new position is:"
+            "subject": "Tu posición fue cambiado por el personal",
+            "warning": "Dependiendo de cuál fue tu posición en combinación con tu tag, puedes considerar esto como una advertencia.",
+            "title": "La posición de tu tag fue cambiado por el personal",
+            "description": "La posición de tu GlobalTag fue cambiado por el personal.",
+            "previous": "Tu posición anterior era:",
+            "new": "Tu nueva posición es:"
         },
         "iconChanged": {
-            "warning": "Depending on what your icon in combination with what your tag was, you may consider this as a warning.",
-            "subject": "Your GlobalTag icon type was changed by staff",
-            "title": "Your tag icon type was changed by staff",
-            "description": "Your GlobalTag icon type was changed by a staff member.",
-            "previous": "Your previous icon type was:",
-            "new": "Your new icon type is:"
+            "warning": "Dependiendo de cuál fue tu icono en combinación con tu tag, puedes considerar esto como una advertencia.",
+            "subject": "El icono de tu GlobalTag fue cambiado por el personal",
+            "title": "El icono de tu tag fue cambiado pro el personal",
+            "description": "El tipo del icono de tu GlobalTag fue cambiado por el personal.",
+            "previous": "Tu tipo de icono anterior era:",
+            "new": "Tu nuevo tipo de icono es:"
         },
         "iconCleared": {
-            "subject": "Your custom icon was cleared",
-            "title": "Your custom icon was cleared",
-            "description": "Your custom icon has been cleared from your account.",
-            "warning": "Consider this a warning, we won't give you a second chance."
+            "subject": "Tu icon personalizado fue borrado",
+            "title": "Tu icon personalizado fue borrado",
+            "description": "Tu icon personalizado fue borrado de tu cuenta.",
+            "warning": "Considera esto como una advertencia, no te daremos una segunda oportunidad."
         }
     },
     "unwatch": {
@@ -118,7 +118,7 @@
         "playerNoTag": "Este jugador no tiene un tag!",
         "missingField": "Falta la clave \"<field>\".",
         "wrongType": "Propriedad \"<field>\" tiene que ser de tipo <type>!",
-        "noIcon": "The icon was not found!"
+        "noIcon": "!El icono no se ha encontrado!"
     },
     "referral": {
         "self": "¡No puedes referirte a ti mismo!",
