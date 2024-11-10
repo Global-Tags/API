@@ -73,6 +73,7 @@ export interface IPlayer {
     reports: { by: String, reportedName: String, reason: String }[],
     roles: string[],
     api_keys: string[],
+    notes: { text: string, author: string, createdAt: Date }[],
     ban: { active: boolean, reason?: string | null, appealable: boolean, appealed: boolean, staff?: string | null },
     clears: { currentTag: string, staff: string, timestamp: number }[],
     connections: {
@@ -164,6 +165,20 @@ const schema = new Schema<IPlayer>({
         required: true,
         default: []
     },
+    notes: [{
+        text: {
+            type: String,
+            required: true
+        },
+        author: {
+            type: String,
+            required: true
+        },
+        createdAt: {
+            type: Date,
+            required: true
+        }
+    }],
     ban: {
         active: {
             type: Boolean,
