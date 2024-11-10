@@ -30,7 +30,9 @@ export enum ModLogType {
     ChangeIconType,
     ClearIconTexture,
     Watch,
-    Unwatch
+    Unwatch,
+    CreateNote,
+    DeleteNote
 }
 
 type NotificationData = {
@@ -75,7 +77,8 @@ type NotificationData = {
     discord?: boolean,
     positions?: { old: string, new: string },
     roles?: { added: string[], removed: string[] },
-    icons?: { old: { name: string, hash?: string | null }, new: { name: string, hash?: string | null } }
+    icons?: { old: { name: string, hash?: string | null }, new: { name: string, hash?: string | null } },
+    note?: string
 });
 
 export async function sendMessage(data: NotificationData) {
@@ -249,7 +252,7 @@ export async function sendMessage(data: NotificationData) {
 
 function modlogDescription(data: NotificationData): string | null {
     if(data.type != NotificationType.ModLog) return null;
-    const { logType: type, oldTag, newTag, reason, appealable, positions, icons } = data;
+    const { logType: type, oldTag, newTag, reason, appealable, positions, icons, note } = data;
     if(type == ModLogType.ChangeTag) return `\`${oldTag}\` → \`${newTag}\``;
     else if(type == ModLogType.Ban) return `**Reason**: \`${reason || 'No reason'}\``;
     else if(type == ModLogType.EditBan) return `**Appealable**: \`${appealable ? `✅` : `❌`}\`. **Reason**: \`${reason}\``;
@@ -257,6 +260,7 @@ function modlogDescription(data: NotificationData): string | null {
     else if(type == ModLogType.EditPosition) return `\`${pascalCase(positions!.old)}\` → \`${pascalCase(positions!.new)}\``;
     else if(type == ModLogType.ChangeIconType) return `\`${pascalCase(icons!.old.name)}\` → \`${pascalCase(icons!.new.name)}\``;
     else if(type == ModLogType.ClearIconTexture) return `[${icons!.old.hash}](${getCustomIconUrl(data.uuid, icons!.old.hash!)})`;
+    else if(type == ModLogType.CreateNote || type == ModLogType.DeleteNote) return `\`${note}\``;
     return null;
 }
 
