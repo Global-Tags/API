@@ -68,6 +68,7 @@ export interface IPlayer {
         name: string,
         hash?: string | null
     },
+    last_language: string,
     history: string[],
     watchlist: boolean,
     referred: boolean,
@@ -117,6 +118,11 @@ const schema = new Schema<IPlayer>({
             default: `NONE`
         },
         hash: String
+    },
+    last_language: {
+        type: String,
+        required: true,
+        default: 'en_us'
     },
     history: {
         type: [String],
