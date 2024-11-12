@@ -99,4 +99,4 @@ Hex colors are not supported yet, but this feature may be added in the future. T
 
 ### Why can't I include certain words in my Tag?
 
-Certain words, such as "LabyMod", are on a blocklist to prevent users from impersonating staff members. For example, setting your tag to something like `&f&lLabyMod &cModerator` could closely mimic official staff tags. This blocklist helps maintain authenticity and prevents confusion among users.
+Certain words, such as "LabyMod", are on a blocklist to prevent users from impersonating staff members. For example, setting your tag to something like `&f&lLABYMOD &cMOD` could closely mimic official staff tags. This blocklist helps maintain authenticity and prevents confusion among users.
