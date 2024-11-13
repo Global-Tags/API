@@ -2,7 +2,7 @@ import Elysia, { t } from "elysia";
 import players, { GlobalIcon, GlobalPosition, Permission } from "../database/schemas/players";
 import Logger from "../libs/Logger";
 import { sendMessage, NotificationType, ModLogType } from "../libs/DiscordNotifier";
-import fetchI18n from "../middleware/FetchI18n";
+import fetchI18n, { getI18nFunctionByLanguage } from "../middleware/FetchI18n";
 import { stripColors } from "../libs/ChatColor";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { strictAuth, validation } from "../../config.json";
@@ -153,7 +153,7 @@ export default new Elysia()
         });
 
         if(player?.isEmailVerified()) {
-            sendTagChangeEmail(player.connections.email.address!, oldTag || '---', tag);
+            sendTagChangeEmail(player.connections.email.address!, oldTag || '---', tag, getI18nFunctionByLanguage(player.last_language));
         }
     }
 
@@ -276,7 +276,7 @@ export default new Elysia()
             staff: session.uuid || 'Unknown'
         });
         player.clearTag(session.uuid!);
-        sendTagClearEmail(player.connections.email.address!, oldTag);
+        sendTagClearEmail(player.connections.email.address!, oldTag, getI18nFunctionByLanguage(player.last_language));
     }
     await player.save();
 

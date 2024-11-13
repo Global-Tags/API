@@ -1,6 +1,6 @@
 import Elysia, { t } from "elysia";
 import players, { Permission } from "../database/schemas/players";
-import fetchI18n from "../middleware/FetchI18n";
+import fetchI18n, { getI18nFunctionByLanguage } from "../middleware/FetchI18n";
 import { ModLogType, NotificationType, sendMessage } from "../libs/DiscordNotifier";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { sendBanEmail, sendUnbanEmail } from "../libs/Mailer";
@@ -54,7 +54,7 @@ export default new Elysia({
     });
 
     if(player.isEmailVerified()) {
-        sendBanEmail(player.connections.email.address!, reason || '---');
+        sendBanEmail(player.connections.email.address!, reason || '---', getI18nFunctionByLanguage(player.last_language));
     }
 
     return { message: i18n(`ban.success`) };
@@ -170,7 +170,7 @@ export default new Elysia({
     });
 
     if(player.isEmailVerified()) {
-        sendUnbanEmail(player.connections.email.address!);
+        sendUnbanEmail(player.connections.email.address!, getI18nFunctionByLanguage(player.last_language));
     }
 
     return { message: i18n(`unban.success`) };
