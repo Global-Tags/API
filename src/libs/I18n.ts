@@ -2,6 +2,7 @@ import * as english from "../../locales/en_us.json";
 import { existsSync, readdirSync } from "fs";
 import { join } from "path";
 import Logger from "./Logger";
+import players from "../database/schemas/players";
 
 export type Language = typeof english;
 export type I18nFunction = (path: string) => string;
@@ -25,6 +26,10 @@ export function getLocales(language: string): Language {
     else return english;
 }
 
+export function isValidLanguage(language: string): boolean {
+    return languages.has(language.toLowerCase())
+}
+
 export function getPath(path: string, locales: Language): string {
     if(typeof locales != `object` || typeof path != `string`) return path;
     let value: any = locales;
@@ -35,4 +40,13 @@ export function getPath(path: string, locales: Language): string {
     }
 
     return value;
+}
+
+export async function saveLastLanguage(uuid: string, language: string) {
+    const player = await players.findOne({ uuid });
+    if(!player) return;
+    if(player.last_language != language && isValidLanguage(language)) {
+        player.last_language = language;
+        await player.save();
+    }
 }
