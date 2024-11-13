@@ -8,16 +8,18 @@ import getAuthProvider from "../middleware/GetAuthProvider";
 import { strictAuth, validation } from "../../config.json";
 import { constantCase } from "change-case";
 import { sendTagChangeEmail, sendTagClearEmail } from "../libs/Mailer";
+import { saveLastLanguage } from "../libs/I18n";
 const { min, max, blacklist, watchlist } = validation.tag;
 
 export default new Elysia()
-.use(fetchI18n).use(getAuthProvider).get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get player info
+.use(fetchI18n).use(getAuthProvider).get(`/`, async ({ error, params, headers, i18n, provider, language }) => { // Get player info
     const uuid = params.uuid.replaceAll(`-`, ``);
     let showBan = false;
+    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
+    const { authorization } = headers;
+    const session = await provider.getSession(authorization, uuid);
+    if(!!session.uuid && !!language) saveLastLanguage(session.uuid, language);
     if(strictAuth) {
-        if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-        const { authorization } = headers;
-        const session = await provider.getSession(authorization, uuid);
         if(!session.uuid) return error(403, { error: i18n(`error.notAllowed`) });
         showBan = session.equal || session.hasPermission(Permission.ManageBans);
     }
