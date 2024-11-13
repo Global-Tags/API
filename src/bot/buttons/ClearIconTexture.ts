@@ -4,6 +4,7 @@ import players, { Permission } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { sendIconClearEmail } from "../../libs/Mailer";
+import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
 
 export default class ClearIconTexture extends Button {
     constructor() {
@@ -42,7 +43,7 @@ export default class ClearIconTexture extends Button {
         });
 
         if(player.isEmailVerified()) {
-            sendIconClearEmail(player.connections.email.address!);
+            sendIconClearEmail(player.connections.email.address!, getI18nFunctionByLanguage(player.last_language));
         }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The icon texture was successfully reset!`)], ephemeral: true });

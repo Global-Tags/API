@@ -68,6 +68,7 @@ export interface IPlayer {
         name: string,
         hash?: string | null
     },
+    last_language: string,
     history: string[],
     watchlist: boolean,
     referred: boolean,
@@ -117,6 +118,11 @@ const schema = new Schema<IPlayer>({
             default: `NONE`
         },
         hash: String
+    },
+    last_language: {
+        type: String,
+        required: true,
+        default: 'en_us'
     },
     history: {
         type: [String],
@@ -239,9 +245,9 @@ const schema = new Schema<IPlayer>({
         async getRoles() {
             if(!bot.synced_roles.enabled) return roles.filter((role) => this.roles.some((name) => name.toUpperCase() == role.name.toUpperCase())).map((role) => role.name);
             if(!this.connections?.discord?.id) return [];
-            const guild = await client.guilds.fetch(bot.synced_roles.guild);
+            const guild = await client.guilds.fetch(bot.synced_roles.guild).catch(() => null);
             if(!guild) return [];
-            const member = await guild.members.fetch(this.connections.discord.id);
+            const member = await guild.members.fetch(this.connections.discord.id).catch(() => null);
             if(!member) return [];
             return _getRoles(member);
         },
@@ -256,7 +262,7 @@ const schema = new Schema<IPlayer>({
             }
             const member = guild.members.cache.get(this.connections.discord.id);
             if(!member) {
-                guild.members.fetch(this.connections.discord.id).catch(() => Logger.error(`Couldn't fetch member ${this.connections.discord!.id}`));
+                guild.members.fetch(this.connections.discord.id).catch(() => null);
                 return [];
             }
             return _getRoles(member);

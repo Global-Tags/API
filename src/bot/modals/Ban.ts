@@ -4,6 +4,7 @@ import players, { Permission } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { sendBanEmail } from "../../libs/Mailer";
+import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
 
 export default class Ban extends Modal {
     constructor() {
@@ -33,7 +34,7 @@ export default class Ban extends Modal {
         });
 
         if(player.isEmailVerified()) {
-            sendBanEmail(player.connections.email.address!, reason || '---');
+            sendBanEmail(player.connections.email.address!, reason || '---', getI18nFunctionByLanguage(player.last_language));
         }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The player was successfully banned!`)], ephemeral: true });
