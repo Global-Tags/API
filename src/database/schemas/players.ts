@@ -4,6 +4,7 @@ import { client } from "../../bot/bot";
 import Logger from "../../libs/Logger";
 import { GuildMember } from "discord.js";
 import { constantCase } from "change-case";
+import { generateSecureCode } from "../../routes/connections";
 
 export enum GlobalPosition {
     Above,
@@ -76,7 +77,7 @@ export interface IPlayer {
     reports: { by: String, reportedName: String, reason: String }[],
     roles: string[],
     api_keys: string[],
-    notes: { text: string, author: string, createdAt: Date }[],
+    notes: { id: string, text: string, author: string, createdAt: Date }[],
     ban: { active: boolean, reason?: string | null, appealable: boolean, appealed: boolean, staff?: string | null },
     clears: { currentData: string, type: 'tag' | 'icon', staff: string, timestamp: number }[],
     connections: {
@@ -96,7 +97,10 @@ export interface IPlayer {
     banPlayer(reason: string, staff: string, appealable?: boolean): void,
     unban(): void,
     clearTag(staff: string): void,
-    clearIcon(staff: string): void
+    clearIcon(staff: string): void,
+    createNote({ text, author }: { text: string, author: string }): void,
+    existsNote(id: string): boolean,
+    deleteNote(id: string): void
 }
 
 const schema = new Schema<IPlayer>({
@@ -175,6 +179,10 @@ const schema = new Schema<IPlayer>({
         default: []
     },
     notes: [{
+        id: {
+            type: String,
+            required: true
+        },
         text: {
             type: String,
             required: true
@@ -331,6 +339,23 @@ const schema = new Schema<IPlayer>({
             })
             this.icon.name = constantCase(GlobalIcon[GlobalIcon.None]);
             this.icon.hash = null;
+        },
+
+        createNote({ text, author }: { text: string, author: string }) {
+            this.notes.push({
+                id: generateSecureCode(5),
+                text,
+                author,
+                createdAt: new Date()
+            });
+        },
+
+        existsNote(id: string) {
+            this.notes.some((note) => note.id == id);
+        },
+
+        deleteNote(id: string) {
+            this.notes = this.notes.filter((note) => note.id != id);
         }
     }
 });
