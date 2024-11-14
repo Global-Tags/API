@@ -105,6 +105,16 @@
         "notWatched": "This player is not on the watchlist!",
         "success": "The player is no longer on the watchlist!"
     },
+    "notes": {
+        "create": {
+            "max_length": "Notes must not exceed <max> characters!",
+            "success": "The note was successfully created!"
+        },
+        "delete": {
+            "not_found": "The note was not found!",
+            "success": "The note was successfully deleted!"
+        }
+    },
     "email": {
         "footer": "Thank you for using GlobalTags!",
         "greeting": "Hey!",
