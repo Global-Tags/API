@@ -168,5 +168,15 @@
             "description": "Dein custom Icon wurde von deinem Account gecleart.",
             "warning": "Sie das als Warnung an, wir werden dir keine zweite Chance geben."
         }
+    },
+    "notes": {
+        "create": {
+            "success": "Die Notiz wurde erfolgreich erstellt!",
+            "max_length": "Notizen dürfen nicht mehr als <max> Zeichen lang sein!"
+        },
+        "delete": {
+            "not_found": "Die Notiz wurde nicht gefunden!",
+            "success": "Die Notiz wurde erfolgreich gelöscht!"
+        }
     }
 }
