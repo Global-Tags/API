@@ -343,7 +343,7 @@ const schema = new Schema<IPlayer>({
 
         createNote({ text, author }: { text: string, author: string }) {
             this.notes.push({
-                id: generateSecureCode(5),
+                id: generateSecureCode(),
                 text,
                 author,
                 createdAt: new Date()
