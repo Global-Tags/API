@@ -16,6 +16,9 @@
         "icon": {
             "maxResolution": 512,
             "blacklist": []
+        },
+        "notes": {
+            "max_length": 100
         }
     },
     "github": {

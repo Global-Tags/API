@@ -1,42 +1,19 @@
 {
-    "error": {
-        "notFound": "Not found!",
-        "unknownError": "An unknown error occurred! Please try again later!",
-        "ratelimit": "You're being ratelimited! Please try again in <seconds> seconds!",
-        "noTag": "Please set a tag first!",
-        "invalidBody": "Request body needs to be a json object!",
-        "playerNotFound": "There is no such player in our records!",
-        "malformedAuthHeader": "You've entered a malformed authorization header!",
-        "banned": "You are banned!",
-        "notAllowed": "You're not allowed to perform that request!",
-        "playerBanned": "This player is banned!",
-        "database": "The database is not connected. Please try again later!",
-        "playerNoTag": "This player does not have a tag!",
-        "missingField": "Missing field \"<field>\".",
-        "wrongType": "Field \"<field>\" needs to be of type <type>!",
-        "noIcon": "The icon was not found!"
-    },
-    "setTag": {
-        "empty": "The tag must not be empty!",
-        "success": {
-            "self": "Your tag was successfully updated!",
-            "admin": "The player's tag was successfully updated!"
-        },
-        "blacklisted": "You're not allowed to include \"<word>\" in your Global Tag!",
-        "validation": "Keep the \"tag\" field between <min> and <max> characters.",
-        "sameTag": "You already have this tag!"
-    },
-    "referral": {
-        "self": "You can't refer yourself!",
-        "alreadyReferred": "You have already referred a player!",
-        "success": "You have successfully referred the player!"
-    },
     "email": {
+        "greeting": "Hey!",
         "banned": {
             "description": "Your account has been banned from GlobalTags for the following reason:",
             "subject": "Your GlobalTags account was banned",
             "title": "Account Banned",
             "appeal": "You can appeal your ban ingame."
+        },
+        "positionChanged": {
+            "title": "Your tag position was changed by staff",
+            "description": "Your GlobalTag position was changed by a staff member.",
+            "subject": "Your GlobalTag position was changed by staff",
+            "warning": "Depending on what your position in combination with what your tag was, you may consider this as a warning.",
+            "previous": "Your previous position was:",
+            "new": "Your new position is:"
         },
         "verification": {
             "subject": "Verify your GlobalTags email address",
@@ -50,11 +27,25 @@
             "access": "You can now access GlobalTags again. Welcome back!",
             "title": "Account Unbanned 🎉"
         },
+        "iconChanged": {
+            "description": "Your GlobalTag icon type was changed by a staff member.",
+            "new": "Your new icon type is:",
+            "previous": "Your previous icon type was:",
+            "subject": "Your GlobalTag icon type was changed by staff",
+            "title": "Your tag icon type was changed by staff",
+            "warning": "Depending on what your icon in combination with what your tag was, you may consider this as a warning."
+        },
         "tagCleared": {
             "warning": "Consider this a warning, we won't give you a second chance.",
             "title": "Your tag was cleared",
             "subject": "Your GlobalTag was cleared",
             "description": "Your tag <span class=\"tag-box\">[tag]</span> has been cleared from your account."
+        },
+        "iconCleared": {
+            "description": "Your custom icon has been cleared from your account.",
+            "subject": "Your custom icon was cleared",
+            "title": "Your custom icon was cleared",
+            "warning": "Consider this a warning, we won't give you a second chance."
         },
         "tagChanged": {
             "previous": "Your previous tag was:",
@@ -70,30 +61,39 @@
             "questions": "You will now receive any important account updates. If you have any questions, feel free to reach out to us on our <a href=\"[link]\" target=\"_blank\">Discord</a>.",
             "success": "Your email was successfully verified! We're excited to have you on board!",
             "title": "Welcome to GlobalTags!"
-        },
-        "greeting": "Hey!",
-        "positionChanged": {
-            "subject": "Your GlobalTag position was changed by staff",
-            "description": "Your GlobalTag position was changed by a staff member.",
-            "title": "Your tag position was changed by staff",
-            "previous": "Your previous position was:",
-            "new": "Your new position is:",
-            "warning": "Depending on what your position in combination with what your tag was, you may consider this as a warning."
-        },
-        "iconChanged": {
-            "description": "Your GlobalTag icon type was changed by a staff member.",
-            "subject": "Your GlobalTag icon type was changed by staff",
-            "title": "Your tag icon type was changed by staff",
-            "previous": "Your previous icon type was:",
-            "new": "Your new icon type is:",
-            "warning": "Depending on what your icon in combination with what your tag was, you may consider this as a warning."
-        },
-        "iconCleared": {
-            "description": "Your custom icon has been cleared from your account.",
-            "subject": "Your custom icon was cleared",
-            "title": "Your custom icon was cleared",
-            "warning": "Consider this a warning, we won't give you a second chance."
         }
+    },
+    "error": {
+        "unknownError": "An unknown error occurred! Please try again later!",
+        "notFound": "Not found!",
+        "ratelimit": "You're being ratelimited! Please try again in <seconds> seconds!",
+        "noTag": "Please set a tag first!",
+        "invalidBody": "Request body needs to be a json object!",
+        "playerNotFound": "There is no such player in our records!",
+        "malformedAuthHeader": "You've entered a malformed authorization header!",
+        "banned": "You are banned!",
+        "notAllowed": "You're not allowed to perform that request!",
+        "playerBanned": "This player is banned!",
+        "database": "The database is not connected. Please try again later!",
+        "playerNoTag": "This player does not have a tag!",
+        "missingField": "Missing field \"<field>\".",
+        "noIcon": "The icon was not found!",
+        "wrongType": "Field \"<field>\" needs to be of type <type>!"
+    },
+    "setTag": {
+        "empty": "The tag must not be empty!",
+        "success": {
+            "self": "Your tag was successfully updated!",
+            "admin": "The player's tag was successfully updated!"
+        },
+        "blacklisted": "You're not allowed to include \"<word>\" in your Global Tag!",
+        "validation": "Keep the \"tag\" field between <min> and <max> characters.",
+        "sameTag": "You already have this tag!"
+    },
+    "referral": {
+        "self": "You can't refer yourself!",
+        "alreadyReferred": "You have already referred a player!",
+        "success": "You have successfully referred the player!"
     },
     "unban": {
         "notBanned": "This player is not banned!",

@@ -4,6 +4,7 @@ import players, { Permission } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { sendTagClearEmail } from "../../libs/Mailer";
+import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
 
 export default class ClearTag extends Button {
     constructor() {
@@ -32,7 +33,7 @@ export default class ClearTag extends Button {
         });
 
         if(player.isEmailVerified()) {
-            sendTagClearEmail(player.connections.email.address!, oldTag);
+            sendTagClearEmail(player.connections.email.address!, oldTag, getI18nFunctionByLanguage(player.last_language));
         }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The tag was successfully deleted!`)], ephemeral: true });

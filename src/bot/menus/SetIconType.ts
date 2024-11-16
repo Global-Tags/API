@@ -5,6 +5,7 @@ import { colors } from "../bot";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { constantCase } from "change-case";
 import { sendIconTypeChangeEmail } from "../../libs/Mailer";
+import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
 
 export default class SetIconType extends SelectMenu {
     constructor() {
@@ -43,7 +44,7 @@ export default class SetIconType extends SelectMenu {
         });
 
         if(player.isEmailVerified()) {
-            sendIconTypeChangeEmail(player.connections.email.address!, oldIcon.name, player.icon.name);
+            sendIconTypeChangeEmail(player.connections.email.address!, oldIcon.name, player.icon.name, getI18nFunctionByLanguage(player.last_language));
         }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The players icon type was successfully updated!`)], ephemeral: true });

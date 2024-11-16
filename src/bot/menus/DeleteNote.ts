@@ -3,8 +3,6 @@ import SelectMenu from "../structs/SelectMenu";
 import players, { Permission } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
-import { constantCase } from "change-case";
-import { sendIconTypeChangeEmail } from "../../libs/Mailer";
 
 export default class DeleteNote extends SelectMenu {
     constructor() {
@@ -19,9 +17,9 @@ export default class DeleteNote extends SelectMenu {
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll(`\``, ``) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
 
-        const note = player.notes.find((note) => note.createdAt.getTime() == parseInt(values[0]));
+        const note = player.notes.find((note) => note.id == values[0]);
         if(!note) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Note not found!`)], ephemeral: true });
-        player.notes = player.notes.filter((n) => n != note);
+        player.deleteNote(note.id);
         await player.save();
 
         sendMessage({

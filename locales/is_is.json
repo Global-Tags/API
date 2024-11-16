@@ -168,5 +168,15 @@
             "description": "Your custom icon has been cleared from your account.",
             "warning": "Consider this a warning, we won't give you a second chance."
         }
+    },
+    "notes": {
+        "create": {
+            "max_length": "Notes must not exceed <max> characters!",
+            "success": "The note was successfully created!"
+        },
+        "delete": {
+            "not_found": "The note was not found!",
+            "success": "The note was successfully deleted!"
+        }
     }
 }

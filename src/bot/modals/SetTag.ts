@@ -4,6 +4,7 @@ import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { sendTagChangeEmail } from "../../libs/Mailer";
+import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
 
 export default class SetTag extends Modal {
     constructor() {
@@ -34,7 +35,7 @@ export default class SetTag extends Modal {
         player.save();
 
         if(player.isEmailVerified()) {
-            sendTagChangeEmail(player.connections.email.address!, oldTag || '---', tag);
+            sendTagChangeEmail(player.connections.email.address!, oldTag || '---', tag, getI18nFunctionByLanguage(player.last_language));
         }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The tag was successfully set!`)], ephemeral: true });

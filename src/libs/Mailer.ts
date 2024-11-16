@@ -4,6 +4,7 @@ import { join } from "path";
 import Logger from "./Logger";
 import { getI18nFunctionByLanguage } from "../middleware/FetchI18n";
 import { pascalCase } from "change-case";
+import { I18nFunction } from "./I18n";
 
 type MailOptions = {
     recipient: string,
@@ -46,9 +47,7 @@ export async function sendEmail({ recipient, subject, template, variables = [] }
     });
 }
 
-const i18n = getI18nFunctionByLanguage();
-
-export function sendBanEmail(address: string, reason: string) {
+export function sendBanEmail(address: string, reason: string, i18n: I18nFunction) {
     sendEmail({
         recipient: address,
         subject: i18n('email.banned.subject'),
@@ -64,7 +63,7 @@ export function sendBanEmail(address: string, reason: string) {
     });
 }
 
-export function sendUnbanEmail(address: string) {
+export function sendUnbanEmail(address: string, i18n: I18nFunction) {
     sendEmail({
         recipient: address,
         subject: i18n('email.unbanned.subject'),
@@ -79,7 +78,7 @@ export function sendUnbanEmail(address: string) {
     });
 }
 
-export function sendTagClearEmail(address: string, tag: string) {
+export function sendTagClearEmail(address: string, tag: string, i18n: I18nFunction) {
     sendEmail({
         recipient: address,
         subject: i18n('email.tagCleared.subject'),
@@ -95,7 +94,7 @@ export function sendTagClearEmail(address: string, tag: string) {
     });
 }
 
-export function sendTagChangeEmail(address: string, oldTag: string, newTag: string) {
+export function sendTagChangeEmail(address: string, oldTag: string, newTag: string, i18n: I18nFunction) {
     sendEmail({
         recipient: address,
         subject: i18n('email.tagChanged.subject'),
@@ -114,7 +113,7 @@ export function sendTagChangeEmail(address: string, oldTag: string, newTag: stri
     });
 }
 
-export function sendPositionChangeEmail(address: string, oldPosition: string, newPosition: string) {
+export function sendPositionChangeEmail(address: string, oldPosition: string, newPosition: string, i18n: I18nFunction) {
     sendEmail({
         recipient: address,
         subject: i18n('email.positionChanged.subject'),
@@ -133,7 +132,7 @@ export function sendPositionChangeEmail(address: string, oldPosition: string, ne
     });
 }
 
-export function sendIconTypeChangeEmail(address: string, oldIcon: string, newIcon: string) {
+export function sendIconTypeChangeEmail(address: string, oldIcon: string, newIcon: string, i18n: I18nFunction) {
     sendEmail({
         recipient: address,
         subject: i18n('email.iconChanged.subject'),
@@ -152,7 +151,7 @@ export function sendIconTypeChangeEmail(address: string, oldIcon: string, newIco
     });
 }
 
-export function sendIconClearEmail(address: string) {
+export function sendIconClearEmail(address: string, i18n: I18nFunction) {
     sendEmail({
         recipient: address,
         subject: i18n('email.iconCleared.subject'),

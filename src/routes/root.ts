@@ -2,22 +2,24 @@ import Elysia, { t } from "elysia";
 import players, { GlobalIcon, GlobalPosition, Permission } from "../database/schemas/players";
 import Logger from "../libs/Logger";
 import { sendMessage, NotificationType, ModLogType } from "../libs/DiscordNotifier";
-import fetchI18n from "../middleware/FetchI18n";
+import fetchI18n, { getI18nFunctionByLanguage } from "../middleware/FetchI18n";
 import { stripColors } from "../libs/ChatColor";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { strictAuth, validation } from "../../config.json";
 import { constantCase } from "change-case";
 import { sendTagChangeEmail, sendTagClearEmail } from "../libs/Mailer";
+import { saveLastLanguage } from "../libs/I18n";
 const { min, max, blacklist, watchlist } = validation.tag;
 
 export default new Elysia()
-.use(fetchI18n).use(getAuthProvider).get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get player info
+.use(fetchI18n).use(getAuthProvider).get(`/`, async ({ error, params, headers, i18n, provider, language }) => { // Get player info
     const uuid = params.uuid.replaceAll(`-`, ``);
     let showBan = false;
+    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
+    const { authorization } = headers;
+    const session = await provider.getSession(authorization, uuid);
+    if(!!session.uuid && !!language) saveLastLanguage(session.uuid, language);
     if(strictAuth) {
-        if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-        const { authorization } = headers;
-        const session = await provider.getSession(authorization, uuid);
         if(!session.uuid) return error(403, { error: i18n(`error.notAllowed`) });
         showBan = session.equal || session.hasPermission(Permission.ManageBans);
     }
@@ -153,7 +155,7 @@ export default new Elysia()
         });
 
         if(player?.isEmailVerified()) {
-            sendTagChangeEmail(player.connections.email.address!, oldTag || '---', tag);
+            sendTagChangeEmail(player.connections.email.address!, oldTag || '---', tag, getI18nFunctionByLanguage(player.last_language));
         }
     }
 
@@ -276,7 +278,7 @@ export default new Elysia()
             staff: session.uuid || 'Unknown'
         });
         player.clearTag(session.uuid!);
-        sendTagClearEmail(player.connections.email.address!, oldTag);
+        sendTagClearEmail(player.connections.email.address!, oldTag, getI18nFunctionByLanguage(player.last_language));
     }
     await player.save();
 

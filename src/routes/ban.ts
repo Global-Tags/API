@@ -1,6 +1,6 @@
 import Elysia, { t } from "elysia";
 import players, { Permission } from "../database/schemas/players";
-import fetchI18n from "../middleware/FetchI18n";
+import fetchI18n, { getI18nFunctionByLanguage } from "../middleware/FetchI18n";
 import { ModLogType, NotificationType, sendMessage } from "../libs/DiscordNotifier";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { sendBanEmail, sendUnbanEmail } from "../libs/Mailer";
@@ -26,7 +26,7 @@ export default new Elysia({
     response: {
         200: t.Object({ banned: t.Boolean(), reason: t.Union([t.String(), t.Null()], { default: "…" }), appealable: t.Boolean() }, { description: 'The ban object.' }),
         401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: "You're not an admin." }),
+        403: t.Object({ error: t.String() }, { description: "You're not allowed to manage bans." }),
         404: t.Object({ error: t.String() }, { description: "The player you searched for was not found." })
     },
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to get the ban of.' }) }),
@@ -54,7 +54,7 @@ export default new Elysia({
     });
 
     if(player.isEmailVerified()) {
-        sendBanEmail(player.connections.email.address!, reason || '---');
+        sendBanEmail(player.connections.email.address!, reason || '---', getI18nFunctionByLanguage(player.last_language));
     }
 
     return { message: i18n(`ban.success`) };
@@ -67,7 +67,7 @@ export default new Elysia({
         200: t.Object({ message: t.String() }, { description: 'The player was successfully banned.' }),
         400: t.Object({ error: t.String() }, { description: "The player is already banned." }),
         401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: "You're not an admin." }),
+        403: t.Object({ error: t.String() }, { description: "You're not allowed to manage bans." }),
         404: t.Object({ error: t.String() }, { description: "The player you tried to ban was not found." })
     },
     body: t.Object({ reason: t.String() }, { error: `error.invalidBody`, additionalProperties: true }),
@@ -107,7 +107,7 @@ export default new Elysia({
         200: t.Object({ message: t.String() }, { description: 'The ban info was successfully edited.' }),
         400: t.Object({ error: t.String() }, { description: "The player is not banned." }),
         401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: "You're not an admin." }),
+        403: t.Object({ error: t.String() }, { description: "You're not allowed to manage bans." }),
         404: t.Object({ error: t.String() }, { description: "The player you tried to edit the ban info of was not found." })
     },
     body: t.Object({ reason: t.Optional(t.String()), appealable: t.Boolean({ error: 'error.wrongType;;[["field", "appealable"], ["type", "boolean"]]' }) }, { error: `error.invalidBody`, additionalProperties: true }),
@@ -170,7 +170,7 @@ export default new Elysia({
     });
 
     if(player.isEmailVerified()) {
-        sendUnbanEmail(player.connections.email.address!);
+        sendUnbanEmail(player.connections.email.address!, getI18nFunctionByLanguage(player.last_language));
     }
 
     return { message: i18n(`unban.success`) };
@@ -183,7 +183,7 @@ export default new Elysia({
         200: t.Object({ message: t.String() }, { description: 'The player was successfully unbanned.' }),
         400: t.Object({ error: t.String() }, { description: "The player is not banned." }),
         401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: "You're not an admin." }),
+        403: t.Object({ error: t.String() }, { description: "You're not allowed to manage bans." }),
         404: t.Object({ error: t.String() }, { description: "The player you tried to unban was not found." })
     },
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to unban.' }) }),

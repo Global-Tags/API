@@ -26,8 +26,8 @@ export default class DeleteNote extends Button {
             options.push(
                 new StringSelectMenuOptionBuilder()
                     .setLabel(note.text.substring(0, 100))
-                    .setDescription(`created by ${username || uuid!} on ${note.createdAt.toDateString()}`)
-                    .setValue(note.createdAt.getTime().toString())
+                    .setDescription(`created by ${username || uuid!} on ${note.createdAt.toDateString()} (#${note.id})`)
+                    .setValue(note.id)
             );
         }
 

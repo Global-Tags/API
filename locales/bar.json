@@ -168,5 +168,15 @@
     },
     "editBan": {
         "success": "The ban was updated!"
+    },
+    "notes": {
+        "create": {
+            "max_length": "Notes must not exceed <max> characters!",
+            "success": "The note was successfully created!"
+        },
+        "delete": {
+            "not_found": "The note was not found!",
+            "success": "The note was successfully deleted!"
+        }
     }
 }

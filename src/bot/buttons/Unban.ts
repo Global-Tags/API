@@ -4,6 +4,7 @@ import { colors } from "../bot";
 import players from "../../database/schemas/players";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { sendUnbanEmail } from "../../libs/Mailer";
+import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
 
 export default class Ban extends Button {
     constructor() {
@@ -31,7 +32,7 @@ export default class Ban extends Button {
         });
 
         if(player.isEmailVerified()) {
-            sendUnbanEmail(player.connections.email.address!);
+            sendUnbanEmail(player.connections.email.address!, getI18nFunctionByLanguage(player.last_language));
         }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The player was successfully unbanned!`)], ephemeral: true });
