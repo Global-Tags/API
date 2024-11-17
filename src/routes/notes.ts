@@ -19,7 +19,7 @@ export default new Elysia({
 
     return player.notes.map((note) => ({
         id: note.id,
-        note: note.text,
+        text: note.text,
         author: note.author,
         createdAt: note.createdAt.getTime()
     }));
@@ -29,7 +29,7 @@ export default new Elysia({
         description: `Get all notes of a player`
     },
     response: {
-        200: t.Array(t.Object({ id: t.String(), note: t.String(), author: t.String(), createdAt: t.Number() }), { description: `The notes of the player.` }),
+        200: t.Array(t.Object({ id: t.String(), text: t.String(), author: t.String(), createdAt: t.Number() }), { description: `The notes of the player.` }),
         401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
         403: t.Object({ error: t.String() }, { description: "You're not allowed to manage notes." }),
         404: t.Object({ error: t.String() }, { description: "The player you tried to get the notes of was not found." })
@@ -52,7 +52,7 @@ export default new Elysia({
 
     return {
         id: note.id,
-        note: note.text,
+        text: note.text,
         author: note.author,
         createdAt: note.createdAt.getTime()
     };
@@ -62,7 +62,7 @@ export default new Elysia({
         description: `Get a specific note from a player`
     },
     response: {
-        200: t.Object({ id: t.String(), note: t.String(), author: t.String(), createdAt: t.Number() }, { description: 'The note info' }),
+        200: t.Object({ id: t.String(), text: t.String(), author: t.String(), createdAt: t.Number() }, { description: 'The note info' }),
         401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
         403: t.Object({ error: t.String() }, { description: "You're not allowed to manage notes." }),
         404: t.Object({ error: t.String() }, { description: "The player or the note was not found." })
