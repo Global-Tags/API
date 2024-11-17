@@ -6,6 +6,7 @@ import axios from "axios";
 import { client } from "../bot/bot";
 import * as config from "../../config.json";
 import { args } from "..";
+import { constantCase } from "change-case";
 
 let requests: number;
 
@@ -60,15 +61,16 @@ type Addon = {
 }
 
 export function initializeMetrics() {
+    if(!config.metrics.enabled) return;
     Logger.debug(`Metric initialized.`);
-    new CronJob(`0 0 * * *`, saveMetrics, null, true, "Europe/Berlin");
+    new CronJob(config.metrics.cron, saveMetrics, null, true, "Europe/Berlin");
 }
 
 async function saveMetrics() {
     if(config.bot.synced_roles.enabled) await client.guilds.cache.get(config.bot.synced_roles.guild)?.members.fetch();
     const users = await players.find();
     const tags = users.filter((user) => user.tag != null).length;
-    const staff = users.filter((user) => user.hasAnyElevatedPermissionSync()).length;
+    const staff = users.filter((user) => user.getRolesSync().includes(constantCase(config.metrics.admin_role))).length;
     const bans = users.filter((user) => user.isBanned()).length;
     const positions = positionList.reduce((object: any, position) => {
         object[position.toLowerCase()] = users.filter((user) => user.position.toUpperCase() == position.toUpperCase()).length;
