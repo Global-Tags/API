@@ -30,6 +30,11 @@
         "enabled": false,
         "dsn": ""
     },
+    "metrics": {
+        "enabled": true,
+        "cron": "0 0 * * *",
+        "admin_role": "ADMIN"
+    },
     "mailer": {
         "enabled": false,
         "host": "",
