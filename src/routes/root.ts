@@ -35,7 +35,7 @@ export default new Elysia()
     }
 
     return {
-        uuid: player.uuid,
+        uuid: formatUUID(player.uuid),
         tag: player.isBanned() ? null : player.tag || null,
         position: constantCase(player.position || GlobalIcon[GlobalPosition.Above]),
         icon: {
@@ -299,3 +299,11 @@ export default new Elysia()
     params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 });
+
+export function formatUUID(uuid: string): string {
+    const cleanedUUID = uuid.replace(/-/g, "");
+    
+    if(cleanedUUID.length != 32) throw new Error("Invalid UUID length: Expected 32 characters without dashes.");
+    
+    return `${cleanedUUID.slice(0, 8)}-${cleanedUUID.slice(8, 12)}-${cleanedUUID.slice(12, 16)}-${cleanedUUID.slice(16, 20)}-${cleanedUUID.slice(20)}`;
+}
