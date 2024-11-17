@@ -4,6 +4,7 @@ import fetchI18n from "../middleware/FetchI18n";
 import { ModLogType, NotificationType, sendMessage } from "../libs/DiscordNotifier";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { validation } from "../../config.json";
+import { formatUUID } from "./root";
 
 export default new Elysia({
     prefix: `/notes`
@@ -20,7 +21,7 @@ export default new Elysia({
     return player.notes.map((note) => ({
         id: note.id,
         text: note.text,
-        author: note.author,
+        author: formatUUID(note.author),
         createdAt: note.createdAt.getTime()
     }));
 }, {
@@ -53,7 +54,7 @@ export default new Elysia({
     return {
         id: note.id,
         text: note.text,
-        author: note.author,
+        author: formatUUID(note.author),
         createdAt: note.createdAt.getTime()
     };
 }, {
