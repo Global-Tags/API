@@ -145,11 +145,3 @@ export default new Elysia({
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to delete the note of.' }), id: t.String({ description: 'The ID of the note you want to delete.' }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 });
-
-function formatUUID(uuid: string): string {
-    const cleanedUUID = uuid.replace(/-/g, "");
-    
-    if(cleanedUUID.length != 32) throw new Error("Invalid UUID length: Expected 32 characters without dashes.");
-    
-    return `${cleanedUUID.slice(0, 8)}-${cleanedUUID.slice(8, 12)}-${cleanedUUID.slice(12, 16)}-${cleanedUUID.slice(16, 20)}-${cleanedUUID.slice(20)}`;
-}
