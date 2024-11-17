@@ -1,7 +1,7 @@
 import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder } from "discord.js";
 import Button from "../structs/Button";
 import { colors } from "../bot";
-import players from "../../database/schemas/players";
+import players, { Permission } from "../../database/schemas/players";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { sendUnbanEmail } from "../../libs/Mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
@@ -14,7 +14,7 @@ export default class Ban extends Button {
     async trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
         const staff = await players.findOne({ "connections.discord.id": user.id });
         if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You need to link your Minecraft account with \`/link\`!`)], ephemeral: true });
-        if(!staff.hasAnyElevatedPermissionSync()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to perform this action!`)], ephemeral: true });
+        if(!staff.hasPermissionSync(Permission.ManageBans)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to perform this action!`)], ephemeral: true });
         
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll(`\``, ``) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
