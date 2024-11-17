@@ -91,8 +91,8 @@ export interface IPlayer {
     getPermissionsSync(): { [key: string]: boolean },
     hasPermission(permission: Permission): Promise<boolean>,
     hasPermissionSync(permission: Permission): boolean,
-    hasAnyElevatedPermission(): Promise<boolean>,
-    hasAnyElevatedPermissionSync(): boolean,
+    canManagePlayers(): Promise<boolean>,
+    canManagePlayersSync(): boolean,
     isBanned(): boolean,
     banPlayer(reason: string, staff: string, appealable?: boolean): void,
     unban(): void,
@@ -292,12 +292,12 @@ const schema = new Schema<IPlayer>({
             return _hasPermission(permission, this.getPermissionsSync());
         },
 
-        async hasAnyElevatedPermission() {
-            return _hasAnyElevatedPermissions(await this.getPermissions());
+        async canManagePlayers() {
+            return _canManagePlayers(await this.getPermissions());
         },
 
-        hasAnyElevatedPermissionSync() {
-            return _hasAnyElevatedPermissions(this.getPermissionsSync());
+        canManagePlayersSync() {
+            return _canManagePlayers(this.getPermissionsSync());
         },
 
         isBanned(): boolean {
@@ -390,9 +390,10 @@ function _hasPermission(permission: Permission, permissions: { [key: string]: bo
     return permissions[Permission[permission]];
 }
 
-function _hasAnyElevatedPermissions(permissions: { [key: string]: boolean }) {
+function _canManagePlayers(permissions: { [key: string]: boolean }) {
     return [
         Permission.ManageBans,
+        Permission.ManageNotes,
         Permission.ManageRoles,
         Permission.ManageTags,
         Permission.ManageWatchlist
