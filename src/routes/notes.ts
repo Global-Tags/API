@@ -127,7 +127,8 @@ export default new Elysia({
         type: NotificationType.ModLog,
         logType: ModLogType.DeleteNote,
         uuid: uuid,
-        staff: session.uuid || 'Unknown'
+        staff: session.uuid || 'Unknown',
+        note: note.text
     });
 
     return { message: i18n(`notes.delete.success`) };
