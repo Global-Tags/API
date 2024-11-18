@@ -27,10 +27,9 @@ export default class CreateNote extends Modal {
             discord: true
         });
 
-        player.notes.push({
+        player.createNote({
             text: note,
-            author: staff.uuid,
-            createdAt: new Date()
+            author: staff.uuid
         });
         player.save();
 
