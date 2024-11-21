@@ -1,20 +1,20 @@
 {
     "error": {
-        "unknownError": "An unknown error occurred! Please try again later!",
-        "notFound": "Not found!",
-        "ratelimit": "You're being ratelimited! Please try again in <seconds> seconds!",
-        "noTag": "Please set a tag first!",
-        "invalidBody": "Request body needs to be a json object!",
-        "playerNotFound": "There is no such player in our records!",
-        "malformedAuthHeader": "You've entered a malformed authorization header!",
-        "banned": "You are banned!",
-        "notAllowed": "You're not allowed to perform that request!",
-        "playerBanned": "This player is banned!",
-        "database": "The database is not connected. Please try again later!",
-        "playerNoTag": "This player does not have a tag!",
-        "missingField": "Missing field \"<field>\".",
-        "wrongType": "Field \"<field>\" needs to be of type <type>!",
-        "noIcon": "The icon was not found!"
+        "unknownError": "",
+        "notFound": "",
+        "ratelimit": "",
+        "noTag": "",
+        "invalidBody": "",
+        "playerNotFound": "",
+        "malformedAuthHeader": "",
+        "banned": "",
+        "notAllowed": "",
+        "playerBanned": "",
+        "database": "",
+        "playerNoTag": "",
+        "missingField": "",
+        "wrongType": "",
+        "noIcon": ""
     },
     "setTag": {
         "empty": "The tag must not be empty!",
@@ -150,8 +150,8 @@
         }
     },
     "ban": {
-        "alreadyBanned": "This player is already banned!",
-        "noReason": "No reason provided",
+        "alreadyBanned": "",
+        "noReason": "",
         "success": "The player was successfully banned!"
     },
     "icon": {
