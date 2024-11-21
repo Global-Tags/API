@@ -1,5 +1,5 @@
 import Elysia from "elysia";
-import { getLocales, getPath } from "../libs/I18n";
+import { getLanguage, translate } from "../libs/I18n";
 
 export default function fetchI18n(app: Elysia) {
     return app.derive({ as: 'global' }, ({ headers }) => ({
@@ -8,7 +8,6 @@ export default function fetchI18n(app: Elysia) {
     }));
 }
 
-export function getI18nFunctionByLanguage(language: string | null = null) {
-    const locales = getLocales(language || 'en_us');
-    return (path: string) => getPath(path, locales);
+export function getI18nFunctionByLanguage(language: string | undefined = undefined) {
+    return (path: string) => translate(path, getLanguage(language));
 }
