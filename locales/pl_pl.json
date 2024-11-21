@@ -14,7 +14,7 @@
         "playerNoTag": "Ten gracz nie ma tagu!",
         "playerBanned": "Ten gracz jest zbanowany!",
         "malformedAuthHeader": "Wprowadzono nieprawidłowy nagłówek autoryzacyjny!",
-        "noIcon": "The icon was not found!"
+        "noIcon": ""
     },
     "ban": {
         "alreadyBanned": "Ten gracz już został zbanowany!",
