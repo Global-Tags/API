@@ -13,8 +13,7 @@
         "noTag": "Vennligst sett en tag først!",
         "playerNoTag": "Denne spiller ikke har en tag!",
         "playerBanned": "Denne spilleren er utstengt!",
-        "malformedAuthHeader": "Du har skrevet inn en feilaktig autorisasjonsoverskrift!",
-        "noIcon": "The icon was not found!"
+        "malformedAuthHeader": "Du har skrevet inn en feilaktig autorisasjonsoverskrift!"
     },
     "ban": {
         "alreadyBanned": "Denne spiller er allerede utstengt!",
@@ -145,38 +144,6 @@
             "title": "Velkommen til GlobalTags!",
             "success": "E-posten din ble bekreftet! Vi er glade for å ha deg om bord!",
             "questions": "Du vil nå motta viktige kontooppdateringer. Hvis du har spørsmål, kan du gjerne kontakte oss på vår <a href=\"[link]\" target=\"_blank\">Discord</a>."
-        },
-        "positionChanged": {
-            "subject": "Your GlobalTag position was changed by staff",
-            "warning": "Depending on what your position in combination with what your tag was, you may consider this as a warning.",
-            "title": "Your tag position was changed by staff",
-            "description": "Your GlobalTag position was changed by a staff member.",
-            "previous": "Your previous position was:",
-            "new": "Your new position is:"
-        },
-        "iconChanged": {
-            "warning": "Depending on what your icon in combination with what your tag was, you may consider this as a warning.",
-            "subject": "Your GlobalTag icon type was changed by staff",
-            "title": "Your tag icon type was changed by staff",
-            "description": "Your GlobalTag icon type was changed by a staff member.",
-            "previous": "Your previous icon type was:",
-            "new": "Your new icon type is:"
-        },
-        "iconCleared": {
-            "subject": "Your custom icon was cleared",
-            "title": "Your custom icon was cleared",
-            "description": "Your custom icon has been cleared from your account.",
-            "warning": "Consider this a warning, we won't give you a second chance."
-        }
-    },
-    "notes": {
-        "create": {
-            "max_length": "Notes must not exceed <max> characters!",
-            "success": "The note was successfully created!"
-        },
-        "delete": {
-            "not_found": "The note was not found!",
-            "success": "The note was successfully deleted!"
         }
     }
 }
