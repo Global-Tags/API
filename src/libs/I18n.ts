@@ -25,10 +25,11 @@ export async function load() {
 function extractTranslations(target: Language, json: any, parentKey?: string): void {
     for (const key in json) {
         const fullKey = parentKey ? `${parentKey}.${key}` : key;
+        const value = json[key];
 
-        if (typeof json[key] === 'object' && json[key] !== null) {
-            extractTranslations(target, json[key], fullKey);
-        } else if (typeof json[key] === 'string') {
+        if (typeof value === 'object' && value !== null) {
+            extractTranslations(target, value, fullKey);
+        } else if (typeof value === 'string' && value.trim() !== '') {
             target.set(fullKey, json[key] as string);
         }
     }
