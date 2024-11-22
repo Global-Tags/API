@@ -19,7 +19,7 @@
     },
     "setTag": {
         "empty": "¡El tag no debe estar vacío!",
-        "blacklisted": "¡No está permitido incluir «<palabra>» en tu GlobalTag!",
+        "blacklisted": "¡No está permitido incluir «<word>» en tu GlobalTag!",
         "sameTag": "¡Ya tienes este tag!",
         "success": {
             "self": "¡Tu tag se ha actualizado con éxito!",
@@ -168,5 +168,15 @@
     },
     "editBan": {
         "success": "¡Se ha actualizado la suspensión!"
+    },
+    "notes": {
+        "create": {
+            "success": "¡La nota se ha creado con éxito!",
+            "max_length": "¡Las notas no deben superar los <max> caracteres!"
+        },
+        "delete": {
+            "not_found": "¡No se ha encontrado la nota!",
+            "success": "¡La nota se ha borrado con éxito!"
+        }
     }
 }

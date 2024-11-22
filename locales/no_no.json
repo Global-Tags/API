@@ -13,7 +13,8 @@
         "noTag": "Vennligst sett en tag først!",
         "playerNoTag": "Denne spiller ikke har en tag!",
         "playerBanned": "Denne spilleren er utstengt!",
-        "malformedAuthHeader": "Du har skrevet inn en feilaktig autorisasjonsoverskrift!"
+        "malformedAuthHeader": "Du har skrevet inn en feilaktig autorisasjonsoverskrift!",
+        "noIcon": "Ikonet ble ikke funnet!"
     },
     "ban": {
         "alreadyBanned": "Denne spiller er allerede utstengt!",
@@ -144,6 +145,26 @@
             "title": "Velkommen til GlobalTags!",
             "success": "E-posten din ble bekreftet! Vi er glade for å ha deg om bord!",
             "questions": "Du vil nå motta viktige kontooppdateringer. Hvis du har spørsmål, kan du gjerne kontakte oss på vår <a href=\"[link]\" target=\"_blank\">Discord</a>."
+        },
+        "positionChanged": {
+            "title": "Din tagg posisjon ble endret av lag-medlem",
+            "previous": "Din forrige posisjon var:",
+            "subject": "Din GlobalTag-posisjon ble endret av lag-medlem",
+            "description": "Din GlobalTag posisjon ble endret av lag-medlem.",
+            "new": "Din nye posisjon er:"
+        },
+        "iconChanged": {
+            "title": "Din tagg ikon-typen ble endret av lag-medlem"
+        }
+    },
+    "notes": {
+        "create": {
+            "success": "Notatet ble opprettet!",
+            "max_length": "Notater må ikke overstige <max> tegn!"
+        },
+        "delete": {
+            "not_found": "Notatet ble ikke funnet!",
+            "success": "Notatet ble slettet!"
         }
     }
 }

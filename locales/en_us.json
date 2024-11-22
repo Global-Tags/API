@@ -61,7 +61,7 @@
     "setTag": {
         "empty": "The tag must not be empty!",
         "sameTag": "You already have this tag!",
-        "blacklisted": "You're not allowed to include \"<word>\" in your Global Tag!",
+        "blacklisted": "You're not allowed to include \"<word>\" in your GlobalTag!",
         "validation": "Keep the \"tag\" field between <min> and <max> characters.",
         "success": {
             "self": "Your tag was successfully updated!",
