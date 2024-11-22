@@ -19,7 +19,7 @@ export default class EntitlementUpdate extends Event {
 
         sendMessage({
             type: NotificationType.Entitlement,
-            description: `<@!${newEntitlement.userId}> has deleted their **${sku.name}** subscription!`,
+            description: `<@!${newEntitlement.userId}> has cancelled their **${sku.name}** subscription!`,
             head: !!player,
             uuid: player?.uuid || ''
         });
