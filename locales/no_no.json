@@ -61,7 +61,7 @@
     "setTag": {
         "empty": "Taggen må ikke være tom!",
         "sameTag": "Du har allerede denne taggen!",
-        "blacklisted": "Du har ikke tilattelse til å inkludere \"<word>\" i globale taggen din!",
+        "blacklisted": "Du har ikke tilattelse til å inkludere \"<word>\" i din GlobalTag!",
         "validation": "Hold \"tag\"-feltet mellom <min> og <max> tegn.",
         "success": {
             "self": "Taggen din ble oppdatert!",
@@ -151,10 +151,22 @@
             "previous": "Din forrige posisjon var:",
             "subject": "Din GlobalTag-posisjon ble endret av lag-medlem",
             "description": "Din GlobalTag posisjon ble endret av lag-medlem.",
-            "new": "Din nye posisjon er:"
+            "new": "Din nye posisjon er:",
+            "warning": "Avhengig av hvilken posisjon du hadde i kombinasjon med taggen din, kan du vurdere dette som en advarsel."
         },
         "iconChanged": {
-            "title": "Din tagg ikon-typen ble endret av lag-medlem"
+            "title": "Din tagg ikon-typen ble endret av lag-medlem",
+            "subject": "Din GlobalTag ikontypen ble endret av lag-medlem",
+            "description": "Din GlobalTag ikontypen ble endret av lag-medlem.",
+            "previous": "Din forrige ikontyp var:",
+            "new": "Din nye ikontyp er:",
+            "warning": "Avhengig av hvilket ikon du hadde i kombinasjon med taggen din, kan du vurdere dette som en advarsel."
+        },
+        "iconCleared": {
+            "subject": "Ditt egendefinert ikon ble tømt",
+            "title": "Ditt egendefinert ikon ble tømt",
+            "description": "Din egendefinert ikon ble tømt fra kontoen din.",
+            "warning": "Se dette som en advarsel, vi gir deg ikke en annen sjanse."
         }
     },
     "notes": {
