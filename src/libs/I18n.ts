@@ -10,7 +10,6 @@ const fallback = 'en_us';
 const languages = new Map<string, Language>();
 
 export async function load() {
-    languages.clear();
     const languageDirectory = join(__dirname, '..', '..', 'locales');
     if(!existsSync(languageDirectory)) return Logger.error(`Translation directory not found!`);
     for(const file of readdirSync(languageDirectory).filter((file) => file.endsWith(`.json`))) {
