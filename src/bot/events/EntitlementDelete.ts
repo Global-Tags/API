@@ -13,14 +13,14 @@ export default class EntitlementDelete extends Event {
     }
 
     async fire(entitlement: Entitlement) {
-        if(!bot.entitlements.enabled || !entitlement.isTest()) return;
+        if(!bot.entitlements.enabled || !!entitlement.startsTimestamp) return; // Temporary replacement for Entitlement#isTest. See https://github.com/discordjs/discord.js/issues/10610
         const player = await players.findOne({ "connections.discord.id": entitlement.userId });
         const sku = bot.entitlements.skus.find((sku) => sku.id == entitlement.skuId);
         if(!sku) return;
 
         sendMessage({
             type: NotificationType.Entitlement,
-            description: `<@!${entitlement.userId}> has deleted their **${sku.name}** subscription!`,
+            description: `[**S**] <@!${entitlement.userId}> has deleted their **${sku.name}** subscription!`,
             head: !!player,
             uuid: player?.uuid || ''
         });
