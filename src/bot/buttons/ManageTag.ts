@@ -1,0 +1,53 @@
+import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import Button from "../structs/Button";
+import players, { Permission } from "../../database/schemas/players";
+import { colors } from "../bot";
+
+export default class ManageTag extends Button {
+    constructor() {
+        super('manageTag');
+    }
+
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, user: User) {
+        const staff = await players.findOne({ "connections.discord.id": user.id });
+        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You need to link your Minecraft account with \`/link\`!`)], ephemeral: true });
+        if(!staff.hasPermission(Permission.ManageTags)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to perform this action!`)], ephemeral: true });
+        
+        const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll(`\``, ``) });
+        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
+
+        const embed = new EmbedBuilder()
+        .setColor(0x5865f2)
+        .setTitle(`Manage tag`)
+        .setDescription(`Here you can edit the player's tag, position and icon.`)
+        .addFields(message.embeds[0].fields[0])
+        .setThumbnail(message.embeds[0].thumbnail!.url);
+
+        const rows = [
+            new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(
+                new ButtonBuilder()
+                .setLabel(`Set tag`)
+                .setCustomId(`setTag`)
+                .setStyle(ButtonStyle.Primary),
+                new ButtonBuilder()
+                .setLabel(`Clear tag`)
+                .setCustomId(`clearTag`)
+                .setStyle(ButtonStyle.Danger)
+            ),
+            new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(
+                new ButtonBuilder()
+                .setLabel(`Set position`)
+                .setCustomId(`setPosition`)
+                .setStyle(ButtonStyle.Primary),
+                new ButtonBuilder()
+                .setLabel(`Manage icon`)
+                .setCustomId(`manageIcon`)
+                .setStyle(ButtonStyle.Primary)
+            )
+        ]
+
+        interaction.reply({ embeds: [embed], components: rows, ephemeral: true });
+    }
+}
