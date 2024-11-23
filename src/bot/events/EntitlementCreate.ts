@@ -19,7 +19,7 @@ export default class EntitlementCreate extends Event {
 
         sendMessage({
             type: NotificationType.Entitlement,
-            description: `<@!${entitlement.userId}> just subscribed to **${sku.name}**!`,
+            description: `${!entitlement.startsTimestamp ? '[**S**] ' : ''}<@!${entitlement.userId}> just subscribed to **${sku.name}**!`, // Temporary replacement for Entitlement#isTest. See https://github.com/discordjs/discord.js/issues/10610
             head: !!player,
             uuid: player?.uuid || ''
         })

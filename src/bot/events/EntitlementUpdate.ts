@@ -19,7 +19,7 @@ export default class EntitlementUpdate extends Event {
 
         sendMessage({
             type: NotificationType.Entitlement,
-            description: `<@!${newEntitlement.userId}> has deleted their **${sku.name}** subscription!`,
+            description: `<@!${newEntitlement.userId}> has cancelled their **${sku.name}** subscription!`,
             head: !!player,
             uuid: player?.uuid || ''
         });
@@ -28,7 +28,8 @@ export default class EntitlementUpdate extends Event {
             id: newEntitlement.id,
             sku_id: newEntitlement.skuId,
             user_id: newEntitlement.userId,
-            expires_at: newEntitlement.endsAt
+            expires_at: newEntitlement.endsAt,
+            test: !newEntitlement.startsTimestamp
         }).save();
     }
 }

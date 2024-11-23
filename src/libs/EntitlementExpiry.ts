@@ -16,7 +16,7 @@ async function checkExpiredEntitlements() {
 
         entitlement.done = true;
         entitlement.save();
-        sendMessage({
+        if(!entitlement.test) sendMessage({
             type: NotificationType.Entitlement,
             description: `<@!${entitlement.user_id}>'s **${sku.name}** subscription just expired!`,
             head: !!player,

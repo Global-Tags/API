@@ -55,6 +55,7 @@ export enum Permission {
     CustomIcon,
     ManageBans,
     ManageNotes,
+    ManageSubscriptions,
     ManageRoles,
     ManageTags,
     ManageWatchlist,

@@ -21,6 +21,11 @@ const schema = new Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    test: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 });
 

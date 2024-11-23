@@ -61,7 +61,7 @@
     "setTag": {
         "empty": "Der Tag darf nicht leer sein!",
         "sameTag": "Du hast diesen Tag bereits!",
-        "blacklisted": "Das Wort \"<word>\" darf nicht in deinem Global Tag vorkommen!",
+        "blacklisted": "Das Wort \"<word>\" darf nicht in deinem GlobalTag vorkommen!",
         "validation": "Das \"tag\" Feld darf nur zwischen <min> und <max> Zeichen lang sein.",
         "success": {
             "self": "Dein Tag wurde erfolgreich geändert!",

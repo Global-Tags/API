@@ -14,7 +14,7 @@
         "playerNoTag": "Denne spiller ikke har en tag!",
         "playerBanned": "Denne spilleren er utstengt!",
         "malformedAuthHeader": "Du har skrevet inn en feilaktig autorisasjonsoverskrift!",
-        "noIcon": "The icon was not found!"
+        "noIcon": "Ikonet ble ikke funnet!"
     },
     "ban": {
         "alreadyBanned": "Denne spiller er allerede utstengt!",
@@ -61,7 +61,7 @@
     "setTag": {
         "empty": "Taggen må ikke være tom!",
         "sameTag": "Du har allerede denne taggen!",
-        "blacklisted": "Du har ikke tilattelse til å inkludere \"<word>\" i globale taggen din!",
+        "blacklisted": "Du har ikke tilattelse til å inkludere \"<word>\" i din GlobalTag!",
         "validation": "Hold \"tag\"-feltet mellom <min> og <max> tegn.",
         "success": {
             "self": "Taggen din ble oppdatert!",
@@ -147,36 +147,36 @@
             "questions": "Du vil nå motta viktige kontooppdateringer. Hvis du har spørsmål, kan du gjerne kontakte oss på vår <a href=\"[link]\" target=\"_blank\">Discord</a>."
         },
         "positionChanged": {
-            "subject": "Your GlobalTag position was changed by staff",
-            "warning": "Depending on what your position in combination with what your tag was, you may consider this as a warning.",
-            "title": "Your tag position was changed by staff",
-            "description": "Your GlobalTag position was changed by a staff member.",
-            "previous": "Your previous position was:",
-            "new": "Your new position is:"
+            "title": "Din tagg posisjon ble endret av lag-medlem",
+            "previous": "Din forrige posisjon var:",
+            "subject": "Din GlobalTag-posisjon ble endret av lag-medlem",
+            "description": "Din GlobalTag posisjon ble endret av lag-medlem.",
+            "new": "Din nye posisjon er:",
+            "warning": "Avhengig av hvilken posisjon du hadde i kombinasjon med taggen din, kan du vurdere dette som en advarsel."
         },
         "iconChanged": {
-            "warning": "Depending on what your icon in combination with what your tag was, you may consider this as a warning.",
-            "subject": "Your GlobalTag icon type was changed by staff",
-            "title": "Your tag icon type was changed by staff",
-            "description": "Your GlobalTag icon type was changed by a staff member.",
-            "previous": "Your previous icon type was:",
-            "new": "Your new icon type is:"
+            "title": "Din tagg ikon-typen ble endret av lag-medlem",
+            "subject": "Din GlobalTag ikontypen ble endret av lag-medlem",
+            "description": "Din GlobalTag ikontypen ble endret av lag-medlem.",
+            "previous": "Din forrige ikontyp var:",
+            "new": "Din nye ikontyp er:",
+            "warning": "Avhengig av hvilket ikon du hadde i kombinasjon med taggen din, kan du vurdere dette som en advarsel."
         },
         "iconCleared": {
-            "subject": "Your custom icon was cleared",
-            "title": "Your custom icon was cleared",
-            "description": "Your custom icon has been cleared from your account.",
-            "warning": "Consider this a warning, we won't give you a second chance."
+            "subject": "Ditt egendefinert ikon ble tømt",
+            "title": "Ditt egendefinert ikon ble tømt",
+            "description": "Din egendefinert ikon ble tømt fra kontoen din.",
+            "warning": "Se dette som en advarsel, vi gir deg ikke en annen sjanse."
         }
     },
     "notes": {
         "create": {
-            "max_length": "Notes must not exceed <max> characters!",
-            "success": "The note was successfully created!"
+            "success": "Notatet ble opprettet!",
+            "max_length": "Notater må ikke overstige <max> tegn!"
         },
         "delete": {
-            "not_found": "The note was not found!",
-            "success": "The note was successfully deleted!"
+            "not_found": "Notatet ble ikke funnet!",
+            "success": "Notatet ble slettet!"
         }
     }
 }
