@@ -3,6 +3,7 @@ import Button from "../structs/Button";
 import { colors } from "../bot";
 import players, { Permission } from "../../database/schemas/players";
 import { uuidRegex } from "../commands/PlayerInfo";
+import { bot } from "../../../config.json";
 
 export default class Actions extends Button {
     constructor() {
@@ -31,67 +32,26 @@ export default class Actions extends Button {
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
-                .setLabel(`Edit roles`)
-                .setCustomId(`editRoles`)
+                .setLabel(`Manage account`)
+                .setCustomId(`manageAccount`)
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(!staff.hasPermissionSync(Permission.ManageRoles)),
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageBans) && !staff.hasPermissionSync(Permission.ManageWatchlist)),
+                new ButtonBuilder()
+                .setLabel(`Manage tag`)
+                .setCustomId(`manageTag`)
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(!staff.hasPermissionSync(Permission.ManageTags))
+            ),
+            new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(
+                bot.synced_roles.enabled
+                    ? new ButtonBuilder().setLabel(`Manage subscriptions`).setCustomId(`manageSubscriptions`).setStyle(ButtonStyle.Primary).setDisabled(!staff.hasPermissionSync(Permission.ManageSubscriptions))
+                    : new ButtonBuilder().setLabel(`Edit roles`).setCustomId(`editRoles`).setStyle(ButtonStyle.Primary).setDisabled(!staff.hasPermissionSync(Permission.ManageRoles)),
                 new ButtonBuilder()
                 .setLabel(`Notes${player.notes.length > 0 ? ` (${player.notes.length})` : ''}`)
                 .setCustomId(`notes`)
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(!staff.hasPermissionSync(Permission.ManageNotes))
-            ),
-            new ActionRowBuilder<ButtonBuilder>()
-            .addComponents(
-                new ButtonBuilder()
-                .setLabel(`Unwatch`)
-                .setCustomId(`unwatch`)
-                .setStyle(ButtonStyle.Success)
-                .setDisabled(!staff.hasPermissionSync(Permission.ManageWatchlist)),
-                new ButtonBuilder()
-                .setLabel(`Watch`)
-                .setCustomId(`watch`)
-                .setStyle(ButtonStyle.Danger)
-                .setDisabled(!staff.hasPermissionSync(Permission.ManageWatchlist))
-            ),
-            new ActionRowBuilder<ButtonBuilder>()
-            .addComponents(
-                new ButtonBuilder()
-                .setLabel(`Unban`)
-                .setCustomId(`unban`)
-                .setStyle(ButtonStyle.Success)
-                .setDisabled(!staff.hasPermissionSync(Permission.ManageBans)),
-                new ButtonBuilder()
-                .setLabel(`Ban`)
-                .setCustomId(`ban`)
-                .setStyle(ButtonStyle.Danger)
-                .setDisabled(!staff.hasPermissionSync(Permission.ManageBans))
-            ),
-            new ActionRowBuilder<ButtonBuilder>()
-            .addComponents(
-                new ButtonBuilder()
-                .setLabel(`Set tag`)
-                .setCustomId(`setTag`)
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(!staff.hasPermissionSync(Permission.ManageTags)),
-                new ButtonBuilder()
-                .setLabel(`Clear tag`)
-                .setCustomId(`clearTag`)
-                .setStyle(ButtonStyle.Danger)
-                .setDisabled(!staff.hasPermissionSync(Permission.ManageTags))
-            ),
-            new ActionRowBuilder<ButtonBuilder>()
-            .addComponents(
-                new ButtonBuilder()
-                .setLabel(`Set position`)
-                .setCustomId(`setPosition`)
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(!staff.hasPermissionSync(Permission.ManageTags)),
-                new ButtonBuilder()
-                .setLabel(`Manage icon`)
-                .setCustomId(`manageIcon`)
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(!staff.hasPermissionSync(Permission.ManageTags))
             )
         ]
 
