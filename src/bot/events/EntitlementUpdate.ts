@@ -28,7 +28,8 @@ export default class EntitlementUpdate extends Event {
             id: newEntitlement.id,
             sku_id: newEntitlement.skuId,
             user_id: newEntitlement.userId,
-            expires_at: newEntitlement.endsAt
+            expires_at: newEntitlement.endsAt,
+            test: !newEntitlement.startsTimestamp
         }).save();
     }
 }

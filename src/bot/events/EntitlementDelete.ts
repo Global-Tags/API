@@ -29,7 +29,8 @@ export default class EntitlementDelete extends Event {
             id: entitlement.id,
             sku_id: entitlement.skuId,
             user_id: entitlement.userId,
-            expires_at: new Date()
+            expires_at: new Date(),
+            test: true
         }).save();
     }
 }
