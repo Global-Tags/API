@@ -1,7 +1,7 @@
 # Java Wrapper
 
 ???+ warning
-    You'll need Java Development Kit (JDK) 17 or higher to be able to use the wrapper. This may change in the future.
+    You'll need Java Development Kit (JDK) 11 or higher to be able to use the wrapper.
 
 ## Overview
 The **GlobalTags Java Wrapper** provides an easy-to-use class for interacting with the GlobalTags API. This wrapper simplifies the integration of custom player tags in a Minecraft mod, enabling developers to fetch tag data including the player's tag, icon, and roles. It offers various methods to authenticate with the API, handle cache, and translate color codes for text display.
