@@ -1,6 +1,6 @@
 import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import Button from "../structs/Button";
-import players, { Permission } from "../../database/schemas/players";
+import players from "../../database/schemas/players";
 import { colors } from "../bot";
 
 export default class SetTag extends Button {

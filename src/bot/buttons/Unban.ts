@@ -6,7 +6,7 @@ import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNot
 import { sendUnbanEmail } from "../../libs/Mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
 
-export default class Ban extends Button {
+export default class Unban extends Button {
     constructor() {
         super("unban");
     }

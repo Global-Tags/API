@@ -5,7 +5,7 @@ import { colors } from "../bot";
 import { bot } from "../../../config.json";
 import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 
-export default class PlayerInfo extends Command {
+export default class Link extends Command {
     constructor() {
         super(
             "link",

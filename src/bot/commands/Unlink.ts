@@ -5,7 +5,7 @@ import { colors } from "../bot";
 import { bot } from "../../../config.json";
 import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 
-export default class PlayerInfo extends Command {
+export default class Unlink extends Command {
     constructor() {
         super(
             "unlink",
@@ -21,9 +21,10 @@ export default class PlayerInfo extends Command {
         const player = await players.findOne({ "connections.discord.id": user.id });
         if(!player) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Your Discord account is not linked to any Minecraft account!`)] });
 
-        player.connections!.discord!.id = null;
-        player.connections!.discord!.code = null;
+        player.connections.discord.id = null;
+        player.connections.discord.code = null;
         player.save();
+
         member.roles.remove(bot.connection.role);
 
         sendMessage({

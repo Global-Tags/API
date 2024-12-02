@@ -1,10 +1,9 @@
-import { Entitlement, GuildMember } from "discord.js";
+import { GuildMember } from "discord.js";
 import Event from "../structs/Event";
 import { bot } from "../../../config.json";
 import { client } from "../bot";
 import Logger from "../../libs/Logger";
 import players from "../../database/schemas/players";
-import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 
 export default class GuildMemberAdd extends Event {
     constructor() {
