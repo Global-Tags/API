@@ -51,10 +51,10 @@ export const elysia = new Elysia()
         info: {
             version,
             title: `GlobalTags API`,
-            description: `This documentation is for the API of the GlobalTags addon for the LabyMod Minecraft client.`,
+            description: `This is the official GlobalTags API documentation containing detailed descriptions about the API endpoints and their usage.`,
             license: {
                 name: 'MIT',
-                url: 'https://github.com/RappyLabyAddons/GlobalTagAPI/blob/master/LICENSE'
+                url: 'https://github.com/Global-Tags/API/blob/master/LICENSE'
             },
             contact: {
                 name: `RappyTV`,
@@ -65,7 +65,7 @@ export const elysia = new Elysia()
         tags: [
             { name: `API`, description: `Get info about the API` },
             { name: `Interactions`, description: `Interact with other players` },
-            { name: `Settings`, description: `Modify the settings of your global tag` },
+            { name: `Settings`, description: `Modify the settings of your GlobalTag` },
             { name: `Admin`, description: `Moderation actions` },
             { name: `Connections`, description: `Manage account connections` }
         ]
