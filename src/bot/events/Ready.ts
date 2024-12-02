@@ -6,17 +6,18 @@ import * as bot from "../bot";
 
 export default class Ready extends Event {
     constructor() {
-        super("ready", true);
+        super('ready', true);
     }
 
-    async fire() {
+    public fire() {
         Logger.info(`Bot logged in as ${bot.client.user!.tag}`);
 
-        bot.client.user!.setActivity({
-            name: `🔗 ${(await players.find()).filter((player) => !!player.tag).length} Global Tags`,
-            type: ActivityType.Custom
-        });
-
+        setInterval(async () => {
+            bot.client.user!.setActivity({
+                name: `🔗 ${(await players.find()).filter((player) => !!player.tag).length} Global Tags`,
+                type: ActivityType.Custom
+            });
+        }, 1000 * 60 * 30);
         registerCommands();
     }
 }
