@@ -1,7 +1,7 @@
 import { Context, Elysia, t } from "elysia";
 import { swagger } from "@elysiajs/swagger";
 import Logger from "./libs/Logger";
-import { connect as connectDatabase, connect as databaseConnect } from "./database/mongo";
+import { connect as connectDatabase } from "./database/mongo";
 import { getRouter } from "./libs/RouteLoader";
 import * as config from "../config.json";
 import { version } from "../package.json";
