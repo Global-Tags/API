@@ -74,5 +74,5 @@ You have two options for running the API with Docker:
     You can also run the API without Docker Compose by executing:
 
     ```bash
-    docker run -p 5000:5000 $(docker build -q .)
+    docker run --name gtapi -itd -p 5500:5500 -v ./config.json:/app/config.json -v ./icons:/app/icons rappytv/globaltagsapi:latest
     ```
