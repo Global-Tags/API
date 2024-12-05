@@ -1,9 +1,11 @@
 name: "💡 Feature request"
 description: Suggest an idea for this project
-labels: [
-  "feature",
-  "pending"
-]
+assignees:
+  - "RappyTV"
+labels:
+  - "feature"
+  - "pending"
+title: "feat: "
 body:
   - type: textarea
     attributes:
