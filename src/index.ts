@@ -1,7 +1,7 @@
 import { Context, Elysia, t } from "elysia";
 import { swagger } from "@elysiajs/swagger";
 import Logger from "./libs/Logger";
-import { connect } from "./database/mongo";
+import { connect as databaseConnect } from "./database/mongo";
 import { getRouter } from "./libs/RouteLoader";
 import * as config from "../config.json";
 import { version } from "../package.json";
@@ -10,7 +10,7 @@ import checkDatabase from "./middleware/DatabaseChecker";
 import Ratelimiter from "./libs/Ratelimiter";
 import checkRatelimit from "./middleware/RatelimitChecker";
 import { ip } from "./middleware/ObtainIP";
-import { load } from "./libs/I18n";
+import { load as loadLanguages } from "./libs/I18n";
 import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/FetchI18n";
 import { getRequests, initializeMetrics, loadRequests } from "./libs/Metrics";
 import Metrics from "./database/schemas/metrics";
@@ -21,7 +21,13 @@ import minimist from "minimist";
 import cors from "@elysiajs/cors";
 import { verify as verifyMailOptions } from "./libs/Mailer";
 import { getLatestCommit, retrieveData } from "./libs/GitCommitData";
-import { startJob } from "./libs/EntitlementExpiry";
+import { startJob as startEntitlementExpiryJob } from "./libs/EntitlementExpiry";
+
+
+if(config.srv.trim().length == 0) {
+    Logger.error(`Database connection string is empty!`);
+    process.exit(1);
+}
 
 handleErrors();
 if(config.sentry.enabled) initializeSentry(config.sentry.dsn);
@@ -76,15 +82,14 @@ export const elysia = new Elysia()
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
     AuthProvider.loadProviders();
-    connect(config.srv);
+    databaseConnect(config.srv);
     initializeMetrics();
     if(config.mailer.enabled) {
         verifyMailOptions();
     }
-    
-    // Load languages
-    load();
-    startJob();
+
+    loadLanguages();
+    startEntitlementExpiryJob();
 })
 .onError(({ code, set, error: { message: error }, request }) => {
     const i18n = getI18nFunctionByLanguage(request.headers.get('x-language'));
