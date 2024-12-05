@@ -3,7 +3,7 @@
     "ipHeaders": ["x-real-ip"],
     "strictAuth": true,
     "logLevel": "Info",
-    "srv": "",
+    "mongodb": "",
     "base": "http://localhost:5000",
     "validation": {
         "tag": {

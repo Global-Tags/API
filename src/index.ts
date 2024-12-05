@@ -23,8 +23,7 @@ import { verify as verifyMailOptions } from "./libs/Mailer";
 import { getLatestCommit, retrieveData } from "./libs/GitCommitData";
 import { startJob as startEntitlementExpiryJob } from "./libs/EntitlementExpiry";
 
-
-if(config.srv.trim().length == 0) {
+if(config.mongodb.trim().length == 0) {
     Logger.error(`Database connection string is empty!`);
     process.exit(1);
 }
@@ -82,7 +81,7 @@ export const elysia = new Elysia()
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
     AuthProvider.loadProviders();
-    databaseConnect(config.srv);
+    databaseConnect(config.mongodb);
     initializeMetrics();
     if(config.mailer.enabled) {
         verifyMailOptions();
