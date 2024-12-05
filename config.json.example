@@ -3,7 +3,6 @@
     "ipHeaders": ["x-real-ip"],
     "strictAuth": true,
     "logLevel": "Info",
-    "logTimeFormat": "YYYY-MM-DD HH:mm:ss",
     "srv": "",
     "base": "http://localhost:5000",
     "validation": {
