@@ -1,5 +1,5 @@
 {
-    "port": 5000,
+    "port": 5500,
     "ipHeaders": ["x-real-ip"],
     "strictAuth": true,
     "logLevel": "Info", // Error, Warn, Info or Debug

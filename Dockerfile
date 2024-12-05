@@ -13,6 +13,6 @@ COPY locales locales
 COPY tsconfig.json .
 
 USER 1000
-EXPOSE 5000
+EXPOSE 5500
 # ENV NODE_ENV production // https://github.com/elysiajs/elysia/issues/585
 CMD ["bun", "src/index.ts"]
