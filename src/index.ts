@@ -1,7 +1,7 @@
 import { Context, Elysia, t } from "elysia";
 import { swagger } from "@elysiajs/swagger";
 import Logger from "./libs/Logger";
-import { connect } from "./database/mongo";
+import { connect as connectDatabase, connect as databaseConnect } from "./database/mongo";
 import { getRouter } from "./libs/RouteLoader";
 import * as config from "../config.json";
 import { version } from "../package.json";
@@ -23,6 +23,11 @@ import { verify as verifyMailOptions } from "./libs/Mailer";
 import { getLatestCommit, retrieveData } from "./libs/GitCommitData";
 import { startEntitlementExpiry, startMetrics, startReferralReset } from "./libs/CronJobs";
 import players from "./database/schemas/players";
+
+if(config.srv.trim().length == 0) {
+    Logger.error(`Database connection string is empty!`);
+    process.exit(1);
+}
 
 handleErrors();
 if(config.sentry.enabled) initializeSentry(config.sentry.dsn);
@@ -77,7 +82,7 @@ export const elysia = new Elysia()
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
     AuthProvider.loadProviders();
-    connect(config.srv);
+    connectDatabase(config.srv);
     if(config.mailer.enabled) {
         verifyMailOptions();
     }
