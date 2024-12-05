@@ -3,7 +3,6 @@ import * as config from "../../config.json";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
 import { capitalize } from "../bot/commands/PlayerInfo";
 import { getProfileByUUID } from "./Mojang";
-import { base } from "../../config.json";
 import { getCustomIconUrl } from "../routes/icon";
 import { pascalCase } from "change-case";
 
