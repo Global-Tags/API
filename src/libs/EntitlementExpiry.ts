@@ -5,8 +5,10 @@ import { NotificationType, sendMessage } from "./DiscordNotifier";
 import { bot } from "../../config.json";
 import { client } from "../bot/bot";
 import Logger from "./Logger";
+import { isConnected } from "../database/mongo";
 
 async function checkExpiredEntitlements() {
+    if(!isConnected()) return;
     const ent = await entitlement.find({ done: false, expires_at: { $lt: new Date() } });
     if(!ent) return;
     for (const entitlement of ent) {
