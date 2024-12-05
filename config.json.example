@@ -2,7 +2,7 @@
     "port": 5500,
     "ipHeaders": ["x-real-ip"],
     "strictAuth": true,
-    "logLevel": "Info", // Error, Warn, Info or Debug
+    "logLevel": "Info",
     "logTimeFormat": "YYYY-MM-DD HH:mm:ss",
     "srv": "",
     "base": "http://localhost:5000",
