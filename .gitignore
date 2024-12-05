@@ -4,3 +4,4 @@ package-lock.json
 config.json
 .cache
 icons
+.DS_Store
