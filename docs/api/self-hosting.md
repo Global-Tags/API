@@ -1,12 +1,6 @@
 # Self-hosting the GlobalTagsAPI
 
-## Prerequisites
-- <a href="https://bun.sh" target="_blank">Bun</a>
-- A <a href="https://mongodb.com" target="_blank">MongoDB</a> instance
-- <a href="https://www.docker.com" target="_blank">Docker</a>
-    - <a href="https://docs.docker.com/compose/" target="_blank">Docker Compose</a> *(Optional)*
-
-## Installation
+## Run with bun (that rhymes)
 
 ### 1. Clone the Repository
 
@@ -19,31 +13,24 @@ cd gtapi
 
 ### 2. Create a Configuration File
 
-Next, create a configuration file by copying the example provided. Adjust the settings in `config.json` as needed. The only mandatory change is the `srv` field, which should contain the connection string to your MongoDB instance.
+Next, create a configuration file by copying the example provided. See the [Configuration guide](./configuration-guide.md).
 
 ```bash
 cp config.json.example config.json
 ```
 
-## 3. Running the API
+### 3. Launching the API
 
-### Run with Bun (that rhymes)
+Now use the following command to install the necessary dependencies:
+```bash
+bun install --production
+```
 
-1. **Install Required Dependencies**
+To run the API, execute:
 
-    Use the following command to install the necessary dependencies:
-
-    ```bash
-    bun i
-    ```
-
-2. **Start the API**
-
-    To run the API, execute:
-
-    ```bash
-    bun start
-    ```
+```bash
+bun start
+```
 
 ???+ info "Hosting the API"
     To keep the API online, install a tool called `pm2` to daemonize the process:
@@ -52,27 +39,31 @@ cp config.json.example config.json
     bun i -g pm2 pm2-logrotate
 
     # Start the daemon
-    pm2 start src/index.ts --interpreter ~/.bun/bin/bun --name GlobalTagAPI
+    pm2 start src/index.ts --interpreter ~/.bun/bin/bun --name GlobalTagsAPI
     ```
 
-### Run with Docker
+## Run with docker
 
-You have two options for running the API with Docker:
+### 1. Download important files
+First of all you need to create a config from the example config template:
+```bash
+mkdir gtapi
+cd gtapi
+curl -o config.json https://github.com/Global-Tags/API/blob/master/config.json.example
+```
+You can now edit the `config.yml` as you like. See the [Configuration guide](./configuration-guide.md).
 
-- **Option 1: Using Docker Compose**
+If you're intending to use docker compose you also have to pull the compose file:
+```bash
+curl -O https://github.com/Global-Tags/API/blob/master/compose.yml
+```
 
-    Run the following command to start the API in detached mode:
+### 2. Launching the API
+Then you can run the API:
+```bash
+# Using docker
+docker run --name gtapi -itd -p 5500:5500 -v ./config.json:/app/config.json -v ./icons:/app/icons rappytv/globaltagsapi:latest
 
-    ```bash
-    docker compose up -d # (1)
-    ```
-
-    1. If you'd like to test the setup, you can omit the `-d` option to run it in the foreground.
-
-- **Option 2: Without Docker Compose**
-
-    You can also run the API without Docker Compose by executing:
-
-    ```bash
-    docker run --name gtapi -itd -p 5500:5500 -v ./config.json:/app/config.json -v ./icons:/app/icons rappytv/globaltagsapi:latest
-    ```
+# Using docker compose
+docker compose up -d
+```
