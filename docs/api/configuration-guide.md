@@ -62,25 +62,61 @@ This option decides whether Sentry should be used to capture exceptions or not.
 Here you can enter your Sentry dsn which is used to send any exceptions to.
 
 ### `metrics.enabled`
-
+This option decides whether metrics should be created periodically or not.
 
 ### `metrics.cron`
+This string is the cron representation of the period in which metrics are being created.
+
 ### `metrics.admin_role`
+This option decides which role a player has to have to be counted as an admin.
+
 ### `mailer.enabled`
+This option enables or disables the mailer.
+
 ### `mailer.host`
+This option chooses the mail server to send mails from.
+
 ### `mailer.port`
+This option chooses the port. Example: If you're using SMTPS, enter 465 and set `mailer.secure` to `true`.
+
 ### `mailer.secure`
+This option chooses whether to use the secure variant of your mail protocol.
+
 ### `mailer.auth.username`
+This option is used as the username to authenticate with the mail host.
+
 ### `mailer.auth.password`
+This option is used as the password to authenticate with the mail host.
+
 ### `mailer.sender.address`
+This option contains the address where emails should be sent from.
+
 ### `mailer.sender.name`
+This option is the name which is being used to send mails.
+
 ### `ratelimit.active`
+This option decides whether to protect routes with a ratelimit or not.
+
 ### `ratelimit.routes[x].method`
+This option specifies the http method which needs to be used for this rule to apply.
+
 ### `ratelimit.routes[x].regex`
+This option specifies a regex to match routes which are affected by this rule.
+
 ### `ratelimit.routes[x].max`
+This option specifies the max requests which can be submitted in the time window.
+
 ### `ratelimit.routes[x].seconds`
+This option specifies the time window in seconds.
+
 ### `roles[x].name`
+This option specifies the role's name
+
 ### `roles[x].permissions`
+This option is a permission-boolean keymap.
+
+## TODO: Finish config documentation
+
 ### `bot.enabled`
 ### `bot.token`
 ### `bot.synced_roles.enabled`
