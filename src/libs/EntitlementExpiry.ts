@@ -1,4 +1,3 @@
-import { CronJob } from "cron";
 import entitlement from "../database/schemas/entitlement";
 import players from "../database/schemas/players";
 import { NotificationType, sendMessage } from "./DiscordNotifier";
@@ -6,7 +5,7 @@ import { bot } from "../../config.json";
 import { client } from "../bot/bot";
 import Logger from "./Logger";
 
-async function checkExpiredEntitlements() {
+export async function checkExpiredEntitlements() {
     const ent = await entitlement.find({ done: false, expires_at: { $lt: new Date() } });
     if(!ent) return;
     for (const entitlement of ent) {
@@ -42,8 +41,4 @@ async function checkExpiredEntitlements() {
             member.roles.remove(sku.discordRole);
         }
     }
-}
-
-export function startJob() {
-    new CronJob('*/5 * * * *', checkExpiredEntitlements, null, true, "Europe/Berlin", null, true);
 }
