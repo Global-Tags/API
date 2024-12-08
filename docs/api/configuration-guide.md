@@ -25,21 +25,45 @@ This is the <a href="https://www.mongodb.com/docs/manual/reference/connection-st
 ### `base`
 This string is primarily used in the Discord Client to display custom icons.
 
-### TODO: Write all other options
-
 ### `validation.tag.min`
+This option specifies the minimum length allowed for tags.
+
 ### `validation.tag.max`
+This option specifies the maximum length allowed for tags.
+
 ### `validation.tag.blacklist`
+This string array contains specific keywords which then can't be included in tags.
+
 ### `validation.tag.watchlist`
+This string array contains specific keywords which will put a player on the watchlist if the keyword is included in a tag.
+
 ### `validation.icon.maxResolution`
+This integer specifies the maximum resolution for custom icons. For example if you want the maximum resolution to be 512x512, you put 512
+
 ### `validation.icon.blacklist`
+This string array prevents players from selecting specific default icons.
+
 ### `validation.notes.max_length`
+This strings limits staff notes in its length.
+
 ### `github.owner`
+This option is used to retrieve the owner of the GitHub repository for the GitHub commit data.
+
 ### `github.repository`
+This option is the name of the GitHub repository for the GitHub commit data.
+
 ### `github.branch`
+This option specifies the branch to get the latest commit from
+
 ### `sentry.enabled`
+This option decides whether Sentry should be used to capture exceptions or not.
+
 ### `sentry.dsn`
+Here you can enter your Sentry dsn which is used to send any exceptions to.
+
 ### `metrics.enabled`
+
+
 ### `metrics.cron`
 ### `metrics.admin_role`
 ### `mailer.enabled`
