@@ -12,7 +12,7 @@
         <link rel="prev" href="../guide/">
       
       
-        <link rel="next" href="../custom-auth-provider/">
+        <link rel="next" href="../configuration-guide/">
       
       
       <link rel="icon" href="../../assets/theme/images/icon.png">
@@ -506,22 +506,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
+  <a href="#run-with-bun-that-rhymes" class="md-nav__link">
     <span class="md-ellipsis">
-      Prerequisites
+      Run with bun (that rhymes)
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Installation
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Installation">
+    <nav class="md-nav" aria-label="Run with bun (that rhymes)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -542,34 +533,43 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#3-launching-the-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Launching the API
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-running-the-api" class="md-nav__link">
+  <a href="#run-with-docker" class="md-nav__link">
     <span class="md-ellipsis">
-      3. Running the API
+      Run with docker
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="3. Running the API">
+    <nav class="md-nav" aria-label="Run with docker">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#run-with-bun-that-rhymes" class="md-nav__link">
+  <a href="#1-download-important-files" class="md-nav__link">
     <span class="md-ellipsis">
-      Run with Bun (that rhymes)
+      1. Download important files
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#run-with-docker" class="md-nav__link">
+  <a href="#2-launching-the-api" class="md-nav__link">
     <span class="md-ellipsis">
-      Run with Docker
+      2. Launching the API
     </span>
   </a>
   
@@ -584,6 +584,27 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration-guide/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration Guide
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -730,22 +751,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
+  <a href="#run-with-bun-that-rhymes" class="md-nav__link">
     <span class="md-ellipsis">
-      Prerequisites
+      Run with bun (that rhymes)
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Installation
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Installation">
+    <nav class="md-nav" aria-label="Run with bun (that rhymes)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -766,34 +778,43 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#3-launching-the-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Launching the API
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-running-the-api" class="md-nav__link">
+  <a href="#run-with-docker" class="md-nav__link">
     <span class="md-ellipsis">
-      3. Running the API
+      Run with docker
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="3. Running the API">
+    <nav class="md-nav" aria-label="Run with docker">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#run-with-bun-that-rhymes" class="md-nav__link">
+  <a href="#1-download-important-files" class="md-nav__link">
     <span class="md-ellipsis">
-      Run with Bun (that rhymes)
+      1. Download important files
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#run-with-docker" class="md-nav__link">
+  <a href="#2-launching-the-api" class="md-nav__link">
     <span class="md-ellipsis">
-      Run with Docker
+      2. Launching the API
     </span>
   </a>
   
@@ -828,41 +849,23 @@
 
 
 <h1 id="self-hosting-the-globaltagsapi">Self-hosting the GlobalTagsAPI<a class="headerlink" href="#self-hosting-the-globaltagsapi" title="Permanent link">&para;</a></h1>
-<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
-<ul>
-<li><a href="https://bun.sh" target="_blank">Bun</a></li>
-<li>A <a href="https://mongodb.com" target="_blank">MongoDB</a> instance</li>
-<li><a href="https://www.docker.com" target="_blank">Docker</a><ul>
-<li><a href="https://docs.docker.com/compose/" target="_blank">Docker Compose</a> <em>(Optional)</em></li>
-</ul>
-</li>
-</ul>
-<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
+<h2 id="run-with-bun-that-rhymes">Run with bun (that rhymes)<a class="headerlink" href="#run-with-bun-that-rhymes" title="Permanent link">&para;</a></h2>
 <h3 id="1-clone-the-repository">1. Clone the Repository<a class="headerlink" href="#1-clone-the-repository" title="Permanent link">&para;</a></h3>
 <p>Start by cloning the repository to your local machine:</p>
 <div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Global-Tags/API<span class="w"> </span>gtapi
 <span class="nb">cd</span><span class="w"> </span>gtapi
 </code></pre></div>
 <h3 id="2-create-a-configuration-file">2. Create a Configuration File<a class="headerlink" href="#2-create-a-configuration-file" title="Permanent link">&para;</a></h3>
-<p>Next, create a configuration file by copying the example provided. Adjust the settings in <code>config.json</code> as needed. The only mandatory change is the <code>srv</code> field, which should contain the connection string to your MongoDB instance.</p>
+<p>Next, create a configuration file by copying the example provided. See the <a href="../configuration-guide/">Configuration guide</a>.</p>
 <div class="highlight"><pre><span></span><code>cp<span class="w"> </span>config.json.example<span class="w"> </span>config.json
 </code></pre></div>
-<h2 id="3-running-the-api">3. Running the API<a class="headerlink" href="#3-running-the-api" title="Permanent link">&para;</a></h2>
-<h3 id="run-with-bun-that-rhymes">Run with Bun (that rhymes)<a class="headerlink" href="#run-with-bun-that-rhymes" title="Permanent link">&para;</a></h3>
-<ol>
-<li>
-<p><strong>Install Required Dependencies</strong></p>
-<p>Use the following command to install the necessary dependencies:</p>
-<div class="highlight"><pre><span></span><code>bun<span class="w"> </span>i
-</code></pre></div>
-</li>
-<li>
-<p><strong>Start the API</strong></p>
+<h3 id="3-launching-the-api">3. Launching the API<a class="headerlink" href="#3-launching-the-api" title="Permanent link">&para;</a></h3>
+<p>Now use the following command to install the necessary dependencies:
+<div class="highlight"><pre><span></span><code>bun<span class="w"> </span>install<span class="w"> </span>--production
+</code></pre></div></p>
 <p>To run the API, execute:</p>
 <div class="highlight"><pre><span></span><code>bun<span class="w"> </span>start
 </code></pre></div>
-</li>
-</ol>
 <details class="info" open="open">
 <summary>Hosting the API</summary>
 <p>To keep the API online, install a tool called <code>pm2</code> to daemonize the process:
@@ -870,28 +873,28 @@
 bun<span class="w"> </span>i<span class="w"> </span>-g<span class="w"> </span>pm2<span class="w"> </span>pm2-logrotate
 
 <span class="c1"># Start the daemon</span>
-pm2<span class="w"> </span>start<span class="w"> </span>src/index.ts<span class="w"> </span>--interpreter<span class="w"> </span>~/.bun/bin/bun<span class="w"> </span>--name<span class="w"> </span>GlobalTagAPI
+pm2<span class="w"> </span>start<span class="w"> </span>src/index.ts<span class="w"> </span>--interpreter<span class="w"> </span>~/.bun/bin/bun<span class="w"> </span>--name<span class="w"> </span>GlobalTagsAPI
 </code></pre></div></p>
 </details>
-<h3 id="run-with-docker">Run with Docker<a class="headerlink" href="#run-with-docker" title="Permanent link">&para;</a></h3>
-<p>You have two options for running the API with Docker:</p>
-<ul>
-<li>
-<p><strong>Option 1: Using Docker Compose</strong></p>
-<p>Run the following command to start the API in detached mode:</p>
-<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span><span class="c1"># (1)</span>
+<h2 id="run-with-docker">Run with docker<a class="headerlink" href="#run-with-docker" title="Permanent link">&para;</a></h2>
+<h3 id="1-download-important-files">1. Download important files<a class="headerlink" href="#1-download-important-files" title="Permanent link">&para;</a></h3>
+<p>First of all you need to create a config from the example config template:
+<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>gtapi
+<span class="nb">cd</span><span class="w"> </span>gtapi
+curl<span class="w"> </span>-o<span class="w"> </span>config.json<span class="w"> </span>https://github.com/Global-Tags/API/blob/master/config.json.example
 </code></pre></div>
-<ol>
-<li>If you'd like to test the setup, you can omit the <code>-d</code> option to run it in the foreground.</li>
-</ol>
-</li>
-<li>
-<p><strong>Option 2: Without Docker Compose</strong></p>
-<p>You can also run the API without Docker Compose by executing:</p>
-<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span><span class="m">5000</span>:5000<span class="w"> </span><span class="k">$(</span>docker<span class="w"> </span>build<span class="w"> </span>-q<span class="w"> </span>.<span class="k">)</span>
-</code></pre></div>
-</li>
-</ul>
+You can now edit the <code>config.yml</code> as you like. See the <a href="../configuration-guide/">Configuration guide</a>.</p>
+<p>If you're intending to use docker compose you also have to pull the compose file:
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-O<span class="w"> </span>https://github.com/Global-Tags/API/blob/master/compose.yml
+</code></pre></div></p>
+<h3 id="2-launching-the-api">2. Launching the API<a class="headerlink" href="#2-launching-the-api" title="Permanent link">&para;</a></h3>
+<p>Then you can run the API:
+<div class="highlight"><pre><span></span><code><span class="c1"># Using docker</span>
+docker<span class="w"> </span>run<span class="w"> </span>--name<span class="w"> </span>gtapi<span class="w"> </span>-itd<span class="w"> </span>-p<span class="w"> </span><span class="m">5500</span>:5500<span class="w"> </span>-v<span class="w"> </span>./config.json:/app/config.json<span class="w"> </span>-v<span class="w"> </span>./icons:/app/icons<span class="w"> </span>rappytv/globaltagsapi:latest
+
+<span class="c1"># Using docker compose</span>
+docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
+</code></pre></div></p>
 
 
 
@@ -914,7 +917,7 @@ pm2<span class="w"> </span>start<span class="w"> </span>src/index.ts<span class=
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">October 1, 2024</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">December 5, 2024</span>
   </span>
 
     
@@ -995,13 +998,13 @@ pm2<span class="w"> </span>start<span class="w"> </span>src/index.ts<span class=
         
         
           
-          <a href="../custom-auth-provider/" class="md-footer__link md-footer__link--next" aria-label="Next: Custom Auth Provider">
+          <a href="../configuration-guide/" class="md-footer__link md-footer__link--next" aria-label="Next: Configuration Guide">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Custom Auth Provider
+                Configuration Guide
               </div>
             </div>
             <div class="md-footer__button md-icon">
