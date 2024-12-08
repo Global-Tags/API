@@ -73,8 +73,14 @@ export interface IPlayer {
     last_language: string,
     history: string[],
     watchlist: boolean,
-    referred: boolean,
-    referrals: { uuid: string, timestamp: number }[],
+    referrals: {
+        has_referred: boolean,
+        total: {
+            uuid: string,
+            timestamp: number
+        }[],
+        current_month: number
+    },
     reports: { by: String, reportedName: String, reason: String }[],
     roles: string[],
     api_keys: string[],
@@ -85,6 +91,7 @@ export interface IPlayer {
         discord: { id?: string | null, code?: string | null },
         email: { address?: string | null, code?: string | null }
     },
+    addReferral(uuid: string): void,
     isEmailVerified(): boolean,
     getRoles(): Promise<string[]>,
     getRolesSync(): string[],
@@ -139,24 +146,31 @@ const schema = new Schema<IPlayer>({
         required: true,
         default: false
     },
-    referred: {
-        type: Boolean,
-        required: true,
-        default: false
-    },
     referrals: {
-        type: [{
-            uuid: {
-                type: String,
-                required: true
-            },
-            timestamp: {
-                type: Number,
-                required: true
-            }
-        }],
-        required: true,
-        default: []
+        has_referred: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
+        total: {
+            type: [{
+                uuid: {
+                    type: String,
+                    required: true
+                },
+                timestamp: {
+                    type: Number,
+                    required: true
+                }
+            }],
+            required: true,
+            default: []
+        },
+        current_month: {
+            type: Number,
+            required: true,
+            default: 0
+        }
     },
     reports: {
         type: [
@@ -247,6 +261,11 @@ const schema = new Schema<IPlayer>({
     }
 }, {
     methods: {
+        addReferral(uuid: string) {
+            this.referrals.total.push({ uuid, timestamp: Date.now() });
+            this.referrals.current_month++;
+        },
+
         isEmailVerified() {
             return this.connections.email.address && !this.connections.email.code;
         },

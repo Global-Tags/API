@@ -44,8 +44,11 @@ export default new Elysia()
         },
         roles: player.getRolesSync().map((permission) => constantCase(permission)),
         permissions: Object.keys(player.getPermissionsSync()).filter((perm) => player.getPermissionsSync()[perm]).map((permission) => constantCase(permission)),
-        referred: player.referred,
-        referrals: player.referrals.length,
+        referrals: {
+            has_referred: player.referrals.has_referred,
+            total_referrals: player.referrals.total.length,
+            current_month_referrals: player.referrals.current_month
+        },
         ban: showBan ? {
             active: player.isBanned(),
             reason: player.ban?.reason || null,
@@ -58,7 +61,7 @@ export default new Elysia()
         description: `Get another players' tag info`
     },
     response: {
-        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referred: t.Boolean(), referrals: t.Integer(), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]) }), t.Null()]) }, { description: `You received the tag data.` }),
+        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referrals: t.Object({ has_referred: t.Boolean(), total_referrals: t.Integer(), current_month_referrals: t.Integer() }), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]) }), t.Null()]) }, { description: `You received the tag data.` }),
         401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
         403: t.Object({ error: t.String() }, { description: `The player is banned.` }),
         404: t.Object({ error: t.String() }, { description: `The player is not in the database.` }),
@@ -129,12 +132,12 @@ export default new Elysia()
     const oldTag = player?.tag;
 
     if(!player) {
-        await new players({
+        await players.insertMany({
             uuid,
             tag,
             watchlist: isWatched,
             history: [tag]
-        }).save();
+        });
     } else {
         if(player.tag == tag) return error(400, { error: i18n(`setTag.sameTag`) });
 

@@ -1,4 +1,3 @@
-import { CronJob } from "cron";
 import metrics from "../database/schemas/metrics";
 import players, { GlobalIcon, GlobalPosition } from "../database/schemas/players";
 import Logger from "./Logger";
@@ -60,13 +59,7 @@ type Addon = {
     tags: [number]
 }
 
-export function initializeMetrics() {
-    if(!config.metrics.enabled) return;
-    Logger.debug(`Metric initialized.`);
-    new CronJob(config.metrics.cron, saveMetrics, null, true, "Europe/Berlin");
-}
-
-async function saveMetrics() {
+export async function saveMetrics() {
     if(config.bot.synced_roles.enabled) await client.guilds.cache.get(config.bot.synced_roles.guild)?.members.fetch();
     const users = await players.find();
     const tags = users.filter((user) => user.tag != null).length;
@@ -83,7 +76,7 @@ async function saveMetrics() {
     const addon = await fetchAddon('globaltags');
     const mod = await fetchMod('globaltags');
     
-    new metrics({
+    metrics.insertMany({
         players: users.length,
         tags,
         admins: staff,
@@ -98,9 +91,13 @@ async function saveMetrics() {
         dailyRequests: getRequests(),
         positions,
         icons
-    }).save();
+    }).catch((error) =>
+        Logger.error(`Error while trying to save metrics: ${error}. Request count: ${requests}`)
+    ).then(() =>
+        Logger.debug(`New metrics saved!`)
+    );
+
     requests = 0;
-    Logger.debug(`New metric saved!`);
 }
 
 async function fetchAddon(namespace: string): Promise<Addon | null> {

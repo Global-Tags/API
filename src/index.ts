@@ -10,9 +10,9 @@ import checkDatabase from "./middleware/DatabaseChecker";
 import Ratelimiter from "./libs/Ratelimiter";
 import checkRatelimit from "./middleware/RatelimitChecker";
 import { ip } from "./middleware/ObtainIP";
-import { load } from "./libs/I18n";
+import { load as loadLanguages } from "./libs/I18n";
 import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/FetchI18n";
-import { getRequests, initializeMetrics, loadRequests } from "./libs/Metrics";
+import { getRequests, loadRequests } from "./libs/Metrics";
 import Metrics from "./database/schemas/metrics";
 import AuthProvider from "./auth/AuthProvider";
 import getAuthProvider from "./middleware/GetAuthProvider";
@@ -21,7 +21,8 @@ import minimist from "minimist";
 import cors from "@elysiajs/cors";
 import { verify as verifyMailOptions } from "./libs/Mailer";
 import { getLatestCommit, retrieveData } from "./libs/GitCommitData";
-import { startJob } from "./libs/EntitlementExpiry";
+import { startEntitlementExpiry, startMetrics, startReferralReset } from "./libs/CronJobs";
+import players from "./database/schemas/players";
 
 handleErrors();
 if(config.sentry.enabled) initializeSentry(config.sentry.dsn);
@@ -77,14 +78,14 @@ export const elysia = new Elysia()
     Ratelimiter.initialize();
     AuthProvider.loadProviders();
     connect(config.srv);
-    initializeMetrics();
     if(config.mailer.enabled) {
         verifyMailOptions();
     }
     
-    // Load languages
-    load();
-    startJob();
+    loadLanguages();
+    startEntitlementExpiry();
+    startMetrics();
+    startReferralReset();
 })
 .onError(({ code, set, error: { message: error }, request }) => {
     const i18n = getI18nFunctionByLanguage(request.headers.get('x-language'));
@@ -131,7 +132,7 @@ export const elysia = new Elysia()
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     }
 })
-.get(`/metrics`, async ({ query: { latest }}) => {
+.get(`/metrics`, async ({ query: { latest } }) => {
     const metrics = await Metrics.find();
 
     return metrics.filter((doc) => {
@@ -172,6 +173,35 @@ export const elysia = new Elysia()
     query: t.Object({
         latest: t.Optional(t.String({ error: 'error.wrongType;;[["field", "element"], ["type", "string"]]' }))
     }, { additionalProperties: true })
+}).get('/referrals', async () => {
+    const data = await players.find();
+    const totalReferrals = data.sort((a, b) => b.referrals.total.length - a.referrals.total.length).slice(0, 10);
+    const monthReferrals = data.sort((a, b) => b.referrals.current_month - a.referrals.current_month).slice(0, 10);
+
+    return {
+        total: totalReferrals.map((player) => ({
+            uuid: player.uuid,
+            total_referrals: player.referrals.total.length,
+            current_month_referrals: player.referrals.current_month
+        })),
+        current_month: monthReferrals.map((player) => ({
+            uuid: player.uuid,
+            total_referrals: player.referrals.total.length,
+            current_month_referrals: player.referrals.current_month
+        }))
+    };
+}, {
+    detail: {
+        tags: ['API'],
+        description: 'Get the referral leaderboard'
+    },
+    response: {
+        200: t.Object({
+            total: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() })),
+            current_month: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() }))
+        }, { description: 'The referral leaderboards.' }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    }
 })
 .get(`/ping`, ({ error }: Context) => { return error(204, "") }, {
     detail: {
