@@ -9,7 +9,7 @@ import axios from "axios";
 import { generateSecureCode } from "../../routes/connections";
 import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 
-export default class PlayerInfo extends Command {
+export default class CustomIcon extends Command {
     constructor() {
         super(
             "icon",

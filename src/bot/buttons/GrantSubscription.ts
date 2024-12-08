@@ -1,4 +1,4 @@
-import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from "discord.js";
+import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from "discord.js";
 import Button from "../structs/Button";
 import players, { Permission } from "../../database/schemas/players";
 import { colors } from "../bot";

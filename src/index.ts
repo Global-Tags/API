@@ -1,7 +1,7 @@
 import { Context, Elysia, t } from "elysia";
 import { swagger } from "@elysiajs/swagger";
 import Logger from "./libs/Logger";
-import { connect } from "./database/mongo";
+import { connect as connectDatabase } from "./database/mongo";
 import { getRouter } from "./libs/RouteLoader";
 import * as config from "../config.json";
 import { version } from "../package.json";
@@ -10,9 +10,9 @@ import checkDatabase from "./middleware/DatabaseChecker";
 import Ratelimiter from "./libs/Ratelimiter";
 import checkRatelimit from "./middleware/RatelimitChecker";
 import { ip } from "./middleware/ObtainIP";
-import { load } from "./libs/I18n";
+import { load as loadLanguages } from "./libs/I18n";
 import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/FetchI18n";
-import { getRequests, initializeMetrics, loadRequests } from "./libs/Metrics";
+import { getRequests, loadRequests } from "./libs/Metrics";
 import Metrics from "./database/schemas/metrics";
 import AuthProvider from "./auth/AuthProvider";
 import getAuthProvider from "./middleware/GetAuthProvider";
@@ -21,7 +21,13 @@ import minimist from "minimist";
 import cors from "@elysiajs/cors";
 import { verify as verifyMailOptions } from "./libs/Mailer";
 import { getLatestCommit, retrieveData } from "./libs/GitCommitData";
-import { startJob } from "./libs/EntitlementExpiry";
+import { startEntitlementExpiry, startMetrics, startReferralReset } from "./libs/CronJobs";
+import players from "./database/schemas/players";
+
+if(config.mongodb.trim().length == 0) {
+    Logger.error(`Database connection string is empty!`);
+    process.exit(1);
+}
 
 handleErrors();
 if(config.sentry.enabled) initializeSentry(config.sentry.dsn);
@@ -51,10 +57,10 @@ export const elysia = new Elysia()
         info: {
             version,
             title: `GlobalTags API`,
-            description: `This documentation is for the API of the GlobalTags addon for the LabyMod Minecraft client.`,
+            description: `This is the official GlobalTags API documentation containing detailed descriptions about the API endpoints and their usage.`,
             license: {
                 name: 'MIT',
-                url: 'https://github.com/RappyLabyAddons/GlobalTagAPI/blob/master/LICENSE'
+                url: 'https://github.com/Global-Tags/API/blob/master/LICENSE'
             },
             contact: {
                 name: `RappyTV`,
@@ -65,7 +71,7 @@ export const elysia = new Elysia()
         tags: [
             { name: `API`, description: `Get info about the API` },
             { name: `Interactions`, description: `Interact with other players` },
-            { name: `Settings`, description: `Modify the settings of your global tag` },
+            { name: `Settings`, description: `Modify the settings of your GlobalTag` },
             { name: `Admin`, description: `Moderation actions` },
             { name: `Connections`, description: `Manage account connections` }
         ]
@@ -76,15 +82,15 @@ export const elysia = new Elysia()
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
     AuthProvider.loadProviders();
-    connect(config.srv);
-    initializeMetrics();
+    connectDatabase(config.mongodb);
     if(config.mailer.enabled) {
         verifyMailOptions();
     }
     
-    // Load languages
-    load();
-    startJob();
+    loadLanguages();
+    startEntitlementExpiry();
+    startMetrics();
+    startReferralReset();
 })
 .onError(({ code, set, error: { message: error }, request }) => {
     const i18n = getI18nFunctionByLanguage(request.headers.get('x-language'));
@@ -131,7 +137,7 @@ export const elysia = new Elysia()
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     }
 })
-.get(`/metrics`, async ({ query: { latest }}) => {
+.get(`/metrics`, async ({ query: { latest } }) => {
     const metrics = await Metrics.find();
 
     return metrics.filter((doc) => {
@@ -172,6 +178,35 @@ export const elysia = new Elysia()
     query: t.Object({
         latest: t.Optional(t.String({ error: 'error.wrongType;;[["field", "element"], ["type", "string"]]' }))
     }, { additionalProperties: true })
+}).get('/referrals', async () => {
+    const data = await players.find();
+    const totalReferrals = data.sort((a, b) => b.referrals.total.length - a.referrals.total.length).slice(0, 10);
+    const monthReferrals = data.sort((a, b) => b.referrals.current_month - a.referrals.current_month).slice(0, 10);
+
+    return {
+        total: totalReferrals.map((player) => ({
+            uuid: player.uuid,
+            total_referrals: player.referrals.total.length,
+            current_month_referrals: player.referrals.current_month
+        })),
+        current_month: monthReferrals.map((player) => ({
+            uuid: player.uuid,
+            total_referrals: player.referrals.total.length,
+            current_month_referrals: player.referrals.current_month
+        }))
+    };
+}, {
+    detail: {
+        tags: ['API'],
+        description: 'Get the referral leaderboard'
+    },
+    response: {
+        200: t.Object({
+            total: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() })),
+            current_month: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() }))
+        }, { description: 'The referral leaderboards.' }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    }
 })
 .get(`/ping`, ({ error }: Context) => { return error(204, "") }, {
     detail: {

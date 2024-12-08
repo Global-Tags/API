@@ -13,6 +13,7 @@ nav:
   - API:
     - Guide: api/guide.md
     - Self hosting: api/self-hosting.md
+    - Configuration Guide: api/configuration-guide.md
     - Custom Auth Provider: api/custom-auth-provider.md
   - Language Wrappers:
       - Java Wrapper: wrappers/java.md

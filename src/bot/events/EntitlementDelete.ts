@@ -1,8 +1,6 @@
-import { Entitlement, EntitlementType } from "discord.js";
+import { Entitlement } from "discord.js";
 import Event from "../structs/Event";
 import { bot } from "../../../config.json";
-import { client } from "../bot";
-import Logger from "../../libs/Logger";
 import players from "../../database/schemas/players";
 import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import entitlements from "../../database/schemas/entitlement";
@@ -25,12 +23,12 @@ export default class EntitlementDelete extends Event {
             uuid: player?.uuid || ''
         });
 
-        await new entitlements({
+        await entitlements.insertMany({
             id: entitlement.id,
             sku_id: entitlement.skuId,
             user_id: entitlement.userId,
             expires_at: new Date(),
             test: true
-        }).save();
+        });
     }
 }

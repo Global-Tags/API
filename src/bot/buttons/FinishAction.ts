@@ -1,4 +1,4 @@
-import { ButtonInteraction, CacheType, Message, GuildMember, User, ActionRowBuilder, EmbedBuilder, ButtonBuilder, ActionRow } from "discord.js";
+import { ButtonInteraction, CacheType, Message, GuildMember, User, ActionRowBuilder, EmbedBuilder, ButtonBuilder } from "discord.js";
 import Button from "../structs/Button";
 import { colors } from "../bot";
 import players from "../../database/schemas/players";
