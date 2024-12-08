@@ -91,9 +91,13 @@ export async function saveMetrics() {
         dailyRequests: getRequests(),
         positions,
         icons
-    });
+    }).catch((error) =>
+        Logger.error(`Error while trying to save metrics: ${error}. Request count: ${requests}`)
+    ).then(() =>
+        Logger.debug(`New metrics saved!`)
+    );
+
     requests = 0;
-    Logger.debug(`New metric saved!`);
 }
 
 async function fetchAddon(namespace: string): Promise<Addon | null> {
