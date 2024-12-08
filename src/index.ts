@@ -22,6 +22,7 @@ import cors from "@elysiajs/cors";
 import { verify as verifyMailOptions } from "./libs/Mailer";
 import { getLatestCommit, retrieveData } from "./libs/GitCommitData";
 import { startEntitlementExpiry, startMetrics, startReferralReset } from "./libs/CronJobs";
+import players from "./database/schemas/players";
 
 handleErrors();
 if(config.sentry.enabled) initializeSentry(config.sentry.dsn);
@@ -131,7 +132,7 @@ export const elysia = new Elysia()
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     }
 })
-.get(`/metrics`, async ({ query: { latest }}) => {
+.get(`/metrics`, async ({ query: { latest } }) => {
     const metrics = await Metrics.find();
 
     return metrics.filter((doc) => {
@@ -172,6 +173,35 @@ export const elysia = new Elysia()
     query: t.Object({
         latest: t.Optional(t.String({ error: 'error.wrongType;;[["field", "element"], ["type", "string"]]' }))
     }, { additionalProperties: true })
+}).get('/referrals', async () => {
+    const data = await players.find();
+    const totalReferrals = data.sort((a, b) => b.referrals.total.length - a.referrals.total.length).slice(0, 10);
+    const monthReferrals = data.sort((a, b) => b.referrals.current_month - a.referrals.current_month).slice(0, 10);
+
+    return {
+        total: totalReferrals.map((player) => ({
+            uuid: player.uuid,
+            total_referrals: player.referrals.total.length,
+            current_month_referrals: player.referrals.current_month
+        })),
+        current_month: monthReferrals.map((player) => ({
+            uuid: player.uuid,
+            total_referrals: player.referrals.total.length,
+            current_month_referrals: player.referrals.current_month
+        }))
+    };
+}, {
+    detail: {
+        tags: ['API'],
+        description: 'Get the referral leaderboard'
+    },
+    response: {
+        200: t.Object({
+            total: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() })),
+            current_month: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() }))
+        }, { description: 'The referral leaderboards.' }),
+        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+    }
 })
 .get(`/ping`, ({ error }: Context) => { return error(204, "") }, {
     detail: {
