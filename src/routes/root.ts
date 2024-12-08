@@ -132,12 +132,12 @@ export default new Elysia()
     const oldTag = player?.tag;
 
     if(!player) {
-        await new players({
+        await players.insertMany({
             uuid,
             tag,
             watchlist: isWatched,
             history: [tag]
-        }).save();
+        });
     } else {
         if(player.tag == tag) return error(400, { error: i18n(`setTag.sameTag`) });
 

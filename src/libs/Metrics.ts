@@ -76,7 +76,7 @@ export async function saveMetrics() {
     const addon = await fetchAddon('globaltags');
     const mod = await fetchMod('globaltags');
     
-    new metrics({
+    metrics.insertMany({
         players: users.length,
         tags,
         admins: staff,
@@ -91,7 +91,7 @@ export async function saveMetrics() {
         dailyRequests: getRequests(),
         positions,
         icons
-    }).save();
+    });
     requests = 0;
     Logger.debug(`New metric saved!`);
 }
