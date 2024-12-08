@@ -2,7 +2,6 @@ import { TransportOptions, createTransport } from "nodemailer";
 import { mailer } from "../../config.json";
 import { join } from "path";
 import Logger from "./Logger";
-import { getI18nFunctionByLanguage } from "../middleware/FetchI18n";
 import { pascalCase } from "change-case";
 import { I18nFunction } from "./I18n";
 

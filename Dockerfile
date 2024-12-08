@@ -1,6 +1,7 @@
 FROM oven/bun
 
 WORKDIR /app
+VOLUME /app/icons
 
 COPY package.json .
 COPY bun.lockb .
@@ -8,10 +9,10 @@ COPY bun.lockb .
 RUN bun install --production
 
 COPY src src
-COPY config.json .
+COPY locales locales
 COPY tsconfig.json .
-RUN ls
-# COPY public public
 
+USER 1000
+EXPOSE 5500
 # ENV NODE_ENV production // https://github.com/elysiajs/elysia/issues/585
 CMD ["bun", "src/index.ts"]
