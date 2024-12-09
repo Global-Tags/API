@@ -23,6 +23,7 @@ import { verify as verifyMailOptions } from "./libs/Mailer";
 import { getLatestCommit, retrieveData } from "./libs/GitCommitData";
 import { startEntitlementExpiry, startMetrics, startReferralReset } from "./libs/CronJobs";
 import players from "./database/schemas/players";
+import { formatUUID } from "./routes/root";
 
 if(config.mongodb.trim().length == 0) {
     Logger.error(`Database connection string is empty!`);
@@ -180,17 +181,17 @@ export const elysia = new Elysia()
     }, { additionalProperties: true })
 }).get('/referrals', async () => {
     const data = await players.find();
-    const totalReferrals = data.sort((a, b) => b.referrals.total.length - a.referrals.total.length).slice(0, 10);
-    const monthReferrals = data.sort((a, b) => b.referrals.current_month - a.referrals.current_month).slice(0, 10);
+    const totalReferrals = data.filter((player) => player.referrals.total.length > 0).sort((a, b) => b.referrals.total.length - a.referrals.total.length).slice(0, 10);
+    const monthReferrals = data.filter((player) => player.referrals.current_month > 0).sort((a, b) => b.referrals.current_month - a.referrals.current_month).slice(0, 10);
 
     return {
         total: totalReferrals.map((player) => ({
-            uuid: player.uuid,
+            uuid: formatUUID(player.uuid),
             total_referrals: player.referrals.total.length,
             current_month_referrals: player.referrals.current_month
         })),
         current_month: monthReferrals.map((player) => ({
-            uuid: player.uuid,
+            uuid: formatUUID(player.uuid),
             total_referrals: player.referrals.total.length,
             current_month_referrals: player.referrals.current_month
         }))
