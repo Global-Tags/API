@@ -70,8 +70,8 @@
     },
     "referral": {
         "self": "Du kannst dich nicht selber vermitteln!",
-        "alreadyReferred": "Du hast bereits einen Spieler vermittelt!",
-        "success": "Du hast den Spieler erfolgreich vermittelt!"
+        "alreadyReferred": "Du hast bereits einen Spieler als deinen Vermittler markiert!",
+        "success": "Du hast den Spieler erfolgreich als deinen Vermittler markiert!"
     },
     "resetTag": {
         "success": {

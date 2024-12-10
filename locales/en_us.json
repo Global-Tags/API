@@ -70,8 +70,8 @@
     },
     "referral": {
         "self": "You can't refer yourself!",
-        "alreadyReferred": "You have already referred a player!",
-        "success": "You have successfully referred the player!"
+        "alreadyReferred": "You have already marked a player as your referrer!",
+        "success": "You have successfully marked this player as your referral!"
     },
     "resetTag": {
         "success": {
