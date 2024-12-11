@@ -5,11 +5,11 @@
 ### What do the different role icons mean?
 | Icon | Role |
 | ---- | ---- |
-| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/purple.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Admin</p> |
-| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/aqua.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Developer</p> |
-| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/orange.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Discord Moderator</p> |
-| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/blue.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Partner</p> |
-| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/green.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Financial Supporter / Discord Booster</p> |
+| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/admin.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Admin</p> |
+| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/developer.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Developer</p> |
+| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/moderator.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Discord Moderator</p> |
+| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/partner.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Partner</p> |
+| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/supporter.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">GlobalTags Premium</p> |
 
 ### Which commands can I use?
 
