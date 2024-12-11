@@ -21,7 +21,7 @@ To create a custom tag, follow these steps:
 In the settings, you'll see a tag preview and an input field. Enter your desired tag (1), select a position for the tag, choose an icon, and click "Update" to apply the changes.
 { .annotate }
 
-1. You can also use color codes. For more info read [How can I use colors in my Tag?](../faq.md#how-can-i-use-colors-in-my-tag).
+1. You can also use color codes. For more info read [How can I use colors in my Tag?](../faq.md#how-can-i-customize-my-tag-with-colors).
 
 ![Setting a Tag](../assets/files/labymod/tag.png)
 
