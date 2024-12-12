@@ -1,7 +1,7 @@
-node_modules
-.venv
-package-lock.json
-config.json
-.cache
 icons
+node_modules
+package-lock.json
+.venv
 .DS_Store
+.cache
+.env.*
