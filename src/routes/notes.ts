@@ -3,8 +3,10 @@ import players, { Permission } from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
 import { ModLogType, NotificationType, sendMessage } from "../libs/DiscordNotifier";
 import getAuthProvider from "../middleware/GetAuthProvider";
-import { validation } from "../../config.json";
 import { formatUUID } from "./root";
+import { config } from "../libs/Config";
+
+const { validation } = config;
 
 export default new Elysia({
     prefix: `/notes`
@@ -104,7 +106,7 @@ export default new Elysia({
         403: t.Object({ error: t.String() }, { description: "You're not allowed to manage notes." }),
         404: t.Object({ error: t.String() }, { description: "The player you tried to add a note to was not found." })
     },
-    body: t.Object({ note: t.String({ maxLength: validation.notes.max_length, error: `note.create.max_length;;[["max", "${validation.notes.max_length}"]]` }) }, { error: `error.invalidBody`, additionalProperties: true }),
+    body: t.Object({ note: t.String({ maxLength: validation.notes.maxLength, error: `note.create.max_length;;[["max", "${validation.notes.maxLength}"]]` }) }, { error: `error.invalidBody`, additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to add a note to.' }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 }).delete(`/:id`, async ({ error, params, headers, i18n, body, provider }) => { // Delete note

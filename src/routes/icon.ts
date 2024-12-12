@@ -1,17 +1,17 @@
 import Elysia, { t } from "elysia";
 import players, { GlobalIcon, Permission } from "../database/schemas/players";
-import * as config from "../../config.json";
 import fetchI18n from "../middleware/FetchI18n";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { join } from "path";
 import { constantCase } from "change-case";
+import { config } from "../libs/Config";
 
 const icons = Object.keys(GlobalIcon)
     .filter((pos) => isNaN(Number(pos)))
     .map((pos) => pos.toUpperCase());
 
 export function getCustomIconUrl(uuid: string, hash: string) {
-    return `${config.base}/players/${uuid}/icon/${hash}`;
+    return `${config.baseUrl}/players/${uuid}/icon/${hash}`;
 }
 
 export default new Elysia({

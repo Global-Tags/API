@@ -1,5 +1,7 @@
 import axios from "axios";
-import { github } from "../../config.json";
+import { config } from "./Config";
+
+const { github } = config;
 
 let commit: string | null = null;
 

@@ -1,9 +1,11 @@
 import { TransportOptions, createTransport } from "nodemailer";
-import { mailer } from "../../config.json";
+import { config } from "./Config";
 import { join } from "path";
 import Logger from "./Logger";
 import { pascalCase } from "change-case";
 import { I18nFunction } from "./I18n";
+
+const { mailer } = config;
 
 type MailOptions = {
     recipient: string,

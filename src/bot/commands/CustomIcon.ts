@@ -2,12 +2,13 @@ import { ApplicationCommandOptionType, CacheType, CommandInteraction, CommandInt
 import Command from "../structs/Command";
 import players, { GlobalIcon, Permission } from "../../database/schemas/players";
 import { colors } from "../bot";
-import { bot, validation } from "../../../config.json";
+import { bot } from "../../../config.json";
 import { constantCase } from "change-case";
 import { join } from 'path';
 import axios from "axios";
 import { generateSecureCode } from "../../routes/connections";
 import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { config } from "../../libs/Config";
 
 export default class CustomIcon extends Command {
     constructor() {
@@ -72,7 +73,7 @@ export default class CustomIcon extends Command {
 
             if(file.contentType != 'image/png') return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ The file you uploaded is not a PNG image!`)] });
             if(!file.height || file.height != file.width) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ The file you uploaded is not a square image!`)] });
-            if(file.height > validation.icon.maxResolution) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ The file you uploaded exceeds the max resolution of ${validation.icon.maxResolution}x${validation.icon.maxResolution}!`)] });
+            if(file.height > config.validation.icon.maxResolution) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ The file you uploaded exceeds the max resolution of ${config.validation.icon.maxResolution}x${config.validation.icon.maxResolution}!`)] });
 
             const request = await axios.get(file.url, { responseType: 'arraybuffer' }).catch(() => null);
             if(!request) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ The upload failed, please try again!`)] });

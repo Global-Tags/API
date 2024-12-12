@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { logLevel } from "../../config.json";
+import { config } from "./Config";
 
 enum LogLevel {
     Error,
@@ -30,6 +30,6 @@ export default class Logger {
     }
 
     public static getLoglevel(): LogLevel {
-        return LogLevel[logLevel as keyof typeof LogLevel] || LogLevel.Info;
+        return LogLevel[config.logLevel as keyof typeof LogLevel] || LogLevel.Info;
     }
 }
