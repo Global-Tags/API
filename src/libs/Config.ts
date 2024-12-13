@@ -1,57 +1,5 @@
 import { configDotenv } from "dotenv";
 
-type Config = {
-    port: number,
-    ipHeader: string,
-    strictAuth: boolean,
-    logLevel: string,
-    mongodb: string,
-    baseUrl: string,
-    validation: {
-        tag: {
-            min: number,
-            max: number,
-            blacklist: string[],
-            watchlist: string[]
-        },
-        icon: {
-            maxResolution: number,
-            blacklist: string[]
-        },
-        notes: {
-            maxLength: number
-        }
-    },
-    github: {
-        owner: string,
-        repository: string,
-        branch: string
-    },
-    sentry: {
-        enabled: boolean,
-        dsn: string
-    },
-    metrics: {
-        enabled: boolean,
-        cron: string,
-        adminRole: string
-    },
-    mailer: {
-        enabled: boolean,
-        host: string,
-        port: number,
-        secure: boolean,
-        auth: {
-            username: string,
-            password: string
-        },
-        sender: {
-            address: string,
-            name: string
-        }
-    }
-};
-
 function getEnvNumber(path: string | undefined, defaultValue: number) {
     const number = Number(path);
     return isNaN(number) ? defaultValue : number;
@@ -65,7 +13,7 @@ function getEnvBoolean(path: string | undefined, defaultValue: boolean) {
 configDotenv();
 configDotenv({ path: `./.env.${process.env.NODE_ENV || 'dev'}`, override: true });
 
-export let config: Config = {
+export let config = {
     port: getEnvNumber(process.env.GT_PORT, 5500),
     ipHeader: process.env.GT_PROXY_IP_HEADER || 'x-real-ip',
     strictAuth: getEnvBoolean(process.env.GT_STRICT_AUTH, true),
@@ -113,6 +61,48 @@ export let config: Config = {
         sender: {
             address: process.env.GT_MAILER_SENDER_ADDRESS || '',
             name: process.env.GT_MAILER_SENDER_NAME || 'GlobalTags System'
+        }
+    },
+    discordBot: {
+        enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_ENABLED, false),
+        token: process.env.GT_DISCORD_BOT_TOKEN || '',
+        notifications: {
+            reports: {
+                enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_REPORTS_ENABLED, false),
+                channel: process.env.GT_DISCORD_BOT_REPORTS_CHANNEL || '',
+                content: process.env.GT_DISCORD_BOT_REPORTS_CONTENT || ''
+            },
+            watchlist: {
+                enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_WATCHLIST_ENABLED, false),
+                channel: process.env.GT_DISCORD_BOT_WATCHLIST_CHANNEL || '',
+                content: process.env.GT_DISCORD_BOT_WATCHLIST_CONTENT || ''
+            },
+            banAppeals: {
+                enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_APPEALS_ENABLED, false),
+                channel: process.env.GT_DISCORD_BOT_APPEALS_CHANNEL || '',
+                content: process.env.GT_DISCORD_BOT_APPEALS_CONTENT || ''
+            },
+            mogLog: {
+                enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_MODLOG_ENABLED, false),
+                channel: process.env.GT_DISCORD_BOT_MODLOG_CHANNEL || ''
+            },
+            referrals: {
+                enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_REFERRALS_ENABLED, false),
+                channel: process.env.GT_DISCORD_BOT_REFERRALS_CHANNEL || ''
+            },
+            accountConnections: {
+                enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_ENABLED, false),
+                channel: process.env.GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_CHANNEL || '',
+                role: process.env.GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_ROLE || ''
+            },
+            customIcons: {
+                enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_CUSTOM_ICONS_ENABLED, false),
+                channel: process.env.GT_DISCORD_BOT_CUSTOM_ICONS_CHANNEL || ''
+            },
+            entitlements: {
+                enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_ENTITLEMENTS_ENABLED, false),
+                channel: process.env.GT_DISCORD_BOT_ENTITLEMENTS_CHANNEL || ''
+            }
         }
     }
 };
