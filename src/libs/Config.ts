@@ -63,6 +63,9 @@ export let config = {
             name: process.env.GT_MAILER_SENDER_NAME || 'GlobalTags System'
         }
     },
+    ratelimiter: {
+        enabled: getEnvBoolean(process.env.GT_RATELIMITER_ENABLED, true)
+    },
     discordBot: {
         enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_ENABLED, false),
         token: process.env.GT_DISCORD_BOT_TOKEN || '',

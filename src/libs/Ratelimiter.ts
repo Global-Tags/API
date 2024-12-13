@@ -1,5 +1,6 @@
 import { IpContext } from "../middleware/RatelimitChecker";
-import { ratelimit } from "../../config.json";
+import { config } from "./Config";
+import ratelimiterConfig from "../../config/ratelimiter.json";
 
 type RatelimitData = {
     reset: number,
@@ -14,14 +15,14 @@ type RatelimiterKey = {
 
 export default class Ratelimiter {
     private static ratelimiters: Map<RatelimiterKey, Ratelimiter> = new Map();
-    private static enabled: boolean = ratelimit.active;
+    private static enabled: boolean = config.ratelimiter.enabled;
     public key;
     private players: Map<string, { requests: number, timestamp: number }> = new Map();
     private maxRequests: number;
     private resetAfter: number;
 
     public static initialize() {
-        for(const route of ratelimit.routes) {
+        for(const route of ratelimiterConfig) {
             const key: RatelimiterKey = { method: route.method, regex: route.regex };
             this.ratelimiters.set(key, new Ratelimiter(key));
         }
@@ -37,7 +38,7 @@ export default class Ratelimiter {
 
     constructor(key: RatelimiterKey) {
         this.key = key;
-        const config: { max: number, seconds: number } = ratelimit.routes.find((route) => route.regex == key.regex)!;
+        const config: { max: number, seconds: number } = ratelimiterConfig.find((route) => route.regex == key.regex)!;
         this.maxRequests = config.max;
         this.resetAfter = config.seconds * 1000;
         Ratelimiter.ratelimiters.set(key, this);
