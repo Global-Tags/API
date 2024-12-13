@@ -23,12 +23,7 @@ import { getLatestCommit, retrieveData } from "./libs/GitCommitData";
 import { startEntitlementExpiry, startMetrics, startReferralReset } from "./libs/CronJobs";
 import players from "./database/schemas/players";
 import { formatUUID } from "./routes/root";
-import { configDotenv } from "dotenv";
-import { config, initializeConfig } from "./libs/Config";
-
-configDotenv();
-configDotenv({ path: `./.env.${process.env.NODE_ENV || 'dev'}`, override: true });
-initializeConfig();
+import { config } from "./libs/Config";
 
 if(config.mongodb.trim().length == 0) {
     Logger.error(`Database connection string is empty!`);

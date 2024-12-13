@@ -1,3 +1,5 @@
+import { configDotenv } from "dotenv";
+
 type Config = {
     port: number,
     ipHeader: string,
@@ -60,58 +62,57 @@ function getEnvBoolean(path: string | undefined, defaultValue: boolean) {
     return path.toLowerCase() === 'true';
 }
 
-export let config: Config;
+configDotenv();
+configDotenv({ path: `./.env.${process.env.NODE_ENV || 'dev'}`, override: true });
 
-export function initializeConfig() {
-    config = {
-        port: getEnvNumber(process.env.GT_PORT, 5500),
-        ipHeader: process.env.GT_PROXY_IP_HEADER || 'x-real-ip',
-        strictAuth: getEnvBoolean(process.env.GT_STRICT_AUTH, true),
-        logLevel: process.env.GT_LOG_LEVEL || 'Info',
-        mongodb: process.env.GT_MONGODB_CONNECTION || '',
-        baseUrl: process.env.GT_BASE_URL || 'http://localhost:5500',
-        validation: {
-            tag: {
-                min: getEnvNumber(process.env.GT_VALIDATION_TAG_MIN_LENGTH, 1),
-                max: getEnvNumber(process.env.GT_VALIDATION_TAG_MAX_LENGTH, 30),
-                blacklist: process.env.GT_VALIDATION_TAG_BLACKLIST?.split(',') || [],
-                watchlist: process.env.GT_VALIDATION_TAG_WATCHLIST?.split(',') || []
-            },
-            icon: {
-                maxResolution: getEnvNumber(process.env.GT_VALIDATION_ICON_MAX_RESOLUTION, 512),
-                blacklist: process.env.GT_VALIDATION_ICON_BLACKLIST?.split(',') || []
-            },
-            notes: {
-                maxLength: getEnvNumber(process.env.GT_VALIDATION_NOTES_MAX_LENGTH, 100)
-            }
+export let config: Config = {
+    port: getEnvNumber(process.env.GT_PORT, 5500),
+    ipHeader: process.env.GT_PROXY_IP_HEADER || 'x-real-ip',
+    strictAuth: getEnvBoolean(process.env.GT_STRICT_AUTH, true),
+    logLevel: process.env.GT_LOG_LEVEL || 'Info',
+    mongodb: process.env.GT_MONGODB_CONNECTION || '',
+    baseUrl: process.env.GT_BASE_URL || 'http://localhost:5500',
+    validation: {
+        tag: {
+            min: getEnvNumber(process.env.GT_VALIDATION_TAG_MIN_LENGTH, 1),
+            max: getEnvNumber(process.env.GT_VALIDATION_TAG_MAX_LENGTH, 30),
+            blacklist: process.env.GT_VALIDATION_TAG_BLACKLIST?.split(',') || [],
+            watchlist: process.env.GT_VALIDATION_TAG_WATCHLIST?.split(',') || []
         },
-        github: {
-            owner: process.env.GT_GITHUB_OWNER || 'Global-Tags',
-            repository: process.env.GT_GITHUB_REPOSITORY || 'API',
-            branch: process.env.GT_GITHUB_BRANCH || 'master'
+        icon: {
+            maxResolution: getEnvNumber(process.env.GT_VALIDATION_ICON_MAX_RESOLUTION, 512),
+            blacklist: process.env.GT_VALIDATION_ICON_BLACKLIST?.split(',') || []
         },
-        sentry: {
-            enabled: getEnvBoolean(process.env.GT_SENTRY_ENABLED, false),
-            dsn: process.env.GT_SENTRY_DSN || ''
+        notes: {
+            maxLength: getEnvNumber(process.env.GT_VALIDATION_NOTES_MAX_LENGTH, 100)
+        }
+    },
+    github: {
+        owner: process.env.GT_GITHUB_OWNER || 'Global-Tags',
+        repository: process.env.GT_GITHUB_REPOSITORY || 'API',
+        branch: process.env.GT_GITHUB_BRANCH || 'master'
+    },
+    sentry: {
+        enabled: getEnvBoolean(process.env.GT_SENTRY_ENABLED, false),
+        dsn: process.env.GT_SENTRY_DSN || ''
+    },
+    metrics: {
+        enabled: getEnvBoolean(process.env.GT_METRICS_ENABLED, true),
+        cron: process.env.GT_METRICS_CRON || '0 0 * * *',
+        adminRole: process.env.GT_METRICS_ADMIN_ROLE?.toUpperCase() || 'ADMIN'
+    },
+    mailer: {
+        enabled: getEnvBoolean(process.env.GT_MAILER_ENABLED, false),
+        host: process.env.GT_MAILER_HOST || 'localhost',
+        port: getEnvNumber(process.env.GT_MAILER_PORT, 465),
+        secure: getEnvBoolean(process.env.GT_MAILER_SECURE, true),
+        auth: {
+            username: process.env.GT_MAILER_AUTH_USERNAME || '',
+            password: process.env.GT_MAILER_AUTH_PASSWORD || ''
         },
-        metrics: {
-            enabled: getEnvBoolean(process.env.GT_METRICS_ENABLED, true),
-            cron: process.env.GT_METRICS_CRON || '0 0 * * *',
-            adminRole: process.env.GT_METRICS_ADMIN_ROLE?.toUpperCase() || 'ADMIN'
-        },
-        mailer: {
-            enabled: getEnvBoolean(process.env.GT_MAILER_ENABLED, false),
-            host: process.env.GT_MAILER_HOST || 'localhost',
-            port: getEnvNumber(process.env.GT_MAILER_PORT, 465),
-            secure: getEnvBoolean(process.env.GT_MAILER_SECURE, true),
-            auth: {
-                username: process.env.GT_MAILER_AUTH_USERNAME || '',
-                password: process.env.GT_MAILER_AUTH_PASSWORD || ''
-            },
-            sender: {
-                address: process.env.GT_MAILER_SENDER_ADDRESS || '',
-                name: process.env.GT_MAILER_SENDER_NAME || 'GlobalTags System'
-            }
+        sender: {
+            address: process.env.GT_MAILER_SENDER_ADDRESS || '',
+            name: process.env.GT_MAILER_SENDER_NAME || 'GlobalTags System'
         }
     }
-}
+};
