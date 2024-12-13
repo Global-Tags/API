@@ -1,9 +1,12 @@
 import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } from "discord.js";
 import Button from "../structs/Button";
-import players, { Permission } from "../../database/schemas/players";
+import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { capitalize } from "../commands/PlayerInfo";
-import { roles, bot } from "../../../config.json";
+import { bot } from "../../../config.json";
+import { getRoles, Permission } from "../../libs/RoleManager";
+
+const roles = getRoles();
 
 export default class EditRoles extends Button {
     constructor() {

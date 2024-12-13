@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import players, { GlobalIcon, GlobalPosition, Permission } from "../database/schemas/players";
+import players, { GlobalIcon, GlobalPosition } from "../database/schemas/players";
 import Logger from "../libs/Logger";
 import { sendMessage, NotificationType, ModLogType } from "../libs/DiscordNotifier";
 import fetchI18n, { getI18nFunctionByLanguage } from "../middleware/FetchI18n";
@@ -9,6 +9,8 @@ import { constantCase } from "change-case";
 import { sendTagChangeEmail, sendTagClearEmail } from "../libs/Mailer";
 import { saveLastLanguage } from "../libs/I18n";
 import { config } from "../libs/Config";
+import { Permission } from "../libs/RoleManager";
+
 const { validation } = config;
 const { min, max, blacklist, watchlist } = validation.tag;
 

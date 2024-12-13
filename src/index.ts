@@ -24,6 +24,7 @@ import { startEntitlementExpiry, startMetrics, startReferralReset } from "./libs
 import players from "./database/schemas/players";
 import { formatUUID } from "./routes/root";
 import { config } from "./libs/Config";
+import('./libs/RoleManager');
 
 if(config.mongodb.trim().length == 0) {
     Logger.error(`Database connection string is empty!`);

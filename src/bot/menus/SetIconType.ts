@@ -1,11 +1,12 @@
 import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
-import players, { Permission } from "../../database/schemas/players";
+import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { constantCase } from "change-case";
 import { sendIconTypeChangeEmail } from "../../libs/Mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
+import { Permission } from "../../libs/RoleManager";
 
 export default class SetIconType extends SelectMenu {
     constructor() {

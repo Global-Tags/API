@@ -1,7 +1,8 @@
 import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder, DiscordAPIError } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
-import players, { Permission } from "../../database/schemas/players";
+import players from "../../database/schemas/players";
 import { client, colors } from "../bot";
+import { Permission } from "../../libs/RoleManager";
 
 export default class GrantSubscription extends SelectMenu {
     constructor() {

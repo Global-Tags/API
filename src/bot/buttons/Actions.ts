@@ -1,9 +1,10 @@
 import { ButtonInteraction, CacheType, Message, GuildMember, User, ButtonStyle, ButtonBuilder, ActionRowBuilder, EmbedBuilder } from "discord.js";
 import Button from "../structs/Button";
 import { colors } from "../bot";
-import players, { Permission } from "../../database/schemas/players";
+import players from "../../database/schemas/players";
 import { uuidRegex } from "../commands/PlayerInfo";
 import { bot } from "../../../config.json";
+import { Permission } from "../../libs/RoleManager";
 
 export default class Actions extends Button {
     constructor() {

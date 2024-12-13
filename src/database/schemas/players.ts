@@ -1,10 +1,11 @@
 import { Schema, model } from "mongoose";
-import { bot, roles } from "../../../config.json";
+import { bot } from "../../../config.json";
 import { client } from "../../bot/bot";
 import Logger from "../../libs/Logger";
 import { GuildMember } from "discord.js";
 import { constantCase } from "change-case";
 import { generateSecureCode } from "../../routes/connections";
+import { getRoles, Permission } from "../../libs/RoleManager";
 
 export enum GlobalPosition {
     Above,
@@ -48,18 +49,6 @@ export enum GlobalIcon {
     X,
     Xbox,
     Youtube
-}
-
-export enum Permission {
-    BypassValidation,
-    CustomIcon,
-    ManageBans,
-    ManageNotes,
-    ManageSubscriptions,
-    ManageRoles,
-    ManageTags,
-    ManageWatchlist,
-    ReportImmunity
 }
 
 export interface IPlayer {
@@ -110,6 +99,8 @@ export interface IPlayer {
     existsNote(id: string): boolean,
     deleteNote(id: string): void
 }
+
+const roles = getRoles();
 
 const schema = new Schema<IPlayer>({
     uuid: {

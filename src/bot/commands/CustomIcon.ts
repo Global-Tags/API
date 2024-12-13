@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, User } from "discord.js";
 import Command from "../structs/Command";
-import players, { GlobalIcon, Permission } from "../../database/schemas/players";
+import players, { GlobalIcon } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { constantCase } from "change-case";
 import { join } from 'path';
@@ -8,6 +8,7 @@ import axios from "axios";
 import { generateSecureCode } from "../../routes/connections";
 import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { config } from "../../libs/Config";
+import { Permission } from "../../libs/RoleManager";
 
 export default class CustomIcon extends Command {
     constructor() {
