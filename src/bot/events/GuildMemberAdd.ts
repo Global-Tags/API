@@ -1,10 +1,12 @@
 import { GuildMember } from "discord.js";
 import Event from "../structs/Event";
-import { bot } from "../../../config.json";
 import { client } from "../bot";
 import Logger from "../../libs/Logger";
 import players from "../../database/schemas/players";
 import { config } from "../../libs/Config";
+import { getSkus } from "../../libs/SkuManager";
+
+const skus = getSkus();
 
 export default class GuildMemberAdd extends Event {
     constructor() {
@@ -15,14 +17,14 @@ export default class GuildMemberAdd extends Event {
         if(!config.discordBot.notifications.entitlements.enabled) return;
         const player = await players.findOne({ "connections.discord.id": member.id });
         if(!player) return;
-        const entitlements = (await client.application!.entitlements.fetch({ user: member.id })).filter(e => e.isActive() && bot.entitlements.skus.some(sku => sku.id == e.skuId));
+        const entitlements = (await client.application!.entitlements.fetch({ user: member.id })).filter(e => e.isActive() && skus.some(sku => sku.id == e.skuId));
 
-        for(const sku of bot.entitlements.skus.filter((sku) => entitlements.find((e) => e.skuId == sku.id))) {
+        for(const sku of skus.filter((sku) => entitlements.find((e) => e.skuId == sku.id))) {
             const entitlement = entitlements.find((e) => e.skuId == sku.id)!;
 
             if(sku.discordRole) {
-                const guild = await client.guilds.fetch(bot.synced_roles.guild).catch(() => {
-                    Logger.error(`Couldn't fetch guild ${bot.synced_roles.guild}`);
+                const guild = await client.guilds.fetch(config.discordBot.syncedRoles.guild).catch(() => {
+                    Logger.error(`Couldn't fetch guild ${config.discordBot.syncedRoles.guild}`);
                     return null;
                 });
                 if(!guild) return;

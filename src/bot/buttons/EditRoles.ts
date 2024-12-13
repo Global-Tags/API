@@ -3,8 +3,8 @@ import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { capitalize } from "../commands/PlayerInfo";
-import { bot } from "../../../config.json";
 import { getRoles, Permission } from "../../libs/RoleManager";
+import { config } from "../../libs/Config";
 
 const roles = getRoles();
 
@@ -17,7 +17,7 @@ export default class EditRoles extends Button {
         const staff = await players.findOne({ "connections.discord.id": user.id });
         if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You need to link your Minecraft account with \`/link\`!`)], ephemeral: true });
         if(!staff.hasPermissionSync(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to perform this action!`)], ephemeral: true });
-        if(bot.synced_roles.enabled) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Synced roles are enabled!`)], ephemeral: true });
+        if(config.discordBot.syncedRoles.enabled) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Synced roles are enabled!`)], ephemeral: true });
 
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll(`\``, ``) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });

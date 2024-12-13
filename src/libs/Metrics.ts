@@ -3,7 +3,6 @@ import players, { GlobalIcon, GlobalPosition } from "../database/schemas/players
 import Logger from "./Logger";
 import axios from "axios";
 import { client } from "../bot/bot";
-import { bot } from "../../config.json";
 import { args } from "..";
 import { constantCase } from "change-case";
 import { config } from "./Config";
@@ -61,7 +60,7 @@ type Addon = {
 }
 
 export async function saveMetrics() {
-    if(bot.synced_roles.enabled) await client.guilds.cache.get(bot.synced_roles.guild)?.members.fetch();
+    if(config.discordBot.syncedRoles.enabled) await client.guilds.cache.get(config.discordBot.syncedRoles.guild)?.members.fetch();
     const users = await players.find();
     const tags = users.filter((user) => user.tag != null).length;
     const staff = users.filter((user) => user.getRolesSync().includes(constantCase(config.metrics.adminRole))).length;

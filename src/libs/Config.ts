@@ -69,6 +69,10 @@ export let config = {
     discordBot: {
         enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_ENABLED, false),
         token: process.env.GT_DISCORD_BOT_TOKEN || '',
+        syncedRoles: {
+            enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_SYNCED_ROLES_ENABLED, false),
+            guild: process.env.GT_DISCORD_BOT_SYNCED_ROLES_GUILD || ''
+        },
         notifications: {
             reports: {
                 enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_REPORTS_ENABLED, false),

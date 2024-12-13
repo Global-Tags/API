@@ -6,6 +6,7 @@ import { GuildMember } from "discord.js";
 import { constantCase } from "change-case";
 import { generateSecureCode } from "../../routes/connections";
 import { getRoles, Permission } from "../../libs/RoleManager";
+import { config } from "../../libs/Config";
 
 export enum GlobalPosition {
     Above,
@@ -262,9 +263,9 @@ const schema = new Schema<IPlayer>({
         },
 
         async getRoles() {
-            if(!bot.synced_roles.enabled) return roles.filter((role) => this.roles.some((name) => name.toUpperCase() == role.name.toUpperCase())).map((role) => role.name);
+            if(!config.discordBot.syncedRoles.enabled) return roles.filter((role) => this.roles.some((name) => name.toUpperCase() == role.name.toUpperCase())).map((role) => role.name);
             if(!this.connections?.discord?.id) return [];
-            const guild = await client.guilds.fetch(bot.synced_roles.guild).catch(() => null);
+            const guild = await client.guilds.fetch(config.discordBot.syncedRoles.guild).catch(() => null);
             if(!guild) return [];
             const member = await guild.members.fetch(this.connections.discord.id).catch(() => null);
             if(!member) return [];
@@ -272,11 +273,11 @@ const schema = new Schema<IPlayer>({
         },
 
         getRolesSync() {
-            if(!bot.synced_roles.enabled) return roles.filter((role) => this.roles.some((name) => name.toUpperCase() == role.name.toUpperCase())).map((role) => role.name);
+            if(!config.discordBot.syncedRoles.enabled) return roles.filter((role) => this.roles.some((name) => name.toUpperCase() == role.name.toUpperCase())).map((role) => role.name);
             if(!this.connections?.discord?.id) return [];
-            const guild = client.guilds.cache.get(bot.synced_roles.guild);
+            const guild = client.guilds.cache.get(config.discordBot.syncedRoles.guild);
             if(!guild) {
-                client.guilds.fetch(bot.synced_roles.guild).catch(() => Logger.error(`Couldn't fetch guild ${bot.synced_roles.guild}`));
+                client.guilds.fetch(config.discordBot.syncedRoles.guild).catch(() => Logger.error(`Couldn't fetch guild ${config.discordBot.syncedRoles.guild}`));
                 return [];
             }
             const member = guild.members.cache.get(this.connections.discord.id);

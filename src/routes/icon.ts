@@ -17,7 +17,7 @@ export function getCustomIconUrl(uuid: string, hash: string) {
 
 export default new Elysia({
     prefix: "/icon"
-}).use(fetchI18n).use(getAuthProvider).get('/:hash', async ({ error, params, headers, i18n, provider }) => {
+}).use(fetchI18n).use(getAuthProvider).get('/:hash', async ({ error, params, i18n }) => {
     const uuid = params.uuid.replaceAll(`-`, ``);
 
     const player = await players.findOne({ uuid });
