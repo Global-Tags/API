@@ -2,7 +2,6 @@ import { ApplicationCommandOptionType, CacheType, CommandInteraction, CommandInt
 import Command from "../structs/Command";
 import players, { GlobalIcon, Permission } from "../../database/schemas/players";
 import { colors } from "../bot";
-import { bot } from "../../../config.json";
 import { constantCase } from "change-case";
 import { join } from 'path';
 import axios from "axios";
@@ -54,7 +53,7 @@ export default class CustomIcon extends Command {
 
     async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, user: User) {
         await interaction.deferReply({ ephemeral: true });
-        if(!bot.connection.active) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Account linking is deactivated!`)] });
+        if(!config.discordBot.notifications.accountConnections.enabled) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Account linking is deactivated!`)] });
 
         const player = await players.findOne({ "connections.discord.id": user.id });
         if(!player) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Your account is not linked to a Minecraft account!`)] });

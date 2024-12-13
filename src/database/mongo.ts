@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Logger from "../libs/Logger";
 import { destroy, spawn } from "../bot/bot";
-import * as config from "../../config.json";
+import { config } from "../libs/Config";
 
 export async function connect(connectionString: string) {
     _eventHandler(connectionString);
@@ -17,10 +17,10 @@ function _eventHandler(connectionString: string) {
     const connection = mongoose.connection;
     connection.on(`connected`, () => {
         Logger.info("Connected to database!");
-        if(config.bot.enabled) spawn();
+        if(config.discordBot.enabled) spawn();
     }).on(`disconnected`, () => {
         Logger.error("Lost database connection");
-        if(config.bot.enabled) destroy();
+        if(config.discordBot.enabled) destroy();
         setTimeout(() => _connect(connectionString), 10000);
     }).on(`connecting`, () => Logger.debug(`Connecting to database...`));
 }

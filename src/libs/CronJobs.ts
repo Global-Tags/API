@@ -1,6 +1,5 @@
 import { CronJob } from "cron";
 import { checkExpiredEntitlements } from "./EntitlementExpiry";
-import { bot } from "../../config.json";
 import { saveMetrics } from "./Metrics";
 import Logger from "./Logger";
 import players from "../database/schemas/players";
@@ -9,7 +8,7 @@ import { config } from "./Config";
 const tz = 'Europe/Berlin';
 
 export function startEntitlementExpiry() {
-    if(!bot.entitlements.enabled) return;
+    if(!config.discordBot.notifications.entitlements.enabled) return;
     Logger.debug('Entitlement expiry initialized.');
     new CronJob('*/5 * * * *', checkExpiredEntitlements, null, true, tz, null, true);
 }

@@ -5,8 +5,8 @@ import Event from "./structs/Event";
 import Command from "./structs/Command";
 import Modal from "./structs/Modal";
 import Button from "./structs/Button";
-import * as config from "../../config.json";
 import SelectMenu from "./structs/SelectMenu";
+import { config } from "../libs/Config";
 
 export const client = new Client({
     intents: [
@@ -68,5 +68,5 @@ export const modals = new Collection<string, Modal>();
     });
 })();
 
-export const spawn = () => client.login(config.bot.token);
+export const spawn = () => client.login(config.discordBot.token);
 export const destroy = () => client.destroy();

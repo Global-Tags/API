@@ -5,6 +5,7 @@ import { client } from "../bot";
 import Logger from "../../libs/Logger";
 import players from "../../database/schemas/players";
 import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { config } from "../../libs/Config";
 
 export default class EntitlementCreate extends Event {
     constructor() {
@@ -12,7 +13,7 @@ export default class EntitlementCreate extends Event {
     }
 
     async fire(entitlement: Entitlement) {
-        if(!bot.entitlements.enabled) return;
+        if(!config.discordBot.notifications.entitlements.enabled) return;
         const sku = bot.entitlements.skus.find((sku) => sku.id == entitlement.skuId);
         if(!sku) return;
         const player = await players.findOne({ "connections.discord.id": entitlement.userId });

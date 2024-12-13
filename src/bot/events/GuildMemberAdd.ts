@@ -4,6 +4,7 @@ import { bot } from "../../../config.json";
 import { client } from "../bot";
 import Logger from "../../libs/Logger";
 import players from "../../database/schemas/players";
+import { config } from "../../libs/Config";
 
 export default class GuildMemberAdd extends Event {
     constructor() {
@@ -11,7 +12,7 @@ export default class GuildMemberAdd extends Event {
     }
 
     async fire(member: GuildMember) {
-        if(!bot.entitlements.enabled) return;
+        if(!config.discordBot.notifications.entitlements.enabled) return;
         const player = await players.findOne({ "connections.discord.id": member.id });
         if(!player) return;
         const entitlements = (await client.application!.entitlements.fetch({ user: member.id })).filter(e => e.isActive() && bot.entitlements.skus.some(sku => sku.id == e.skuId));

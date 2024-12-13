@@ -2,8 +2,8 @@ import { ApplicationCommandOptionType, CacheType, CommandInteraction, CommandInt
 import Command from "../structs/Command";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { bot } from "../../../config.json";
 import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { config } from "../../libs/Config";
 
 export default class Link extends Command {
     constructor() {
@@ -23,7 +23,7 @@ export default class Link extends Command {
 
     async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, user: User) {
         await interaction.deferReply({ ephemeral: true });
-        if(!bot.connection.active) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Account linking is deactivated!`)] });
+        if(!config.discordBot.notifications.accountConnections.enabled) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Account linking is deactivated!`)] });
         const code = options.getString('code', true);
 
         const self = await players.findOne({ "connections.discord.id": user.id });
@@ -35,7 +35,7 @@ export default class Link extends Command {
         player.connections!.discord!.id = user.id;
         player.connections!.discord!.code = null;
         player.save();
-        member.roles.add(bot.connection.role);
+        member.roles.add(config.discordBot.notifications.accountConnections.role);
 
         sendMessage({
             type: NotificationType.DiscordLink,
