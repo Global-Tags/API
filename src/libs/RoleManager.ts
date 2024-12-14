@@ -1,4 +1,5 @@
 import roleConfig from "../../config/roles.json";
+import { config } from "./Config";
 
 const roles: Role[] = [];
 
@@ -23,8 +24,12 @@ export class Role {
         this.permissions = permissions;
     }
 
-    hasPermission(permission: Permission) {
+    hasPermission(permission: Permission): boolean {
         return this.permissions.includes(permission);
+    }
+
+    getSyncedRoles(): string[] {
+        return config.discordBot.syncedRoles.getRoles(this);
     }
 }
 

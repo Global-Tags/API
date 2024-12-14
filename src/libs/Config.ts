@@ -1,4 +1,5 @@
 import { configDotenv } from "dotenv";
+import { Role } from "./RoleManager";
 
 function getEnvNumber(path: string | undefined, defaultValue: number) {
     const number = Number(path);
@@ -71,7 +72,8 @@ export let config = {
         token: process.env.GT_DISCORD_BOT_TOKEN || '',
         syncedRoles: {
             enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_SYNCED_ROLES_ENABLED, false),
-            guild: process.env.GT_DISCORD_BOT_SYNCED_ROLES_GUILD || ''
+            guild: process.env.GT_DISCORD_BOT_SYNCED_ROLES_GUILD || '',
+            getRoles: (role: Role) => process.env[`GT_DISCORD_BOT_SYNCED_ROLES_${role.name.toUpperCase()}`]?.split(',') || []
         },
         notifications: {
             reports: {
