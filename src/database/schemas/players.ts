@@ -1,11 +1,10 @@
 import { Schema, model } from "mongoose";
-import { bot } from "../../../config.json";
 import { client } from "../../bot/bot";
 import Logger from "../../libs/Logger";
 import { GuildMember } from "discord.js";
 import { constantCase } from "change-case";
 import { generateSecureCode } from "../../routes/connections";
-import { getRoles, Permission } from "../../libs/RoleManager";
+import { getRole, getRoles, Permission } from "../../libs/RoleManager";
 import { config } from "../../libs/Config";
 
 export enum GlobalPosition {
@@ -374,25 +373,21 @@ const schema = new Schema<IPlayer>({
 
 function _getRoles(member: GuildMember): string[] {
     if(!member) return [];
-    return Object
-        .keys(bot.synced_roles.roles)
-        .filter((key) => {
-            const role = roles.find((role) => role.name.toUpperCase() == key.toUpperCase());
-            if(!role) return false;
-            const roleIds = bot.synced_roles.roles[role.name as keyof typeof bot.synced_roles.roles];
-            if(!roleIds) return false;
-            return roleIds.some((id) => member.roles.cache.has(id));
-        })
-        .map((role) => role);
+
+    return getRoles().filter((role) => {
+        const roleIds = role.getSyncedRoles();
+        if(roleIds.length == 0) return false;
+        return roleIds.some((id) => member.roles.cache.has(id));
+    }).map((role) => role.name.toLowerCase());
 }
 
 function _getPermissions(localRoles: string[]) {
     const permissions: { [key: string]: boolean } = {};
     for(const permission of Object.keys(Permission).filter(key => isNaN(Number(key)))) {
         permissions[permission] = localRoles.some((key) => {
-            const role = roles.find((r) => r.name == key)!;
+            const role = getRole(key);
             if(!role) return false;
-            return role.permissions[permission as keyof typeof role.permissions] || false;
+            return role.hasPermission(Permission[permission as keyof typeof Permission]);
         });
     }
     return permissions;
