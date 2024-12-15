@@ -44,25 +44,24 @@ bun start
 
 ## Run with docker
 
-### 1. Download important files
-First of all you need to create a config from the example config template:
-```bash
-mkdir gtapi
-cd gtapi
-curl -O https://raw.githubusercontent.com/Global-Tags/API/refs/heads/master/.env
-```
-You can now edit the `.env` as you like. See the [Configuration guide](./configuration-guide.md).
+### 1. Clone the Repository
 
-If you're intending to use docker compose you also have to pull the compose file:
+Start by cloning the repository to your local machine:
+
 ```bash
-curl -O https://raw.githubusercontent.com/Global-Tags/API/refs/heads/master/compose.yml
+git clone https://github.com/Global-Tags/API gtapi
+cd gtapi
 ```
+
+You can now edit your `.env` file and the configs in `./config`.
 
 ### 2. Launching the API
 Then you can run the API:
 ```bash
 # Using docker
-docker run --name gtapi -itd -p 5500:5500 -v ./icons:/app/icons rappytv/globaltagsapi:latest
+docker run --name gtapi -itd -p 5500:5500 -v ./config:/app/config -v ./icons:/app/icons rappytv/globaltagsapi:latest
+
+# OR
 
 # Using docker compose
 docker compose up -d
