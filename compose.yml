@@ -2,6 +2,7 @@ services:
   api:
     image: rappytv/globaltagsapi:latest
     restart: unless-stopped
+    user: root
     ports:
       - 5500:5500
     env_file: .env
