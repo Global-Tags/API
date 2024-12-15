@@ -16,7 +16,7 @@ cd gtapi
 Next, create a configuration file by copying the example provided. See the [Configuration guide](./configuration-guide.md).
 
 ```bash
-cp config.json.example config.json
+cp .env .env.prod
 ```
 
 ### 3. Launching the API
@@ -39,7 +39,7 @@ bun start
     bun i -g pm2 pm2-logrotate
 
     # Start the daemon
-    pm2 start src/index.ts --interpreter ~/.bun/bin/bun --name GlobalTagsAPI
+    pm2 start "bun start" --name GlobalTagsAPI
     ```
 
 ## Run with docker
@@ -49,20 +49,20 @@ First of all you need to create a config from the example config template:
 ```bash
 mkdir gtapi
 cd gtapi
-curl -o config.json https://github.com/Global-Tags/API/blob/master/config.json.example
+curl -O https://raw.githubusercontent.com/Global-Tags/API/refs/heads/master/.env
 ```
-You can now edit the `config.yml` as you like. See the [Configuration guide](./configuration-guide.md).
+You can now edit the `.env` as you like. See the [Configuration guide](./configuration-guide.md).
 
 If you're intending to use docker compose you also have to pull the compose file:
 ```bash
-curl -O https://github.com/Global-Tags/API/blob/master/compose.yml
+curl -O https://raw.githubusercontent.com/Global-Tags/API/refs/heads/master/compose.yml
 ```
 
 ### 2. Launching the API
 Then you can run the API:
 ```bash
 # Using docker
-docker run --name gtapi -itd -p 5500:5500 -v ./config.json:/app/config.json -v ./icons:/app/icons rappytv/globaltagsapi:latest
+docker run --name gtapi -itd -p 5500:5500 -v ./icons:/app/icons rappytv/globaltagsapi:latest
 
 # Using docker compose
 docker compose up -d
