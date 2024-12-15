@@ -1,0 +1,38 @@
+[
+    {
+        "method": "GET",
+        "regex": "\/players\/\\w+\/?",
+        "max": 1000,
+        "seconds": 60
+    },
+    {
+        "method": "POST",
+        "regex": "^\/players\/\\w+\/?$",
+        "max": 5,
+        "seconds": 60
+    },
+    {
+        "method": "POST",
+        "regex": "\/players\/\\w+\/admin/?",
+        "max": 2,
+        "seconds": 30
+    },
+    {
+        "method": "POST",
+        "regex": "\/players\/\\w+/position\/?",
+        "max": 5,
+        "seconds": 60
+    },
+    {
+        "method": "POST",
+        "regex": "\/players\/\\w+/icon\/?",
+        "max": 5,
+        "seconds": 60
+    },
+    {
+        "method": "POST",
+        "regex": "\/players\/\\w+/report\/?",
+        "max": 5,
+        "seconds": 60
+    }
+]

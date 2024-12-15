@@ -1,8 +1,9 @@
 import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
-import players, { Permission } from "../../database/schemas/players";
+import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { Permission } from "../../libs/RoleManager";
 
 export default class EditRoles extends SelectMenu {
     constructor() {

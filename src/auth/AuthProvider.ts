@@ -1,7 +1,8 @@
 import { existsSync, readdirSync } from "fs";
 import { join } from "path";
 import Logger from "../libs/Logger";
-import players, { Permission } from "../database/schemas/players";
+import players from "../database/schemas/players";
+import { Permission } from "../libs/RoleManager";
 
 export type SessionData = {
     uuid: string | null,

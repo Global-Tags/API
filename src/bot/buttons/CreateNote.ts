@@ -1,6 +1,6 @@
 import { ButtonInteraction, CacheType, Message, GuildMember, User, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import Button from "../structs/Button";
-import { validation } from "../../../config.json";
+import { config } from "../../libs/Config";
 
 export default class CreateNote extends Button {
     constructor() {
@@ -18,7 +18,7 @@ export default class CreateNote extends Button {
                 .setLabel(`Note`)
                 .setCustomId(`note`)
                 .setPlaceholder(`Enter the note you want to add`)
-                .setMaxLength(validation.notes.max_length)
+                .setMaxLength(config.validation.notes.maxLength)
                 .setRequired(true)
                 .setStyle(TextInputStyle.Paragraph)
             )

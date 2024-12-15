@@ -1,9 +1,10 @@
 import { ButtonInteraction, CacheType, Message, GuildMember, User, ButtonStyle, ButtonBuilder, ActionRowBuilder, EmbedBuilder } from "discord.js";
 import Button from "../structs/Button";
 import { colors } from "../bot";
-import players, { Permission } from "../../database/schemas/players";
+import players from "../../database/schemas/players";
 import { uuidRegex } from "../commands/PlayerInfo";
-import { bot } from "../../../config.json";
+import { Permission } from "../../libs/RoleManager";
+import { config } from "../../libs/Config";
 
 export default class Actions extends Button {
     constructor() {
@@ -44,7 +45,7 @@ export default class Actions extends Button {
             ),
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
-                bot.synced_roles.enabled
+                config.discordBot.syncedRoles.enabled
                     ? new ButtonBuilder().setLabel(`Manage subscriptions`).setCustomId(`manageSubscriptions`).setStyle(ButtonStyle.Primary).setDisabled(!staff.hasPermissionSync(Permission.ManageSubscriptions))
                     : new ButtonBuilder().setLabel(`Edit roles`).setCustomId(`editRoles`).setStyle(ButtonStyle.Primary).setDisabled(!staff.hasPermissionSync(Permission.ManageRoles)),
                 new ButtonBuilder()

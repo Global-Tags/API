@@ -3,9 +3,9 @@ import players, { GlobalIcon, GlobalPosition } from "../database/schemas/players
 import Logger from "./Logger";
 import axios from "axios";
 import { client } from "../bot/bot";
-import * as config from "../../config.json";
 import { args } from "..";
 import { constantCase } from "change-case";
+import { config } from "./Config";
 
 let requests: number;
 
@@ -60,10 +60,10 @@ type Addon = {
 }
 
 export async function saveMetrics() {
-    if(config.bot.synced_roles.enabled) await client.guilds.cache.get(config.bot.synced_roles.guild)?.members.fetch();
+    if(config.discordBot.syncedRoles.enabled) await client.guilds.cache.get(config.discordBot.syncedRoles.guild)?.members.fetch();
     const users = await players.find();
     const tags = users.filter((user) => user.tag != null).length;
-    const staff = users.filter((user) => user.getRolesSync().includes(constantCase(config.metrics.admin_role))).length;
+    const staff = users.filter((user) => user.getRolesSync().includes(constantCase(config.metrics.adminRole))).length;
     const bans = users.filter((user) => user.isBanned()).length;
     const positions = positionList.reduce((object: any, position) => {
         object[position.toLowerCase()] = users.filter((user) => user.position.toUpperCase() == position.toUpperCase()).length;

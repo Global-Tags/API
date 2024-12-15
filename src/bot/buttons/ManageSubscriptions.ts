@@ -1,8 +1,11 @@
 import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import Button from "../structs/Button";
-import players, { Permission } from "../../database/schemas/players";
+import players from "../../database/schemas/players";
 import { client, colors } from "../bot";
-import { bot } from "../../../config.json";
+import { Permission } from "../../libs/RoleManager";
+import { getSkus } from "../../libs/SkuManager";
+
+const skus = getSkus();
 
 export default class ManageSubscriptions extends Button {
     constructor() {
@@ -18,12 +21,12 @@ export default class ManageSubscriptions extends Button {
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
         if(!player.connections.discord.id) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player does not have their account linked!`)], ephemeral: true });
 
-        const entitlements = (await client.application!.entitlements.fetch({ user: player.connections.discord.id })).filter(e => e.isActive() && bot.entitlements.skus.some(sku => sku.id == e.skuId));
+        const entitlements = (await client.application!.entitlements.fetch({ user: player.connections.discord.id })).filter(e => e.isActive() && skus.some(sku => sku.id == e.skuId));
 
         const embed = new EmbedBuilder()
         .setColor(0x5865f2)
         .setTitle(`Manage subscriptions`)
-        .setDescription(`Here you can grant the player a premium subscription for free or remove it.\n\n${entitlements.size > 0 ? `The player currently has the following subscriptions:\n${entitlements.map(e => `- **${bot.entitlements.skus.find(sku => sku.id == e.skuId)?.name || 'Unknown'}**${!e.startsTimestamp ? ' [**S**]' : ''}`).join(`\n`)}` : 'The player currently has no subscriptions.'}`)
+        .setDescription(`Here you can grant the player a premium subscription for free or remove it.\n\n${entitlements.size > 0 ? `The player currently has the following subscriptions:\n${entitlements.map(e => `- **${skus.find(sku => sku.id == e.skuId)?.name || 'Unknown'}**${!e.startsTimestamp ? ' [**S**]' : ''}`).join(`\n`)}` : 'The player currently has no subscriptions.'}`)
         .addFields(message.embeds[0].fields[0])
         .setThumbnail(message.embeds[0].thumbnail!.url);
 

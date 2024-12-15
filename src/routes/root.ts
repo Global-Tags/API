@@ -1,14 +1,17 @@
 import Elysia, { t } from "elysia";
-import players, { GlobalIcon, GlobalPosition, Permission } from "../database/schemas/players";
+import players, { GlobalIcon, GlobalPosition } from "../database/schemas/players";
 import Logger from "../libs/Logger";
 import { sendMessage, NotificationType, ModLogType } from "../libs/DiscordNotifier";
 import fetchI18n, { getI18nFunctionByLanguage } from "../middleware/FetchI18n";
 import { stripColors } from "../libs/ChatColor";
 import getAuthProvider from "../middleware/GetAuthProvider";
-import { strictAuth, validation } from "../../config.json";
 import { constantCase } from "change-case";
 import { sendTagChangeEmail, sendTagClearEmail } from "../libs/Mailer";
 import { saveLastLanguage } from "../libs/I18n";
+import { config } from "../libs/Config";
+import { Permission } from "../libs/RoleManager";
+
+const { validation } = config;
 const { min, max, blacklist, watchlist } = validation.tag;
 
 export default new Elysia()
@@ -19,7 +22,7 @@ export default new Elysia()
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
     if(!!session.uuid && !!language) saveLastLanguage(session.uuid, language);
-    if(strictAuth) {
+    if(config.strictAuth) {
         if(!session.uuid) return error(403, { error: i18n(`error.notAllowed`) });
         showBan = session.equal || session.hasPermission(Permission.ManageBans);
     }
@@ -69,7 +72,7 @@ export default new Elysia()
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },
     params: t.Object({ uuid: t.String({ description: `The uuid of the player you want to fetch the info of` }) }),
-    headers: t.Object({ authorization: strictAuth ? t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) : t.Optional(t.String({ description: `Your LabyConnect JWT` })) }, { error: `error.notAllowed` }),
+    headers: t.Object({ authorization: config.strictAuth ? t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) : t.Optional(t.String({ description: `Your LabyConnect JWT` })) }, { error: `error.notAllowed` }),
 }).get(`/history`, async ({ error, params, headers, i18n, provider }) => { // Get player's tag history
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
@@ -98,7 +101,7 @@ export default new Elysia()
         503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
     },
     params: t.Object({ uuid: t.String({ description: `The uuid of the player you want to fetch the info of` }) }),
-    headers: t.Object({ authorization: strictAuth ? t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) : t.Optional(t.String({ description: `Your LabyConnect JWT` })) }, { error: `error.notAllowed` }),
+    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` }),
 }).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Change tag
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);

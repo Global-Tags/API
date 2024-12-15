@@ -1,10 +1,10 @@
 import Elysia, { t } from "elysia";
 import players from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
-import { bot } from "../../config.json";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { sendEmail } from "../libs/Mailer";
 import { randomBytes } from "crypto";
+import { config } from "../libs/Config";
 
 export function generateSecureCode(length: number = 10) {
     return randomBytes(length).toString('hex').slice(0, length);
@@ -13,7 +13,7 @@ export function generateSecureCode(length: number = 10) {
 export default new Elysia({
     prefix: "/connections"
 }).use(fetchI18n).use(getAuthProvider).post(`/discord`, async ({ error, params, headers, i18n, provider }) => { // Get a linking code
-    if(!bot.connection.active) return error(409, { error: i18n('connections.discord.disabled') });
+    if(!config.discordBot.notifications.accountConnections.enabled) return error(409, { error: i18n('connections.discord.disabled') });
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
@@ -47,8 +47,8 @@ export default new Elysia({
     },
     params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).delete(`/discord`, async ({ error, params, headers, body, i18n, provider }) => { // Change icon
-    if(!bot.connection.active) return error(409, { error: i18n('connections.discord.disabled') });
+}).delete(`/discord`, async ({ error, params, headers, i18n, provider }) => { // Change icon
+    if(!config.discordBot.notifications.accountConnections.enabled) return error(409, { error: i18n('connections.discord.disabled') });
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
@@ -178,7 +178,7 @@ export default new Elysia({
     },
     params: t.Object({ uuid: t.String({ description: `Your UUID` }), code: t.String({ description: 'Your verification code' }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).delete(`/email`, async ({ error, params, headers, body, i18n, provider }) => { // Change icon
+}).delete(`/email`, async ({ error, params, headers, i18n, provider }) => { // Change icon
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;

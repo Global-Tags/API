@@ -1,22 +1,23 @@
 import Elysia, { t } from "elysia";
-import players, { GlobalIcon, Permission } from "../database/schemas/players";
-import * as config from "../../config.json";
+import players, { GlobalIcon } from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { join } from "path";
 import { constantCase } from "change-case";
+import { config } from "../libs/Config";
+import { Permission } from "../libs/RoleManager";
 
 const icons = Object.keys(GlobalIcon)
     .filter((pos) => isNaN(Number(pos)))
     .map((pos) => pos.toUpperCase());
 
 export function getCustomIconUrl(uuid: string, hash: string) {
-    return `${config.base}/players/${uuid}/icon/${hash}`;
+    return `${config.baseUrl}/players/${uuid}/icon/${hash}`;
 }
 
 export default new Elysia({
     prefix: "/icon"
-}).use(fetchI18n).use(getAuthProvider).get('/:hash', async ({ error, params, headers, i18n, provider }) => {
+}).use(fetchI18n).use(getAuthProvider).get('/:hash', async ({ error, params, i18n }) => {
     const uuid = params.uuid.replaceAll(`-`, ``);
 
     const player = await players.findOne({ uuid });

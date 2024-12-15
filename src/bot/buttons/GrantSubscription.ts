@@ -1,8 +1,11 @@
 import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from "discord.js";
 import Button from "../structs/Button";
-import players, { Permission } from "../../database/schemas/players";
+import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { bot } from "../../../config.json";
+import { Permission } from "../../libs/RoleManager";
+import { getSkus } from "../../libs/SkuManager";
+
+const skus = getSkus();
 
 export default class GrantSubscription extends Button {
     constructor() {
@@ -32,7 +35,7 @@ export default class GrantSubscription extends Button {
             .setPlaceholder('Select a SKU...')
             .setMinValues(1)
             .setMaxValues(1)
-            .setOptions(bot.entitlements.skus.map(sku => 
+            .setOptions(skus.map(sku => 
                 new StringSelectMenuOptionBuilder()
                 .setLabel(sku.name)
                 .setValue(sku.id)

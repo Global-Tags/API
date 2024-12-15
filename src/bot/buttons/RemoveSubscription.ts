@@ -1,8 +1,11 @@
 import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from "discord.js";
 import Button from "../structs/Button";
-import players, { Permission } from "../../database/schemas/players";
+import players from "../../database/schemas/players";
 import { client, colors } from "../bot";
-import { bot } from "../../../config.json";
+import { Permission } from "../../libs/RoleManager";
+import { getSkus } from "../../libs/SkuManager";
+
+const skus = getSkus();
 
 export default class RemoveSubscription extends Button {
     constructor() {
@@ -18,7 +21,7 @@ export default class RemoveSubscription extends Button {
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
         if(!player.connections.discord.id) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player does not have their account linked!`)], ephemeral: true });
 
-        const entitlements = (await client.application!.entitlements.fetch({ user: player.connections.discord.id })).filter(e => !e.startsTimestamp && e.isActive() && bot.entitlements.skus.some(sku => sku.id == e.skuId));
+        const entitlements = (await client.application!.entitlements.fetch({ user: player.connections.discord.id })).filter(e => !e.startsTimestamp && e.isActive() && skus.some(sku => sku.id == e.skuId));
         if(entitlements.size == 0) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ The player currently has no removable subscriptions.`)], ephemeral: true });
 
         const embed = new EmbedBuilder()
@@ -37,7 +40,7 @@ export default class RemoveSubscription extends Button {
             .setMaxValues(1)
             .setOptions(entitlements.map(entitlement => 
                 new StringSelectMenuOptionBuilder()
-                .setLabel(bot.entitlements.skus.find(sku => sku.id == entitlement.skuId)?.name || 'Unknown SKU')
+                .setLabel(skus.find(sku => sku.id == entitlement.skuId)?.name || 'Unknown SKU')
                 .setValue(entitlement.id)
                 .setEmoji('✨')
             ))

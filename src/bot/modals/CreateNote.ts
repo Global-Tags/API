@@ -1,8 +1,9 @@
 import { CacheType, Message, GuildMember, User, EmbedBuilder, ModalSubmitInteraction, ModalSubmitFields } from "discord.js";
-import players, { Permission } from "../../database/schemas/players";
+import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { Permission } from "../../libs/RoleManager";
 
 export default class CreateNote extends Modal {
     constructor() {

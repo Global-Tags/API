@@ -1,7 +1,8 @@
 import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import Button from "../structs/Button";
-import players, { Permission } from "../../database/schemas/players";
+import players from "../../database/schemas/players";
 import { colors } from "../bot";
+import { Permission } from "../../libs/RoleManager";
 
 export default class ManageAccount extends Button {
     constructor() {
