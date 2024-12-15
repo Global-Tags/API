@@ -4,7 +4,9 @@ services:
     restart: unless-stopped
     ports:
       - 5500:5500
+    env_file: .env
     volumes:
+      - ./config:/app/config:ro
       - globaltags-icons:/app/icons
 
 volumes:
