@@ -1,175 +1,182 @@
 # Configuration Guide
 
-## Using different config profiles
+## Using Different Config Profiles
 
-## External config files
+The application always loads the `.env` file by default. This file contains all the **default values** used by the application and the code itself. If an environment-specific variable is missing in a `.env.{NODE_ENV}` file, the application will fall back to the value in `.env`.
 
-Those external config files can be found in the `./config/` directory. Please note that all those files contain the json array structure so the following object definitions have to be in an array when putting them into a config.
+If the `NODE_ENV` environment variable is set, an additional `.env.${NODE_ENV}` file is loaded, overriding any variables defined in the base `.env` file. This approach ensures environment-specific configurations without modifying the `.env` file directly.
+
+### Example
+
+**Base `.env` (default values):**
+```env
+GT_PORT=5500
+GT_LOG_LEVEL=Info
+```
+
+**Production `.env.production` (overrides for production):**
+```env
+GT_PORT=7100
+GT_LOG_LEVEL=Warn
+```
+
+When `NODE_ENV=prod`, the application:
+1. Loads `.env` for default values.
+2. Overrides specified variables with `.env.prod` (e.g., `GT_PORT` becomes `7100`).
+
+**Do not edit the `.env` file directly** for environment-specific changes. Instead, create and use `.env.{NODE_ENV}` files (e.g., `.env.dev`, `.env.prod`).
+
+## External Configuration Files
+
+Configuration files are located in the `./config/` directory and follow a JSON array structure. All objects must be placed within an array when added to these configuration files.
 
 ### `ratelimiter.json`
-This file includes all active rules for the ratelimiter.s
+Defines all active rate-limiting rules.
 
-#### `method`
-This option specifies the http method which needs to be used for this rule to apply.
+- **`method`**: Specifies the HTTP method (e.g., `GET`, `POST`) required for this rule to apply.
+- **`regex`**: A regex pattern to identify routes affected by the rule.
+- **`max`**: The maximum number of allowed requests during the time window.
+- **`seconds`**: The duration of the time window in seconds.
 
-#### `regex`
-This option specifies a regex to match routes which are affected by this rule.
-
-#### `max`
-This option specifies the max requests which can be submitted in the time window.
-
-#### `seconds`
-This option specifies the time window in seconds.
+---
 
 ### `roles.json`
-This file includes all active roles which are availabke.
 
-#### `name`
-This option specifies the role's name
+This file lists all available roles for the system.
 
-#### `permissions`
-This option is a permission-boolean keymap.
+- **`name`**: Specifies the name of the role.
+- **`permissions`**: A string array in PascalCase format, listing all the permissions assigned to the role.
+  Those are all valid permissions:
+    - `BypassValidation`
+    - `CustomIcon`
+    - `ManageBans`
+    - `ManageNotes`
+    - `ManageSubscriptions`
+    - `ManageRoles`
+    - `ManageTags`
+    - `ManageWatchlist`
+    - `ReportImmunity`
+
+---
 
 ### `skus.json`
-This option includes all obtainable entitlement skus for subscriptions.
+Lists all obtainable entitlement SKUs for subscription management.
 
-#### `id`
-This option has to be the discord SKU id.
+- **`id`**: The Discord SKU ID associated with the entitlement.
+- **`name`**: The internal identifier for the SKU.
+- **`role`**: The role granted to the subscriber within GlobalTags.
+- **`discord_role`**: The Discord role assigned to subscribers if role synchronization is enabled.
 
-#### `name`
-This option specifies the internal name for this SKU.
-
-#### `role`
-This option specifies the role to be given to subscribers.
-
-#### `discord_role`
-This option specifies the discord role to be given to subscribers if synced roles are enabled.
+---
 
 ## Environment Variables
 
-All important options are configured by those environment variables.
+Environment variables configure essential application settings. Below is a detailed description of each variable:
 
-### `GT_PORT`
-This integer specifies the port the API should be running on.
+### General Configuration
 
-### `GT_PROXY_IP_HEADER`
-This array of strings represent the headers which can contain the real IP of the client requesting the API. This value should be set by your proxy which the API is running behind.
+- **`GT_PORT`**: Specifies the port on which the API runs.
+- **`GT_PROXY_IP_HEADER`**: The header name that may contain the client’s real IP address when behind a proxy.
+- **`GT_STRICT_AUTH`**: Boolean that determines if unauthenticated requests are allowed on the `/players/:uuid` route. Set to `true` to require valid authorization for all requests.
+- **`GT_LOG_LEVEL`**: Specifies the level of logging detail. Valid values: `Error`, `Warn`, `Info`, `Debug`.
+- **`GT_MONGODB_CONNECTION`** (**required**): MongoDB connection string. Follow the [MongoDB documentation](https://www.mongodb.com/docs/manual/reference/connection-string/) to construct this string.
 
-### `GT_STRICT_AUTH`
-This boolean decides if unauthenticated clients can request the `/players/:uuid` route to get a player's tag info or not. If `false` all requests to that route need to pass a valid authorization header.
+---
 
-### `GT_LOG_LEVEL`
-This string tells the `Logger` script which information to log or not.
+### Tag Validation Settings
 
-Available values are:
+- **`GT_VALIDATION_TAG_MIN_LENGTH`**: Minimum character length for tags.
+- **`GT_VALIDATION_TAG_MAX_LENGTH`**: Maximum character length for tags.
+- **`GT_VALIDATION_TAG_BLACKLIST`**: Array of prohibited keywords that tags cannot contain.
+- **`GT_VALIDATION_TAG_WATCHLIST`**: Array of keywords that will flag a tag and add the player to a watchlist.
+- **`GT_VALIDATION_ICON_MAX_RESOLUTION`**: Maximum resolution (e.g., `512` for 512x512) for custom icons.
+- **`GT_VALIDATION_ICON_BLACKLIST`**: Array of disallowed default icons.
+- **`GT_VALIDATION_NOTES_MAX_LENGTH`**: Maximum character length for staff notes.
 
-- `Error`
-- `Warn`
-- `Info`
-- `Debug`
+---
 
-### `GT_MONGODB_CONNECTION` **!**
-This is the <a href="https://www.mongodb.com/docs/manual/reference/connection-string/" target="_blank">connection</a> string which is used to connect to the MongoDB database. This is the only option which you are **required** to change in the example config.
+### GitHub Configuration
 
-### `GT_BASE_URL`
-This string is primarily used in the Discord Client to display custom icons.
+- **`GT_GITHUB_OWNER`**: GitHub repository owner's username.
+- **`GT_GITHUB_REPOSITORY`**: Name of the GitHub repository.
+- **`GT_GITHUB_BRANCH`**: Branch name to fetch the latest commit.
 
-### `GT_VALIDATION_TAG_MIN_LENGTH`
-This option specifies the minimum length allowed for tags.
+---
 
-### `GT_VALIDATION_TAG_MAX_LENGTH`
-This option specifies the maximum length allowed for tags.
+### Error Reporting and Metrics
 
-### `GT_VALIDATION_TAG_BLACKLIST`
-This string array contains specific keywords which then can't be included in tags.
+- **`GT_SENTRY_ENABLED`**: Enables or disables error reporting using Sentry.
+- **`GT_SENTRY_DSN`**: Sentry DSN (Data Source Name) for exception logging.
+- **`GT_METRICS_ENABLED`**: Enables or disables periodic metrics generation.
+- **`GT_METRICS_CRON`**: Cron expression defining the schedule for metric generation.
+- **`GT_METRICS_ADMIN_ROLE`**: Role required for a player to be recognized as an admin in metrics.
 
-### `GT_VALIDATION_TAG_WATCHLIST`
-This string array contains specific keywords which will put a player on the watchlist if the keyword is included in a tag.
+---
 
-### `GT_VALIDATION_ICON_MAX_RESOLUTION`
-This integer specifies the maximum resolution for custom icons. For example if you want the maximum resolution to be 512x512, you put 512
+### Email Configuration
 
-### `GT_VALIDATION_ICON_BLACKLIST`
-This string array prevents players from selecting specific default icons.
+- **`GT_MAILER_ENABLED`**: Enables or disables the email-sending feature.
+- **`GT_MAILER_HOST`**: Hostname of the mail server.
+- **`GT_MAILER_PORT`**: Port number for the mail server (e.g., `465` for SMTPS).
+- **`GT_MAILER_SECURE`**: Boolean determining whether to use a secure protocol.
+- **`GT_MAILER_AUTH_USERNAME`**: Username for authenticating with the mail server.
+- **`GT_MAILER_AUTH_PASSWORD`**: Password for authenticating with the mail server.
+- **`GT_MAILER_SENDER_ADDRESS`**: Email address used as the sender.
+- **`GT_MAILER_SENDER_NAME`**: Name displayed as the sender.
 
-### `GT_VALIDATION_NOTES_MAX_LENGTH`
-This strings limits staff notes in its length.
+---
 
-### `GT_GITHUB_OWNER`
-This option is used to retrieve the owner of the GitHub repository for the GitHub commit data.
+### Ratelimiting
 
-### `GT_GITHUB_REPOSITORY`
-This option is the name of the GitHub repository for the GitHub commit data.
+- **`GT_RATELIMITER_ENABLED`**: Boolean to enable or disable rate-limiting protection for routes. See the [ratelimiter configuration](#ratelimiterjson).
 
-### `GT_GITHUB_BRANCH`
-This option specifies the branch to get the latest commit from
+---
 
-### `GT_SENTRY_ENABLED`
-This option decides whether Sentry should be used to capture exceptions or not.
+### Discord Bot Configuration
 
-### `GT_SENTRY_DSN`
-Here you can enter your Sentry dsn which is used to send any exceptions to.
+- **General**
+    - **`GT_DISCORD_BOT_ENABLED`**: Enables or disables the Discord bot.
+    - **`GT_DISCORD_BOT_TOKEN`**: Token used for bot authentication.
 
-### `GT_METRICS_ENABLED`
-This option decides whether metrics should be created periodically or not.
+- **Role Synchronization**
+    - **`GT_DISCORD_BOT_SYNCED_ROLES_ENABLED`**: Enables role synchronization between GlobalTags and Discord.
+    - **`GT_DISCORD_BOT_SYNCED_ROLES_GUILD`**: ID of the Discord guild for role synchronization.
+    - **`GT_DISCORD_BOT_SYNCED_ROLES_{ROLE}`**: Maps GlobalTags roles to Discord role IDs. Example:
+        ```env
+        GT_DISCORD_BOT_SYNCED_ROLES_ADMIN=123456,987654
+        ```
 
-### `GT_METRICS_CRON`
-This string is the cron representation of the period in which metrics are being created.
+- **Notifications and Logs**
+    - **Reports**:
+        - **`GT_DISCORD_BOT_REPORTS_ENABLED`**: Enables sending reports to a Discord channel.
+        - **`GT_DISCORD_BOT_REPORTS_CHANNEL`**: ID of the Discord channel for reports.
+        - **`GT_DISCORD_BOT_REPORTS_CONTENT`**: Message content template (e.g., to mention roles).
 
-### `GT_METRICS_ADMIN_ROLE`
-This option decides which role a player has to have to be counted as an admin.
+    - **Watchlist**:
+        - **`GT_DISCORD_BOT_WATCHLIST_ENABLED`**: Enables logging watchlist events to a channel.
+        - **`GT_DISCORD_BOT_WATCHLIST_CHANNEL`**: ID of the channel for watchlist logs.
 
-### `GT_MAILER_ENABLED`
-This option enables or disables the mailer.
+    - **Ban Appeals**:
+        - **`GT_DISCORD_BOT_APPEALS_ENABLED`**: Enables ban appeals and their notifications.
+        - **`GT_DISCORD_BOT_APPEALS_CHANNEL`**: ID of the channel for ban appeals.
 
-### `GT_MAILER_HOST`
-This option chooses the mail server to send mails from.
+    - **Moderation Logs**:
+        - **`GT_DISCORD_BOT_MODLOG_ENABLED`**: Enables staff action logging to a channel.
+        - **`GT_DISCORD_BOT_MODLOG_CHANNEL`**: ID of the moderation log channel.
 
-### `GT_MAILER_PORT`
-This option chooses the port. Example: If you're using SMTPS, enter 465 and set `mailer.secure` to `true`.
+    - **User referrals**:
+        - **`GT_DISCORD_BOT_REFERRALS_ENABLED`**: Decides whether or not user referrals should be sent into a Discord channel.
+        - **`GT_DISCORD_BOT_REFERRALS_CHANNEL`**: Specifies the ID of the Discord channel where referral messages are sent.
 
-### `GT_MAILER_SECURE`
-This option chooses whether to use the secure variant of your mail protocol.
+    - **Account connections**:
+        - **`GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_ENABLED`**: Enables or disables the ability for users to link their Discord account (via `/gt link discord` in-game or `/link` on Discord).  
+        - **`GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_CHANNEL`**: Specifies the Discord channel ID where new account connection notifications are sent.  
+        - **`GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_ROLE`**: Defines the ID of a Discord role treated as a "Verified" role for linked accounts.
 
-### `GT_MAILER_AUTH_USERNAME`
-This option is used as the username to authenticate with the mail host.
+    - **Custom Icons**:
+        - **`GT_DISCORD_BOT_CUSTOM_ICONS_ENABLED`**: Enables notifications for custom icon updates.
+        - **`GT_DISCORD_BOT_CUSTOM_ICONS_CHANNEL`**: ID of the channel for custom icon logs.
 
-### `GT_MAILER_AUTH_PASSWORD`
-This option is used as the password to authenticate with the mail host.
-
-### `GT_MAILER_SENDER_ADDRESS`
-This option contains the address where emails should be sent from.
-
-### `GT_MAILER_SENDER_NAME`
-This option is the name which is being used to send mails.
-
-### `GT_RATELIMITER_ENABLED`
-This option decides whether to protect routes with a ratelimit or not.
-
-## TODO: Finish config documentation
-
-### `GT_DISCORD_BOT_ENABLED`
-### `GT_DISCORD_BOT_TOKEN`
-### `GT_DISCORD_BOT_SYNCED_ROLES_ENABLED`
-### `GT_DISCORD_BOT_SYNCED_ROLES_GUILD`
-### `GT_DISCORD_BOT_SYNCED_ROLES_{ROLE}`
-### `GT_DISCORD_BOT_REPORTS_ENABLED`
-### `GT_DISCORD_BOT_REPORTS_CHANNEL`
-### `GT_DISCORD_BOT_REPORTS_CONTENT`
-### `GT_DISCORD_BOT_WATCHLIST_ENABLED`
-### `GT_DISCORD_BOT_WATCHLIST_CHANNEL`
-### `GT_DISCORD_BOT_WATCHLIST_CONTENT`
-### `GT_DISCORD_BOT_BAN_APPEALS_ENABLED`
-### `GT_DISCORD_BOT_BAN_APPEALS_CHANNEL`
-### `GT_DISCORD_BOT_BAN_APPEALS_CONTENT`
-### `GT_DISCORD_BOT_MODLOG_ENABLED`
-### `GT_DISCORD_BOT_MODLOG_CHANNEL`
-### `GT_DISCORD_BOT_REFERRALS_ENABLED`
-### `GT_DISCORD_BOT_REFERRALS_CHANNEL`
-### `GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_ENABLED`
-### `GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_ROLE`
-### `GT_DISCORD_BOT_ACCOUNT_CONNTECTIONS_LOG`
-### `GT_DISCORD_BOT_CUSTOM_ICONS_ENABLED`
-### `GT_DISCORD_BOT_CUSTOM_ICONS_LOG`
-### `GT_DISCORD_BOT_ENTITLEMENTS_ENABLED`
-### `GT_DISCORD_BOT_ENTITLEMENTS_LOG`
+    - **Entitlements (SKUs)**:
+        - **`GT_DISCORD_BOT_ENTITLEMENTS_ENABLED`**: Enables SKU subscription logging.
+        - **`GT_DISCORD_BOT_ENTITLEMENTS_CHANNEL`**: ID of the channel for entitlement logs.
