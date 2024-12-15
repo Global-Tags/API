@@ -1,10 +1,11 @@
 import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder } from "discord.js";
 import Button from "../structs/Button";
-import players, { Permission } from "../../database/schemas/players";
+import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { sendIconClearEmail } from "../../libs/Mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
+import { Permission } from "../../libs/RoleManager";
 
 export default class ClearIconTexture extends Button {
     constructor() {

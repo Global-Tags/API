@@ -5,11 +5,11 @@
 ### What do the different role icons mean?
 | Icon | Role |
 | ---- | ---- |
-| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/purple.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Admin</p> |
-| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/aqua.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Developer</p> |
-| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/orange.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Discord Moderator</p> |
-| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/blue.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Partner</p> |
-| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/green.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Financial Supporter / Discord Booster</p> |
+| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/admin.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Admin</p> |
+| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/developer.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Developer</p> |
+| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/moderator.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Discord Moderator</p> |
+| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/partner.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Partner</p> |
+| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/supporter.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">GlobalTags Premium</p> |
 
 ### Which commands can I use?
 
@@ -51,9 +51,9 @@ There are several commands to help manage your settings. The main command is `/g
 
 ## Tags
 
-### How can I use colors in my Tag?
+### How Can I Customize My Tag with Colors?
 
-You can customize your tag with colors using Minecraft's default color codes. To add a color to your tag, simply include the appropriate color code before your text. The codes range from `0-9` for various numbers, and `a-f` for letters, along with additional codes for effects like bold or italic text. 
+You can personalize your tag by using either Minecraft's default color codes or hex color codes. To apply a color, simply place the corresponding code before your text. Minecraft's default codes include numbers `0-9` for various colors and letters `a-f` for additional options, along with codes for text effects like bold or italic.
 
 ??? info "All Minecraft color codes"
 
@@ -81,18 +81,20 @@ You can customize your tag with colors using Minecraft's default color codes. To
     - `n` - Underlined
     - `o` - Italic
 
-Hex colors are not supported yet, but this feature may be added in the future. To apply these codes, use the `&` symbol followed by the code, like this:
+If you'd like to use hex colors, use the format `<#HEXCODE>`. For example, `<#ff0000>` will create a bright red color. Remember, the brackets `< >` are essential for the color to be correctly applied.
+
+Here is an example of applying such color or decoration codes:
 
 === ":material-tag-text: Tag"
     ```
-    &aThis is a green tag
+    A &agreen &for <#ff0000>bright red&f, decorated <#ff0000>&o&l&nWord
     ```
 
 === ":material-image: Result"
-    ![Green tag](./assets/files/faq/green_tag.png){ width=200 }
+    ![Colored tag](./assets/files/faq/colored_tag.png)
 
 !!! Note
-    Please do **NOT** put spaces after color codes as this will create a whitespace which is a rule violation.
+    Please refrain from putting spaces after color codes as this will create a whitespace which is a rule violation.
 
     Do - `&eExample`<br>
     Don't - `&e Example`

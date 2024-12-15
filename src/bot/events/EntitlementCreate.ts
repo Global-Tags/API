@@ -1,10 +1,13 @@
 import { Entitlement } from "discord.js";
 import Event from "../structs/Event";
-import { bot } from "../../../config.json";
 import { client } from "../bot";
 import Logger from "../../libs/Logger";
 import players from "../../database/schemas/players";
 import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { config } from "../../libs/Config";
+import { getSkus } from "../../libs/SkuManager";
+
+const skus = getSkus();
 
 export default class EntitlementCreate extends Event {
     constructor() {
@@ -12,8 +15,8 @@ export default class EntitlementCreate extends Event {
     }
 
     async fire(entitlement: Entitlement) {
-        if(!bot.entitlements.enabled) return;
-        const sku = bot.entitlements.skus.find((sku) => sku.id == entitlement.skuId);
+        if(!config.discordBot.notifications.entitlements.enabled) return;
+        const sku = skus.find((sku) => sku.id == entitlement.skuId);
         if(!sku) return;
         const player = await players.findOne({ "connections.discord.id": entitlement.userId });
 
@@ -29,8 +32,8 @@ export default class EntitlementCreate extends Event {
             await player.save();
         }
         if(sku.discordRole) {
-            const guild = await client.guilds.fetch(bot.synced_roles.guild).catch(() => {
-                Logger.error(`Couldn't fetch guild ${bot.synced_roles.guild}`);
+            const guild = await client.guilds.fetch(config.discordBot.syncedRoles.guild).catch(() => {
+                Logger.error(`Couldn't fetch guild ${config.discordBot.syncedRoles.guild}`);
                 return null;
             });
             if(!guild) return;

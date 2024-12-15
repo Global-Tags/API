@@ -3,7 +3,6 @@ import { swagger } from "@elysiajs/swagger";
 import Logger from "./libs/Logger";
 import { connect as connectDatabase } from "./database/mongo";
 import { getRouter } from "./libs/RouteLoader";
-import * as config from "../config.json";
 import { version } from "../package.json";
 import access from "./middleware/AccessLog";
 import checkDatabase from "./middleware/DatabaseChecker";
@@ -24,6 +23,8 @@ import { getLatestCommit, retrieveData } from "./libs/GitCommitData";
 import { startEntitlementExpiry, startMetrics, startReferralReset } from "./libs/CronJobs";
 import players from "./database/schemas/players";
 import { formatUUID } from "./routes/root";
+import { config } from "./libs/Config";
+import('./libs/RoleManager');
 
 if(config.mongodb.trim().length == 0) {
     Logger.error(`Database connection string is empty!`);
@@ -43,7 +44,7 @@ export const elysia = new Elysia()
 .onRequest(checkDatabase)
 .onTransform(access)
 .onBeforeHandle(checkRatelimit)
-.use(ip({ checkHeaders: config.ipHeaders }))
+.use(ip({ checkHeaders: [config.ipHeader] }))
 .use(cors())
 .use(fetchI18n)
 .use(getAuthProvider)

@@ -1,10 +1,10 @@
 import * as bot from "../bot/bot";
-import * as config from "../../config.json";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
 import { capitalize } from "../bot/commands/PlayerInfo";
 import { getProfileByUUID } from "./Mojang";
 import { getCustomIconUrl } from "../routes/icon";
 import { pascalCase } from "change-case";
+import { config } from "./Config";
 
 export enum NotificationType {
     Report,
@@ -84,12 +84,12 @@ export async function sendMessage(data: NotificationData) {
     const { username: user, uuid } = await getProfileByUUID(data.uuid);
     const username = user || uuid;
 
-    if(data.type == NotificationType.Report && config.bot.reports.active) {
+    if(data.type == NotificationType.Report && config.discordBot.notifications.reports.enabled) {
         const profile = await getProfileByUUID(data.reporterUuid);
 
         _sendMessage(
-            config.bot.reports.channel,
-            config.bot.reports.content,
+            config.discordBot.notifications.reports.channel,
+            config.discordBot.notifications.reports.content,
             new EmbedBuilder()
             .setColor(0xff0000)
             .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
@@ -113,10 +113,10 @@ export async function sendMessage(data: NotificationData) {
                 }
             ])
         )
-    } else if(data.type == NotificationType.WatchlistAdd && config.bot.watchlist.active) {
+    } else if(data.type == NotificationType.WatchlistAdd && config.discordBot.notifications.watchlist.enabled) {
         _sendMessage(
-            config.bot.watchlist.channel,
-            config.bot.watchlist.content,
+            config.discordBot.notifications.watchlist.channel,
+            config.discordBot.notifications.watchlist.content,
             new EmbedBuilder()
             .setColor(0x5865f2)
             .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
@@ -136,10 +136,10 @@ export async function sendMessage(data: NotificationData) {
                 }
             ])
         );
-    } else if(data.type == NotificationType.WatchlistTagUpdate && config.bot.watchlist.active) {
+    } else if(data.type == NotificationType.WatchlistTagUpdate && config.discordBot.notifications.watchlist.enabled) {
         _sendMessage(
-            config.bot.watchlist.channel,
-            config.bot.watchlist.content,
+            config.discordBot.notifications.watchlist.channel,
+            config.discordBot.notifications.watchlist.content,
             new EmbedBuilder()
             .setColor(0x5865f2)
             .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
@@ -155,10 +155,10 @@ export async function sendMessage(data: NotificationData) {
                 }
             ])
         );
-    } else if(data.type == NotificationType.Appeal && config.bot.appeals.active) {
+    } else if(data.type == NotificationType.Appeal && config.discordBot.notifications.banAppeals.enabled) {
         _sendMessage(
-            config.bot.appeals.channel,
-            config.bot.appeals.content,
+            config.discordBot.notifications.banAppeals.channel,
+            config.discordBot.notifications.banAppeals.content,
             new EmbedBuilder()
             .setColor(0x5865f2)
             .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
@@ -174,9 +174,9 @@ export async function sendMessage(data: NotificationData) {
                 }
             ])
         );
-    } else if(data.type == NotificationType.DiscordLink && config.bot.connection.active) {
+    } else if(data.type == NotificationType.DiscordLink && config.discordBot.notifications.accountConnections.channel) {
         _sendMessage(
-            config.bot.connection.log,
+            config.discordBot.notifications.accountConnections.channel,
             undefined,
             new EmbedBuilder()
             .setColor(0x5865f2)
@@ -194,16 +194,16 @@ export async function sendMessage(data: NotificationData) {
             ]),
             false
         );
-    } else if(data.type == NotificationType.Referral && config.bot.referral.active) {
+    } else if(data.type == NotificationType.Referral && config.discordBot.notifications.referrals.enabled) {
         const profile = await getProfileByUUID(data.invited);
 
         _sendMessage(
-            config.bot.referral.channel,
+            config.discordBot.notifications.referrals.channel,
             `[\`${username}\`](<https://laby.net/@${uuid}>) has invited [\`${profile.username || profile.uuid}\`](<https://laby.net/@${profile.uuid}>).`,
             null,
             false
         );
-    } else if(data.type == NotificationType.Entitlement && config.bot.entitlements.enabled) {
+    } else if(data.type == NotificationType.Entitlement && config.discordBot.notifications.entitlements.enabled) {
         const embed = new EmbedBuilder()
         .setColor(bot.colors.standart)
         .setTitle('💵 Entitlement update')
@@ -212,12 +212,12 @@ export async function sendMessage(data: NotificationData) {
         if(data.head) embed.setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`);
 
         _sendMessage(
-            config.bot.entitlements.log,
+            config.discordBot.notifications.entitlements.channel,
             undefined,
             embed,
             false
         )
-    } else if(data.type == NotificationType.CustomIconUpload && config.bot.custom_icons.active) {
+    } else if(data.type == NotificationType.CustomIconUpload && config.discordBot.notifications.customIcons.enabled) {
         const embed = new EmbedBuilder()
         .setColor(bot.colors.standart)
         .setTitle(':frame_photo: New icon upload')
@@ -231,17 +231,17 @@ export async function sendMessage(data: NotificationData) {
         .setThumbnail(getCustomIconUrl(data.uuid, data.hash));
 
         _sendMessage(
-            config.bot.custom_icons.log,
+            config.discordBot.notifications.customIcons.channel,
             undefined,
             embed,
             true
         )
-    } else if(data.type == NotificationType.ModLog && config.bot.mod_log.active) {
+    } else if(data.type == NotificationType.ModLog && config.discordBot.notifications.mogLog.enabled) {
         const profile = await getProfileByUUID(data.staff);
 
         const description = modlogDescription(data);
         _sendMessage(
-            config.bot.mod_log.channel,
+            config.discordBot.notifications.mogLog.channel,
             `[**${ModLogType[data.logType]}**] [\`${profile.username || profile.uuid}\`](<https://laby.net/@${profile.uuid}>)${data.discord ? ' [**D**]' : ''} → [\`${username}\`](<https://laby.net/@${uuid}>)${description ? `: ${description}` : ''}`,
             null,
             false
@@ -264,7 +264,7 @@ function modlogDescription(data: NotificationData): string | null {
 }
 
 async function _sendMessage(channel: string, content: string | undefined, embed: EmbedBuilder | null, actionButton: boolean = true) {
-    if(!config.bot.enabled) return;
+    if(!config.discordBot.enabled) return;
     (await bot.client.channels.fetch(channel) as TextChannel)?.send({
         content,
         embeds: embed == null ? [] : [embed],

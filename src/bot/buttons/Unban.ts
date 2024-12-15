@@ -1,10 +1,11 @@
 import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder } from "discord.js";
 import Button from "../structs/Button";
 import { colors } from "../bot";
-import players, { Permission } from "../../database/schemas/players";
+import players from "../../database/schemas/players";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { sendUnbanEmail } from "../../libs/Mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
+import { Permission } from "../../libs/RoleManager";
 
 export default class Unban extends Button {
     constructor() {

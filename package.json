@@ -1,25 +1,24 @@
 {
   "name": "globaltags",
   "private": true,
-  "version": "1.5.1",
+  "version": "1.5.2",
   "module": "src/index.ts",
   "scripts": {
-    "dev": "bun --watch src/index.ts",
-    "build": "bun build src/index.ts",
-    "start": "NODE_ENV=production bun src/index.ts",
-    "test": "bun test"
+    "dev": "NODE_ENV=dev bun --watch src/index.ts",
+    "start": "NODE_ENV=prod bun src/index.ts"
   },
   "author": "RappyTV",
   "license": "MIT",
   "dependencies": {
     "@elysiajs/cors": "^1.1.1",
     "@elysiajs/swagger": "^1.1.6",
-    "@sentry/bun": "^8.42.0",
-    "axios": "^1.7.8",
+    "@sentry/bun": "^8.45.0",
+    "axios": "^1.7.9",
     "chalk": "^5.3.0",
     "change-case": "^5.4.4",
-    "cron": "^3.2.1",
+    "cron": "^3.3.1",
     "discord.js": "^14.16.3",
+    "dotenv": "^16.4.7",
     "elysia": "1.0.25",
     "jsonwebtoken": "^9.0.2",
     "minimist": "^1.2.8",

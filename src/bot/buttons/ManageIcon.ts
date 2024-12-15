@@ -1,9 +1,10 @@
 import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import Button from "../structs/Button";
-import players, { GlobalIcon, Permission } from "../../database/schemas/players";
+import players, { GlobalIcon } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { constantCase } from "change-case";
 import { getCustomIconUrl } from "../../routes/icon";
+import { Permission } from "../../libs/RoleManager";
 
 export default class ManageIcon extends Button {
     constructor() {

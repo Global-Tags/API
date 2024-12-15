@@ -1,9 +1,12 @@
 import { Entitlement } from "discord.js";
 import Event from "../structs/Event";
-import { bot } from "../../../config.json";
 import players from "../../database/schemas/players";
 import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import entitlements from "../../database/schemas/entitlement";
+import { config } from "../../libs/Config";
+import { getSkus } from "../../libs/SkuManager";
+
+const skus = getSkus();
 
 export default class EntitlementDelete extends Event {
     constructor() {
@@ -11,9 +14,9 @@ export default class EntitlementDelete extends Event {
     }
 
     async fire(entitlement: Entitlement) {
-        if(!bot.entitlements.enabled || !!entitlement.startsTimestamp) return; // Temporary replacement for Entitlement#isTest. See https://github.com/discordjs/discord.js/issues/10610
+        if(!config.discordBot.notifications.entitlements.enabled || !!entitlement.startsTimestamp) return; // Temporary replacement for Entitlement#isTest. See https://github.com/discordjs/discord.js/issues/10610
         const player = await players.findOne({ "connections.discord.id": entitlement.userId });
-        const sku = bot.entitlements.skus.find((sku) => sku.id == entitlement.skuId);
+        const sku = skus.find((sku) => sku.id == entitlement.skuId);
         if(!sku) return;
 
         sendMessage({

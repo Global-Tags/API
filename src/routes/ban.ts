@@ -1,9 +1,10 @@
 import Elysia, { t } from "elysia";
-import players, { Permission } from "../database/schemas/players";
+import players from "../database/schemas/players";
 import fetchI18n, { getI18nFunctionByLanguage } from "../middleware/FetchI18n";
 import { ModLogType, NotificationType, sendMessage } from "../libs/DiscordNotifier";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { sendBanEmail, sendUnbanEmail } from "../libs/Mailer";
+import { Permission } from "../libs/RoleManager";
 
 export default new Elysia({
     prefix: `/ban`

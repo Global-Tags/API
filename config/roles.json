@@ -1,0 +1,46 @@
+[
+    {
+        "name": "admin",
+        "permissions": [
+            "BypassValidation",
+            "CustomIcon",
+            "ManageBans",
+            "ManageNotes",
+            "ManageSubscriptions",
+            "ManageRoles",
+            "ManageTags",
+            "ManageWatchlist",
+            "ReportImmunity"
+        ]
+    },
+    {
+        "name": "developer",
+        "permissions": [
+            "BypassValidation",
+            "CustomIcon",
+            "ManageNotes",
+            "ReportImmunity"
+        ]
+    },
+    {
+        "name": "moderator",
+        "permissions": [
+            "BypassValidation",
+            "CustomIcon",
+            "ManageNotes",
+            "ReportImmunity"
+        ]
+    },
+    {
+        "name": "partner",
+        "permissions": [
+            "CustomIcon"
+        ]
+    },
+    {
+        "name": "premium",
+        "permissions": [
+            "CustomIcon"
+        ]
+    }
+]

@@ -1,7 +1,8 @@
 import Elysia, { t } from "elysia";
-import players, { GlobalPosition, Permission } from "../database/schemas/players";
+import players, { GlobalPosition } from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
 import getAuthProvider from "../middleware/GetAuthProvider";
+import { Permission } from "../libs/RoleManager";
 
 const positions = Object.keys(GlobalPosition)
     .filter((pos) => isNaN(Number(pos)))

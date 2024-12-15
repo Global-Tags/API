@@ -1,12 +1,13 @@
 services:
   api:
     image: rappytv/globaltagsapi:latest
-    user: 1000:1000
     restart: unless-stopped
+    user: root
     ports:
       - 5500:5500
+    env_file: .env
     volumes:
-      - ./config.json:/app/config.json:ro
+      - ./config:/app/config:ro
       - globaltags-icons:/app/icons
 
 volumes:

@@ -1,18 +1,21 @@
 import entitlement from "../database/schemas/entitlement";
 import players from "../database/schemas/players";
 import { NotificationType, sendMessage } from "./DiscordNotifier";
-import { bot } from "../../config.json";
 import { client } from "../bot/bot";
 import Logger from "./Logger";
 import { isConnected } from "../database/mongo";
+import { config } from "./Config";
+import { getSkus } from "./SkuManager";
+
+const skus = getSkus();
 
 export async function checkExpiredEntitlements() {
     if(!isConnected()) return;
-    const ent = await entitlement.find({ done: false, expires_at: { $lt: new Date() } });
-    if(!ent) return;
-    for (const entitlement of ent) {
+    const entitlements = await entitlement.find({ done: false, expires_at: { $lt: new Date() } });
+    if(!entitlements) return;
+    for (const entitlement of entitlements) {
         const player = await players.findOne({ "connections.discord.id": entitlement.user_id });
-        const sku = bot.entitlements.skus.find((sku) => sku.id == entitlement.sku_id);
+        const sku = skus.find((sku) => sku.id == entitlement.sku_id);
         if(!sku) continue;
 
         entitlement.done = true;
@@ -30,8 +33,8 @@ export async function checkExpiredEntitlements() {
         }
 
         if(sku.discordRole) {
-            const guild = await client.guilds.fetch(bot.synced_roles.guild).catch(() => {
-                Logger.error(`Couldn't fetch guild ${bot.synced_roles.guild}`);
+            const guild = await client.guilds.fetch(config.discordBot.syncedRoles.guild).catch(() => {
+                Logger.error(`Couldn't fetch guild ${config.discordBot.syncedRoles.guild}`);
                 return null;
             });
             if(!guild) return;
