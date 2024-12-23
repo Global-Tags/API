@@ -1,1 +1,21 @@
-{}
+{
+    "error": {
+        "invalidBody": "İstek gövdesi bir JSON nesnesi olmalıdır!",
+        "missingField": "JSON alanı eksik \"<field>\".",
+        "notAllowed": "Buna erişiminiz yok!",
+        "database": "Veritabanı bağlı değil. Lütfen daha sonra tekrar deneyin!",
+        "playerNotFound": "Bu oyuncu veritabanımızda yok!",
+        "banned": "Sen bann oldun!",
+        "wrongType": "\"<field>\" alanı <type> türünde olmalıdır!",
+        "noTag": "Önce bir gün seçmelisiniz!",
+        "playerNoTag": "Bu oyuncunun günü yok!",
+        "playerBanned": "Bu oyuncu yasaklandı!",
+        "noIcon": "Icon bulunamadı!",
+        "notFound": "Bulunamadı!",
+        "unknownError": "Bilinmeyen bir hata oluştu! Lütfen daha sonra tekrar deneyin!",
+        "ratelimit": "Cihaz sınırlıdır! Lütfen <seconds> saniye içinde tekrar deneyin!"
+    },
+    "ban": {
+        "alreadyBanned": "Bu oyuncu zaten yasaklandı!"
+    }
+}
