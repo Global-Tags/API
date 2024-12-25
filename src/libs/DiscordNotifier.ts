@@ -12,6 +12,7 @@ export enum NotificationType {
     Appeal,
     ModLog,
     DiscordLink,
+    EmailLink,
     Referral,
     Entitlement,
     CustomIconUpload
@@ -58,6 +59,9 @@ type NotificationData = {
     type: NotificationType.DiscordLink,
     connected: boolean,
     userId: string
+} | {
+    type: NotificationType.EmailLink,
+    connected: boolean
 } | {
     type: NotificationType.CustomIconUpload,
     hash: string
@@ -191,6 +195,22 @@ export async function sendMessage(data: NotificationData) {
                 {
                     name: `User ID`,
                     value: `[\`${data.userId}\`](discord://-/users/${data.userId})`
+                }
+            ]),
+            false
+        );
+    } else if(data.type == NotificationType.EmailLink && config.discordBot.notifications.accountConnections.channel) {
+        _sendMessage(
+            config.discordBot.notifications.accountConnections.channel,
+            undefined,
+            new EmbedBuilder()
+            .setColor(0x5865f2)
+            .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
+            .setTitle(data.connected ? 'New email connection' : 'Email connection removed')
+            .addFields([
+                {
+                    name: `Player`,
+                    value: `[\`${username}\`](https://laby.net/@${uuid})`
                 }
             ]),
             false

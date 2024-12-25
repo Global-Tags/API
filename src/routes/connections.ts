@@ -5,6 +5,7 @@ import getAuthProvider from "../middleware/GetAuthProvider";
 import { sendEmail } from "../libs/Mailer";
 import { randomBytes } from "crypto";
 import { config } from "../libs/Config";
+import { NotificationType, sendMessage } from "../libs/DiscordNotifier";
 
 export function generateSecureCode(length: number = 10) {
     return randomBytes(length).toString('hex').slice(0, length);
@@ -147,6 +148,12 @@ export default new Elysia({
     player.connections.email.code = null;
     await player.save();
 
+    sendMessage({
+        type: NotificationType.EmailLink,
+        connected: true,
+        uuid: player.uuid
+    });
+
     sendEmail({
         recipient: player.connections.email.address!,
         subject: i18n('email.verified.subject'),
@@ -192,6 +199,12 @@ export default new Elysia({
     player.connections.email.address = null;
     player.connections.email.code = null;
     await player.save();
+
+    sendMessage({
+        type: NotificationType.EmailLink,
+        connected: false,
+        uuid: player.uuid
+    });
 
     return { message: i18n('connections.email.unlinked') };
 }, {
