@@ -21,38 +21,46 @@ export default class Actions extends Button {
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
 
         const embed = new EmbedBuilder()
-        .setColor(0x5865f2)
-        .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
-        .setTitle(`Action menu`)
-        .addFields({
-            name: `Target UUID`,
-            value: `\`\`\`${uuid}\`\`\``
-        });
+            .setColor(0x5865f2)
+            .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
+            .setTitle(`Action menu`)
+            .addFields({
+                name: `Target UUID`,
+                value: `\`\`\`${uuid}\`\`\``
+            });
 
         const rows = [
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
-                .setLabel(`Manage account`)
-                .setCustomId(`manageAccount`)
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(!staff.hasPermissionSync(Permission.ManageBans) && !staff.hasPermissionSync(Permission.ManageWatchlist)),
+                    .setLabel(`Manage account`)
+                    .setCustomId(`manageAccount`)
+                    .setStyle(ButtonStyle.Primary)
+                    .setDisabled(!staff.hasPermissionSync(Permission.ManageBans) && !staff.hasPermissionSync(Permission.ManageWatchlist)),
                 new ButtonBuilder()
-                .setLabel(`Manage tag`)
-                .setCustomId(`manageTag`)
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(!staff.hasPermissionSync(Permission.ManageTags))
+                    .setLabel(`Manage tag`)
+                    .setCustomId(`manageTag`)
+                    .setStyle(ButtonStyle.Primary)
+                    .setDisabled(!staff.hasPermissionSync(Permission.ManageTags))
+            ),
+            new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(
+                new ButtonBuilder()
+                    .setLabel(`Reports${player.reports.length > 0 ? ` (${player.reports.length})` : ''}`)
+                    .setCustomId(`reports`)
+                    .setStyle(ButtonStyle.Primary)
+                    .setDisabled(!staff.hasPermissionSync(Permission.ManageReports)),
+                new ButtonBuilder()
+                    .setLabel(`Notes${player.notes.length > 0 ? ` (${player.notes.length})` : ''}`)
+                    .setCustomId(`notes`)
+                    .setStyle(ButtonStyle.Primary)
+                    .setDisabled(!staff.hasPermissionSync(Permission.ManageNotes))
             ),
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 config.discordBot.syncedRoles.enabled
                     ? new ButtonBuilder().setLabel(`Manage subscriptions`).setCustomId(`manageSubscriptions`).setStyle(ButtonStyle.Primary).setDisabled(!staff.hasPermissionSync(Permission.ManageSubscriptions))
                     : new ButtonBuilder().setLabel(`Edit roles`).setCustomId(`editRoles`).setStyle(ButtonStyle.Primary).setDisabled(!staff.hasPermissionSync(Permission.ManageRoles)),
-                new ButtonBuilder()
-                .setLabel(`Notes${player.notes.length > 0 ? ` (${player.notes.length})` : ''}`)
-                .setCustomId(`notes`)
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(!staff.hasPermissionSync(Permission.ManageNotes))
             )
         ]
 

@@ -2,9 +2,9 @@ import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder,
 import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { capitalize } from "../commands/PlayerInfo";
 import { getRoles, Permission } from "../../libs/RoleManager";
 import { config } from "../../libs/Config";
+import { capitalCase } from "change-case";
 
 const roles = getRoles();
 
@@ -24,7 +24,7 @@ export default class EditRoles extends Button {
 
         const options = roles.filter(key => isNaN(Number(key))).slice(0, 25).map(({ name: role }) => {
             return {
-                label: capitalize(role),
+                label: capitalCase(role),
                 value: role.toUpperCase(),
                 default: player.roles.includes(role.toUpperCase())
             }

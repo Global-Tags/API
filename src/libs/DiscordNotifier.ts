@@ -1,9 +1,8 @@
 import * as bot from "../bot/bot";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
-import { capitalize } from "../bot/commands/PlayerInfo";
 import { getProfileByUUID } from "./Mojang";
 import { getCustomIconUrl } from "../routes/icon";
-import { pascalCase } from "change-case";
+import { capitalCase, pascalCase } from "change-case";
 import { config } from "./Config";
 
 export enum NotificationType {
@@ -13,6 +12,7 @@ export enum NotificationType {
     Appeal,
     ModLog,
     DiscordLink,
+    EmailLink,
     Referral,
     Entitlement,
     CustomIconUpload
@@ -31,7 +31,8 @@ export enum ModLogType {
     Watch,
     Unwatch,
     CreateNote,
-    DeleteNote
+    DeleteNote,
+    DeleteReport
 }
 
 type NotificationData = {
@@ -59,6 +60,9 @@ type NotificationData = {
     connected: boolean,
     userId: string
 } | {
+    type: NotificationType.EmailLink,
+    connected: boolean
+} | {
     type: NotificationType.CustomIconUpload,
     hash: string
 } | {
@@ -77,7 +81,8 @@ type NotificationData = {
     positions?: { old: string, new: string },
     roles?: { added: string[], removed: string[] },
     icons?: { old: { name: string, hash?: string | null }, new: { name: string, hash?: string | null } },
-    note?: string
+    note?: string,
+    report?: string
 });
 
 export async function sendMessage(data: NotificationData) {
@@ -194,6 +199,22 @@ export async function sendMessage(data: NotificationData) {
             ]),
             false
         );
+    } else if(data.type == NotificationType.EmailLink && config.discordBot.notifications.accountConnections.channel) {
+        _sendMessage(
+            config.discordBot.notifications.accountConnections.channel,
+            undefined,
+            new EmbedBuilder()
+            .setColor(0x5865f2)
+            .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
+            .setTitle(data.connected ? 'New email connection' : 'Email connection removed')
+            .addFields([
+                {
+                    name: `Player`,
+                    value: `[\`${username}\`](https://laby.net/@${uuid})`
+                }
+            ]),
+            false
+        );
     } else if(data.type == NotificationType.Referral && config.discordBot.notifications.referrals.enabled) {
         const profile = await getProfileByUUID(data.invited);
 
@@ -251,15 +272,16 @@ export async function sendMessage(data: NotificationData) {
 
 function modlogDescription(data: NotificationData): string | null {
     if(data.type != NotificationType.ModLog) return null;
-    const { logType: type, oldTag, newTag, reason, appealable, positions, icons, note } = data;
+    const { logType: type, oldTag, newTag, reason, appealable, positions, icons, note, report } = data;
     if(type == ModLogType.ChangeTag) return `\`${oldTag}\` → \`${newTag}\``;
     else if(type == ModLogType.Ban) return `**Reason**: \`${reason || 'No reason'}\``;
     else if(type == ModLogType.EditBan) return `**Appealable**: \`${appealable ? `✅` : `❌`}\`. **Reason**: \`${reason}\``;
-    else if(type == ModLogType.EditRoles) return `\n\`\`\`diff\n${data.roles!.added.map((role) => `+ ${capitalize(role)}`).join('\n')}${data.roles!.added.length > 0 && data.roles!.removed.length > 0 ? '\n' : ''}${data.roles!.removed.map((role) => `- ${capitalize(role)}`).join('\n')}\`\`\``;
+    else if(type == ModLogType.EditRoles) return `\n\`\`\`diff\n${data.roles!.added.map((role) => `+ ${capitalCase(role)}`).join('\n')}${data.roles!.added.length > 0 && data.roles!.removed.length > 0 ? '\n' : ''}${data.roles!.removed.map((role) => `- ${capitalCase(role)}`).join('\n')}\`\`\``;
     else if(type == ModLogType.EditPosition) return `\`${pascalCase(positions!.old)}\` → \`${pascalCase(positions!.new)}\``;
     else if(type == ModLogType.ChangeIconType) return `\`${pascalCase(icons!.old.name)}\` → \`${pascalCase(icons!.new.name)}\``;
     else if(type == ModLogType.ClearIconTexture) return `[${icons!.old.hash}](${getCustomIconUrl(data.uuid, icons!.old.hash!)})`;
     else if(type == ModLogType.CreateNote || type == ModLogType.DeleteNote) return `\`${note}\``;
+    else if(type == ModLogType.DeleteReport) return `\`${report}\``;
     return null;
 }
 
