@@ -17,10 +17,12 @@ export enum Permission {
 
 export class Role {
     name: string
+    hasIcon: boolean
     permissions: Permission[]
 
-    constructor(name: string, permissions: Permission[]) {
+    constructor(name: string, hasIcon: boolean, permissions: Permission[]) {
         this.name = name;
+        this.hasIcon = hasIcon;
         this.permissions = permissions;
     }
 
@@ -38,7 +40,7 @@ for(const role of roleConfig) {
         .filter((permission) => permission in Permission)
         .map((permission) => Permission[permission as keyof typeof Permission]);
 
-    roles.push(new Role(role.name, permissions));
+    roles.push(new Role(role.name, role.hasIcon, permissions));
 }
 
 export function getRoles(): Role[] {

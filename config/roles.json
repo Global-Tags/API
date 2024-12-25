@@ -1,6 +1,7 @@
 [
     {
         "name": "admin",
+        "hasIcon": true,
         "permissions": [
             "BypassValidation",
             "CustomIcon",
@@ -15,6 +16,7 @@
     },
     {
         "name": "developer",
+        "hasIcon": true,
         "permissions": [
             "BypassValidation",
             "CustomIcon",
@@ -24,6 +26,7 @@
     },
     {
         "name": "moderator",
+        "hasIcon": true,
         "permissions": [
             "BypassValidation",
             "CustomIcon",
@@ -33,12 +36,14 @@
     },
     {
         "name": "partner",
+        "hasIcon": true,
         "permissions": [
             "CustomIcon"
         ]
     },
     {
         "name": "premium",
+        "hasIcon": true,
         "permissions": [
             "CustomIcon"
         ]
