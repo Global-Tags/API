@@ -55,8 +55,8 @@ export default new Elysia()
         },
         ban: showBan ? {
             active: player.isBanned(),
-            reason: player.ban?.reason || null,
-            appealable: player.ban!.appealable
+            reason: player.ban.reason || null,
+            appealable: player.ban.appealable
         } : null
     };
 }, {
