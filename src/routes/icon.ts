@@ -95,7 +95,7 @@ export default new Elysia({
     player.hide_role_icon = !player.hide_role_icon;
     await player.save();
 
-    return { message: i18n(`icon.staff_icon.success.${player.hide_role_icon ? 'hidden' : 'shown'}`) };
+    return { message: i18n(`icon.role_icon.success.${player.hide_role_icon ? 'hidden' : 'shown'}`) };
 }, {
     detail: {
         tags: ['Settings'],
