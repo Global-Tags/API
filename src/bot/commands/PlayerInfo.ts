@@ -4,6 +4,7 @@ import players from "../../database/schemas/players";
 import * as bot from "../bot";
 import { translateToAnsi } from "../../libs/ChatColor";
 import { getProfileByUsername } from "../../libs/Mojang";
+import { capitalCase } from "change-case";
 export const uuidRegex = /[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}|[a-f0-9]{8}(?:[a-f0-9]{4}){4}[a-f0-9]{8}/;
 
 export default class PlayerInfo extends Command {
@@ -55,12 +56,12 @@ export default class PlayerInfo extends Command {
                     },
                     {
                         name: `Position`,
-                        value: `\`\`\`${capitalize(data.position)}\`\`\``,
+                        value: `\`\`\`${capitalCase(data.position)}\`\`\``,
                         inline: true
                     },
                     {
                         name: `Icon`,
-                        value: `\`\`\`${capitalize(data.icon.name)}\`\`\``,
+                        value: `\`\`\`${capitalCase(data.icon.name)}\`\`\``,
                         inline: true
                     },
                     {
@@ -80,7 +81,7 @@ export default class PlayerInfo extends Command {
                     },
                     {
                         name: `Roles [${roles.length}]`,
-                        value: `\`\`\`${roles.length > 0 ? roles.map((role) => `- ${capitalize(role)}`).join('\n') : `--`}\`\`\``,
+                        value: `\`\`\`${roles.length > 0 ? roles.map((role) => `- ${capitalCase(role)}`).join('\n') : `--`}\`\`\``,
                         inline: false
                     }
                 ])
@@ -98,17 +99,4 @@ export default class PlayerInfo extends Command {
             ] : []
         });
     }
-}
-
-export function capitalize(text: string): string {
-    const parts = text.split('_');
-    if(parts.length > 1) {
-        const capitalized = [];
-        
-        for(const part of parts) {
-            capitalized.push(capitalize(part));
-        }
-        return capitalized.join(' ');
-    }
-    return text.charAt(0).toUpperCase() + text.substring(1).toLowerCase();
 }

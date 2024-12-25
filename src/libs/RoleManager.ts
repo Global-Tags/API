@@ -1,3 +1,4 @@
+import { pascalCase } from "change-case";
 import roleConfig from "../../config/roles.json";
 import { config } from "./Config";
 
@@ -17,10 +18,12 @@ export enum Permission {
 
 export class Role {
     name: string
+    hasIcon: boolean
     permissions: Permission[]
 
-    constructor(name: string, permissions: Permission[]) {
+    constructor(name: string, hasIcon: boolean, permissions: Permission[]) {
         this.name = name;
+        this.hasIcon = hasIcon;
         this.permissions = permissions;
     }
 
@@ -35,10 +38,10 @@ export class Role {
 
 for(const role of roleConfig) {
     const permissions = role.permissions
-        .filter((permission) => permission in Permission)
-        .map((permission) => Permission[permission as keyof typeof Permission]);
+        .filter((permission) => pascalCase(permission) in Permission)
+        .map((permission) => Permission[pascalCase(permission) as keyof typeof Permission]);
 
-    roles.push(new Role(role.name, permissions));
+    roles.push(new Role(role.name, role.hasIcon, permissions));
 }
 
 export function getRoles(): Role[] {

@@ -71,6 +71,7 @@ export interface IPlayer {
         current_month: number
     },
     reports: { by: String, reportedName: String, reason: String }[],
+    hide_role_icon: boolean,
     roles: string[],
     api_keys: string[],
     notes: { id: string, text: string, author: string, createdAt: Date }[],
@@ -173,6 +174,11 @@ const schema = new Schema<IPlayer>({
         ],
         required: true,
         default: []
+    },
+    hide_role_icon: {
+        type: Boolean,
+        required: true,
+        default: false
     },
     roles: {
         type: [String],

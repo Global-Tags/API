@@ -1,46 +1,51 @@
 [
     {
         "name": "admin",
+        "hasIcon": true,
         "permissions": [
-            "BypassValidation",
-            "CustomIcon",
-            "ManageBans",
-            "ManageNotes",
-            "ManageSubscriptions",
-            "ManageRoles",
-            "ManageTags",
-            "ManageWatchlist",
-            "ReportImmunity"
+            "bypass_validation",
+            "custom_icon",
+            "manage_bans",
+            "manage_notes",
+            "manage_subscriptions",
+            "manage_roles",
+            "manage_tags",
+            "manage_watchlist",
+            "report_immunity"
         ]
     },
     {
         "name": "developer",
+        "hasIcon": true,
         "permissions": [
-            "BypassValidation",
-            "CustomIcon",
-            "ManageNotes",
-            "ReportImmunity"
+            "bypass_validation",
+            "custom_icon",
+            "manage_notes",
+            "report_immunity"
         ]
     },
     {
         "name": "moderator",
+        "hasIcon": true,
         "permissions": [
-            "BypassValidation",
-            "CustomIcon",
-            "ManageNotes",
-            "ReportImmunity"
+            "bypass_validation",
+            "custom_icon",
+            "manage_notes",
+            "report_immunity"
         ]
     },
     {
         "name": "partner",
+        "hasIcon": true,
         "permissions": [
-            "CustomIcon"
+            "custom_icon"
         ]
     },
     {
         "name": "premium",
+        "hasIcon": true,
         "permissions": [
-            "CustomIcon"
+            "custom_icon"
         ]
     }
 ]

@@ -28,6 +28,12 @@
     "icon": {
         "sameIcon": "You already chose this icon!",
         "notAllowed": "You're not allowed to choose this icon!",
+        "role_icon": {
+            "success": {
+                "hidden": "Your role icon is now hidden!",
+                "shown": "Your role icon is now shown!"
+            }
+        },
         "success": {
             "self": "Your icon was successfully set!",
             "admin": "The player's icon was successfully set!"

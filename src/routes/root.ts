@@ -5,11 +5,11 @@ import { sendMessage, NotificationType, ModLogType } from "../libs/DiscordNotifi
 import fetchI18n, { getI18nFunctionByLanguage } from "../middleware/FetchI18n";
 import { stripColors } from "../libs/ChatColor";
 import getAuthProvider from "../middleware/GetAuthProvider";
-import { constantCase } from "change-case";
+import { snakeCase } from "change-case";
 import { sendTagChangeEmail, sendTagClearEmail } from "../libs/Mailer";
 import { saveLastLanguage } from "../libs/I18n";
 import { config } from "../libs/Config";
-import { Permission } from "../libs/RoleManager";
+import { getRole, Permission } from "../libs/RoleManager";
 
 const { validation } = config;
 const { min, max, blacklist, watchlist } = validation.tag;
@@ -30,9 +30,9 @@ export default new Elysia()
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNoTag`) });
 
-    if(constantCase(player.icon.name) == constantCase(GlobalIcon[GlobalIcon.Custom])) {
+    if(snakeCase(player.icon.name) == snakeCase(GlobalIcon[GlobalIcon.Custom])) {
         if(!(await player.hasPermission(Permission.CustomIcon))) {
-            player.icon.name = constantCase(GlobalIcon[GlobalIcon.None]);
+            player.icon.name = snakeCase(GlobalIcon[GlobalIcon.None]);
             await player.save();
         }
     }
@@ -40,13 +40,14 @@ export default new Elysia()
     return {
         uuid: formatUUID(player.uuid),
         tag: player.isBanned() ? null : player.tag || null,
-        position: constantCase(player.position || GlobalIcon[GlobalPosition.Above]),
+        position: snakeCase(player.position || GlobalIcon[GlobalPosition.Above]),
         icon: {
-            type: constantCase(player.icon.name || GlobalIcon[GlobalIcon.None]),
+            type: snakeCase(player.icon.name || GlobalIcon[GlobalIcon.None]),
             hash: player.icon.hash || null
         },
-        roles: player.getRolesSync().map((permission) => constantCase(permission)),
-        permissions: Object.keys(player.getPermissionsSync()).filter((perm) => player.getPermissionsSync()[perm]).map((permission) => constantCase(permission)),
+        roleIcon: !player.hide_role_icon ? player.getRolesSync().find((role) => getRole(role)?.hasIcon) || null : null,
+        roles: player.getRolesSync().map((role) => snakeCase(role)),
+        permissions: Object.keys(player.getPermissionsSync()).filter((perm) => player.getPermissionsSync()[perm]).map((permission) => snakeCase(permission)),
         referrals: {
             has_referred: player.referrals.has_referred,
             total_referrals: player.referrals.total.length,
@@ -54,8 +55,8 @@ export default new Elysia()
         },
         ban: showBan ? {
             active: player.isBanned(),
-            reason: player.ban?.reason || null,
-            appealable: player.ban!.appealable
+            reason: player.ban.reason || null,
+            appealable: player.ban.appealable
         } : null
     };
 }, {
@@ -64,7 +65,7 @@ export default new Elysia()
         description: `Get another players' tag info`
     },
     response: {
-        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referrals: t.Object({ has_referred: t.Boolean(), total_referrals: t.Integer(), current_month_referrals: t.Integer() }), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]) }), t.Null()]) }, { description: `You received the tag data.` }),
+        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referrals: t.Object({ has_referred: t.Boolean(), total_referrals: t.Integer(), current_month_referrals: t.Integer() }), roleIcon: t.Union([t.String(), t.Null()]), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]) }), t.Null()]) }, { description: `You received the tag data.` }),
         401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
         403: t.Object({ error: t.String() }, { description: `The player is banned.` }),
         404: t.Object({ error: t.String() }, { description: `The player is not in the database.` }),
