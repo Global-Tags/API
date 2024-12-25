@@ -26,7 +26,7 @@ export default class DeleteReport extends Button {
             const { username, uuid } = await getProfileByUUID(report.by);
             options.push(
                 new StringSelectMenuOptionBuilder()
-                    .setLabel(`${report.reported_tag} ${report.reason}`.substring(0, 100))
+                    .setLabel(`${report.reported_tag} - ${report.reason}`.substring(0, 100))
                     .setDescription(`created by ${username || uuid!} on ${report.created_at.toDateString()} (#${report.id})`)
                     .setValue(report.id)
             );
