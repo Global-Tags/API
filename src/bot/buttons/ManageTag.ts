@@ -28,7 +28,7 @@ export default class ManageTag extends Button {
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
-                .setLabel(`Set tag`)
+                .setLabel(`Change tag`)
                 .setCustomId(`setTag`)
                 .setStyle(ButtonStyle.Primary),
                 new ButtonBuilder()
