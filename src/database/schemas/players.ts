@@ -99,7 +99,8 @@ export interface IPlayer {
     createNote({ text, author }: { text: string, author: string }): void,
     existsNote(id: string): boolean,
     deleteNote(id: string): void,
-    createReport({ by, reported_tag, reason }: { by: string, reported_tag: string, reason: string }): void
+    createReport({ by, reported_tag, reason }: { by: string, reported_tag: string, reason: string }): void,
+    deleteReport(id: string): void
 }
 
 const roles = getRoles();
@@ -399,6 +400,10 @@ const schema = new Schema<IPlayer>({
                 reason,
                 created_at: new Date()
             })
+        },
+
+        deleteReport(id: string) {
+            this.reports = this.reports.filter((report) => report.id != id);
         }
     }
 });
