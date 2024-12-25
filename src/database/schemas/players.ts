@@ -70,7 +70,7 @@ export interface IPlayer {
         }[],
         current_month: number
     },
-    reports: { by: String, reportedName: String, reason: String }[],
+    reports: { id: string, by: string, reported_tag: string, reason: string, created_at: Date }[],
     hide_role_icon: boolean,
     roles: string[],
     api_keys: string[],
@@ -98,7 +98,8 @@ export interface IPlayer {
     clearIcon(staff: string): void,
     createNote({ text, author }: { text: string, author: string }): void,
     existsNote(id: string): boolean,
-    deleteNote(id: string): void
+    deleteNote(id: string): void,
+    createReport({ by, reported_tag, reason }: { by: string, reported_tag: string, reason: string }): void
 }
 
 const roles = getRoles();
@@ -165,13 +166,28 @@ const schema = new Schema<IPlayer>({
         }
     },
     reports: {
-        type: [
-            {
-                by: String,
-                reportedName: String,
-                reason: String
+        type: [{
+            id: {
+                type: String,
+                required: true
+            },
+            by: {
+                type: String,
+                required: true
+            },
+            reported_tag: {
+                type: String,
+                required: true
+            },
+            reason: {
+                type: String,
+                required: true
+            },
+            created_at: {
+                type: Date,
+                required: true
             }
-        ],
+        }],
         required: true,
         default: []
     },
@@ -373,6 +389,16 @@ const schema = new Schema<IPlayer>({
 
         deleteNote(id: string) {
             this.notes = this.notes.filter((note) => note.id != id);
+        },
+
+        createReport({ by, reported_tag, reason }: { by: string, reported_tag: string, reason: string }) {
+            this.reports.push({
+                id: generateSecureCode(),
+                by,
+                reported_tag,
+                reason,
+                created_at: new Date()
+            })
         }
     }
 });
