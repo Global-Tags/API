@@ -1,11 +1,12 @@
 import Elysia, { t } from "elysia";
-import players, { GlobalIcon } from "../database/schemas/players";
+import players from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { join } from "path";
 import { constantCase } from "change-case";
 import { config } from "../libs/Config";
 import { Permission } from "../libs/RoleManager";
+import GlobalIcon from "../types/GlobalIcon";
 
 const icons = Object.keys(GlobalIcon)
     .filter((pos) => isNaN(Number(pos)))

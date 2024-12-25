@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import players, { GlobalIcon, GlobalPosition } from "../database/schemas/players";
+import players from "../database/schemas/players";
 import Logger from "../libs/Logger";
 import { sendMessage, NotificationType, ModLogType } from "../libs/DiscordNotifier";
 import fetchI18n, { getI18nFunctionByLanguage } from "../middleware/FetchI18n";
@@ -10,6 +10,8 @@ import { sendTagChangeEmail, sendTagClearEmail } from "../libs/Mailer";
 import { saveLastLanguage } from "../libs/I18n";
 import { config } from "../libs/Config";
 import { getRole, Permission } from "../libs/RoleManager";
+import GlobalIcon from "../types/GlobalIcon";
+import GlobalPosition from "../types/GlobalPosition";
 
 const { validation } = config;
 const { min, max, blacklist, watchlist } = validation.tag;
@@ -40,7 +42,7 @@ export default new Elysia()
     return {
         uuid: formatUUID(player.uuid),
         tag: player.isBanned() ? null : player.tag || null,
-        position: snakeCase(player.position || GlobalIcon[GlobalPosition.Above]),
+        position: snakeCase(player.position || GlobalPosition[GlobalPosition.Above]),
         icon: {
             type: snakeCase(player.icon.name || GlobalIcon[GlobalIcon.None]),
             hash: player.icon.hash || null

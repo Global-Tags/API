@@ -6,50 +6,7 @@ import { constantCase } from "change-case";
 import { generateSecureCode } from "../../routes/connections";
 import { getRole, getRoles, Permission } from "../../libs/RoleManager";
 import { config } from "../../libs/Config";
-
-export enum GlobalPosition {
-    Above,
-    Below,
-    Right,
-    Left
-}
-
-export enum GlobalIcon {
-    None,
-    Custom,
-    Android,
-    Apple,
-    Bereal,
-    Crown,
-    Discord,
-    Duolingo,
-    Ebio,
-    Epicgames,
-    Gamescom,
-    Github,
-    Gitlab,
-    Heart,
-    Instagram,
-    Kick,
-    Labynet,
-    Paypal,
-    Pinterest,
-    Playstation,
-    Reddit,
-    Snapchat,
-    Soundcloud,
-    Spotify,
-    Star,
-    Statsfm,
-    Steam,
-    Telegram,
-    Threads,
-    Tiktok,
-    Twitch,
-    X,
-    Xbox,
-    Youtube
-}
+import GlobalIcon from "../../types/GlobalIcon";
 
 export interface IPlayer {
     uuid: string,

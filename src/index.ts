@@ -1,6 +1,7 @@
 import { Context, Elysia, t } from "elysia";
 import { swagger } from "@elysiajs/swagger";
 import Logger from "./libs/Logger";
+import players from "./database/schemas/players";
 import { connect as connectDatabase } from "./database/mongo";
 import { getRouter } from "./libs/RouteLoader";
 import { version } from "../package.json";
@@ -21,7 +22,6 @@ import cors from "@elysiajs/cors";
 import { verify as verifyMailOptions } from "./libs/Mailer";
 import { getLatestCommit, retrieveData } from "./libs/GitCommitData";
 import { startEntitlementExpiry, startMetrics, startReferralReset } from "./libs/CronJobs";
-import players from "./database/schemas/players";
 import { formatUUID } from "./routes/root";
 import { config } from "./libs/Config";
 import('./libs/RoleManager');

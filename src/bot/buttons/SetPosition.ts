@@ -1,9 +1,10 @@
 import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } from "discord.js";
 import Button from "../structs/Button";
-import players, { GlobalPosition } from "../../database/schemas/players";
+import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { constantCase, pascalCase } from "change-case";
 import { Permission } from "../../libs/RoleManager";
+import GlobalPosition from "../../types/GlobalPosition";
 
 const positions = Object.keys(GlobalPosition)
     .filter((pos) => isNaN(Number(pos)))

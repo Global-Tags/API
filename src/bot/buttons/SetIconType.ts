@@ -1,9 +1,10 @@
 import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } from "discord.js";
 import Button from "../structs/Button";
-import players, { GlobalIcon } from "../../database/schemas/players";
+import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { constantCase, pascalCase } from "change-case";
 import { Permission } from "../../libs/RoleManager";
+import GlobalIcon from "../../types/GlobalIcon";
 
 const icons = Object.keys(GlobalIcon)
     .filter((icon) => isNaN(Number(icon)))

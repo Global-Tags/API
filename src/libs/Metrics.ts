@@ -1,11 +1,13 @@
 import metrics from "../database/schemas/metrics";
-import players, { GlobalIcon, GlobalPosition } from "../database/schemas/players";
+import players from "../database/schemas/players";
 import Logger from "./Logger";
 import axios from "axios";
 import { client } from "../bot/bot";
 import { args } from "..";
 import { constantCase } from "change-case";
 import { config } from "./Config";
+import GlobalPosition from "../types/GlobalPosition";
+import GlobalIcon from "../types/GlobalIcon";
 
 let requests: number;
 
