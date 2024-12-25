@@ -10,6 +10,7 @@ export enum Permission {
     ManageBans,
     ManageNotes,
     ManageSubscriptions,
+    ManageReports,
     ManageRoles,
     ManageTags,
     ManageWatchlist,
