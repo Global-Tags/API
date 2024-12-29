@@ -1,4 +1,4 @@
-import { configDotenv } from "dotenv";
+import { config as loadEnv } from "dotenv";
 import { constantCase } from "change-case";
 
 function getEnvNumber(path: string | undefined, defaultValue: number) {
@@ -11,8 +11,8 @@ function getEnvBoolean(path: string | undefined, defaultValue: boolean) {
     return path.toLowerCase() === 'true';
 }
 
-configDotenv();
-configDotenv({ path: `./.env.${process.env.NODE_ENV || 'dev'}`, override: true });
+loadEnv();
+loadEnv({ path: `./.env.${process.env.NODE_ENV || 'dev'}`, override: true });
 
 export let config = {
     port: getEnvNumber(process.env.GT_PORT, 5500),
