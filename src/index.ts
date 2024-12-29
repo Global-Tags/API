@@ -83,12 +83,12 @@ export const elysia = new Elysia()
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
     AuthProvider.loadProviders();
-    await connectDatabase(config.mongodb);
+    loadLanguages();
     if(config.mailer.enabled) {
         verifyMailOptions();
     }
+    await connectDatabase(config.mongodb);
     
-    loadLanguages();
     startRoleCacheJob();
     startEntitlementExpiry();
     startMetrics();
