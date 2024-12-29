@@ -47,7 +47,7 @@
         "self": "Nie możesz zgłosić samego siebie!",
         "alreadyReported": "Już zgłosiłeś tag tego gracza!",
         "invalidReason": "Musisz podać ważny powód!",
-        "validation": "Wartość pola „powód” powinna mieścić się w przedziale od <min> do <max> znaków.",
+        "validation": "Wartość pola „reason” powinna mieścić się w przedziale od <min> do <max> znaków.",
         "success": "Gracz został pomyślnie zgłoszony!",
         "immune": "Tego gracza nie można zgłosić!"
     },

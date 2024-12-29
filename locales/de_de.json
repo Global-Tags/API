@@ -31,6 +31,12 @@
         "success": {
             "self": "Dein Icon wurde erfolgreich ausgewählt!",
             "admin": "Das Icon des Spielers wurde erfolgreich geändert!"
+        },
+        "role_icon": {
+            "success": {
+                "hidden": "Dein Rollenicon ist nun versteckt!",
+                "shown": "Dein Rollenicon wird nun angezeigt!"
+            }
         }
     },
     "position": {
