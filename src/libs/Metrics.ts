@@ -8,6 +8,7 @@ import { constantCase } from "change-case";
 import { config } from "./Config";
 import GlobalPosition from "../types/GlobalPosition";
 import GlobalIcon from "../types/GlobalIcon";
+import { getCachedRoles } from "../database/schemas/roles";
 
 let requests: number;
 
@@ -65,7 +66,10 @@ export async function saveMetrics() {
     if(config.discordBot.syncedRoles.enabled) await client.guilds.cache.get(config.discordBot.syncedRoles.guild)?.members.fetch();
     const users = await players.find();
     const tags = users.filter((user) => user.tag != null).length;
-    const staff = users.filter((user) => user.getRolesSync().includes(constantCase(config.metrics.adminRole))).length;
+    const staff = users.filter((user) => {
+        const adminRole = getCachedRoles().find((role) => role.name == config.metrics.adminRole);
+        return !!adminRole && user.getRolesSync().includes(adminRole);
+    }).length;
     const bans = users.filter((user) => user.isBanned()).length;
     const positions = positionList.reduce((object: any, position) => {
         object[position.toLowerCase()] = users.filter((user) => user.position.toUpperCase() == position.toUpperCase()).length;
