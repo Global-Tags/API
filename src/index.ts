@@ -79,11 +79,11 @@ export const elysia = new Elysia()
     }
 }))
 .use(getRouter(`/players/:uuid`, __dirname))
-.onStart(() => {
+.onStart(async () => {
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
     AuthProvider.loadProviders();
-    connectDatabase(config.mongodb);
+    await connectDatabase(config.mongodb);
     if(config.mailer.enabled) {
         verifyMailOptions();
     }

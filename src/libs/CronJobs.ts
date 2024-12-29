@@ -5,6 +5,7 @@ import Logger from "./Logger";
 import players from "../database/schemas/players";
 import { config } from "./Config";
 import { updateRoleCache } from "../database/schemas/roles";
+import { isConnected } from "../database/mongo";
 
 const tz = 'Europe/Berlin';
 
@@ -22,6 +23,7 @@ export function startMetrics() {
 
 export function startReferralReset() {
     new CronJob('0 0 1 * *', async () => {
+        if(!isConnected()) return;
         const data = await players.find({ 'referrals.current_month': { $gt: 0 } });
 
         for(const player of data) {
