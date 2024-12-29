@@ -26,7 +26,7 @@ import { formatUUID } from "./routes/root";
 import { config } from "./libs/Config";
 
 if(config.mongodb.trim().length == 0) {
-    Logger.error(`Database connection string is empty!`);
+    Logger.error('Database connection string is empty!');
     process.exit(1);
 }
 
@@ -51,34 +51,35 @@ export const elysia = new Elysia()
     path: '/docs',
     autoDarkMode: true,
     exclude: [
-        `/docs`,
-        `/docs/json`
+        '/docs',
+        '/docs/json'
     ],
     documentation: {
         info: {
             version,
-            title: `GlobalTags API`,
-            description: `This is the official GlobalTags API documentation containing detailed descriptions about the API endpoints and their usage.`,
+            title: 'GlobalTags API',
+            description: 'This is the official GlobalTags API documentation containing detailed descriptions about the API endpoints and their usage.',
             license: {
                 name: 'MIT',
                 url: 'https://github.com/Global-Tags/API/blob/master/LICENSE'
             },
             contact: {
-                name: `RappyTV`,
-                url: `https://www.rappytv.com`,
-                email: `contact@rappytv.com`
+                name: 'RappyTV',
+                url: 'https://www.rappytv.com',
+                email: 'contact@rappytv.com'
             }
         },
         tags: [
-            { name: `API`, description: `Get info about the API` },
-            { name: `Interactions`, description: `Interact with other players` },
-            { name: `Settings`, description: `Modify the settings of your GlobalTag` },
-            { name: `Admin`, description: `Moderation actions` },
-            { name: `Connections`, description: `Manage account connections` }
+            { name: 'API', description: 'Get info about the API' },
+            { name: 'Interactions', description: 'Interact with other players' },
+            { name: 'Settings', description: 'Modify the settings of your GlobalTag' },
+            { name: 'Roles', description: 'Holds role management routes' },
+            { name: 'Admin', description: 'Moderation actions' },
+            { name: 'Connections', description: 'Manage account connections' }
         ]
     }
 }))
-.use(getRouter(`/players/:uuid`, __dirname))
+.use(getRouter('/players/:uuid', __dirname))
 .onStart(async () => {
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
@@ -114,14 +115,14 @@ export const elysia = new Elysia()
         return { error: error.trim() };
     } else if(code == 'NOT_FOUND') {
         set.status = 404;
-        return { error: i18n(`error.notFound`) };
+        return { error: i18n('error.notFound') };
     } else {
         set.status = 500;
         Logger.error(error);
-        return { error: i18n(`error.unknownError`) };
+        return { error: i18n('error.unknownError') };
     }
 })
-.get(`/`, () => ({
+.get('/', () => ({
     version,
     requests: getRequests(),
     commit: {
@@ -131,15 +132,15 @@ export const elysia = new Elysia()
     }
 }), {
     detail: {
-        tags: [`API`],
-        description: `Returns some basic info about the API.`
+        tags: ['API'],
+        description: 'Returns some basic info about the API.'
     },
     response: {
-        200: t.Object({ version: t.String(), requests: t.Number(), commit: t.Object({ branch: t.String(), sha: t.Union([t.String(), t.Null()]), tree: t.Union([t.String(), t.Null()]) }) }, { description: `Some basic API info` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        200: t.Object({ version: t.String(), requests: t.Number(), commit: t.Object({ branch: t.String(), sha: t.Union([t.String(), t.Null()]), tree: t.Union([t.String(), t.Null()]) }) }, { description: 'Some basic API info' }),
+        503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
     }
 })
-.get(`/metrics`, async ({ query: { latest } }) => {
+.get('/metrics', async ({ query: { latest } }) => {
     const metrics = await Metrics.find();
 
     return metrics.filter((doc) => {
@@ -159,8 +160,8 @@ export const elysia = new Elysia()
     }));
 }, {
     detail: {
-        tags: [`API`],
-        description: `Get API statistics`
+        tags: ['API'],
+        description: 'Get API statistics'
     },
     response: {
         200: t.Array(t.Object({
@@ -174,8 +175,8 @@ export const elysia = new Elysia()
             dailyRequests: t.Number(),
             positions: t.Object({}, { default: {}, additionalProperties: true, description: 'All position counts' }),
             icons: t.Object({}, { default: {}, additionalProperties: true, description: 'All icon counts' })
-        }, { description: `The server is reachable` })),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        }, { description: 'The server is reachable' })),
+        503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
     },
     query: t.Object({
         latest: t.Optional(t.String({ error: 'error.wrongType;;[["field", "element"], ["type", "string"]]' }))
@@ -207,17 +208,17 @@ export const elysia = new Elysia()
             total: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() })),
             current_month: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() }))
         }, { description: 'The referral leaderboards.' }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
     }
 })
-.get(`/ping`, ({ error }: Context) => { return error(204, "") }, {
+.get('/ping', ({ error }: Context) => { return error(204, "") }, {
     detail: {
-        tags: [`API`],
-        description: `Used by uptime checkers. This route is not being logged`
+        tags: ['API'],
+        description: 'Used by uptime checkers. This route is not being logged'
     },
     response: {
-        204: t.Any({ description: `The server is reachable` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        204: t.Any({ description: 'The server is reachable' }),
+        503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
     }
 })
 .listen(config.port);
