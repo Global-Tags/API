@@ -14,7 +14,6 @@ interface IRole {
 }
 
 export type Role = HydratedDocument<IRole>;
-
 const cachedRoles: Role[] = [];
 
 const schema = new Schema<IRole>({
@@ -54,11 +53,34 @@ export function getCachedRoles(): Role[] {
     return cachedRoles;
 }
 
+const defaultRoles = [
+    {
+        name: 'admin',
+        hasIcon: false,
+        permissions: [
+            'bypass_validation',
+            'custom_icon',
+            'manage_bans',
+            'manage_notes',
+            'manage_subscriptions',
+            'manage_reports',
+            'manage_roles',
+            'manage_tags',
+            'manage_watchlist',
+            'report_immunity'
+        ]
+    }
+]
+
 export async function updateRoleCache(): Promise<void> {
     if(!isConnected()) return;
     cachedRoles.length = 0;
+    let roles = await roleModel.find();
+    if(roles.length == 0) {
+        cachedRoles.push(...await roleModel.insertMany(defaultRoles));
+    }
 
-    for(const role of await roleModel.find()) {
+    for(const role of roles) {
         cachedRoles.push(role);
     }
 }
