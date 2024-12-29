@@ -1,5 +1,5 @@
 import { config as loadEnv } from "dotenv";
-import { constantCase } from "change-case";
+import { constantCase, snakeCase } from "change-case";
 
 function getEnvNumber(path: string | undefined, defaultValue: number) {
     const number = Number(path);
@@ -21,6 +21,7 @@ export let config = {
     logLevel: process.env.GT_LOG_LEVEL || 'Info',
     mongodb: process.env.GT_MONGODB_CONNECTION || '',
     baseUrl: process.env.GT_BASE_URL || 'http://localhost:5500',
+    iconUrl: (role: string) => (process.env.GT_ICON_URL || 'https://cdn.rappytv.com/globaltags/icons/role/{role}.png').replaceAll('{role}', snakeCase(role)),
     validation: {
         tag: {
             min: getEnvNumber(process.env.GT_VALIDATION_TAG_MIN_LENGTH, 1),
