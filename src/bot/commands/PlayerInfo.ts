@@ -81,7 +81,7 @@ export default class PlayerInfo extends Command {
                     },
                     {
                         name: `Roles [${roles.length}]`,
-                        value: `\`\`\`${roles.length > 0 ? roles.map((role) => `- ${capitalCase(role)}`).join('\n') : `--`}\`\`\``,
+                        value: `\`\`\`${roles.length > 0 ? roles.map((role) => `- ${capitalCase(role.name)}`).join('\n') : `--`}\`\`\``,
                         inline: false
                     }
                 ])
