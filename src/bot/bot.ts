@@ -26,6 +26,11 @@ export const colors = {
     error: 0xff0000
 };
 
+export const images = {
+    roles: 'https://cdn.rappytv.com/bots/globaltags/roles.png',
+    placeholder: 'https://cdn.rappytv.com/bots/placeholder.png'
+}
+
 export const commands = new Collection<string, Command>();
 export const buttons = new Collection<string, Button>();
 export const menus = new Collection<string, SelectMenu>();
