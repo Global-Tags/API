@@ -3,6 +3,7 @@ import { config } from "../../libs/Config";
 import { pascalCase } from "change-case";
 import { Permission } from "../../types/Permission";
 import { isConnected } from "../mongo";
+import Logger from "../../libs/Logger";
 
 interface IRole {
     name: string,
@@ -83,6 +84,7 @@ export async function updateRoleCache(): Promise<void> {
     for(const role of roles) {
         cachedRoles.push(role);
     }
+    Logger.debug('Updated role cache.');
 }
 
 export default roleModel;
