@@ -21,10 +21,9 @@ import minimist from "minimist";
 import cors from "@elysiajs/cors";
 import { verify as verifyMailOptions } from "./libs/Mailer";
 import { getLatestCommit, retrieveData } from "./libs/GitCommitData";
-import { startEntitlementExpiry, startMetrics, startReferralReset } from "./libs/CronJobs";
+import { startEntitlementExpiry, startMetrics, startReferralReset, startRoleCacheJob } from "./libs/CronJobs";
 import { formatUUID } from "./routes/root";
 import { config } from "./libs/Config";
-import('./libs/RoleManager');
 
 if(config.mongodb.trim().length == 0) {
     Logger.error(`Database connection string is empty!`);
@@ -90,6 +89,7 @@ export const elysia = new Elysia()
     }
     
     loadLanguages();
+    startRoleCacheJob();
     startEntitlementExpiry();
     startMetrics();
     startReferralReset();

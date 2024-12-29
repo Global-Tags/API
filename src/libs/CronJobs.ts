@@ -4,6 +4,7 @@ import { saveMetrics } from "./Metrics";
 import Logger from "./Logger";
 import players from "../database/schemas/players";
 import { config } from "./Config";
+import { updateRoleCache } from "../database/schemas/roles";
 
 const tz = 'Europe/Berlin';
 
@@ -28,4 +29,8 @@ export function startReferralReset() {
             player.save();
         }
     }, null, true, tz);
+}
+
+export function startRoleCacheJob() {
+    new CronJob('*/5 * * * *', updateRoleCache, null, true, tz, null, true);
 }

@@ -9,10 +9,9 @@ import { snakeCase } from "change-case";
 import { sendTagChangeEmail, sendTagClearEmail } from "../libs/Mailer";
 import { saveLastLanguage } from "../libs/I18n";
 import { config } from "../libs/Config";
-import { getRole } from "../libs/RoleManager";
 import GlobalIcon from "../types/GlobalIcon";
 import GlobalPosition from "../types/GlobalPosition";
-import { Permission } from "../types/Permission";
+import { Permission, permissions } from "../types/Permission";
 
 const { validation } = config;
 const { min, max, blacklist, watchlist } = validation.tag;
@@ -48,9 +47,9 @@ export default new Elysia()
             type: snakeCase(player.icon.name || GlobalIcon[GlobalIcon.None]),
             hash: player.icon.hash || null
         },
-        roleIcon: !player.hide_role_icon ? player.getRolesSync().find((role) => getRole(role)?.hasIcon) || null : null,
-        roles: player.getRolesSync().map((role) => snakeCase(role)),
-        permissions: Object.keys(player.getPermissionsSync()).filter((perm) => player.getPermissionsSync()[perm]).map((permission) => snakeCase(permission)),
+        roleIcon: !player.hide_role_icon ? player.getRolesSync().find((role) => role.hasIcon)?.name || null : null,
+        roles: player.getRolesSync().map((role) => snakeCase(role.name)),
+        permissions: permissions.filter((permission) => player.hasPermissionSync(permission)).map((permission) => snakeCase(permission.toString())),
         referrals: {
             has_referred: player.referrals.has_referred,
             total_referrals: player.referrals.total.length,
