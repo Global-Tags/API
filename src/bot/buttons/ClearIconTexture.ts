@@ -5,7 +5,7 @@ import { colors } from "../bot";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { sendIconClearEmail } from "../../libs/Mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
-import { Permission } from "../../libs/RoleManager";
+import { Permission } from "../../types/Permission";
 
 export default class ClearIconTexture extends Button {
     constructor() {

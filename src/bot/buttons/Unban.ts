@@ -5,7 +5,7 @@ import players from "../../database/schemas/players";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { sendUnbanEmail } from "../../libs/Mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
-import { Permission } from "../../libs/RoleManager";
+import { Permission } from "../../types/Permission";
 
 export default class Unban extends Button {
     constructor() {

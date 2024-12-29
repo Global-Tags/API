@@ -8,8 +8,8 @@ import axios from "axios";
 import { generateSecureCode } from "../../routes/connections";
 import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { config } from "../../libs/Config";
-import { Permission } from "../../libs/RoleManager";
 import GlobalIcon from "../../types/GlobalIcon";
+import { Permission } from "../../types/Permission";
 
 export default class CustomIcon extends Command {
     constructor() {

@@ -3,8 +3,8 @@ import players from "../database/schemas/players";
 import { NotificationType, sendMessage } from "../libs/DiscordNotifier";
 import fetchI18n from "../middleware/FetchI18n";
 import getAuthProvider from "../middleware/GetAuthProvider";
-import { Permission } from "../libs/RoleManager";
 import { formatUUID } from "./root";
+import { Permission } from "../types/Permission";
 
 export default new Elysia({
     prefix: "/reports"

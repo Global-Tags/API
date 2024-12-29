@@ -4,7 +4,7 @@ import fetchI18n, { getI18nFunctionByLanguage } from "../middleware/FetchI18n";
 import { ModLogType, NotificationType, sendMessage } from "../libs/DiscordNotifier";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { sendBanEmail, sendUnbanEmail } from "../libs/Mailer";
-import { Permission } from "../libs/RoleManager";
+import { Permission } from "../types/Permission";
 
 export default new Elysia({
     prefix: `/ban`

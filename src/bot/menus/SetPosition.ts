@@ -6,7 +6,7 @@ import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNot
 import { constantCase } from "change-case";
 import { sendPositionChangeEmail } from "../../libs/Mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
-import { Permission } from "../../libs/RoleManager";
+import { Permission } from "../../types/Permission";
 
 export default class SetPosition extends SelectMenu {
     constructor() {

@@ -3,8 +3,8 @@ import Button from "../structs/Button";
 import { colors } from "../bot";
 import players from "../../database/schemas/players";
 import { uuidRegex } from "../commands/PlayerInfo";
-import { Permission } from "../../libs/RoleManager";
 import { config } from "../../libs/Config";
+import { Permission } from "../../types/Permission";
 
 export default class Actions extends Button {
     constructor() {

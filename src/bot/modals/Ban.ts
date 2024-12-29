@@ -5,7 +5,7 @@ import { colors } from "../bot";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { sendBanEmail } from "../../libs/Mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
-import { Permission } from "../../libs/RoleManager";
+import { Permission } from "../../types/Permission";
 
 export default class Ban extends Modal {
     constructor() {

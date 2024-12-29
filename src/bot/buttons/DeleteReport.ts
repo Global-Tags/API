@@ -3,7 +3,7 @@ import Button from "../structs/Button";
 import { colors } from "../bot";
 import players from "../../database/schemas/players";
 import { getProfileByUUID } from "../../libs/Mojang";
-import { Permission } from "../../libs/RoleManager";
+import { Permission } from "../../types/Permission";
 
 export default class DeleteReport extends Button {
     constructor() {

@@ -3,8 +3,8 @@ import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { constantCase, pascalCase } from "change-case";
-import { Permission } from "../../libs/RoleManager";
 import GlobalIcon from "../../types/GlobalIcon";
+import { Permission } from "../../types/Permission";
 
 const icons = Object.keys(GlobalIcon)
     .filter((icon) => isNaN(Number(icon)))

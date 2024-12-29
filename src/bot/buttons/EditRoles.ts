@@ -2,9 +2,10 @@ import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder,
 import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { getRoles, Permission } from "../../libs/RoleManager";
+import { getRoles } from "../../libs/RoleManager";
 import { config } from "../../libs/Config";
 import { capitalCase } from "change-case";
+import { Permission } from "../../types/Permission";
 
 const roles = getRoles();
 

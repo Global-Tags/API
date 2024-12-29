@@ -1,21 +1,9 @@
 import { pascalCase } from "change-case";
 import roleConfig from "../../config/roles.json";
 import { config } from "./Config";
+import { Permission } from "../types/Permission";
 
 const roles: Role[] = [];
-
-export enum Permission {
-    BypassValidation,
-    CustomIcon,
-    ManageBans,
-    ManageNotes,
-    ManageSubscriptions,
-    ManageReports,
-    ManageRoles,
-    ManageTags,
-    ManageWatchlist,
-    ReportImmunity
-}
 
 export class Role {
     name: string

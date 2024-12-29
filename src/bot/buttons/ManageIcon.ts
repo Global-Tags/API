@@ -4,8 +4,8 @@ import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { constantCase } from "change-case";
 import { getCustomIconUrl } from "../../routes/icon";
-import { Permission } from "../../libs/RoleManager";
 import GlobalIcon from "../../types/GlobalIcon";
+import { Permission } from "../../types/Permission";
 
 export default class ManageIcon extends Button {
     constructor() {

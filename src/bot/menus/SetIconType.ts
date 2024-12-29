@@ -6,7 +6,7 @@ import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNot
 import { constantCase } from "change-case";
 import { sendIconTypeChangeEmail } from "../../libs/Mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
-import { Permission } from "../../libs/RoleManager";
+import { Permission } from "../../types/Permission";
 
 export default class SetIconType extends SelectMenu {
     constructor() {

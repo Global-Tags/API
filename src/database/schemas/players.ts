@@ -4,9 +4,10 @@ import Logger from "../../libs/Logger";
 import { GuildMember } from "discord.js";
 import { constantCase } from "change-case";
 import { generateSecureCode } from "../../routes/connections";
-import { getRole, getRoles, Permission } from "../../libs/RoleManager";
+import { getRole, getRoles } from "../../libs/RoleManager";
 import { config } from "../../libs/Config";
 import GlobalIcon from "../../types/GlobalIcon";
+import { Permission } from "../../types/Permission";
 
 export interface IPlayer {
     uuid: string,

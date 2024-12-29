@@ -3,7 +3,7 @@ import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
-import { Permission } from "../../libs/RoleManager";
+import { Permission } from "../../types/Permission";
 
 export default class CreateNote extends Modal {
     constructor() {

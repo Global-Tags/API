@@ -5,7 +5,7 @@ import { ModLogType, NotificationType, sendMessage } from "../libs/DiscordNotifi
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { formatUUID } from "./root";
 import { config } from "../libs/Config";
-import { Permission } from "../libs/RoleManager";
+import { Permission } from "../types/Permission";
 
 const { validation } = config;
 

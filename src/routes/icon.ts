@@ -5,8 +5,8 @@ import getAuthProvider from "../middleware/GetAuthProvider";
 import { join } from "path";
 import { constantCase } from "change-case";
 import { config } from "../libs/Config";
-import { Permission } from "../libs/RoleManager";
 import GlobalIcon from "../types/GlobalIcon";
+import { Permission } from "../types/Permission";
 
 const icons = Object.keys(GlobalIcon)
     .filter((pos) => isNaN(Number(pos)))

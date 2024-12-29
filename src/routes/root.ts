@@ -9,9 +9,10 @@ import { snakeCase } from "change-case";
 import { sendTagChangeEmail, sendTagClearEmail } from "../libs/Mailer";
 import { saveLastLanguage } from "../libs/I18n";
 import { config } from "../libs/Config";
-import { getRole, Permission } from "../libs/RoleManager";
+import { getRole } from "../libs/RoleManager";
 import GlobalIcon from "../types/GlobalIcon";
 import GlobalPosition from "../types/GlobalPosition";
+import { Permission } from "../types/Permission";
 
 const { validation } = config;
 const { min, max, blacklist, watchlist } = validation.tag;
