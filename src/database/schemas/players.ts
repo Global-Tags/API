@@ -1,13 +1,13 @@
-import { HydratedDocument, Schema, model } from "mongoose";
+import { Schema, model } from "mongoose";
 import { client } from "../../bot/bot";
 import Logger from "../../libs/Logger";
 import { GuildMember } from "discord.js";
 import { constantCase } from "change-case";
 import { generateSecureCode } from "../../routes/connections";
 import { config } from "../../libs/Config";
-import GlobalIcon from "../../types/GlobalIcon";
 import { Permission } from "../../types/Permission";
 import { getCachedRoles, Role } from "./roles";
+import { GlobalIcon } from "../../types/GlobalIcon";
 
 export interface IPlayer {
     uuid: string,

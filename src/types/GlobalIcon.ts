@@ -1,4 +1,4 @@
-enum GlobalIcon {
+export enum GlobalIcon {
     None,
     Custom,
     Android,
@@ -35,4 +35,4 @@ enum GlobalIcon {
     Youtube
 }
 
-export default GlobalIcon;
+export const icons = Object.keys(GlobalIcon).filter(key => isNaN(Number(key))).map((icon) => GlobalIcon[icon as keyof typeof GlobalIcon]);

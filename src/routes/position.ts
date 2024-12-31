@@ -2,12 +2,9 @@ import Elysia, { t } from "elysia";
 import players from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
 import getAuthProvider from "../middleware/GetAuthProvider";
-import GlobalPosition from "../types/GlobalPosition";
 import { Permission } from "../types/Permission";
-
-const positions = Object.keys(GlobalPosition)
-    .filter((pos) => isNaN(Number(pos)))
-    .map((pos) => pos.toUpperCase());
+import { GlobalPosition } from "../types/GlobalPosition";
+import { pascalCase, snakeCase } from "change-case";
 
 export default new Elysia({
     prefix: "/position"
@@ -22,10 +19,10 @@ export default new Elysia({
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.noTag`) });
     if(player.isBanned()) return error(403, { error: i18n(`error.banned`) });
-    if(!positions.includes(position)) return error(422, { error: i18n(`position.invalid`) });
-    if(position == player.position) return error(400, { error: i18n(`position.samePosition`) });
+    if(!(pascalCase(position) in GlobalPosition)) return error(422, { error: i18n(`position.invalid`) });
+    if(snakeCase(position) == snakeCase(player.position)) return error(400, { error: i18n(`position.samePosition`) });
 
-    player.position = position as "ABOVE" | "BELOW" | "RIGHT" | "LEFT";
+    player.position = snakeCase(position);
     await player.save();
 
     return { message: i18n(`position.success.${session.equal ? 'self' : 'admin'}`) };

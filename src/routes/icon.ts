@@ -3,14 +3,10 @@ import players from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { join } from "path";
-import { constantCase } from "change-case";
+import { constantCase, pascalCase, snakeCase } from "change-case";
 import { config } from "../libs/Config";
-import GlobalIcon from "../types/GlobalIcon";
 import { Permission } from "../types/Permission";
-
-const icons = Object.keys(GlobalIcon)
-    .filter((pos) => isNaN(Number(pos)))
-    .map((pos) => pos.toUpperCase());
+import { GlobalIcon, icons } from "../types/GlobalIcon";
 
 export function getCustomIconUrl(uuid: string, hash: string) {
     return `${config.baseUrl}/players/${uuid}/icon/${hash}`;
@@ -54,13 +50,13 @@ export default new Elysia({
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.noTag`) });
     if(player.isBanned()) return error(403, { error: i18n(`error.banned`) });
-    if(icon == player.icon.name) return error(400, { error: i18n(`icon.sameIcon`) });
+    if(snakeCase(icon) == snakeCase(player.icon.name)) return error(400, { error: i18n(`icon.sameIcon`) });
 
     const isCustomIconDisallowed = constantCase(icon) == constantCase(GlobalIcon[GlobalIcon.Custom]) && !session.hasPermission(Permission.CustomIcon);
 
-    if(!session.hasPermission(Permission.BypassValidation) && (isCustomIconDisallowed || !icons.includes(icon) || config.validation.icon.blacklist.includes(icon.toLowerCase()))) return error(403, { error: i18n(`icon.notAllowed`) });
+    if(!session.hasPermission(Permission.BypassValidation) && (isCustomIconDisallowed || !(pascalCase(icon) in GlobalIcon) || config.validation.icon.blacklist.includes(pascalCase(icon)))) return error(403, { error: i18n(`icon.notAllowed`) });
 
-    player.icon.name = icon;
+    player.icon.name = snakeCase(icon);
     await player.save();
 
     return { message: i18n(`icon.success.${session.equal ? 'self' : 'admin'}`) };

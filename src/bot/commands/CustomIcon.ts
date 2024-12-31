@@ -8,8 +8,8 @@ import axios from "axios";
 import { generateSecureCode } from "../../routes/connections";
 import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { config } from "../../libs/Config";
-import GlobalIcon from "../../types/GlobalIcon";
 import { Permission } from "../../types/Permission";
+import { GlobalIcon } from "../../types/GlobalIcon";
 
 export default class CustomIcon extends Command {
     constructor() {
@@ -65,7 +65,7 @@ export default class CustomIcon extends Command {
 
         if(sub == 'toggle') {
             const shouldEnable = options.getBoolean('enable', true);
-            player.icon.name = shouldEnable ? constantCase(GlobalIcon[GlobalIcon.Custom]) : constantCase(GlobalIcon[GlobalIcon.None]);
+            player.icon.name = constantCase(GlobalIcon[shouldEnable ? GlobalIcon.Custom : GlobalIcon.None]);
             await player.save();
 
             interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ Your custom icon has been ${shouldEnable ? 'enabled' : 'disabled'}!`)] });

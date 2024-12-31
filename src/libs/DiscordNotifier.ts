@@ -277,8 +277,8 @@ function modlogDescription(data: NotificationData): string | null {
     else if(type == ModLogType.Ban) return `**Reason**: \`${reason || 'No reason'}\``;
     else if(type == ModLogType.EditBan) return `**Appealable**: \`${appealable ? `✅` : `❌`}\`. **Reason**: \`${reason}\``;
     else if(type == ModLogType.EditRoles) return `\n\`\`\`diff\n${data.roles!.added.map((role) => `+ ${capitalCase(role)}`).join('\n')}${data.roles!.added.length > 0 && data.roles!.removed.length > 0 ? '\n' : ''}${data.roles!.removed.map((role) => `- ${capitalCase(role)}`).join('\n')}\`\`\``;
-    else if(type == ModLogType.EditPosition) return `\`${pascalCase(positions!.old)}\` → \`${pascalCase(positions!.new)}\``;
-    else if(type == ModLogType.ChangeIconType) return `\`${pascalCase(icons!.old.name)}\` → \`${pascalCase(icons!.new.name)}\``;
+    else if(type == ModLogType.EditPosition) return `\`${capitalCase(positions!.old)}\` → \`${capitalCase(positions!.new)}\``;
+    else if(type == ModLogType.ChangeIconType) return `\`${capitalCase(icons!.old.name)}\` → \`${capitalCase(icons!.new.name)}\``;
     else if(type == ModLogType.ClearIconTexture) return `[${icons!.old.hash}](${getCustomIconUrl(data.uuid, icons!.old.hash!)})`;
     else if(type == ModLogType.CreateNote || type == ModLogType.DeleteNote) return `\`${note}\``;
     else if(type == ModLogType.DeleteReport) return `\`${report}\``;
