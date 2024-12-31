@@ -49,7 +49,7 @@ export let config = {
     metrics: {
         enabled: getEnvBoolean(process.env.GT_METRICS_ENABLED, true),
         cron: process.env.GT_METRICS_CRON || '0 0 * * *',
-        adminRole: process.env.GT_METRICS_ADMIN_ROLE?.toUpperCase() || 'ADMIN'
+        adminRole: process.env.GT_METRICS_ADMIN_ROLE || ''
     },
     mailer: {
         enabled: getEnvBoolean(process.env.GT_MAILER_ENABLED, false),
