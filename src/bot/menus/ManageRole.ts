@@ -26,7 +26,7 @@ export default class ManageRole extends SelectMenu {
         const embed = new EmbedBuilder()
         .setColor(colors.standart)
         .setTitle(`Edit **${capitalCase(role.name)}**`)
-        .setDescription(`**ID**: \`${role.name}\`\n**Has Icon**: \`${role.hasIcon ? '✅' : '❌'}\`\n**Permissions**: [\`${permissions.length}\`]:\n>>> ${allPermissions.map((permission) => `- ${capitalCase(Permission[permission])}: \`${role.hasPermission(permission) ? '✅' : '❌'}\``).join('\n')}`)
+        .setDescription(`**ID**: \`${role.name}\`\n**Has Icon**: \`${role.hasIcon ? '✅' : '❌'}\`\n**Metrics admin**: \`${role.name == config.metrics.adminRole ? '✅' : '❌'}\`\n**Permissions**: [\`${permissions.length}\`]:\n>>> ${allPermissions.map((permission) => `- ${capitalCase(Permission[permission])}: \`${role.hasPermission(permission) ? '✅' : '❌'}\``).join('\n')}`)
         .setImage(images.placeholder)
         .setFooter({ text: `${role.name}` });
 

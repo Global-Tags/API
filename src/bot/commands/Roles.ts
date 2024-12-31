@@ -35,7 +35,7 @@ export default class RolesCommand extends Command {
         .setTitle('Manage roles')
         .addFields(roles.slice(0, 25).map((role) => ({
             name: `🎭 ${capitalCase(role.name)} (\`${role.name}\`)`,
-            value: `>>> Own icon: \`${role.hasIcon ? '✅' : '❌'}\`\nPermissions: \`${role.getPermissions().length}\``,
+            value: `>>> Own icon: \`${role.hasIcon ? '✅' : '❌'}\`\nMetrics admin: \`${role.name == config.metrics.adminRole ? '✅' : '❌'}\`\nPermissions: \`${role.getPermissions().length}\``,
             inline: true
         })))
         .setImage(images.placeholder)
