@@ -75,3 +75,4 @@ export const modals = new Collection<string, Modal>();
 
 export const spawn = () => client.login(config.discordBot.token);
 export const destroy = () => client.destroy();
+export const fetchGuild = () => client.guilds.fetch(config.discordBot.server);

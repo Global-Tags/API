@@ -2,7 +2,7 @@ import metrics from "../database/schemas/metrics";
 import players from "../database/schemas/players";
 import Logger from "./Logger";
 import axios from "axios";
-import { client } from "../bot/bot";
+import { client, fetchGuild } from "../bot/bot";
 import { args } from "..";
 import { config } from "./Config";
 import { getCachedRoles } from "../database/schemas/roles";
@@ -55,7 +55,7 @@ type Addon = {
 }
 
 export async function saveMetrics() {
-    if(config.discordBot.syncedRoles.enabled) await client.guilds.cache.get(config.discordBot.syncedRoles.guild)?.members.fetch();
+    if(config.discordBot.syncedRoles.enabled) await (await fetchGuild())?.members.fetch();
     const users = await players.find();
     const tags = users.filter((user) => user.tag != null).length;
     const staff = users.filter((user) => {

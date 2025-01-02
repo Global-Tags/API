@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { client } from "../../bot/bot";
+import { client, fetchGuild } from "../../bot/bot";
 import Logger from "../../libs/Logger";
 import { GuildMember } from "discord.js";
 import { constantCase } from "change-case";
@@ -241,7 +241,7 @@ const schema = new Schema<IPlayer>({
         async getRoles(): Promise<Role[]> {
             if(!config.discordBot.syncedRoles.enabled) return getCachedRoles().filter((role) => this.roles.some((name) => name.toLowerCase() == role.name.toLowerCase()));
             if(!this.connections?.discord?.id) return [];
-            const guild = await client.guilds.fetch(config.discordBot.syncedRoles.guild).catch(() => null);
+            const guild = await fetchGuild();
             if(!guild) return [];
             const member = await guild.members.fetch(this.connections.discord.id).catch(() => null);
             if(!member) return [];
@@ -251,9 +251,9 @@ const schema = new Schema<IPlayer>({
         getRolesSync(): Role[] {
             if(!config.discordBot.syncedRoles.enabled) return getCachedRoles().filter((role) => this.roles.some((name) => name.toUpperCase() == role.name.toUpperCase()));
             if(!this.connections?.discord?.id) return [];
-            const guild = client.guilds.cache.get(config.discordBot.syncedRoles.guild);
+            const guild = client.guilds.cache.get(config.discordBot.server);
             if(!guild) {
-                client.guilds.fetch(config.discordBot.syncedRoles.guild).catch(() => Logger.error(`Couldn't fetch guild ${config.discordBot.syncedRoles.guild}`));
+                fetchGuild().catch(() => Logger.error(`Couldn't fetch guild ${config.discordBot.server}`));
                 return [];
             }
             const member = guild.members.cache.get(this.connections.discord.id);
