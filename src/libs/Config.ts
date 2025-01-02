@@ -102,6 +102,7 @@ export let config = {
             },
             accountConnections: {
                 enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_ENABLED, false),
+                hideEmails: getEnvBoolean(process.env.GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_HIDE_EMAILS, true),
                 channel: process.env.GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_CHANNEL || '',
                 role: process.env.GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_ROLE || ''
             },
