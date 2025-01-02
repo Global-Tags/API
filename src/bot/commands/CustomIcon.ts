@@ -9,7 +9,7 @@ import { generateSecureCode } from "../../routes/connections";
 import { config } from "../../libs/Config";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon } from "../../types/GlobalIcon";
-import { sendCustomIconUploadMessage } from "../../libs/DiscordNotifier";
+import { sendCustomIconUploadMessage } from "../../libs/discord-notifier";
 import { getProfileByUUID } from "../../libs/Mojang";
 
 export default class CustomIcon extends Command {

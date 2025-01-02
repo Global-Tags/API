@@ -2,7 +2,7 @@ import Elysia, { t } from "elysia";
 import players from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
 import getAuthProvider from "../middleware/GetAuthProvider";
-import { sendReferralMessage } from "../libs/DiscordNotifier";
+import { sendReferralMessage } from "../libs/discord-notifier";
 import { getProfileByUUID } from "../libs/Mojang";
 
 export default new Elysia({

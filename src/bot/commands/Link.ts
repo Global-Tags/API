@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType, CacheType, CommandInteraction, CommandInt
 import Command from "../structs/Command";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { sendDiscordLinkMessage } from "../../libs/DiscordNotifier";
+import { sendDiscordLinkMessage } from "../../libs/discord-notifier";
 import { config } from "../../libs/Config";
 import { getProfileByUUID } from "../../libs/Mojang";
 import { onDiscordLink } from "../../libs/events";

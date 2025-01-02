@@ -3,7 +3,7 @@ import Event from "../structs/Event";
 import { client, fetchGuild } from "../bot";
 import Logger from "../../libs/Logger";
 import players from "../../database/schemas/players";
-import { sendEntitlementMessage } from "../../libs/DiscordNotifier";
+import { sendEntitlementMessage } from "../../libs/discord-notifier";
 import { config } from "../../libs/Config";
 import { getSkus } from "../../libs/SkuManager";
 

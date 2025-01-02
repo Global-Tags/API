@@ -1,11 +1,11 @@
 import entitlement from "../database/schemas/entitlement";
 import players from "../database/schemas/players";
-import { client, fetchGuild } from "../bot/bot";
+import { fetchGuild } from "../bot/bot";
 import Logger from "./Logger";
 import { isConnected } from "../database/mongo";
 import { config } from "./Config";
 import { getSkus } from "./SkuManager";
-import { sendEntitlementMessage } from "./DiscordNotifier";
+import { sendEntitlementMessage } from "./discord-notifier";
 
 const skus = getSkus();
 

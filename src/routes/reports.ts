@@ -4,7 +4,7 @@ import fetchI18n from "../middleware/FetchI18n";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { formatUUID } from "./root";
 import { Permission } from "../types/Permission";
-import { sendReportMessage } from "../libs/DiscordNotifier";
+import { sendReportMessage } from "../libs/discord-notifier";
 import { getProfileByUUID } from "../libs/Mojang";
 
 export default new Elysia({

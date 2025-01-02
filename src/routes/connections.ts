@@ -5,7 +5,7 @@ import getAuthProvider from "../middleware/GetAuthProvider";
 import { sendEmail } from "../libs/Mailer";
 import { randomBytes } from "crypto";
 import { config } from "../libs/Config";
-import { sendDiscordLinkMessage, sendEmailLinkMessage } from "../libs/DiscordNotifier";
+import { sendDiscordLinkMessage, sendEmailLinkMessage } from "../libs/discord-notifier";
 import { getProfileByUUID } from "../libs/Mojang";
 
 export function generateSecureCode(length: number = 10) {
