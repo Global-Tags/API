@@ -2,8 +2,10 @@ import { ApplicationCommandOptionType, CacheType, CommandInteraction, CommandInt
 import Command from "../structs/Command";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { sendDiscordLinkMessage } from "../../libs/DiscordNotifier";
 import { config } from "../../libs/Config";
+import { getProfileByUUID } from "../../libs/Mojang";
+import { onDiscordLink } from "../../libs/events";
 
 export default class Link extends Command {
     constructor() {
@@ -32,17 +34,11 @@ export default class Link extends Command {
         const player = await players.findOne({ "connections.discord.code": code });
         if(!player) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Invalid code`)] });
 
-        player.connections!.discord!.id = user.id;
-        player.connections!.discord!.code = null;
-        player.save();
-        member.roles.add(config.discordBot.notifications.accountConnections.role);
+        onDiscordLink(await getProfileByUUID(player.uuid), player.connections.discord.id!);
 
-        sendMessage({
-            type: NotificationType.DiscordLink,
-            connected: true,
-            userId: user.id,
-            uuid: player.uuid
-        });
+        player.connections.discord.id = user.id;
+        player.connections.discord.code = null;
+        player.save();
 
         interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ Your account was successfully linked!`)] });
     }

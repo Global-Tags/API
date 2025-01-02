@@ -6,10 +6,11 @@ import { constantCase } from "change-case";
 import { join } from 'path';
 import axios from "axios";
 import { generateSecureCode } from "../../routes/connections";
-import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
 import { config } from "../../libs/Config";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon } from "../../types/GlobalIcon";
+import { sendCustomIconUploadMessage } from "../../libs/DiscordNotifier";
+import { getProfileByUUID } from "../../libs/Mojang";
 
 export default class CustomIcon extends Command {
     constructor() {
@@ -84,11 +85,10 @@ export default class CustomIcon extends Command {
             await player.save();
             await Bun.write(Bun.file(join('icons', player.uuid, `${player.icon.hash}.png`)), request.data, { createPath: true });
 
-            sendMessage({
-                type: NotificationType.CustomIconUpload,
-                uuid: player.uuid,
-                hash: player.icon.hash
-            });
+            sendCustomIconUploadMessage(
+                await getProfileByUUID(player.uuid),
+                player.icon.hash
+            );
 
             interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ Your custom icon was successfully uploaded!\nYou may need to clear your cache ingame for the icon to be shown.`).setThumbnail(`attachment://${file.name}`)], files: [file] });
         } else if(sub == 'unset') {

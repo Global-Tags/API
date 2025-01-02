@@ -1,9 +1,9 @@
 import { Entitlement } from "discord.js";
 import Event from "../structs/Event";
-import { client } from "../bot";
+import { client, fetchGuild } from "../bot";
 import Logger from "../../libs/Logger";
 import players from "../../database/schemas/players";
-import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { sendEntitlementMessage } from "../../libs/DiscordNotifier";
 import { config } from "../../libs/Config";
 import { getSkus } from "../../libs/SkuManager";
 
@@ -20,20 +20,19 @@ export default class EntitlementCreate extends Event {
         if(!sku) return;
         const player = await players.findOne({ "connections.discord.id": entitlement.userId });
 
-        sendMessage({
-            type: NotificationType.Entitlement,
-            description: `${!entitlement.startsTimestamp ? '[**S**] ' : ''}<@!${entitlement.userId}> just subscribed to **${sku.name}**!`, // Temporary replacement for Entitlement#isTest. See https://github.com/discordjs/discord.js/issues/10610
-            head: !!player,
-            uuid: player?.uuid || ''
-        })
+        sendEntitlementMessage(
+            player?.uuid || '',
+            `${!entitlement.startsTimestamp ? '[**S**] ' : ''}<@!${entitlement.userId}> just subscribed to **${sku.name}**!`, // Temporary replacement for Entitlement#isTest. See https://github.com/discordjs/discord.js/issues/10610
+            !!player,
+        );
 
         if(player) {
             player.roles.push(sku.role);
             await player.save();
         }
         if(sku.discordRole) {
-            const guild = await client.guilds.fetch(config.discordBot.syncedRoles.guild).catch(() => {
-                Logger.error(`Couldn't fetch guild ${config.discordBot.syncedRoles.guild}`);
+            const guild = await fetchGuild().catch(() => {
+                Logger.error(`Couldn't fetch guild ${config.discordBot.server}`);
                 return null;
             });
             if(!guild) return;

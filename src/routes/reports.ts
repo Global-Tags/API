@@ -1,10 +1,11 @@
 import Elysia, { t } from "elysia";
 import players from "../database/schemas/players";
-import { NotificationType, sendMessage } from "../libs/DiscordNotifier";
 import fetchI18n from "../middleware/FetchI18n";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { formatUUID } from "./root";
 import { Permission } from "../types/Permission";
+import { sendReportMessage } from "../libs/DiscordNotifier";
+import { getProfileByUUID } from "../libs/Mojang";
 
 export default new Elysia({
     prefix: "/reports"
@@ -69,12 +70,11 @@ export default new Elysia({
     });
     await player.save();
 
-    sendMessage({
-        type: NotificationType.Report,
-        uuid,
-        reporterUuid: session.uuid,
-        reason,
-        tag: player.tag
+    sendReportMessage({
+        user: await getProfileByUUID(uuid),
+        reporter: await getProfileByUUID(session.uuid),
+        tag: player.tag,
+        reason
     });
     return { message: i18n(`report.success`) };
 }, {

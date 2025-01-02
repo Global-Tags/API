@@ -1,7 +1,7 @@
 import { Entitlement } from "discord.js";
 import Event from "../structs/Event";
 import entitlement from "../../database/schemas/entitlement";
-import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { sendEntitlementMessage } from "../../libs/DiscordNotifier";
 import players from "../../database/schemas/players";
 import { config } from "../../libs/Config";
 import { getSkus } from "../../libs/SkuManager";
@@ -20,12 +20,11 @@ export default class EntitlementUpdate extends Event {
         const sku = skus.find((sku) => sku.id == newEntitlement.skuId);
         if(!sku) return;
 
-        sendMessage({
-            type: NotificationType.Entitlement,
-            description: `<@!${newEntitlement.userId}> has cancelled their **${sku.name}** subscription!`,
-            head: !!player,
-            uuid: player?.uuid || ''
-        });
+        sendEntitlementMessage(
+            player?.uuid || '',
+            `<@!${newEntitlement.userId}> has cancelled their **${sku.name}** subscription!`,
+            !!player,
+        );
 
         await entitlement.insertMany({
             id: newEntitlement.id,

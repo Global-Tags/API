@@ -5,7 +5,8 @@ import getAuthProvider from "../middleware/GetAuthProvider";
 import { sendEmail } from "../libs/Mailer";
 import { randomBytes } from "crypto";
 import { config } from "../libs/Config";
-import { NotificationType, sendMessage } from "../libs/DiscordNotifier";
+import { sendDiscordLinkMessage, sendEmailLinkMessage } from "../libs/DiscordNotifier";
+import { getProfileByUUID } from "../libs/Mojang";
 
 export function generateSecureCode(length: number = 10) {
     return randomBytes(length).toString('hex').slice(0, length);
@@ -59,6 +60,12 @@ export default new Elysia({
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.noTag`) });
     if(!player.connections.discord.id && !player.connections.discord.code) return error(400, { error: i18n(`connections.discord.notConnected`) });
+
+    sendDiscordLinkMessage(
+        await getProfileByUUID(player.uuid),
+        player.connections.discord.id!,
+        false
+    );
 
     player.connections.discord.id = null;
     player.connections.discord.code = null;
@@ -148,11 +155,11 @@ export default new Elysia({
     player.connections.email.code = null;
     await player.save();
 
-    sendMessage({
-        type: NotificationType.EmailLink,
-        connected: true,
-        uuid: player.uuid
-    });
+    sendEmailLinkMessage(
+        await getProfileByUUID(player.uuid),
+        config.discordBot.notifications.accountConnections.hideEmails ? null : player.connections.email.address!,
+        true
+    );
 
     sendEmail({
         recipient: player.connections.email.address!,
@@ -196,15 +203,15 @@ export default new Elysia({
     if(!player) return error(404, { error: i18n(`error.noTag`) });
     if(!player.connections.email.address && !player.connections.email.code) return error(400, { error: i18n(`connections.email.notConnected`) });
 
+    sendEmailLinkMessage(
+        await getProfileByUUID(player.uuid),
+        config.discordBot.notifications.accountConnections.hideEmails ? null : player.connections.email.address!,
+        false
+    );
+
     player.connections.email.address = null;
     player.connections.email.code = null;
     await player.save();
-
-    sendMessage({
-        type: NotificationType.EmailLink,
-        connected: false,
-        uuid: player.uuid
-    });
 
     return { message: i18n('connections.email.unlinked') };
 }, {

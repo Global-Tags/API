@@ -1,11 +1,11 @@
 import entitlement from "../database/schemas/entitlement";
 import players from "../database/schemas/players";
-import { NotificationType, sendMessage } from "./DiscordNotifier";
-import { client } from "../bot/bot";
+import { client, fetchGuild } from "../bot/bot";
 import Logger from "./Logger";
 import { isConnected } from "../database/mongo";
 import { config } from "./Config";
 import { getSkus } from "./SkuManager";
+import { sendEntitlementMessage } from "./DiscordNotifier";
 
 const skus = getSkus();
 
@@ -20,12 +20,13 @@ export async function checkExpiredEntitlements() {
 
         entitlement.done = true;
         entitlement.save();
-        if(!entitlement.test) sendMessage({
-            type: NotificationType.Entitlement,
-            description: `<@!${entitlement.user_id}>'s **${sku.name}** subscription just expired!`,
-            head: !!player,
-            uuid: player?.uuid || ''
-        });
+        if(!entitlement.test) {
+            sendEntitlementMessage(
+                player?.uuid || '',
+                `<@!${entitlement.user_id}>'s **${sku.name}** subscription just expired!`,
+                !!player
+            );
+        }
 
         if(player) {
             player.roles = player.roles.filter((role) => role != sku.role);
@@ -33,13 +34,13 @@ export async function checkExpiredEntitlements() {
         }
 
         if(sku.discordRole) {
-            const guild = await client.guilds.fetch(config.discordBot.syncedRoles.guild).catch(() => {
-                Logger.error(`Couldn't fetch guild ${config.discordBot.syncedRoles.guild}`);
+            const guild = await fetchGuild().catch(() => {
+                Logger.error(`Couldn't fetch guild '${config.discordBot.server}'!`);
                 return null;
             });
             if(!guild) return;
             const member = await guild.members.fetch(entitlement.user_id).catch(() => {
-                Logger.error(`Couldn't fetch member ${entitlement.user_id}`);
+                Logger.error(`Couldn't fetch member '${entitlement.user_id}'!`);
                 return null;
             });
             if(!member) return;

@@ -1,8 +1,9 @@
 import Elysia, { t } from "elysia";
 import players from "../database/schemas/players";
-import { NotificationType, sendMessage } from "../libs/DiscordNotifier";
 import fetchI18n from "../middleware/FetchI18n";
 import getAuthProvider from "../middleware/GetAuthProvider";
+import { sendReferralMessage } from "../libs/DiscordNotifier";
+import { getProfileByUUID } from "../libs/Mojang";
 
 export default new Elysia({
     prefix: '/referral'
@@ -30,11 +31,7 @@ export default new Elysia({
     executor.referrals.has_referred = true;
     executor.save();
 
-    sendMessage({
-        type: NotificationType.Referral,
-        uuid,
-        invited: executor.uuid
-    });
+    sendReferralMessage(await getProfileByUUID(uuid), await getProfileByUUID(executor.uuid));
     return { message: i18n('referral.success') };
 }, {
     detail: {

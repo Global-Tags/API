@@ -6,7 +6,7 @@ import { join } from "path";
 import { constantCase, pascalCase, snakeCase } from "change-case";
 import { config } from "../libs/Config";
 import { Permission } from "../types/Permission";
-import { GlobalIcon, icons } from "../types/GlobalIcon";
+import { GlobalIcon } from "../types/GlobalIcon";
 
 export function getCustomIconUrl(uuid: string, hash: string) {
     return `${config.baseUrl}/players/${uuid}/icon/${hash}`;
