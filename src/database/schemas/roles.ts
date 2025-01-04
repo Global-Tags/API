@@ -7,6 +7,7 @@ import Logger from "../../libs/Logger";
 
 interface IRole {
     name: string,
+    position: number,
     hasIcon: boolean,
     permissions: string[],
     getPermissions(): Permission[],
@@ -20,6 +21,10 @@ const cachedRoles: Role[] = [];
 const schema = new Schema<IRole>({
     name: {
         type: String,
+        required: true
+    },
+    position: {
+        type: Number,
         required: true
     },
     hasIcon: {
@@ -57,6 +62,7 @@ export function getCachedRoles(): Role[] {
 const defaultRoles = [
     {
         name: 'admin',
+        position: 0,
         hasIcon: false,
         permissions: [
             'bypass_validation',
@@ -84,7 +90,15 @@ export async function updateRoleCache(): Promise<void> {
     for(const role of roles) {
         cachedRoles.push(role);
     }
+    cachedRoles.sort();
     Logger.debug('Updated role cache.');
+}
+
+export async function getNextPosition(): Promise<number> {
+    if(!isConnected()) return -1;
+    const roles = await roleModel.find();
+    roles.sort((a, b) => a.position - b.position);
+    return roles[roles.length - 1].position + 1;
 }
 
 export default roleModel;
