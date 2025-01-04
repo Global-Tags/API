@@ -1,7 +1,7 @@
 import Elysia, { t } from "elysia";
 import players from "../database/schemas/players";
 import Logger from "../libs/Logger";
-import { sendMessage, NotificationType, ModLogType } from "../libs/DiscordNotifier";
+import { ModLogType, sendModLogMessage, sendWatchlistAddMessage, sendWatchlistTagUpdateMessage } from "../libs/discord-notifier";
 import fetchI18n, { getI18nFunctionByLanguage } from "../middleware/FetchI18n";
 import { stripColors } from "../libs/ChatColor";
 import getAuthProvider from "../middleware/GetAuthProvider";
@@ -12,6 +12,7 @@ import { config } from "../libs/Config";
 import { Permission, permissions } from "../types/Permission";
 import { GlobalIcon } from "../types/GlobalIcon";
 import { GlobalPosition } from "../types/GlobalPosition";
+import { getProfileByUUID } from "../libs/Mojang";
 
 const { validation } = config;
 const { min, max, blacklist, watchlist } = validation.tag;
@@ -112,10 +113,10 @@ export default new Elysia()
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
     if(!session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n(`error.notAllowed`) });
-    
+
     const player = await players.findOne({ uuid });
     if(player && player.isBanned()) return error(403, { error: i18n(`error.${session.equal ? 'b' : 'playerB'}anned`) });
-    
+
     let isWatched = false;
     let notifyWatch = true;
     if(!session.hasPermission(Permission.BypassValidation)) {
@@ -124,10 +125,10 @@ export default new Elysia()
         if(strippedTag.length < min || strippedTag.length > max) return error(422, { error: i18n(`setTag.validation`).replace('<min>', String(min)).replace('<max>', String(max)) });
         const blacklistedWord = blacklist.find((word) => strippedTag.toLowerCase().includes(word));
         if(blacklistedWord) return error(422, { error: i18n(`setTag.blacklisted`).replaceAll(`<word>`, blacklistedWord) });
-        isWatched = (player && player.watchlist) || watchlist.some((word) => {
+        isWatched = (player && player.watchlist) || watchlist.some(async (word) => {
             if(strippedTag.toLowerCase().includes(word)) {
                 Logger.warn(`Now watching ${uuid} for matching "${word}" in "${tag}".`);
-                sendMessage({ type: NotificationType.WatchlistAdd, uuid, tag, word });
+                sendWatchlistAddMessage({ user: await getProfileByUUID(uuid), tag, word });
                 notifyWatch = false;
                 return true;
             }
@@ -154,13 +155,15 @@ export default new Elysia()
     }
     
     if(!session.equal) {
-        sendMessage({
-            type: NotificationType.ModLog,
+        sendModLogMessage({
             logType: ModLogType.ChangeTag,
-            uuid: uuid,
-            staff: session.uuid || 'Unknown',
-            oldTag: oldTag || 'None',
-            newTag: tag
+            staff: await getProfileByUUID(session.uuid!),
+            user: await getProfileByUUID(uuid),
+            discord: false,
+            tags: {
+                old: oldTag || 'None',
+                new: tag
+            }
         });
 
         if(player?.isEmailVerified()) {
@@ -168,7 +171,7 @@ export default new Elysia()
         }
     }
 
-    if(isWatched && notifyWatch) sendMessage({ type: NotificationType.WatchlistTagUpdate, uuid, tag });
+    if(isWatched && notifyWatch) sendWatchlistTagUpdateMessage(await getProfileByUUID(uuid), tag);
     return { message: i18n(`setTag.success.${session.equal ? 'self' : 'admin'}`) };
 }, {
     detail: {
@@ -201,11 +204,11 @@ export default new Elysia()
     player.watchlist = true;
     await player.save();
     
-    sendMessage({
-        type: NotificationType.ModLog,
+    sendModLogMessage({
         logType: ModLogType.Watch,
-        uuid: uuid,
-        staff: session.uuid || 'Unknown'
+        staff: await getProfileByUUID(session.uuid!),
+        user: await getProfileByUUID(uuid),
+        discord: false
     });
 
     return { message: i18n(`watch.success`) };
@@ -240,11 +243,11 @@ export default new Elysia()
     player.watchlist = false;
     await player.save();
     
-    sendMessage({
-        type: NotificationType.ModLog,
+    sendModLogMessage({
         logType: ModLogType.Unwatch,
-        uuid: uuid,
-        staff: session.uuid || 'Unknown'
+        staff: await getProfileByUUID(session.uuid!),
+        user: await getProfileByUUID(uuid),
+        discord: false
     });
 
     return { message: i18n(`unwatch.success`) };
@@ -280,11 +283,11 @@ export default new Elysia()
 
     player.tag = null;
     if(!session.equal) {
-        sendMessage({
-            type: NotificationType.ModLog,
+        sendModLogMessage({
             logType: ModLogType.ClearTag,
-            uuid: uuid,
-            staff: session.uuid || 'Unknown'
+            staff: await getProfileByUUID(session.uuid!),
+            user: await getProfileByUUID(uuid),
+            discord: false
         });
         player.clearTag(session.uuid!);
         sendTagClearEmail(player.connections.email.address!, oldTag, getI18nFunctionByLanguage(player.last_language));

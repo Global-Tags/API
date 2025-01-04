@@ -2,11 +2,12 @@ import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder }
 import SelectMenu from "../structs/SelectMenu";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { snakeCase } from "change-case";
 import { sendPositionChangeEmail } from "../../libs/Mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
 import { Permission } from "../../types/Permission";
+import { getProfileByUUID } from "../../libs/Mojang";
 
 export default class SetPosition extends SelectMenu {
     constructor() {
@@ -26,16 +27,15 @@ export default class SetPosition extends SelectMenu {
         player.position = snakeCase(values[0]);
         await player.save();
 
-        sendMessage({
-            type: NotificationType.ModLog,
+        sendModLogMessage({
             logType: ModLogType.EditPosition,
-            uuid: player.uuid,
-            staff: staff.uuid,
+            staff: await getProfileByUUID(staff.uuid),
+            user: await getProfileByUUID(player.uuid),
+            discord: true,
             positions: {
                 old: oldPosition,
                 new: player.position
-            },
-            discord: true
+            }
         });
 
         if(player.isEmailVerified()) {

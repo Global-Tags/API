@@ -26,25 +26,65 @@ export enum ModLogType {
     DeleteRole,
 }
 
-type NotificationData = {
-    uuid: string,
+type ModLogData = {
     logType: ModLogType,
-    hasUser: boolean,
-    staff: string,
-    oldTag?: string,
-    newTag?: string,
-    reason?: string,
-    appealable?: boolean,
-    discord?: boolean,
-    positions?: { old: string, new: string },
-    permissions?: { added: string[], removed: string[] },
-    roles?: { added: string[], removed: string[] },
-    role?: string,
-    roleIcon?: boolean,
-    icons?: { old: { name: string, hash?: string | null }, new: { name: string, hash?: string | null } },
-    note?: string,
-    report?: string
-};
+    staff: Profile,
+    user?: Profile,
+    discord: boolean
+} & ({
+    logType: ModLogType.ChangeTag,
+    tags: { old: string, new: string }
+} | {
+    logType: ModLogType.ClearTag
+} | {
+    logType: ModLogType.Ban,
+    reason: string
+} | {
+    logType: ModLogType.Unban
+} | {
+    logType: ModLogType.EditBan,
+    reason: string,
+    appealable: boolean
+} | {
+    logType: ModLogType.EditRoles,
+    roles: { added: string[], removed: string[] }
+} | {
+    logType: ModLogType.EditPosition,
+    positions: { old: string, new: string }
+} | {
+    logType: ModLogType.ChangeIconType,
+    icons: { old: { name: string, hash?: string | null }, new: { name: string, hash?: string | null } }
+} | {
+    logType: ModLogType.ClearIconTexture,
+    icon: { name: string, hash?: string | null }
+} | {
+    logType: ModLogType.Watch
+} | {
+    logType: ModLogType.Unwatch
+} | {
+    logType: ModLogType.CreateNote,
+    note: string
+} | {
+    logType: ModLogType.DeleteNote,
+    note: string
+} | {
+    logType: ModLogType.DeleteReport,
+    report: string
+} | {
+    logType: ModLogType.CreateRole,
+    role: string
+} | {
+    logType: ModLogType.ChangeRoleIcon,
+    role: string,
+    roleIcon: boolean
+} | {
+    logType: ModLogType.ChangeRolePermissions,
+    role: string,
+    permissions: { added: string[], removed: string[] }
+} | {
+    logType: ModLogType.DeleteRole,
+    role: string
+});
 
 export function sendReportMessage({ user, reporter, tag, reason } : {
     user: Profile,
@@ -255,32 +295,32 @@ export function sendCustomIconUploadMessage(user: Profile, hash: string) {
 
 // TODO: Fix mod log arguments
 
-export function sendModLogMessage({ user, staff, data }: { user: Profile | null, staff: Profile, data: NotificationData }) {
+export function sendModLogMessage(data: ModLogData) {
     if(!config.discordBot.notifications.mogLog.enabled) return;
 
     const description = modlogDescription(data);
     sendMessage({
         channel: config.discordBot.notifications.mogLog.channel,
-        content: `[**${ModLogType[data.logType]}**] [\`${staff.username || staff.uuid}\`](<https://laby.net/@${staff.uuid}>)${data.discord ? ' [**D**]' : ''}${user ? ` → [\`${user.username || user.uuid}\`](<https://laby.net/@${user.uuid}>)` : ''}${description ? `: ${description}` : ''}`,
+        content: `[**${ModLogType[data.logType]}**] [\`${data.staff.username || data.staff.uuid}\`](<https://laby.net/@${data.staff.uuid}>)${data.discord ? ' [**D**]' : ''}${data.user ? ` → [\`${data.user.username || data.user.uuid}\`](<https://laby.net/@${data.user.uuid}>)` : ''}${description ? `: ${description}` : ''}`,
         embed: null,
         actionButton: false
     });
 }
 
-function modlogDescription(data: NotificationData): string | null {
-    const { logType: type, oldTag, newTag, reason, appealable, positions, icons, note, report } = data;
-    if(type == ModLogType.ChangeTag) return `\`${oldTag}\` → \`${newTag}\``;
-    else if(type == ModLogType.Ban) return `**Reason**: \`${reason || 'No reason'}\``;
-    else if(type == ModLogType.EditBan) return `**Appealable**: \`${appealable ? `✅` : `❌`}\`. **Reason**: \`${reason}\``;
-    else if(type == ModLogType.EditRoles) return `\n\`\`\`diff\n${data.roles!.added.map((role) => `+ ${capitalCase(role)}`).join('\n')}${data.roles!.added.length > 0 && data.roles!.removed.length > 0 ? '\n' : ''}${data.roles!.removed.map((role) => `- ${capitalCase(role)}`).join('\n')}\`\`\``;
-    else if(type == ModLogType.EditPosition) return `\`${capitalCase(positions!.old)}\` → \`${capitalCase(positions!.new)}\``;
-    else if(type == ModLogType.ChangeIconType) return `\`${capitalCase(icons!.old.name)}\` → \`${capitalCase(icons!.new.name)}\``;
-    else if(type == ModLogType.ClearIconTexture) return `[${icons!.old.hash}](${getCustomIconUrl(data.uuid, icons!.old.hash!)})`;
-    else if(type == ModLogType.CreateNote || type == ModLogType.DeleteNote) return `\`${note}\``;
-    else if(type == ModLogType.DeleteReport) return `\`${report}\``;
+function modlogDescription(data: ModLogData): string | null {
+    const { logType: type } = data;
+    if(type == ModLogType.ChangeTag) return `\`${data.tags.old}\` → \`${data.tags.new}\``;
+    else if(type == ModLogType.Ban) return `**Reason**: \`${data.reason || 'No reason'}\``;
+    else if(type == ModLogType.EditBan) return `**Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Reason**: \`${data.reason}\``;
+    else if(type == ModLogType.EditRoles) return `\n\`\`\`diff\n${data.roles.added.map((role) => `+ ${capitalCase(role)}`).join('\n')}${data.roles.added.length > 0 && data.roles.removed.length > 0 ? '\n' : ''}${data.roles.removed.map((role) => `- ${capitalCase(role)}`).join('\n')}\`\`\``;
+    else if(type == ModLogType.EditPosition) return `\`${capitalCase(data.positions.old)}\` → \`${capitalCase(data.positions.new)}\``;
+    else if(type == ModLogType.ChangeIconType) return `\`${capitalCase(data.icons.old.name)}\` → \`${capitalCase(data.icons.new.name)}\``;
+    else if(type == ModLogType.ClearIconTexture) return `[${data.icon.hash}](${getCustomIconUrl(data.user!.uuid!, data.icon.hash!)})`;
+    else if(type == ModLogType.CreateNote || type == ModLogType.DeleteNote) return `\`${data.note}\``;
+    else if(type == ModLogType.DeleteReport) return `\`${data.report}\``;
     else if(type == ModLogType.CreateRole) return `\`${data.role}\``;
     else if(type == ModLogType.ChangeRoleIcon) return `\`${data.roleIcon ? '❌' : '✅'}\` → \`${data.roleIcon ? '✅' : '❌'}\``;
-    else if(type == ModLogType.ChangeRolePermissions) return `\n\`\`\`diff\n${data.permissions!.added.map((permission) => `+ ${capitalCase(permission)}`).join('\n')}${data.permissions!.added.length > 0 && data.permissions!.removed.length > 0 ? '\n' : ''}${data.permissions!.removed.map((permission) => `- ${capitalCase(permission)}`).join('\n')}\`\`\``;
+    else if(type == ModLogType.ChangeRolePermissions) return `\n\`\`\`diff\n${data.permissions.added.map((permission) => `+ ${capitalCase(permission)}`).join('\n')}${data.permissions.added.length > 0 && data.permissions.removed.length > 0 ? '\n' : ''}${data.permissions.removed.map((permission) => `- ${capitalCase(permission)}`).join('\n')}\`\`\``;
     else if(type == ModLogType.DeleteRole) return `\`${data.role}\``;
     return null;
 }

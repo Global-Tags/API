@@ -2,10 +2,11 @@ import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder 
 import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendTagClearEmail } from "../../libs/Mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
 import { Permission } from "../../types/Permission";
+import { getProfileByUUID } from "../../libs/Mojang";
 
 export default class ClearTag extends Button {
     constructor() {
@@ -25,11 +26,10 @@ export default class ClearTag extends Button {
         player.clearTag(staff.uuid);
         await player.save();
 
-        sendMessage({
-            type: NotificationType.ModLog,
+        sendModLogMessage({
             logType: ModLogType.ClearTag,
-            uuid: player.uuid,
-            staff: staff.uuid,
+            user: await getProfileByUUID(player.uuid),
+            staff: await getProfileByUUID(staff.uuid),
             discord: true
         });
 

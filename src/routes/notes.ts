@@ -1,7 +1,7 @@
 import Elysia, { t } from "elysia";
 import players from "../database/schemas/players";
 import fetchI18n from "../middleware/FetchI18n";
-import { ModLogType, NotificationType, sendMessage } from "../libs/DiscordNotifier";
+import { ModLogType, sendModLogMessage } from "../libs/discord-notifier";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { formatUUID } from "./root";
 import { config } from "../libs/Config";
@@ -87,9 +87,9 @@ export default new Elysia({
     player.createNote({ text: note, author: session.uuid! });
     await player.save();
 
-    sendMessage({
-        type: NotificationType.ModLog,
+    sendModLogMessage({
         logType: ModLogType.CreateNote,
+        hasUser: true,
         uuid: uuid,
         staff: session.uuid || 'Unknown',
         note
@@ -126,9 +126,10 @@ export default new Elysia({
 
     player.deleteNote(note.id);
     await player.save();
-    sendMessage({
-        type: NotificationType.ModLog,
+
+    sendModLogMessage({
         logType: ModLogType.DeleteNote,
+        hasUser: true,
         uuid: uuid,
         staff: session.uuid || 'Unknown',
         note: note.text

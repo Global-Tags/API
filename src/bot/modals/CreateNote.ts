@@ -2,8 +2,9 @@ import { CacheType, Message, GuildMember, User, EmbedBuilder, ModalSubmitInterac
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import Modal from "../structs/Modal";
-import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
+import { getProfileByUUID } from "../../libs/Mojang";
 
 export default class CreateNote extends Modal {
     constructor() {
@@ -19,13 +20,12 @@ export default class CreateNote extends Modal {
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
         const note = fields.getTextInputValue('note');
 
-        sendMessage({
-            type: NotificationType.ModLog,
+        sendModLogMessage({
             logType: ModLogType.CreateNote,
-            uuid: player.uuid,
-            staff: staff.uuid,
-            note,
-            discord: true
+            staff: await getProfileByUUID(staff.uuid),
+            user: await getProfileByUUID(player.uuid),
+            discord: true,
+            note
         });
 
         player.createNote({

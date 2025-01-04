@@ -2,10 +2,11 @@ import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder } from "dis
 import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendIconClearEmail } from "../../libs/Mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
 import { Permission } from "../../types/Permission";
+import { getProfileByUUID } from "../../libs/Mojang";
 
 export default class ClearIconTexture extends Button {
     constructor() {
@@ -25,22 +26,15 @@ export default class ClearIconTexture extends Button {
         player.clearIcon(staff.uuid);
         await player.save();
 
-        sendMessage({
-            type: NotificationType.ModLog,
+        sendModLogMessage({
             logType: ModLogType.ClearIconTexture,
-            uuid: player.uuid,
-            staff: staff.uuid,
-            icons: {
-                old: {
-                    name: player.icon.name,
-                    hash: oldHash
-                },
-                new: {
-                    name: player.icon.name,
-                    hash: null
-                }
-            },
-            discord: true
+            staff: await getProfileByUUID(staff.uuid),
+            user: await getProfileByUUID(player.uuid),
+            discord: true,
+            icon: {
+                name: player.icon.name,
+                hash: oldHash
+            }
         });
 
         if(player.isEmailVerified()) {

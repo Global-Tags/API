@@ -1,10 +1,11 @@
 import Elysia, { t } from "elysia";
 import players from "../database/schemas/players";
 import fetchI18n, { getI18nFunctionByLanguage } from "../middleware/FetchI18n";
-import { ModLogType, NotificationType, sendMessage } from "../libs/DiscordNotifier";
+import { ModLogType, sendBanAppealMessage, sendModLogMessage } from "../libs/discord-notifier";
 import getAuthProvider from "../middleware/GetAuthProvider";
 import { sendBanEmail, sendUnbanEmail } from "../libs/Mailer";
 import { Permission } from "../types/Permission";
+import { getProfileByUUID } from "../libs/Mojang";
 
 export default new Elysia({
     prefix: `/ban`
@@ -46,11 +47,12 @@ export default new Elysia({
 
     player.banPlayer(reason, session.uuid!);
     await player.save();
-    sendMessage({
-        type: NotificationType.ModLog,
+
+    sendModLogMessage({
         logType: ModLogType.Ban,
-        uuid: uuid,
-        staff: session.uuid || 'Unknown',
+        staff: await getProfileByUUID(session.uuid!),
+        user: await getProfileByUUID(uuid),
+        discord: false,
         reason: reason
     });
 
@@ -89,11 +91,12 @@ export default new Elysia({
     player.ban.reason = reason;
     player.ban.appealable = body.appealable;
     await player.save();
-    sendMessage({
-        type: NotificationType.ModLog,
+
+    sendModLogMessage({
         logType: ModLogType.EditBan,
-        uuid: uuid,
-        staff: session.uuid || 'Unknown',
+        user: await getProfileByUUID(uuid),
+        staff: await getProfileByUUID(session.uuid!),
+        discord: false,
         appealable: body.appealable,
         reason: reason
     });
@@ -129,11 +132,10 @@ export default new Elysia({
     player.ban.appealed = true;
     await player.save();
 
-    sendMessage({
-        type: NotificationType.Appeal,
-        uuid,
+    sendBanAppealMessage(
+        await getProfileByUUID(uuid),
         reason
-    });
+    );
 
     return { message: i18n(`appeal.success`) };
 }, {
@@ -163,11 +165,12 @@ export default new Elysia({
 
     player.unban();
     await player.save();
-    sendMessage({
-        type: NotificationType.ModLog,
+
+    sendModLogMessage({
         logType: ModLogType.Unban,
-        uuid: uuid,
-        staff: session.uuid || 'Unknown'
+        staff: await getProfileByUUID(session.uuid!),
+        user: await getProfileByUUID(uuid),
+        discord: false
     });
 
     if(player.isEmailVerified()) {

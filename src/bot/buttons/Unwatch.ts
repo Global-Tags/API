@@ -2,8 +2,9 @@ import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder 
 import Button from "../structs/Button";
 import { colors } from "../bot";
 import players from "../../database/schemas/players";
-import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
+import { getProfileByUUID } from "../../libs/Mojang";
 
 export default class Unwatch extends Button {
     constructor() {
@@ -22,11 +23,10 @@ export default class Unwatch extends Button {
         player.watchlist = false;
         player.save();
 
-        sendMessage({
-            type: NotificationType.ModLog,
+        sendModLogMessage({
             logType: ModLogType.Unwatch,
-            uuid: player.uuid,
-            staff: staff.uuid,
+            staff: await getProfileByUUID(staff.uuid),
+            user: await getProfileByUUID(player.uuid),
             discord: true
         });
 

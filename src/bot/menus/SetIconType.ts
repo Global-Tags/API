@@ -2,11 +2,12 @@ import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder }
 import SelectMenu from "../structs/SelectMenu";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { snakeCase } from "change-case";
 import { sendIconTypeChangeEmail } from "../../libs/Mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
 import { Permission } from "../../types/Permission";
+import { getProfileByUUID } from "../../libs/Mojang";
 
 export default class SetIconType extends SelectMenu {
     constructor() {
@@ -26,11 +27,11 @@ export default class SetIconType extends SelectMenu {
         player.icon.name = snakeCase(values[0]);
         await player.save();
 
-        sendMessage({
-            type: NotificationType.ModLog,
+        sendModLogMessage({
             logType: ModLogType.ChangeIconType,
-            uuid: player.uuid,
-            staff: staff.uuid,
+            staff: await getProfileByUUID(staff.uuid),
+            user: await getProfileByUUID(player.uuid),
+            discord: true,
             icons: {
                 old: {
                     name: oldIcon.name,
@@ -40,8 +41,7 @@ export default class SetIconType extends SelectMenu {
                     name: player.icon.name,
                     hash: player.icon.hash
                 }
-            },
-            discord: true
+            }
         });
 
         if(player.isEmailVerified()) {
