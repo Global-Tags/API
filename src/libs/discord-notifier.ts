@@ -21,7 +21,7 @@ export enum ModLogType {
     DeleteNote,
     DeleteReport,
     CreateRole,
-    ChangeRoleIcon,
+    ToggleRoleIcon,
     ChangeRolePermissions,
     DeleteRole,
 }
@@ -74,7 +74,7 @@ type ModLogData = {
     logType: ModLogType.CreateRole,
     role: string
 } | {
-    logType: ModLogType.ChangeRoleIcon,
+    logType: ModLogType.ToggleRoleIcon,
     role: string,
     roleIcon: boolean
 } | {
@@ -317,8 +317,8 @@ function modlogDescription(data: ModLogData): string | null {
     else if(type == ModLogType.CreateNote || type == ModLogType.DeleteNote) return `\`${data.note}\``;
     else if(type == ModLogType.DeleteReport) return `\`${data.report}\``;
     else if(type == ModLogType.CreateRole) return `\`${data.role}\``;
-    else if(type == ModLogType.ChangeRoleIcon) return `\`${data.roleIcon ? '❌' : '✅'}\` → \`${data.roleIcon ? '✅' : '❌'}\``;
-    else if(type == ModLogType.ChangeRolePermissions) return `\n\`\`\`diff\n${data.permissions.added.map((permission) => `+ ${capitalCase(permission)}`).join('\n')}${data.permissions.added.length > 0 && data.permissions.removed.length > 0 ? '\n' : ''}${data.permissions.removed.map((permission) => `- ${capitalCase(permission)}`).join('\n')}\`\`\``;
+    else if(type == ModLogType.ToggleRoleIcon) return `\`${data.role}\`\n\`${data.roleIcon ? '❌' : '✅'}\` → \`${data.roleIcon ? '✅' : '❌'}\``;
+    else if(type == ModLogType.ChangeRolePermissions) return `\`${data.role}\`\n\`\`\`diff\n${data.permissions.added.map((permission) => `+ ${capitalCase(permission)}`).join('\n')}${data.permissions.added.length > 0 && data.permissions.removed.length > 0 ? '\n' : ''}${data.permissions.removed.map((permission) => `- ${capitalCase(permission)}`).join('\n')}\`\`\``;
     else if(type == ModLogType.DeleteRole) return `\`${data.role}\``;
     return null;
 }
