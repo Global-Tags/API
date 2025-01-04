@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, User } from "discord.js";
 import Command from "../structs/Command";
-import { config } from "../../libs/Config";
+import { config } from "../../libs/config";
 import { colors, images } from "../bot";
 import players from "../../database/schemas/players";
 import { Permission } from "../../types/Permission";

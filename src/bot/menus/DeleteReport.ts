@@ -4,7 +4,7 @@ import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID } from "../../libs/Mojang";
+import { getProfileByUUID } from "../../libs/mojang";
 
 export default class DeleteReport extends SelectMenu {
     constructor() {

@@ -3,10 +3,10 @@ import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { sendTagChangeEmail } from "../../libs/Mailer";
-import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
+import { sendTagChangeEmail } from "../../libs/mailer";
+import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID } from "../../libs/Mojang";
+import { getProfileByUUID } from "../../libs/mojang";
 
 export default class SetTag extends Modal {
     constructor() {

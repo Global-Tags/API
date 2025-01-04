@@ -1,10 +1,10 @@
 import Elysia, { t } from "elysia";
 import players from "../database/schemas/players";
-import fetchI18n from "../middleware/FetchI18n";
+import fetchI18n from "../middleware/fetch-i18n";
 import { ModLogType, sendModLogMessage } from "../libs/discord-notifier";
-import getAuthProvider from "../middleware/GetAuthProvider";
+import getAuthProvider from "../middleware/get-auth-provider";
 import { formatUUID } from "./root";
-import { config } from "../libs/Config";
+import { config } from "../libs/config";
 import { Permission } from "../types/Permission";
 
 const { validation } = config;

@@ -1,9 +1,9 @@
 import { CronJob } from "cron";
-import { checkExpiredEntitlements } from "./EntitlementExpiry";
-import { saveMetrics } from "./Metrics";
+import { checkExpiredEntitlements } from "./entitlement-expiry";
+import { saveMetrics } from "./metrics";
 import Logger from "./Logger";
 import players from "../database/schemas/players";
-import { config } from "./Config";
+import { config } from "./config";
 import { updateRoleCache } from "../database/schemas/roles";
 import { isConnected } from "../database/mongo";
 

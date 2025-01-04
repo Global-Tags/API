@@ -4,8 +4,8 @@ import { client, fetchGuild } from "../bot";
 import Logger from "../../libs/Logger";
 import players from "../../database/schemas/players";
 import { sendEntitlementMessage } from "../../libs/discord-notifier";
-import { config } from "../../libs/Config";
-import { getSkus } from "../../libs/SkuManager";
+import { config } from "../../libs/config";
+import { getSkus } from "../../libs/sku-manager";
 
 const skus = getSkus();
 

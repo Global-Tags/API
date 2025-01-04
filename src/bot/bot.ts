@@ -6,7 +6,7 @@ import Command from "./structs/Command";
 import Modal from "./structs/Modal";
 import Button from "./structs/Button";
 import SelectMenu from "./structs/SelectMenu";
-import { config } from "../libs/Config";
+import { config } from "../libs/config";
 
 export const client = new Client({
     intents: [

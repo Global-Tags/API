@@ -1,9 +1,9 @@
 import * as bot from "../bot/bot";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
-import { Profile } from "./Mojang";
+import { Profile } from "./mojang";
 import { getCustomIconUrl } from "../routes/icon";
 import { capitalCase } from "change-case";
-import { config } from "./Config";
+import { config } from "./config";
 
 export enum ModLogType {
     ChangeTag,
@@ -292,8 +292,6 @@ export function sendCustomIconUploadMessage(user: Profile, hash: string) {
         embed
     });
 }
-
-// TODO: Fix mod log arguments
 
 export function sendModLogMessage(data: ModLogData) {
     if(!config.discordBot.notifications.mogLog.enabled) return;

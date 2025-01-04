@@ -3,8 +3,8 @@ import Event from "../structs/Event";
 import entitlement from "../../database/schemas/entitlement";
 import { sendEntitlementMessage } from "../../libs/discord-notifier";
 import players from "../../database/schemas/players";
-import { config } from "../../libs/Config";
-import { getSkus } from "../../libs/SkuManager";
+import { config } from "../../libs/config";
+import { getSkus } from "../../libs/sku-manager";
 
 const skus = getSkus();
 

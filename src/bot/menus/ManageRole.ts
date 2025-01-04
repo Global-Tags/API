@@ -5,7 +5,7 @@ import { colors, images } from "../bot";
 import { Permission, permissions as allPermissions } from "../../types/Permission";
 import { getCachedRoles } from "../../database/schemas/roles";
 import { capitalCase } from "change-case";
-import { config } from "../../libs/Config";
+import { config } from "../../libs/config";
 
 export default class ManageRole extends SelectMenu {
     constructor() {

@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { config } from "./Config";
+import { config } from "./config";
 
 enum LogLevel {
     Error,

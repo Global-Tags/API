@@ -1,12 +1,12 @@
 import Elysia, { t } from "elysia";
 import players from "../database/schemas/players";
-import fetchI18n from "../middleware/FetchI18n";
-import getAuthProvider from "../middleware/GetAuthProvider";
-import { sendEmail } from "../libs/Mailer";
+import fetchI18n from "../middleware/fetch-i18n";
+import getAuthProvider from "../middleware/get-auth-provider";
+import { sendEmail } from "../libs/mailer";
 import { randomBytes } from "crypto";
-import { config } from "../libs/Config";
+import { config } from "../libs/config";
 import { sendDiscordLinkMessage, sendEmailLinkMessage } from "../libs/discord-notifier";
-import { getProfileByUUID } from "../libs/Mojang";
+import { getProfileByUUID } from "../libs/mojang";
 
 export function generateSecureCode(length: number = 10) {
     return randomBytes(length).toString('hex').slice(0, length);

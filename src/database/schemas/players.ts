@@ -4,7 +4,7 @@ import Logger from "../../libs/Logger";
 import { GuildMember } from "discord.js";
 import { constantCase } from "change-case";
 import { generateSecureCode } from "../../routes/connections";
-import { config } from "../../libs/Config";
+import { config } from "../../libs/config";
 import { Permission } from "../../types/Permission";
 import { getCachedRoles, Role } from "./roles";
 import { GlobalIcon } from "../../types/GlobalIcon";

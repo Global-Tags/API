@@ -3,10 +3,10 @@ import Modal from "../structs/Modal";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { sendBanEmail } from "../../libs/Mailer";
-import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
+import { sendBanEmail } from "../../libs/mailer";
+import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID } from "../../libs/Mojang";
+import { getProfileByUUID } from "../../libs/mojang";
 
 export default class Ban extends Modal {
     constructor() {

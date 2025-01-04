@@ -4,7 +4,7 @@ import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID } from "../../libs/Mojang";
+import { getProfileByUUID } from "../../libs/mojang";
 
 export default class CreateNote extends Modal {
     constructor() {

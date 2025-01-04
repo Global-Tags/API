@@ -2,8 +2,8 @@ import { CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedB
 import Command from "../structs/Command";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { config } from "../../libs/Config";
-import { getProfileByUUID } from "../../libs/Mojang";
+import { config } from "../../libs/config";
+import { getProfileByUUID } from "../../libs/mojang";
 import { onDiscordUnlink } from "../../libs/events";
 
 export default class Unlink extends Command {

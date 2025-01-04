@@ -3,10 +3,10 @@ import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { sendIconClearEmail } from "../../libs/Mailer";
-import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
+import { sendIconClearEmail } from "../../libs/mailer";
+import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID } from "../../libs/Mojang";
+import { getProfileByUUID } from "../../libs/mojang";
 
 export default class ClearIconTexture extends Button {
     constructor() {

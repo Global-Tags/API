@@ -1,10 +1,10 @@
 import Elysia, { t } from "elysia";
 import players from "../database/schemas/players";
-import fetchI18n from "../middleware/FetchI18n";
-import getAuthProvider from "../middleware/GetAuthProvider";
+import fetchI18n from "../middleware/fetch-i18n";
+import getAuthProvider from "../middleware/get-auth-provider";
 import { join } from "path";
 import { constantCase, pascalCase, snakeCase } from "change-case";
-import { config } from "../libs/Config";
+import { config } from "../libs/config";
 import { Permission } from "../types/Permission";
 import { GlobalIcon } from "../types/GlobalIcon";
 

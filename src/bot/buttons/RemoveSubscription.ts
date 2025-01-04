@@ -2,7 +2,7 @@ import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowB
 import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { client, colors } from "../bot";
-import { getSkus } from "../../libs/SkuManager";
+import { getSkus } from "../../libs/sku-manager";
 import { Permission } from "../../types/Permission";
 
 const skus = getSkus();

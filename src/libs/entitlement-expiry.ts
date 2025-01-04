@@ -3,8 +3,8 @@ import players from "../database/schemas/players";
 import { fetchGuild } from "../bot/bot";
 import Logger from "./Logger";
 import { isConnected } from "../database/mongo";
-import { config } from "./Config";
-import { getSkus } from "./SkuManager";
+import { config } from "./config";
+import { getSkus } from "./sku-manager";
 import { sendEntitlementMessage } from "./discord-notifier";
 
 const skus = getSkus();

@@ -1,5 +1,5 @@
 import { HydratedDocument, model, Schema } from "mongoose"
-import { config } from "../../libs/Config";
+import { config } from "../../libs/config";
 import { pascalCase } from "change-case";
 import { Permission } from "../../types/Permission";
 import { isConnected } from "../mongo";

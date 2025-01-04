@@ -2,8 +2,8 @@ import { GuildMember } from "discord.js";
 import Event from "../structs/Event";
 import { client } from "../bot";
 import players from "../../database/schemas/players";
-import { config } from "../../libs/Config";
-import { getSkus } from "../../libs/SkuManager";
+import { config } from "../../libs/config";
+import { getSkus } from "../../libs/sku-manager";
 
 const skus = getSkus();
 

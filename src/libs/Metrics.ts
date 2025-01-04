@@ -4,7 +4,7 @@ import Logger from "./Logger";
 import axios from "axios";
 import { client, fetchGuild } from "../bot/bot";
 import { args } from "..";
-import { config } from "./Config";
+import { config } from "./config";
 import { getCachedRoles } from "../database/schemas/roles";
 import { GlobalIcon, icons as iconList } from "../types/GlobalIcon";
 import { snakeCase } from "change-case";

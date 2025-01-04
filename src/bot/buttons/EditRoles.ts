@@ -2,7 +2,7 @@ import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder,
 import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { config } from "../../libs/Config";
+import { config } from "../../libs/config";
 import { capitalCase } from "change-case";
 import { Permission } from "../../types/Permission";
 import { getCachedRoles } from "../../database/schemas/roles";
