@@ -4,6 +4,8 @@ import { Permission } from "../../types/Permission";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { getCachedRoles, updateRoleCache } from "../../database/schemas/roles";
+import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
+import { getProfileByUUID } from "../../libs/mojang";
 
 export default class DeleteRole extends Button {
     constructor() {
@@ -17,6 +19,13 @@ export default class DeleteRole extends Button {
 
         const role = getCachedRoles().find((role) => role.name == message.embeds[1].footer!.text);
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Role not found!`)], ephemeral: true });
+
+        sendModLogMessage({
+            logType: ModLogType.DeleteRole,
+            staff: await getProfileByUUID(staff.uuid),
+            discord: true,
+            role: role.name
+        });
 
         await role.deleteOne();
         updateRoleCache();

@@ -3,9 +3,11 @@ import SelectMenu from "../structs/SelectMenu";
 import players from "../../database/schemas/players";
 import { colors, images } from "../bot";
 import { Permission, permissions as allPermissions } from "../../types/Permission";
-import { getCachedRoles } from "../../database/schemas/roles";
+import { getCachedRoles, updateRoleCache } from "../../database/schemas/roles";
 import { capitalCase } from "change-case";
 import { config } from "../../libs/config";
+import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
+import { getProfileByUUID } from "../../libs/mojang";
 
 export default class ManagePermissions extends SelectMenu {
     constructor() {
@@ -21,12 +23,30 @@ export default class ManagePermissions extends SelectMenu {
         const role = getCachedRoles().find((role) => role.name == message.embeds[1].footer!.text);
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Role not found!`)], ephemeral: true });
 
+        const permissions = [ ...role.permissions ];
+        const added: string[] = [];
+        const removed: string[] = [];
+
         role.permissions = [];
         for(const permission of values) {
+            if(!permissions.includes(permission)) added.push(permission);
             if(permission in Permission) role.permissions.push(permission);
         }
+        for(const permission of permissions) {
+            if(!values.includes(permission)) removed.push(permission);
+        }
+        updateRoleCache();
 
-        // TODO: Send mod log
+        sendModLogMessage({
+            logType: ModLogType.ChangeRolePermissions,
+            staff: await getProfileByUUID(staff.uuid),
+            discord: true,
+            role: role.name,
+            permissions: {
+                added,
+                removed
+            }
+        });
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The role permissions were successfully updated!`)], ephemeral: true });
     }

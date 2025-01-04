@@ -5,6 +5,8 @@ import Modal from "../structs/Modal";
 import { Permission } from "../../types/Permission";
 import roles, { updateRoleCache } from "../../database/schemas/roles";
 import { snakeCase } from "change-case";
+import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
+import { getProfileByUUID } from "../../libs/mojang";
 
 export default class CreateRole extends Modal {
     constructor() {
@@ -27,7 +29,12 @@ export default class CreateRole extends Modal {
         }]);
         updateRoleCache();
 
-        // TODO: Send mod log
+        sendModLogMessage({
+            logType: ModLogType.CreateRole,
+            staff: await getProfileByUUID(staff.uuid),
+            discord: true,
+            role: name
+        });
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The role \`${name}\` was successfully created!`)], ephemeral: true });
     }

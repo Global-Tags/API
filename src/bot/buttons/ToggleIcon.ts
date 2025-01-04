@@ -4,6 +4,8 @@ import { Permission } from "../../types/Permission";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { getCachedRoles } from "../../database/schemas/roles";
+import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
+import { getProfileByUUID } from "../../libs/mojang";
 
 export default class ToggleIcon extends Button {
     constructor() {
@@ -20,6 +22,14 @@ export default class ToggleIcon extends Button {
 
         role.hasIcon = !role.hasIcon;
         role.save();
+
+        sendModLogMessage({
+            logType: ModLogType.ToggleRoleIcon,
+            staff: await getProfileByUUID(staff.uuid),
+            discord: true,
+            role: role.name,
+            roleIcon: role.hasIcon
+        })
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The Icon has been ${role.hasIcon ? 'enabled' : 'disabled'}!`)], ephemeral: true });
     }
