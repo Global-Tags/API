@@ -24,7 +24,7 @@ export default class CreateRole extends Modal {
 
         await roles.insertMany([{
             name,
-            position: getNextPosition(),
+            position: await getNextPosition(),
             hasIcon: false,
             permissions: []
         }]);
