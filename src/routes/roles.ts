@@ -3,134 +3,145 @@ import getAuthProvider from "../middleware/get-auth-provider";
 import fetchI18n from "../middleware/fetch-i18n";
 import { config } from "../libs/config";
 import { Permission } from "../types/Permission";
-import players from "../database/schemas/players";
-import { formatUUID } from "./players/:uuid/root";
-import { sendModLogMessage } from "../libs/discord-notifier";
-
-const { validation } = config;
+import { ModLogType, sendModLogMessage } from "../libs/discord-notifier";
+import roles, { getCachedRoles, getNextPosition, updateRoleCache } from "../database/schemas/roles";
+import { snakeCase } from "change-case";
+import { getProfileByUUID } from "../libs/mojang";
 
 export default new Elysia({
     prefix: 'roles'
 }).use(fetchI18n).use(getAuthProvider).get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get roles
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.hasPermission(Permission.ManageNotes)) return error(403, { error: i18n(`error.notAllowed`) });
+    const session = await provider.getSession(headers.authorization);
+    if(!session.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n(`error.notAllowed`) });
 
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
-
-    return player.notes.map((note) => ({
-        id: note.id,
-        text: note.text,
-        author: formatUUID(note.author),
-        createdAt: note.createdAt.getTime()
+    return getCachedRoles().map((role) => ({
+        name: role.name,
+        position: role.position,
+        hasIcon: role.hasIcon,
+        permissions: role.getPermissions().map((permission) => snakeCase(Permission[permission]))
     }));
 }, {
     detail: {
-        tags: ['Admin'],
-        description: `Get all notes of a player`
+        tags: ['Roles'],
+        description: 'Returns all roles'
     },
     response: {
-        200: t.Array(t.Object({ id: t.String(), text: t.String(), author: t.String(), createdAt: t.Number() }), { description: `The notes of the player.` }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: "You're not allowed to manage notes." }),
-        404: t.Object({ error: t.String() }, { description: "The player you tried to get the notes of was not found." })
+        200: t.Array(t.Object({ name: t.String(), position: t.Integer(), hasIcon: t.Boolean(), permissions: t.Array(t.String()) }), { description: 'An array of all roles' }),
+        401: t.Object({ error: t.String() }, { description: 'You\'ve passed a malformed authorization header' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to get the notes of.' }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).get(`/:id`, async ({ error, params, headers, i18n, provider }) => { // Get specific role
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: `Your LabyConnect JWT` }) }, { error: 'error.notAllowed' })
+}).get(`/:name`, async ({ error, params, headers, i18n, provider }) => { // Get specific role
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.hasPermission(Permission.ManageNotes)) return error(403, { error: i18n(`error.notAllowed`) });
+    const session = await provider.getSession(headers.authorization);
+    if(!session.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
-    const { id } = params;
+    const name = snakeCase(decodeURIComponent(params.name));
 
-    const note = player.notes.find((note) => note.id == id);
-    if(!note) return error(404, { error: i18n(`notes.delete.not_found`) });
+    const role = getCachedRoles().find((role) => snakeCase(role.name) == name);
+    if(!role) return error(404, { error: i18n('roles.not_found') });
 
     return {
-        id: note.id,
-        text: note.text,
-        author: formatUUID(note.author),
-        createdAt: note.createdAt.getTime()
+        name: role.name,
+        position: role.position,
+        hasIcon: role.hasIcon,
+        permissions: role.getPermissions().map((permission) => snakeCase(Permission[permission]))
     };
 }, {
     detail: {
-        tags: ['Admin'],
-        description: `Get a specific note from a player`
+        tags: ['Roles'],
+        description: 'Returns role data of a specific role'
     },
     response: {
-        200: t.Object({ id: t.String(), text: t.String(), author: t.String(), createdAt: t.Number() }, { description: 'The note info' }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: "You're not allowed to manage notes." }),
-        404: t.Object({ error: t.String() }, { description: "The player or the note was not found." })
+        200: t.Object({ name: t.String(), position: t.Integer(), hasIcon: t.Boolean(), permissions: t.Array(t.String()) }, { description: 'The role info' }),
+        401: t.Object({ error: t.String() }, { description: 'You\'ve passed a malformed authorization header' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
+        404: t.Object({ error: t.String() }, { description: 'There is no role with the name you provided' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to get the note of.' }), id: t.String({ description: 'The ID of the note you want to get.' }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Create role
+    params: t.Object({ name: t.String({ description: 'The role name' }) }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: `Your LabyConnect JWT` }) }, { error: 'error.notAllowed' })
+}).post(`/`, async ({ error, headers, body, i18n, provider }) => { // Create role
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.hasPermission(Permission.ManageNotes)) return error(403, { error: i18n(`error.notAllowed`) });
+    const session = await provider.getSession(headers.authorization);
+    if(!session.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
-    const { note } = body;
+    const name = snakeCase(body.name.trim());
+    if(getCachedRoles().find((role) => snakeCase(role.name) == name)) return error(409, { error: i18n('roles.create.already_exists').replaceAll('<role>', name) });
 
-    player.createNote({ text: note, author: session.uuid! });
-    await player.save();
+    await roles.insertMany([{
+        name,
+        position: await getNextPosition(),
+        hasIcon: false,
+        permissions: []
+    }]);
+    updateRoleCache();
 
-    return { message: i18n(`notes.create.success`) };
+    sendModLogMessage({
+        logType: ModLogType.CreateRole,
+        staff: await getProfileByUUID(session.uuid!),
+        discord: false,
+        role: name
+    });
+
+    return { message: i18n('roles.create.success') };
 }, {
     detail: {
-        tags: ['Admin'],
-        description: `Add a note to a player`
+        tags: ['Roles'],
+        description: 'Creates a new role'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: 'The note was successfully added.' }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: "You're not allowed to manage notes." }),
-        404: t.Object({ error: t.String() }, { description: "The player you tried to add a note to was not found." })
+        200: t.Object({ message: t.String() }, { description: 'The role was created successfully' }),
+        401: t.Object({ error: t.String() }, { description: 'You\'ve passed a malformed authorization header' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
+        409: t.Object({ error: t.String() }, { description: 'A role with the provided name already exists' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ note: t.String({ maxLength: validation.notes.maxLength, error: `note.create.max_length;;[["max", "${validation.notes.maxLength}"]]` }) }, { error: `error.invalidBody`, additionalProperties: true }),
-    params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to add a note to.' }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).delete(`/:id`, async ({ error, params, headers, i18n, provider }) => { // Delete role
+    body: t.Object({ name: t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: `Your LabyConnect JWT` }) }, { error: 'error.notAllowed' })
+}).delete(`/:name`, async ({ error, params, headers, i18n, provider }) => { // Delete role
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.hasPermission(Permission.ManageNotes)) return error(403, { error: i18n(`error.notAllowed`) });
+    const session = await provider.getSession(headers.authorization);
+    if(!session.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
-    const { id } = params;
+    const name = snakeCase(decodeURIComponent(params.name));
 
-    const note = player.notes.find((note) => note.id == id);
-    if(!note) return error(404, { error: i18n(`notes.delete.not_found`) });
+    const role = getCachedRoles().find((role) => snakeCase(role.name) == name);
+    if(!role) return error(404, { error: i18n('roles.not_found') });
 
-    player.deleteNote(note.id);
-    await player.save();
+    sendModLogMessage({
+        logType: ModLogType.DeleteRole,
+        staff: await getProfileByUUID(session.uuid!),
+        discord: false,
+        role: role.name
+    });
 
-    return { message: i18n(`notes.delete.success`) };
+    await role.deleteOne();
+    updateRoleCache();
+
+    return { message: i18n(`roles.delete.success`) };
 }, {
     detail: {
-        tags: ['Admin'],
-        description: `Delete a note from a player`
+        tags: ['Roles'],
+        description: 'Deletes a specific role'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: 'The note was successfully deleted.' }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: "You're not allowed to manage notes." }),
-        404: t.Object({ error: t.String() }, { description: "The player or the note was not found." })
+        200: t.Object({ message: t.String() }, { description: 'The role was deleted successfully' }),
+        401: t.Object({ error: t.String() }, { description: 'You\'ve passed a malformed authorization header' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
+        404: t.Object({ error: t.String() }, { description: 'There is no role with the name you provided' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to delete the note of.' }), id: t.String({ description: 'The ID of the note you want to delete.' }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
+    params: t.Object({ name: t.String({ description: 'The role name' }) }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: `Your LabyConnect JWT` }) }, { error: 'error.notAllowed' })
 });
