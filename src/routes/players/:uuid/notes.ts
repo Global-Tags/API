@@ -6,6 +6,7 @@ import getAuthProvider from "../../../middleware/get-auth-provider";
 import { formatUUID } from "./root";
 import { config } from "../../../libs/config";
 import { Permission } from "../../../types/Permission";
+import { getProfileByUUID } from "../../../libs/mojang";
 
 const { validation } = config;
 
@@ -89,9 +90,9 @@ export default new Elysia({
 
     sendModLogMessage({
         logType: ModLogType.CreateNote,
-        hasUser: true,
-        uuid: uuid,
-        staff: session.uuid || 'Unknown',
+        staff: await getProfileByUUID(session.uuid!),
+        user: await getProfileByUUID(uuid),
+        discord: false,
         note
     });
 
@@ -129,9 +130,9 @@ export default new Elysia({
 
     sendModLogMessage({
         logType: ModLogType.DeleteNote,
-        hasUser: true,
-        uuid: uuid,
-        staff: session.uuid || 'Unknown',
+        staff: await getProfileByUUID(session.uuid!),
+        user: await getProfileByUUID(uuid),
+        discord: false,
         note: note.text
     });
 
