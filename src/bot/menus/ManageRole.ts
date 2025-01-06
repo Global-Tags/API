@@ -36,6 +36,11 @@ export default class ManageRole extends SelectMenu {
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
+                .setLabel('Rename')
+                .setCustomId('renameRole')
+                .setStyle(ButtonStyle.Primary)
+                .setEmoji('🏷️'),
+                new ButtonBuilder()
                 .setLabel('Toggle Icon')
                 .setCustomId('toggleIcon')
                 .setStyle(ButtonStyle.Primary)
