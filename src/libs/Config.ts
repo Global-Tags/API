@@ -35,6 +35,9 @@ export let config = {
         },
         notes: {
             maxLength: getEnvNumber(process.env.GT_VALIDATION_NOTES_MAX_LENGTH, 100)
+        },
+        roles: {
+            maxLength: getEnvNumber(process.env.GT_VALIDATION_ROLE_NAME_MAX_LENGTH, 20)
         }
     },
     github: {
