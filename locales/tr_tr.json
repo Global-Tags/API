@@ -43,7 +43,7 @@
         "invalid": "Lütfen geçerli bir pozisyon girin!"
     },
     "editBan": {
-        "success": "Ban güncellendi"
+        "success": "Ban güncellendi!"
     },
     "appeal": {
         "notBanned": "Sen ban değilsin!",
