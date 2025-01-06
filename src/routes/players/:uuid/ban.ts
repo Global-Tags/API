@@ -1,11 +1,11 @@
 import Elysia, { t } from "elysia";
-import players from "../database/schemas/players";
-import fetchI18n, { getI18nFunctionByLanguage } from "../middleware/fetch-i18n";
-import { ModLogType, sendBanAppealMessage, sendModLogMessage } from "../libs/discord-notifier";
-import getAuthProvider from "../middleware/get-auth-provider";
-import { sendBanEmail, sendUnbanEmail } from "../libs/mailer";
-import { Permission } from "../types/Permission";
-import { getProfileByUUID } from "../libs/mojang";
+import players from "../../../database/schemas/players";
+import fetchI18n, { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
+import { ModLogType, sendBanAppealMessage, sendModLogMessage } from "../../../libs/discord-notifier";
+import getAuthProvider from "../../../middleware/get-auth-provider";
+import { sendBanEmail, sendUnbanEmail } from "../../../libs/mailer";
+import { Permission } from "../../../types/Permission";
+import { getProfileByUUID } from "../../../libs/mojang";
 
 export default new Elysia({
     prefix: `/ban`

@@ -1,17 +1,17 @@
 import Elysia, { t } from "elysia";
-import players from "../database/schemas/players";
-import fetchI18n from "../middleware/fetch-i18n";
-import { ModLogType, sendModLogMessage } from "../libs/discord-notifier";
 import getAuthProvider from "../middleware/get-auth-provider";
-import { formatUUID } from "./root";
+import fetchI18n from "../middleware/fetch-i18n";
 import { config } from "../libs/config";
 import { Permission } from "../types/Permission";
+import players from "../database/schemas/players";
+import { formatUUID } from "./players/:uuid/root";
+import { sendModLogMessage } from "../libs/discord-notifier";
 
 const { validation } = config;
 
 export default new Elysia({
-    prefix: `/notes`
-}).use(fetchI18n).use(getAuthProvider).get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get notes
+    prefix: 'roles'
+}).use(fetchI18n).use(getAuthProvider).get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get roles
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
@@ -40,7 +40,7 @@ export default new Elysia({
     },
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to get the notes of.' }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).get(`/:id`, async ({ error, params, headers, i18n, provider }) => { // Get specific note
+}).get(`/:id`, async ({ error, params, headers, i18n, provider }) => { // Get specific role
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
@@ -73,7 +73,7 @@ export default new Elysia({
     },
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to get the note of.' }), id: t.String({ description: 'The ID of the note you want to get.' }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Add note to player
+}).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Create role
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
@@ -86,14 +86,6 @@ export default new Elysia({
 
     player.createNote({ text: note, author: session.uuid! });
     await player.save();
-
-    sendModLogMessage({
-        logType: ModLogType.CreateNote,
-        hasUser: true,
-        uuid: uuid,
-        staff: session.uuid || 'Unknown',
-        note
-    });
 
     return { message: i18n(`notes.create.success`) };
 }, {
@@ -110,7 +102,7 @@ export default new Elysia({
     body: t.Object({ note: t.String({ maxLength: validation.notes.maxLength, error: `note.create.max_length;;[["max", "${validation.notes.maxLength}"]]` }) }, { error: `error.invalidBody`, additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to add a note to.' }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).delete(`/:id`, async ({ error, params, headers, i18n, provider }) => { // Delete note
+}).delete(`/:id`, async ({ error, params, headers, i18n, provider }) => { // Delete role
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = params.uuid.replaceAll(`-`, ``);
     const { authorization } = headers;
@@ -126,14 +118,6 @@ export default new Elysia({
 
     player.deleteNote(note.id);
     await player.save();
-
-    sendModLogMessage({
-        logType: ModLogType.DeleteNote,
-        hasUser: true,
-        uuid: uuid,
-        staff: session.uuid || 'Unknown',
-        note: note.text
-    });
 
     return { message: i18n(`notes.delete.success`) };
 }, {

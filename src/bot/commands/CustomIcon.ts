@@ -5,7 +5,7 @@ import { colors } from "../bot";
 import { constantCase } from "change-case";
 import { join } from 'path';
 import axios from "axios";
-import { generateSecureCode } from "../../routes/connections";
+import { generateSecureCode } from "../../routes/players/:uuid/connections";
 import { config } from "../../libs/config";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon } from "../../types/GlobalIcon";

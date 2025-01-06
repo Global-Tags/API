@@ -1,11 +1,11 @@
 import Elysia, { t } from "elysia";
-import players from "../database/schemas/players";
-import fetchI18n from "../middleware/fetch-i18n";
-import getAuthProvider from "../middleware/get-auth-provider";
+import players from "../../../database/schemas/players";
+import fetchI18n from "../../../middleware/fetch-i18n";
+import getAuthProvider from "../../../middleware/get-auth-provider";
 import { formatUUID } from "./root";
-import { Permission } from "../types/Permission";
-import { sendReportMessage } from "../libs/discord-notifier";
-import { getProfileByUUID } from "../libs/mojang";
+import { Permission } from "../../../types/Permission";
+import { sendReportMessage } from "../../../libs/discord-notifier";
+import { getProfileByUUID } from "../../../libs/mojang";
 
 export default new Elysia({
     prefix: "/reports"

@@ -22,8 +22,9 @@ import cors from "@elysiajs/cors";
 import { verify as verifyMailOptions } from "./libs/mailer";
 import { getLatestCommit, retrieveData } from "./libs/git-commit-data";
 import { startEntitlementExpiry, startMetrics, startReferralReset, startRoleCacheJob } from "./libs/cron-jobs";
-import { formatUUID } from "./routes/root";
+import { formatUUID } from "./routes/players/:uuid/root";
 import { config } from "./libs/config";
+import { join } from "path";
 
 if(config.mongodb.trim().length == 0) {
     Logger.error('Database connection string is empty!');
@@ -79,7 +80,7 @@ export const elysia = new Elysia()
         ]
     }
 }))
-.use(getRouter('/players/:uuid', __dirname))
+.use(getRouter(join(__dirname, 'routes')))
 .onStart(async () => {
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();

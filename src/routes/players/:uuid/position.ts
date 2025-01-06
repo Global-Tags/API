@@ -1,9 +1,9 @@
 import Elysia, { t } from "elysia";
-import players from "../database/schemas/players";
-import fetchI18n from "../middleware/fetch-i18n";
-import getAuthProvider from "../middleware/get-auth-provider";
-import { Permission } from "../types/Permission";
-import { GlobalPosition } from "../types/GlobalPosition";
+import players from "../../../database/schemas/players";
+import fetchI18n from "../../../middleware/fetch-i18n";
+import getAuthProvider from "../../../middleware/get-auth-provider";
+import { Permission } from "../../../types/Permission";
+import { GlobalPosition } from "../../../types/GlobalPosition";
 import { pascalCase, snakeCase } from "change-case";
 
 export default new Elysia({
