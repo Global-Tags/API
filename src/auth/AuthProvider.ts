@@ -18,7 +18,7 @@ export default abstract class AuthProvider {
         this.id = id;
     }
 
-    public async getSession(token: string, uuid: string) {
+    public async getSession(token: string, uuid?: string | null) {
         const tokenUuid = await this.getUUID(token);
         if(!tokenUuid) return { uuid: tokenUuid, equal: tokenUuid == uuid, hasPermission: (permission: Permission) => false };
         const data = await players.findOne({ uuid: tokenUuid });
