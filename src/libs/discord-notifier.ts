@@ -44,7 +44,7 @@ type ModLogData = {
     logType: ModLogType.Unban
 } | {
     logType: ModLogType.EditBan,
-    reason: string,
+    reason?: string,
     appealable: boolean
 } | {
     logType: ModLogType.EditRoles,
@@ -313,7 +313,7 @@ function modlogDescription(data: ModLogData): string | null {
     const { logType: type } = data;
     if(type == ModLogType.ChangeTag) return `\`${data.tags.old}\` → \`${data.tags.new}\``;
     else if(type == ModLogType.Ban) return `**Reason**: \`${data.reason || 'No reason'}\``;
-    else if(type == ModLogType.EditBan) return `**Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Reason**: \`${data.reason}\``;
+    else if(type == ModLogType.EditBan) return `**Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Reason**: \`${data.reason || '-- No reason --'}\``;
     else if(type == ModLogType.EditRoles) return `\n\`\`\`diff\n${data.roles.added.map((role) => `+ ${capitalCase(role)}`).join('\n')}${data.roles.added.length > 0 && data.roles.removed.length > 0 ? '\n' : ''}${data.roles.removed.map((role) => `- ${capitalCase(role)}`).join('\n')}\`\`\``;
     else if(type == ModLogType.EditPosition) return `\`${capitalCase(data.positions.old)}\` → \`${capitalCase(data.positions.new)}\``;
     else if(type == ModLogType.ChangeIconType) return `\`${capitalCase(data.icons.old.name)}\` → \`${capitalCase(data.icons.new.name)}\``;
