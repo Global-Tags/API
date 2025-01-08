@@ -11,6 +11,7 @@ export async function getRouter(dirname: string) {
 }
 
 async function getRoutes(app: Elysia, prefix: string, dirname: string) {
+    prefix = prefix.replace(/\[(\w+)\]/g, ':$1');
     const elysia = new Elysia({ prefix });
     for(const file of readdirSync(dirname)) {
         if(lstatSync(join(dirname, file)).isDirectory()) {
