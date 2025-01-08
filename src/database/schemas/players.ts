@@ -65,17 +65,20 @@ const schema = new Schema<IPlayer>({
         required: true,
         unique: true
     },
-    tag: String,
+    tag: {
+        type: String,
+        default: null
+    },
     position: {
         type: String,
         required: true,
-        default: `ABOVE`
+        default: 'above'
     },
     icon: {
         name: {
             type: String,
             required: true,
-            default: `NONE`
+            default: 'none'
         },
         hash: String
     },
