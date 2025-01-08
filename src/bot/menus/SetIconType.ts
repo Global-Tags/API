@@ -33,14 +33,8 @@ export default class SetIconType extends SelectMenu {
             user: await getProfileByUUID(player.uuid),
             discord: true,
             icons: {
-                old: {
-                    name: oldIcon.name,
-                    hash: oldIcon.hash
-                },
-                new: {
-                    name: player.icon.name,
-                    hash: player.icon.hash
-                }
+                old: oldIcon.name,
+                new: player.icon.name
             }
         });
 

@@ -31,10 +31,7 @@ export default class ClearIconTexture extends Button {
             staff: await getProfileByUUID(staff.uuid),
             user: await getProfileByUUID(player.uuid),
             discord: true,
-            icon: {
-                name: player.icon.name,
-                hash: oldHash
-            }
+            hash: oldHash
         });
 
         if(player.isEmailVerified()) {

@@ -5,8 +5,11 @@ import { pascalCase, snakeCase } from "change-case";
 import { config } from "../../../libs/config";
 import { Permission } from "../../../types/Permission";
 import { GlobalIcon } from "../../../types/GlobalIcon";
-import { stripUUID } from "../../../libs/game-profiles";
+import { getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
+import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
+import { sendTagChangeEmail } from "../../../libs/mailer";
+import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 
 export function getCustomIconUrl(uuid: string, hash: string) {
     return `${config.baseUrl}/players/${uuid}/icon/${hash}`;
@@ -45,6 +48,8 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     const isCustomIconDisallowed = snakeCase(GlobalIcon[GlobalIcon.Custom]) == icon && !session.hasPermission(Permission.CustomIcon);
     if(!session.hasPermission(Permission.BypassValidation) && (isCustomIconDisallowed || !(pascalCase(icon) in GlobalIcon) || config.validation.icon.blacklist.includes(pascalCase(icon)))) return error(403, { error: i18n('icon.notAllowed') });
 
+    const oldIcon = player?.icon;
+
     if(player) {
         if(player.isBanned()) return error(403, { error: i18n('error.banned') });
         if(snakeCase(player.icon.name) == icon) return error(400, { error: i18n('icon.sameIcon') });
@@ -56,6 +61,23 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
             uuid,
             icon
         });
+    }
+    
+    if(!session.equal) {
+        sendModLogMessage({
+            logType: ModLogType.ChangeIconType,
+            staff: await getProfileByUUID(session.uuid!),
+            user: await getProfileByUUID(uuid),
+            discord: false,
+            icons: {
+                old: oldIcon?.name || '---',
+                new: icon
+            }
+        });
+
+        if(player?.isEmailVerified()) {
+            sendTagChangeEmail(player.connections.email.address!, oldIcon?.name || '---', icon, getI18nFunctionByLanguage(player.last_language));
+        }
     }
 
     return { message: i18n(`icon.success.${session.equal ? 'self' : 'admin'}`) };

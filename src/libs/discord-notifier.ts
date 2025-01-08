@@ -54,10 +54,10 @@ type ModLogData = {
     positions: { old: string, new: string }
 } | {
     logType: ModLogType.ChangeIconType,
-    icons: { old: { name: string, hash?: string | null }, new: { name: string, hash?: string | null } }
+    icons: { old: string, new: string }
 } | {
     logType: ModLogType.ClearIconTexture,
-    icon: { name: string, hash?: string | null }
+    hash: string
 } | {
     logType: ModLogType.Watch
 } | {
@@ -316,8 +316,8 @@ function modlogDescription(data: ModLogData): string | null {
     else if(type == ModLogType.EditBan) return `**Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Reason**: \`${data.reason || '-- No reason --'}\``;
     else if(type == ModLogType.EditRoles) return `\n\`\`\`diff\n${data.roles.added.map((role) => `+ ${capitalCase(role)}`).join('\n')}${data.roles.added.length > 0 && data.roles.removed.length > 0 ? '\n' : ''}${data.roles.removed.map((role) => `- ${capitalCase(role)}`).join('\n')}\`\`\``;
     else if(type == ModLogType.EditPosition) return `\`${capitalCase(data.positions.old)}\` → \`${capitalCase(data.positions.new)}\``;
-    else if(type == ModLogType.ChangeIconType) return `\`${capitalCase(data.icons.old.name)}\` → \`${capitalCase(data.icons.new.name)}\``;
-    else if(type == ModLogType.ClearIconTexture) return `[${data.icon.hash}](${getCustomIconUrl(data.user!.uuid!, data.icon.hash!)})`;
+    else if(type == ModLogType.ChangeIconType) return `\`${capitalCase(data.icons.old)}\` → \`${capitalCase(data.icons.new)}\``;
+    else if(type == ModLogType.ClearIconTexture) return `[${data.hash}](${getCustomIconUrl(data.user!.uuid!, data.hash)})`;
     else if(type == ModLogType.CreateNote || type == ModLogType.DeleteNote) return `\`${data.note}\``;
     else if(type == ModLogType.DeleteReport) return `\`${data.report}\``;
     else if(type == ModLogType.CreateRole) return `\`${data.role}\``;

@@ -3,8 +3,11 @@ import players from "../../../database/schemas/players";
 import { Permission } from "../../../types/Permission";
 import { GlobalPosition } from "../../../types/GlobalPosition";
 import { pascalCase, snakeCase } from "change-case";
-import { stripUUID } from "../../../libs/game-profiles";
+import { getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
+import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
+import { sendTagChangeEmail } from "../../../libs/mailer";
+import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 
 export default (app: ElysiaApp) => app.post('/', async ({ session, body: { position }, params, i18n, error }) => { // Change tag position
     if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
@@ -13,6 +16,8 @@ export default (app: ElysiaApp) => app.post('/', async ({ session, body: { posit
     position = snakeCase(position);
     const uuid = stripUUID(params.uuid);
     const player = await players.findOne({ uuid });
+
+    const oldPosition = player?.position;
 
     if(player) {
         if(player.isBanned()) return error(403, { error: i18n('error.banned') });
@@ -25,6 +30,23 @@ export default (app: ElysiaApp) => app.post('/', async ({ session, body: { posit
             uuid,
             position
         });
+    }
+
+    if(!session.equal) {
+        sendModLogMessage({
+            logType: ModLogType.EditPosition,
+            staff: await getProfileByUUID(session.uuid!),
+            user: await getProfileByUUID(uuid),
+            discord: false,
+            positions: {
+                old: oldPosition || '---',
+                new: position
+            }
+        });
+
+        if(player?.isEmailVerified()) {
+            sendTagChangeEmail(player.connections.email.address!, oldPosition || '---', position, getI18nFunctionByLanguage(player.last_language));
+        }
     }
 
     return { message: i18n(`position.success.${session.equal ? 'self' : 'admin'}`) };
