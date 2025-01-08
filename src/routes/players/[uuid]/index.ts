@@ -1,10 +1,9 @@
-import Elysia, { t } from "elysia";
+import { t } from "elysia";
 import players from "../../../database/schemas/players";
 import Logger from "../../../libs/Logger";
 import { ModLogType, sendModLogMessage, sendWatchlistAddMessage, sendWatchlistTagUpdateMessage } from "../../../libs/discord-notifier";
-import fetchI18n, { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
+import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 import { stripColors } from "../../../libs/chat-color";
-import getAuthProvider from "../../../middleware/get-auth-provider";
 import { snakeCase } from "change-case";
 import { sendTagChangeEmail, sendTagClearEmail } from "../../../libs/mailer";
 import { saveLastLanguage } from "../../../libs/i18n";
@@ -13,12 +12,12 @@ import { Permission, permissions } from "../../../types/Permission";
 import { GlobalIcon } from "../../../types/GlobalIcon";
 import { GlobalPosition } from "../../../types/GlobalPosition";
 import { formatUUID, getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { ElysiaApp } from "../../..";
 
 const { validation } = config;
 const { min, max, blacklist, watchlist } = validation.tag;
 
-export default new Elysia()
-.use(fetchI18n).use(getAuthProvider).get(`/`, async ({ error, params, headers, i18n, provider, language }) => { // Get player info
+export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers, i18n, provider, language }) => { // Get player info
     const uuid = stripUUID(params.uuid);
     let showBan = false;
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });

@@ -1,13 +1,10 @@
-import Elysia, { t } from "elysia";
+import { t } from "elysia";
 import players from "../../../database/schemas/players";
-import fetchI18n from "../../../middleware/fetch-i18n";
-import getAuthProvider from "../../../middleware/get-auth-provider";
 import { sendReferralMessage } from "../../../libs/discord-notifier";
 import { getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { ElysiaApp } from "../../..";
 
-export default new Elysia({
-    prefix: '/referral'
-}).use(fetchI18n).use(getAuthProvider).post('/', async ({ error, params, headers, i18n, provider }) => { // Refer to player
+export default (app: ElysiaApp) => app.post('/', async ({ error, params, headers, i18n, provider }) => { // Refer to player
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = stripUUID(params.uuid);
     const { authorization } = headers;

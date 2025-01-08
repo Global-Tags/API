@@ -1,15 +1,13 @@
-import Elysia, { t } from "elysia";
+import { t } from "elysia";
 import players from "../../../database/schemas/players";
-import fetchI18n, { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
+import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 import { ModLogType, sendBanAppealMessage, sendModLogMessage } from "../../../libs/discord-notifier";
-import getAuthProvider from "../../../middleware/get-auth-provider";
 import { sendBanEmail, sendUnbanEmail } from "../../../libs/mailer";
 import { Permission } from "../../../types/Permission";
 import { getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { ElysiaApp } from "../../..";
 
-export default new Elysia({
-    prefix: `/ban`
-}).use(fetchI18n).use(getAuthProvider).get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get ban info
+export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get ban info
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = stripUUID(params.uuid);
     const { authorization } = headers;

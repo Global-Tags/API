@@ -1,21 +1,18 @@
-import Elysia, { t } from "elysia";
+import { t } from "elysia";
 import players from "../../../database/schemas/players";
-import fetchI18n from "../../../middleware/fetch-i18n";
-import getAuthProvider from "../../../middleware/get-auth-provider";
 import { join } from "path";
 import { constantCase, pascalCase, snakeCase } from "change-case";
 import { config } from "../../../libs/config";
 import { Permission } from "../../../types/Permission";
 import { GlobalIcon } from "../../../types/GlobalIcon";
 import { stripUUID } from "../../../libs/game-profiles";
+import { ElysiaApp } from "../../..";
 
 export function getCustomIconUrl(uuid: string, hash: string) {
     return `${config.baseUrl}/players/${uuid}/icon/${hash}`;
 }
 
-export default new Elysia({
-    prefix: "/icon"
-}).use(fetchI18n).use(getAuthProvider).get('/:hash', async ({ error, params: { uuid, hash }, i18n }) => {
+export default (app: ElysiaApp) => app.get('/:hash', async ({ error, params: { uuid, hash }, i18n }) => {
     const player = await players.findOne({ uuid: stripUUID(uuid) });
     if(!player) return error(404, { error: i18n(`error.noTag`) });
     if(player.isBanned()) return error(403, { error: i18n(`error.banned`) });

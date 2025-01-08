@@ -1,15 +1,12 @@
-import Elysia, { t } from "elysia";
+import { t } from "elysia";
 import players from "../../../database/schemas/players";
-import fetchI18n from "../../../middleware/fetch-i18n";
-import getAuthProvider from "../../../middleware/get-auth-provider";
 import { Permission } from "../../../types/Permission";
 import { GlobalPosition } from "../../../types/GlobalPosition";
 import { pascalCase, snakeCase } from "change-case";
 import { stripUUID } from "../../../libs/game-profiles";
+import { ElysiaApp } from "../../..";
 
-export default new Elysia({
-    prefix: "/position"
-}).use(fetchI18n).use(getAuthProvider).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Change tag position
+export default (app: ElysiaApp) => app.post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Change tag position
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = stripUUID(params.uuid);
     const position = body.position.toUpperCase();

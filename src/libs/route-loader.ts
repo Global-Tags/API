@@ -18,10 +18,12 @@ async function getRoutes(app: Elysia, prefix: string, dirname: string) {
             await getRoutes(app, `${prefix}/${file}`, join(dirname, file));
             continue;
         }
-        const route: Elysia = (await import(join(dirname, file))).default;
-
+        const root = file == 'index.ts';
+        const route = new Elysia({ prefix: root ? undefined : file.slice(0, -3) });
+        (await import(join(dirname, file))).default(route);
         elysia.use(route);
-        Logger.debug(`Loaded route ${prefix}/${file != `root.ts` ? file.slice(0, -3) : ``}`);
+
+        Logger.debug(`Loaded route ${prefix}/${route.config.prefix || ''}`);
     }
     app.use(elysia);
 }

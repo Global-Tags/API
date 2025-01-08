@@ -40,7 +40,7 @@ loadRequests();
 retrieveData();
 
 // Elysia API
-export const elysia = new Elysia()
+const elysia = new Elysia()
 .onRequest(checkDatabase)
 .onTransform(access)
 .onBeforeHandle(checkRatelimit)
@@ -223,3 +223,5 @@ export const elysia = new Elysia()
     }
 })
 .listen(config.port);
+
+export type ElysiaApp = typeof elysia;

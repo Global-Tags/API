@@ -1,16 +1,12 @@
-import Elysia, { t } from "elysia";
-import getAuthProvider from "../middleware/get-auth-provider";
-import fetchI18n from "../middleware/fetch-i18n";
-import { config } from "../libs/config";
+import { t } from "elysia";
 import { Permission } from "../types/Permission";
 import { ModLogType, sendModLogMessage } from "../libs/discord-notifier";
 import roles, { getCachedRoles, getNextPosition, updateRoleCache } from "../database/schemas/roles";
 import { snakeCase } from "change-case";
 import { getProfileByUUID } from "../libs/game-profiles";
+import { ElysiaApp } from "..";
 
-export default new Elysia({
-    prefix: 'roles'
-}).use(fetchI18n).use(getAuthProvider).get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get roles
+export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get roles
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const session = await provider.getSession(headers.authorization);
     if(!session.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n(`error.notAllowed`) });

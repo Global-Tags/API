@@ -1,20 +1,18 @@
-import Elysia, { t } from "elysia";
+import { t } from "elysia";
 import players from "../../../database/schemas/players";
-import fetchI18n from "../../../middleware/fetch-i18n";
 import getAuthProvider from "../../../middleware/get-auth-provider";
 import { sendEmail } from "../../../libs/mailer";
 import { randomBytes } from "crypto";
 import { config } from "../../../libs/config";
 import { sendDiscordLinkMessage, sendEmailLinkMessage } from "../../../libs/discord-notifier";
 import { getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { ElysiaApp } from "../../..";
 
 export function generateSecureCode(length: number = 10) {
     return randomBytes(length).toString('hex').slice(0, length);
 }
 
-export default new Elysia({
-    prefix: "/connections"
-}).use(fetchI18n).use(getAuthProvider).post(`/discord`, async ({ error, params, headers, i18n, provider }) => { // Get a linking code
+export default (app: ElysiaApp) => app.post(`/discord`, async ({ error, params, headers, i18n, provider }) => { // Get a linking code
     if(!config.discordBot.notifications.accountConnections.enabled) return error(409, { error: i18n('connections.discord.disabled') });
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = stripUUID(params.uuid);

@@ -1,17 +1,14 @@
-import Elysia, { t } from "elysia";
+import { t } from "elysia";
 import players from "../../../database/schemas/players";
-import fetchI18n from "../../../middleware/fetch-i18n";
 import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
-import getAuthProvider from "../../../middleware/get-auth-provider";
 import { config } from "../../../libs/config";
 import { Permission } from "../../../types/Permission";
 import { formatUUID, getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { ElysiaApp } from "../../..";
 
 const { validation } = config;
 
-export default new Elysia({
-    prefix: `/notes`
-}).use(fetchI18n).use(getAuthProvider).get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get notes
+export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get notes
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const uuid = stripUUID(params.uuid);
     const { authorization } = headers;
