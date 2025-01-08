@@ -16,12 +16,15 @@ loadEnv({ path: `./.env.${process.env.NODE_ENV || 'dev'}`, override: true });
 
 export let config = {
     port: getEnvNumber(process.env.GT_PORT, 5500),
-    ipHeader: process.env.GT_PROXY_IP_HEADER || 'x-real-ip',
     strictAuth: getEnvBoolean(process.env.GT_STRICT_AUTH, true),
     logLevel: process.env.GT_LOG_LEVEL || 'Info',
     mongodb: process.env.GT_MONGODB_CONNECTION || '',
     baseUrl: process.env.GT_BASE_URL || 'http://localhost:5500',
     iconUrl: (role: string) => (process.env.GT_ICON_URL || 'https://cdn.rappytv.com/globaltags/icons/role/{role}.png').replaceAll('{role}', snakeCase(role)),
+    proxy: {
+        enabled: getEnvBoolean(process.env.GT_PROXY_ENABLED, false),
+        ipHeader: process.env.GT_PROXY_IP_HEADER || 'x-real-ip'
+    },
     validation: {
         tag: {
             min: getEnvNumber(process.env.GT_VALIDATION_TAG_MIN_LENGTH, 1),
