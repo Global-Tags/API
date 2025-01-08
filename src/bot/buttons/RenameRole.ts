@@ -1,11 +1,7 @@
 import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import Button from "../structs/Button";
-import { Permission } from "../../types/Permission";
-import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { getCachedRoles, updateRoleCache } from "../../database/schemas/roles";
-import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { getProfileByUUID } from "../../libs/game-profiles";
+import { getCachedRoles } from "../../database/schemas/roles";
 import { config } from "../../libs/config";
 
 export default class RenameRole extends Button {

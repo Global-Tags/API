@@ -3,7 +3,7 @@ import Command from "../structs/Command";
 import players from "../../database/schemas/players";
 import * as bot from "../bot";
 import { translateToAnsi } from "../../libs/chat-color";
-import { getProfileByUsername } from "../../libs/game-profiles";
+import { formatUUID, getProfileByUsername, stripUUID } from "../../libs/game-profiles";
 import { capitalCase } from "change-case";
 export const uuidRegex = /[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}|[a-f0-9]{8}(?:[a-f0-9]{4}){4}[a-f0-9]{8}/;
 
@@ -33,7 +33,8 @@ export default class PlayerInfo extends Command {
             name = profile.username;
             uuid = profile.uuid;
         }
-        const data = await players.findOne({ uuid: uuid.replaceAll(`-`, ``) });
+        const strippedUUID = stripUUID(uuid);
+        const data = await players.findOne({ uuid: strippedUUID });
         const roles = data?.getRolesSync() || [];
 
         if(!data) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ This player is not in our records!`)] });
@@ -42,13 +43,13 @@ export default class PlayerInfo extends Command {
             embeds: [
                 new EmbedBuilder()
                 .setColor(bot.colors.standart)
-                .setThumbnail(`https://laby.net/texture/profile/head/${uuid.replaceAll(`-`, ``)}.png?size=1024&overlay`)
+                .setThumbnail(`https://laby.net/texture/profile/head/${strippedUUID}.png?size=1024&overlay`)
                 .setURL(`https://laby.net/${uuid}`)
                 .setTitle(`Playerdata${!!name ? ` of ${name}` : ``}`)
                 .addFields([
                     {
                         name: `UUID`,
-                        value: `\`\`\`${uuid}\`\`\``
+                        value: `\`\`\`${formatUUID(uuid)}\`\`\``
                     },
                     {
                         name: `Tag`,

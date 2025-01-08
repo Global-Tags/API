@@ -7,6 +7,7 @@ import { constantCase, pascalCase, snakeCase } from "change-case";
 import { config } from "../../../libs/config";
 import { Permission } from "../../../types/Permission";
 import { GlobalIcon } from "../../../types/GlobalIcon";
+import { stripUUID } from "../../../libs/game-profiles";
 
 export function getCustomIconUrl(uuid: string, hash: string) {
     return `${config.baseUrl}/players/${uuid}/icon/${hash}`;
@@ -14,14 +15,12 @@ export function getCustomIconUrl(uuid: string, hash: string) {
 
 export default new Elysia({
     prefix: "/icon"
-}).use(fetchI18n).use(getAuthProvider).get('/:hash', async ({ error, params, i18n }) => {
-    const uuid = params.uuid.replaceAll(`-`, ``);
-
-    const player = await players.findOne({ uuid });
+}).use(fetchI18n).use(getAuthProvider).get('/:hash', async ({ error, params: { uuid, hash }, i18n }) => {
+    const player = await players.findOne({ uuid: stripUUID(uuid) });
     if(!player) return error(404, { error: i18n(`error.noTag`) });
     if(player.isBanned()) return error(403, { error: i18n(`error.banned`) });
 
-    const file = Bun.file(join('icons', player.uuid, `${params.hash.trim()}.png`));
+    const file = Bun.file(join('icons', player.uuid, `${hash.trim()}.png`));
     if(!(await file.exists())) return error(404, { error: i18n(`error.noIcon`) });
 
     return file;
@@ -41,7 +40,7 @@ export default new Elysia({
     params: t.Object({ uuid: t.String({ description: `The uuid of the image owner` }), hash: t.String({ description: 'The image hash' }) })
 }).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Change icon
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
+    const uuid = stripUUID(params.uuid);
     const icon = body.icon.trim().toUpperCase();
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
@@ -80,7 +79,7 @@ export default new Elysia({
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 }).post(`/role`, async ({ error, params, headers, body, i18n, provider }) => { // Toggle role icon
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
+    const uuid = stripUUID(params.uuid);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
     if(!session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n(`error.notAllowed`) });

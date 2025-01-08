@@ -5,6 +5,7 @@ import players from "../../database/schemas/players";
 import { uuidRegex } from "../commands/PlayerInfo";
 import { config } from "../../libs/config";
 import { Permission } from "../../types/Permission";
+import { stripUUID } from "../../libs/game-profiles";
 
 export default class Actions extends Button {
     constructor() {
@@ -15,18 +16,19 @@ export default class Actions extends Button {
         const staff = await players.findOne({ "connections.discord.id": user.id });
         if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You need to link your Minecraft account with \`/link\`!`)], ephemeral: true });
         if(!staff.canManagePlayersSync()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to perform this action!`)], ephemeral: true });
-        const uuid = message.embeds[0].fields[0].value.replaceAll(`\``, ``).match(uuidRegex)?.[0]?.replaceAll('-', '');
+        const uuid = message.embeds[0].fields[0].value.replaceAll(`\``, ``);
         if(!uuid) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
-        const player = await players.findOne({ uuid });
+        const strippedUUID = stripUUID(uuid);
+        const player = await players.findOne({ uuid: strippedUUID });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
 
         const embed = new EmbedBuilder()
             .setColor(0x5865f2)
-            .setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`)
+            .setThumbnail(`https://laby.net/texture/profile/head/${strippedUUID}.png?size=1024&overlay`)
             .setTitle(`Action menu`)
             .addFields({
                 name: `Target UUID`,
-                value: `\`\`\`${uuid}\`\`\``
+                value: `\`\`\`${strippedUUID}\`\`\``
             });
 
         const rows = [

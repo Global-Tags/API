@@ -3,13 +3,13 @@ import players from "../../../database/schemas/players";
 import fetchI18n from "../../../middleware/fetch-i18n";
 import getAuthProvider from "../../../middleware/get-auth-provider";
 import { sendReferralMessage } from "../../../libs/discord-notifier";
-import { getProfileByUUID } from "../../../libs/game-profiles";
+import { getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
 
 export default new Elysia({
     prefix: '/referral'
 }).use(fetchI18n).use(getAuthProvider).post('/', async ({ error, params, headers, i18n, provider }) => { // Refer to player
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll('-', '');
+    const uuid = stripUUID(params.uuid);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
     if(!session.uuid) return error(403, { error: i18n('error.notAllowed') });

@@ -12,14 +12,14 @@ import { config } from "../../../libs/config";
 import { Permission, permissions } from "../../../types/Permission";
 import { GlobalIcon } from "../../../types/GlobalIcon";
 import { GlobalPosition } from "../../../types/GlobalPosition";
-import { getProfileByUUID } from "../../../libs/game-profiles";
+import { formatUUID, getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
 
 const { validation } = config;
 const { min, max, blacklist, watchlist } = validation.tag;
 
 export default new Elysia()
 .use(fetchI18n).use(getAuthProvider).get(`/`, async ({ error, params, headers, i18n, provider, language }) => { // Get player info
-    const uuid = params.uuid.replaceAll(`-`, ``);
+    const uuid = stripUUID(params.uuid);
     let showBan = false;
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
     const { authorization } = headers;
@@ -79,7 +79,7 @@ export default new Elysia()
     headers: t.Object({ authorization: config.strictAuth ? t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) : t.Optional(t.String({ description: `Your LabyConnect JWT` })) }, { error: `error.notAllowed` }),
 }).get(`/history`, async ({ error, params, headers, i18n, provider }) => { // Get player's tag history
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
+    const uuid = stripUUID(params.uuid);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
     if(!session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n(`error.notAllowed`) });
@@ -108,7 +108,7 @@ export default new Elysia()
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` }),
 }).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Change tag
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
+    const uuid = stripUUID(params.uuid);
     const tag = body.tag.trim();
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
@@ -192,7 +192,7 @@ export default new Elysia()
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 }).post(`/watch`, async ({ error, params, headers, i18n, provider }) => { // Watch player
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
+    const uuid = stripUUID(params.uuid);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
     if(!session.hasPermission(Permission.ManageWatchlist)) return error(403, { error: i18n(`error.notAllowed`) });
@@ -231,7 +231,7 @@ export default new Elysia()
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 }).post(`/unwatch`, async ({ error, params, headers, i18n, provider }) => { // Unwatch player
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
+    const uuid = stripUUID(params.uuid);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
     if(!session.hasPermission(Permission.ManageWatchlist)) return error(403, { error: i18n(`error.notAllowed`) });
@@ -270,7 +270,7 @@ export default new Elysia()
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 }).delete(`/`, async ({ error, params, headers, i18n, provider }) => { // Delete tag
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
+    const uuid = stripUUID(params.uuid);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
     if(!session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n(`error.notAllowed`) });
@@ -311,11 +311,3 @@ export default new Elysia()
     params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 });
-
-export function formatUUID(uuid: string): string {
-    const cleanedUUID = uuid.replace(/-/g, "");
-    
-    if(cleanedUUID.length != 32) throw new Error("Invalid UUID length: Expected 32 characters without dashes.");
-    
-    return `${cleanedUUID.slice(0, 8)}-${cleanedUUID.slice(8, 12)}-${cleanedUUID.slice(12, 16)}-${cleanedUUID.slice(16, 20)}-${cleanedUUID.slice(20)}`;
-}

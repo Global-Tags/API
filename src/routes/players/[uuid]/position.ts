@@ -5,12 +5,13 @@ import getAuthProvider from "../../../middleware/get-auth-provider";
 import { Permission } from "../../../types/Permission";
 import { GlobalPosition } from "../../../types/GlobalPosition";
 import { pascalCase, snakeCase } from "change-case";
+import { stripUUID } from "../../../libs/game-profiles";
 
 export default new Elysia({
     prefix: "/position"
 }).use(fetchI18n).use(getAuthProvider).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Change tag position
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
+    const uuid = stripUUID(params.uuid);
     const position = body.position.toUpperCase();
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);

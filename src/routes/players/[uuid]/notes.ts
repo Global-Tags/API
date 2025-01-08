@@ -3,10 +3,9 @@ import players from "../../../database/schemas/players";
 import fetchI18n from "../../../middleware/fetch-i18n";
 import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
 import getAuthProvider from "../../../middleware/get-auth-provider";
-import { formatUUID } from "./root";
 import { config } from "../../../libs/config";
 import { Permission } from "../../../types/Permission";
-import { getProfileByUUID } from "../../../libs/game-profiles";
+import { formatUUID, getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
 
 const { validation } = config;
 
@@ -14,7 +13,7 @@ export default new Elysia({
     prefix: `/notes`
 }).use(fetchI18n).use(getAuthProvider).get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get notes
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
+    const uuid = stripUUID(params.uuid);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
     if(!session.hasPermission(Permission.ManageNotes)) return error(403, { error: i18n(`error.notAllowed`) });
@@ -43,7 +42,7 @@ export default new Elysia({
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 }).get(`/:id`, async ({ error, params, headers, i18n, provider }) => { // Get specific note
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
+    const uuid = stripUUID(params.uuid);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
     if(!session.hasPermission(Permission.ManageNotes)) return error(403, { error: i18n(`error.notAllowed`) });
@@ -76,7 +75,7 @@ export default new Elysia({
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 }).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Add note to player
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
+    const uuid = stripUUID(params.uuid);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
     if(!session.hasPermission(Permission.ManageNotes)) return error(403, { error: i18n(`error.notAllowed`) });
@@ -113,7 +112,7 @@ export default new Elysia({
     headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
 }).delete(`/:id`, async ({ error, params, headers, i18n, provider }) => { // Delete note
     if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = params.uuid.replaceAll(`-`, ``);
+    const uuid = stripUUID(params.uuid);
     const { authorization } = headers;
     const session = await provider.getSession(authorization, uuid);
     if(!session.hasPermission(Permission.ManageNotes)) return error(403, { error: i18n(`error.notAllowed`) });
