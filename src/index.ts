@@ -9,7 +9,6 @@ import access from "./middleware/access-log";
 import checkDatabase from "./middleware/database-checker";
 import Ratelimiter from "./libs/Ratelimiter";
 import checkRatelimit from "./middleware/ratelimit-checker";
-import { ip } from "./middleware/obtain-ip";
 import { load as loadLanguages } from "./libs/i18n";
 import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/fetch-i18n";
 import { getRequests, loadRequests } from "./libs/metrics";
@@ -25,6 +24,7 @@ import { startEntitlementExpiry, startMetrics, startReferralReset, startRoleCach
 import { config } from "./libs/config";
 import { join } from "path";
 import { formatUUID } from "./libs/game-profiles";
+import { ip } from "elysia-ip";
 
 if(config.mongodb.trim().length == 0) {
     Logger.error('Database connection string is empty!');
@@ -44,7 +44,7 @@ const elysia = new Elysia()
 .onRequest(checkDatabase)
 .onTransform(access)
 .onBeforeHandle(checkRatelimit)
-.use(ip({ checkHeaders: [config.ipHeader] }))
+.use(ip({ headersOnly: config.proxy.enabled, checkHeaders: [config.proxy.ipHeader] }))
 .use(cors())
 .use(fetchI18n)
 .use(getAuthProvider)
