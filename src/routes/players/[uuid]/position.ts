@@ -6,41 +6,43 @@ import { pascalCase, snakeCase } from "change-case";
 import { stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
-export default (app: ElysiaApp) => app.post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Change tag position
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
+export default (app: ElysiaApp) => app.post('/', async ({ session, body: { position }, params, i18n, error }) => { // Change tag position
+    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
+    if(!(pascalCase(position) in GlobalPosition)) return error(422, { error: i18n('position.invalid') });
+
+    position = snakeCase(position);
     const uuid = stripUUID(params.uuid);
-    const position = body.position.toUpperCase();
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n(`error.notAllowed`) });
-
     const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n(`error.noTag`) });
-    if(player.isBanned()) return error(403, { error: i18n(`error.banned`) });
-    if(!(pascalCase(position) in GlobalPosition)) return error(422, { error: i18n(`position.invalid`) });
-    if(snakeCase(position) == snakeCase(player.position)) return error(400, { error: i18n(`position.samePosition`) });
 
-    player.position = snakeCase(position);
-    await player.save();
+    if(player) {
+        if(player.isBanned()) return error(403, { error: i18n('error.banned') });
+        if(snakeCase(player.position) == position) return error(400, { error: i18n('position.samePosition') });
+
+        player.position = position;
+        await player.save();
+    } else {
+        await players.insertMany({
+            uuid,
+            position
+        });
+    }
 
     return { message: i18n(`position.success.${session.equal ? 'self' : 'admin'}`) };
 }, {
     detail: {
         tags: ['Settings'],
-        description: `Change your global tag's position`
+        description: 'Changes your GlobalTag position'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: `The tag position was successfully changed` }),
-        400: t.Object({ error: t.String() }, { description: `You provided an invalid position.` }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: `You're banned.` }),
-        404: t.Object({ error: t.String() }, { description: `You don't have a tag to change the position of.` }),
-        406: t.Object({ error: t.String() }, { description: `You tried to change your tag to the position it's already set to.` }),
-        422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
-        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        200: t.Object({ message: t.String() }, { description: 'The tag position was updated' }),
+        400: t.Object({ error: t.String() }, { description: 'You provided an invalid position' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to change your tag position' }),
+        409: t.Object({ error: t.String() }, { description: 'Your tag is already in that position' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ position: t.String({ error: `error.missingField;;[["field", "position"]]` }) }, { error: `error.invalidBody`, additionalProperties: true }),
-    params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
+    body: t.Object({ position: t.String({ error: 'error.missingField;;[["field", "position"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
+    params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 });

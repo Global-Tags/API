@@ -12,17 +12,13 @@ export function generateSecureCode(length: number = 10) {
     return randomBytes(length).toString('hex').slice(0, length);
 }
 
-export default (app: ElysiaApp) => app.post(`/discord`, async ({ error, params, headers, i18n, provider }) => { // Get a linking code
+export default (app: ElysiaApp) => app.post('/discord', async ({ session, params, i18n, error }) => { // Get a discord linking code
     if(!config.discordBot.notifications.accountConnections.enabled) return error(409, { error: i18n('connections.discord.disabled') });
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = stripUUID(params.uuid);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.equal) return error(403, { error: i18n(`error.notAllowed`) });
+    if(!session?.equal) return error(403, { error: i18n('error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n(`error.noTag`) });
-    if(player.connections.discord.id) return error(400, { error: i18n(`connections.discord.alreadyConnected`) });
+    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    if(!player) return error(404, { error: i18n('error.noTag') });
+    if(player.connections.discord.id) return error(409, { error: i18n('connections.discord.alreadyConnected') });
     if(player.connections.discord.code) return { code: player.connections.discord.code };
 
     player.connections.discord.code = generateSecureCode();
@@ -32,32 +28,26 @@ export default (app: ElysiaApp) => app.post(`/discord`, async ({ error, params, 
 }, {
     detail: {
         tags: ['Connections'],
-        description: `Receive a code to link your Discord account with '/link' on the discord server`
+        description: 'Returns a code to link your Discord account with \'/link\' with the bot'
     },
     response: {
-        200: t.Object({ code: t.String() }, { description: `You received a linking code.` }),
-        400: t.Object({ error: t.String() }, { description: `You already have a Discord account connected.` }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: `You're now allowed to manage connections for this player.` }),
-        404: t.Object({ error: t.String() }, { description: `You don't have a GlobalTags account.` }),
-        409: t.Object({ error: t.String() }, { description: `Account linking is deactivated.` }),
-        422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
-        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        200: t.Object({ code: t.String() }, { description: 'You received a linking code' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage connections for this player' }),
+        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account.' }),
+        409: t.Object({ error: t.String() }, { description: 'Account linking is deactivated / You already have a Discord account connected' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).delete(`/discord`, async ({ error, params, headers, i18n, provider }) => { // Change icon
+    params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+}).delete('/discord', async ({ session, params, i18n, error }) => { // Unlink discord account
     if(!config.discordBot.notifications.accountConnections.enabled) return error(409, { error: i18n('connections.discord.disabled') });
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = stripUUID(params.uuid);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.equal) return error(403, { error: i18n(`error.notAllowed`) });
+    if(!session?.equal) return error(403, { error: i18n('error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n(`error.noTag`) });
-    if(!player.connections.discord.id && !player.connections.discord.code) return error(400, { error: i18n(`connections.discord.notConnected`) });
+    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    if(!player) return error(404, { error: i18n('error.noTag') });
+    if(!player.connections.discord.id && !player.connections.discord.code) return error(409, { error: i18n('connections.discord.notConnected') });
 
     sendDiscordLinkMessage(
         await getProfileByUUID(player.uuid),
@@ -73,32 +63,26 @@ export default (app: ElysiaApp) => app.post(`/discord`, async ({ error, params, 
 }, {
     detail: {
         tags: ['Connections'],
-        description: `Unlink your connected discord account.`
+        description: 'Unlinks your connected discord account'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: `Your account was successfully unlinked.` }),
-        400: t.Object({ error: t.String() }, { description: `You don't have a Discord account connected.` }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: `You're now allowed to manage connections for this player.` }),
-        404: t.Object({ error: t.String() }, { description: `You don't have a GlobalTags account.` }),
-        409: t.Object({ error: t.String() }, { description: `Account linking is deactivated.` }),
-        422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
-        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        200: t.Object({ message: t.String() }, { description: 'Your account was unlinked' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage connections for this player' }),
+        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account.' }),
+        409: t.Object({ error: t.String() }, { description: 'Account linking is deactivated / You don\'t have a Discord account connected' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).use(getAuthProvider).post(`/email`, async ({ error, params, headers, body: { email }, i18n, provider }) => { // Send verification email
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = stripUUID(params.uuid);
-    const { authorization } = headers;
+    params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+}).use(getAuthProvider).post('/email', async ({ session, body: { email }, params, i18n, error }) => { // Send verification email
+    if(!session?.equal) return error(403, { error: i18n('error.notAllowed') });
     email = email.trim();
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.equal) return error(403, { error: i18n(`error.notAllowed`) });
 
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n(`error.noTag`) });
-    if(player.connections.email.address) return error(400, { error: i18n(`connections.email.alreadyConnected`) });
+    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    if(!player) return error(404, { error: i18n('error.noTag') });
+    if(player.connections.email.address) return error(409, { error: i18n('connections.email.alreadyConnected') });
 
     player.connections.email.address = email;
     player.connections.email.code = generateSecureCode();
@@ -123,32 +107,27 @@ export default (app: ElysiaApp) => app.post(`/discord`, async ({ error, params, 
 }, {
     detail: {
         tags: ['Connections'],
-        description: `Sends a verification email to your email address.`
+        description: 'Sends a verification email to your email address'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: `The verification email was sent.` }),
-        400: t.Object({ error: t.String() }, { description: `You already have an email address linked.` }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: `You're now allowed to manage connections for this player.` }),
-        404: t.Object({ error: t.String() }, { description: `You don't have a GlobalTags account.` }),
-        422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
-        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        200: t.Object({ message: t.String() }, { description: 'The verification email was sent' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage connections for this player' }),
+        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account.' }),
+        409: t.Object({ error: t.String() }, { description: 'You already have an email address linked' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ email: t.String({ error: 'connections.email.invalidEmail', format: 'email' }) }, { error: `error.invalidBody`, additionalProperties: true }),
-    params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).use(getAuthProvider).post(`/email/:code`, async ({ error, params, headers, i18n, provider }) => { // Send verification email
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = stripUUID(params.uuid);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.equal) return error(403, { error: i18n(`error.notAllowed`) });
+    body: t.Object({ email: t.String({ error: 'connections.email.invalidEmail', format: 'email' }) }, { error: 'error.invalidBody', additionalProperties: true }),
+    params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+}).use(getAuthProvider).post('/email/:code', async ({ session, params, i18n, error }) => { // Verify email
+    if(!session?.equal) return error(403, { error: i18n('error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n(`error.noTag`) });
-    if(player.isEmailVerified()) return error(400, { error: i18n(`connections.email.alreadyConnected`) });
-    if(player.connections.email.code !== params.code) return error(403, { error: i18n(`connections.email.invalidCode`) });
+    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    if(!player) return error(404, { error: i18n('error.noTag') });
+    if(player.isEmailVerified()) return error(409, { error: i18n('connections.email.alreadyConnected') });
+    if(player.connections.email.code != params.code) return error(403, { error: i18n('connections.email.invalidCode') });
 
     player.connections.email.code = null;
     await player.save();
@@ -176,30 +155,26 @@ export default (app: ElysiaApp) => app.post(`/discord`, async ({ error, params, 
 }, {
     detail: {
         tags: ['Connections'],
-        description: `Sends a verification email to your email address.`
+        description: 'Verifies the verification code sent to your inbox'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: `Your email was successfully verified.` }),
-        400: t.Object({ error: t.String() }, { description: `You already have an email address linked.` }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: `You're now allowed to manage connections for this player.` }),
-        404: t.Object({ error: t.String() }, { description: `You don't have a GlobalTags account.` }),
-        422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
-        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        200: t.Object({ message: t.String() }, { description: 'Your email address was verified' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage connections for this player' }),
+        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account' }),
+        409: t.Object({ error: t.String() }, { description: 'You already have an email address linked' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    params: t.Object({ uuid: t.String({ description: `Your UUID` }), code: t.String({ description: 'Your verification code' }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).delete(`/email`, async ({ error, params, headers, i18n, provider }) => { // Change icon
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
+    params: t.Object({ uuid: t.String({ description: 'Your UUID' }), code: t.String({ description: 'Your verification code' }) }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+}).delete('/email', async ({ session, params, i18n, error }) => { // Unlink email
+    if(!session?.equal) return error(403, { error: i18n('error.notAllowed') });
     const uuid = stripUUID(params.uuid);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.equal) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n(`error.noTag`) });
-    if(!player.connections.email.address && !player.connections.email.code) return error(400, { error: i18n(`connections.email.notConnected`) });
+    if(!player) return error(404, { error: i18n('error.noTag') });
+    if(!player.connections.email.address && !player.connections.email.code) return error(400, { error: i18n('connections.email.notConnected') });
 
     sendEmailLinkMessage(
         await getProfileByUUID(player.uuid),
@@ -215,18 +190,17 @@ export default (app: ElysiaApp) => app.post(`/discord`, async ({ error, params, 
 }, {
     detail: {
         tags: ['Connections'],
-        description: `Unlink your email.`
+        description: 'Unlinks your email'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: `Your email was successfully unlinked.` }),
-        400: t.Object({ error: t.String() }, { description: `You don't have an email address connected.` }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: `You're now allowed to manage connections for this player.` }),
-        404: t.Object({ error: t.String() }, { description: `You don't have a GlobalTags account.` }),
-        422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
-        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        200: t.Object({ message: t.String() }, { description: 'Your email was unlinked' }),
+        400: t.Object({ error: t.String() }, { description: 'You don\'t have an email address connected' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage connections for this player' }),
+        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
+    params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 });

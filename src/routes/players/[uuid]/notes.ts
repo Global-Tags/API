@@ -8,14 +8,10 @@ import { ElysiaApp } from "../../..";
 
 const { validation } = config;
 
-export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get notes
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = stripUUID(params.uuid);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.hasPermission(Permission.ManageNotes)) return error(403, { error: i18n(`error.notAllowed`) });
+export default (app: ElysiaApp) => app.get(`/`, async ({ session, params, i18n, error }) => { // Get notes
+    if(!session?.hasPermission(Permission.ManageNotes)) return error(403, { error: i18n('error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
+    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
 
     return player.notes.map((note) => ({
@@ -27,26 +23,23 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
 }, {
     detail: {
         tags: ['Admin'],
-        description: `Get all notes of a player`
+        description: 'Returns all player notes'
     },
     response: {
-        200: t.Array(t.Object({ id: t.String(), text: t.String(), author: t.String(), createdAt: t.Number() }), { description: `The notes of the player.` }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: "You're not allowed to manage notes." }),
-        404: t.Object({ error: t.String() }, { description: "The player you tried to get the notes of was not found." })
+        200: t.Array(t.Object({ id: t.String(), text: t.String(), author: t.String(), createdAt: t.Number() }), { description: 'The notes of the player' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage notes' }),
+        404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to get the notes of.' }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).get(`/:id`, async ({ error, params, headers, i18n, provider }) => { // Get specific note
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = stripUUID(params.uuid);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.hasPermission(Permission.ManageNotes)) return error(403, { error: i18n(`error.notAllowed`) });
+    params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+}).get(`/:id`, async ({ session, params: { uuid, id }, i18n, error }) => { // Get specific note
+    if(!session?.hasPermission(Permission.ManageNotes)) return error(403, { error: i18n('error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
+    const player = await players.findOne({ uuid: stripUUID(uuid) });
     if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
-    const { id } = params;
 
     const note = player.notes.find((note) => note.id == id);
     if(!note) return error(404, { error: i18n(`notes.delete.not_found`) });
@@ -60,26 +53,24 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
 }, {
     detail: {
         tags: ['Admin'],
-        description: `Get a specific note from a player`
+        description: 'Returns a specific player note'
     },
     response: {
         200: t.Object({ id: t.String(), text: t.String(), author: t.String(), createdAt: t.Number() }, { description: 'The note info' }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: "You're not allowed to manage notes." }),
-        404: t.Object({ error: t.String() }, { description: "The player or the note was not found." })
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage notes' }),
+        404: t.Object({ error: t.String() }, { description: 'The player or the note was not found' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to get the note of.' }), id: t.String({ description: 'The ID of the note you want to get.' }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Add note to player
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
+    params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }), id: t.String({ description: 'The note ID' }) }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+}).post(`/`, async ({ session, body: { note }, params, i18n, error }) => { // Add note to player
+    if(!session?.hasPermission(Permission.ManageNotes)) return error(403, { error: i18n('error.notAllowed') });
     const uuid = stripUUID(params.uuid);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.hasPermission(Permission.ManageNotes)) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
-    const { note } = body;
 
     player.createNote({ text: note, author: session.uuid! });
     await player.save();
@@ -96,27 +87,25 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
 }, {
     detail: {
         tags: ['Admin'],
-        description: `Add a note to a player`
+        description: 'Creates a player note'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: 'The note was successfully added.' }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: "You're not allowed to manage notes." }),
-        404: t.Object({ error: t.String() }, { description: "The player you tried to add a note to was not found." })
+        200: t.Object({ message: t.String() }, { description: 'The note was created' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage notes' }),
+        404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ note: t.String({ maxLength: validation.notes.maxLength, error: `note.create.max_length;;[["max", "${validation.notes.maxLength}"]]` }) }, { error: `error.invalidBody`, additionalProperties: true }),
-    params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to add a note to.' }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).delete(`/:id`, async ({ error, params, headers, i18n, provider }) => { // Delete note
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = stripUUID(params.uuid);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.hasPermission(Permission.ManageNotes)) return error(403, { error: i18n(`error.notAllowed`) });
+    body: t.Object({ note: t.String({ maxLength: validation.notes.maxLength, error: `note.create.max_length;;[["max", "${validation.notes.maxLength}"]]` }) }, { error: 'error.invalidBody', additionalProperties: true }),
+    params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+}).delete(`/:id`, async ({ session, params: { uuid, id }, i18n, error }) => { // Delete note
+    if(!session?.hasPermission(Permission.ManageNotes)) return error(403, { error: i18n('error.notAllowed') });
+    uuid = stripUUID(uuid);
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
-    const { id } = params;
 
     const note = player.notes.find((note) => note.id == id);
     if(!note) return error(404, { error: i18n(`notes.delete.not_found`) });
@@ -136,14 +125,16 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
 }, {
     detail: {
         tags: ['Admin'],
-        description: `Delete a note from a player`
+        description: 'Deletes a specific player note'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: 'The note was successfully deleted.' }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: "You're not allowed to manage notes." }),
-        404: t.Object({ error: t.String() }, { description: "The player or the note was not found." })
+        200: t.Object({ message: t.String() }, { description: 'The note was deleted' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage notes' }),
+        404: t.Object({ error: t.String() }, { description: 'The player or the note was not found' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to delete the note of.' }), id: t.String({ description: 'The ID of the note you want to delete.' }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
+    params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }), id: t.String({ description: 'The note ID' }) }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 });

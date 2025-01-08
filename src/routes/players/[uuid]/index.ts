@@ -17,20 +17,16 @@ import { ElysiaApp } from "../../..";
 const { validation } = config;
 const { min, max, blacklist, watchlist } = validation.tag;
 
-export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers, i18n, provider, language }) => { // Get player info
-    const uuid = stripUUID(params.uuid);
+export default (app: ElysiaApp) => app.get('/', async ({ session, language, params, i18n, error }) => { // Get player info
     let showBan = false;
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!!session.uuid && !!language) saveLastLanguage(session.uuid, language);
+    if(!!session?.uuid && !!language) saveLastLanguage(session.uuid, language);
     if(config.strictAuth) {
-        if(!session.uuid) return error(403, { error: i18n(`error.notAllowed`) });
+        if(!session?.uuid) return error(403, { error: i18n('error.notAllowed') });
         showBan = session.equal || session.hasPermission(Permission.ManageBans);
     }
 
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n(`error.playerNoTag`) });
+    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    if(!player) return error(404, { error: i18n('error.playerNoTag') });
 
     if(snakeCase(player.icon.name) == snakeCase(GlobalIcon[GlobalIcon.Custom])) {
         if(!(await player.hasPermission(Permission.CustomIcon))) {
@@ -64,27 +60,22 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
 }, {
     detail: {
         tags: ['Interactions'],
-        description: `Get another players' tag info`
+        description: 'Returns a players\' tag info'
     },
     response: {
-        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referrals: t.Object({ has_referred: t.Boolean(), total_referrals: t.Integer(), current_month_referrals: t.Integer() }), roleIcon: t.Union([t.String(), t.Null()]), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]) }), t.Null()]) }, { description: `You received the tag data.` }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: `The player is banned.` }),
-        404: t.Object({ error: t.String() }, { description: `The player is not in the database.` }),
-        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referrals: t.Object({ has_referred: t.Boolean(), total_referrals: t.Integer(), current_month_referrals: t.Integer() }), roleIcon: t.Union([t.String(), t.Null()]), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]) }), t.Null()]) }, { description: 'The tag data' }),
+        403: t.Object({ error: t.String() }, { description: 'The player is banned' }),
+        404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    params: t.Object({ uuid: t.String({ description: `The uuid of the player you want to fetch the info of` }) }),
-    headers: t.Object({ authorization: config.strictAuth ? t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) : t.Optional(t.String({ description: `Your LabyConnect JWT` })) }, { error: `error.notAllowed` }),
-}).get(`/history`, async ({ error, params, headers, i18n, provider }) => { // Get player's tag history
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = stripUUID(params.uuid);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n(`error.notAllowed`) });
+    params: t.Object({ uuid: t.String({ description: 'The uuid of the player you want to fetch the info of' }) }),
+    headers: t.Object({ authorization: config.strictAuth ? t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) : t.Optional(t.String({ description: 'Your authentication token' })) }, { error: 'error.notAllowed' }),
+}).get('/history', async ({ session, params, i18n, error }) => { // Get player's tag history
+    if(!session || session?.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n(`error.playerNoTag`) });
+    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    if(!player) return error(404, { error: i18n('error.playerNoTag') });
 
     return player.history.map((tag) => ({
         tag,
@@ -93,25 +84,20 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
 }, {
     detail: {
         tags: ['Interactions'],
-        description: `Get another players' tag history`
+        description: 'Returns a players\' tag history'
     },
     response: {
-        200: t.Array(t.Object({ tag: t.String(), flaggedWords: t.Array(t.String()) }), { description: `You received the tag history.` }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: `The player is banned.` }),
-        404: t.Object({ error: t.String() }, { description: `The player is not in the database.` }),
-        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        200: t.Array(t.Object({ tag: t.String(), flaggedWords: t.Array(t.String()) }), { description: 'The tag history' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage tags' }),
+        404: t.Object({ error: t.String() }, { description: 'The player is not in the database' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    params: t.Object({ uuid: t.String({ description: `The uuid of the player you want to fetch the info of` }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` }),
-}).post(`/`, async ({ error, params, headers, body, i18n, provider }) => { // Change tag
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
+    params: t.Object({ uuid: t.String({ description: 'The uuid of the player you want to fetch the info of' }) }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' }),
+}).post('/', async ({ session, body: { tag }, params, i18n, error }) => { // Change tag
     const uuid = stripUUID(params.uuid);
-    const tag = body.tag.trim();
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n(`error.notAllowed`) });
+    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid });
     if(player && player.isBanned()) return error(403, { error: i18n(`error.${session.equal ? 'b' : 'playerB'}anned`) });
@@ -120,10 +106,10 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
     let notifyWatch = true;
     if(!session.hasPermission(Permission.BypassValidation)) {
         const strippedTag = stripColors(tag);
-        if(strippedTag == '') return error(422, { error: i18n(`setTag.empty`) });
-        if(strippedTag.length < min || strippedTag.length > max) return error(422, { error: i18n(`setTag.validation`).replace('<min>', String(min)).replace('<max>', String(max)) });
+        if(strippedTag == '') return error(422, { error: i18n('setTag.empty') });
+        if(strippedTag.length < min || strippedTag.length > max) return error(422, { error: i18n('setTag.validation').replace('<min>', String(min)).replace('<max>', String(max)) });
         const blacklistedWord = blacklist.find((word) => strippedTag.toLowerCase().includes(word));
-        if(blacklistedWord) return error(422, { error: i18n(`setTag.blacklisted`).replaceAll(`<word>`, blacklistedWord) });
+        if(blacklistedWord) return error(422, { error: i18n('setTag.blacklisted').replaceAll('<word>', blacklistedWord) });
         isWatched = (player && player.watchlist) || watchlist.some(async (word) => {
             if(strippedTag.toLowerCase().includes(word)) {
                 Logger.warn(`Now watching ${uuid} for matching "${word}" in "${tag}".`);
@@ -145,7 +131,7 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
             history: [tag]
         });
     } else {
-        if(player.tag == tag) return error(400, { error: i18n(`setTag.sameTag`) });
+        if(player.tag == tag) return error(409, { error: i18n('setTag.sameTag') });
 
         player.tag = tag;
         if(isWatched) player.watchlist = true;
@@ -175,112 +161,28 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
 }, {
     detail: {
         tags: ['Settings'],
-        description: `Change your global tag`
+        description: 'Changes your global tag'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: `The player was successfully reported` }),
-        400: t.Object({ error: t.String() }, { description: `You already have this tag.` }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: `You're banned.` }),
-        422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
-        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        200: t.Object({ message: t.String() }, { description: 'Your tag was changed' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re banned.' }),
+        409: t.Object({ error: t.String() }, { description: 'You already have this tag' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
-    body: t.Object({ tag: t.String({ error: `error.wrongType;;[["field", "tag"], ["type", "string"]]` }) }, { error: `error.invalidBody`, additionalProperties: true }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).post(`/watch`, async ({ error, params, headers, i18n, provider }) => { // Watch player
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
+    params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
+    body: t.Object({ tag: t.String({ error: 'error.wrongType;;[["field", "tag"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+}).delete('/', async ({ session, params, i18n, error }) => { // Delete tag
+    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
     const uuid = stripUUID(params.uuid);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.hasPermission(Permission.ManageWatchlist)) return error(403, { error: i18n(`error.notAllowed`) });
-    
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
-    if(player.watchlist) return error(400, { error: i18n(`watch.alreadyWatched`) });
-
-    player.watchlist = true;
-    await player.save();
-    
-    sendModLogMessage({
-        logType: ModLogType.Watch,
-        staff: await getProfileByUUID(session.uuid!),
-        user: await getProfileByUUID(uuid),
-        discord: false
-    });
-
-    return { message: i18n(`watch.success`) };
-}, {
-    detail: {
-        tags: ['Admin'],
-        description: `Watch a player`
-    },
-    response: {
-        200: t.Object({ message: t.String() }, { description: `The player is on the watchlist now.` }),
-        400: t.Object({ error: t.String() }, { description: `The player is already on the watchlist.` }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: `You're not an admin.` }),
-        404: t.Object({ error: t.String() }, { description: `The player was not found.` }),
-        422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
-        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
-    },
-    params: t.Object({ uuid: t.String({ description: `The player's UUID` }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).post(`/unwatch`, async ({ error, params, headers, i18n, provider }) => { // Unwatch player
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = stripUUID(params.uuid);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.hasPermission(Permission.ManageWatchlist)) return error(403, { error: i18n(`error.notAllowed`) });
-    
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
-    if(!player.watchlist) return error(400, { error: i18n(`unwatch.notWatched`) });
-
-    player.watchlist = false;
-    await player.save();
-    
-    sendModLogMessage({
-        logType: ModLogType.Unwatch,
-        staff: await getProfileByUUID(session.uuid!),
-        user: await getProfileByUUID(uuid),
-        discord: false
-    });
-
-    return { message: i18n(`unwatch.success`) };
-}, {
-    detail: {
-        tags: ['Admin'],
-        description: `Unwatch a player`
-    },
-    response: {
-        200: t.Object({ message: t.String() }, { description: `The player is no longer on the watchlist.` }),
-        400: t.Object({ error: t.String() }, { description: `The player is not on the watchlist.` }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: `You're not an admin.` }),
-        404: t.Object({ error: t.String() }, { description: `The player was not found.` }),
-        422: t.Object({ error: t.String() }, { description: `You're lacking the validation requirements.` }),
-        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
-    },
-    params: t.Object({ uuid: t.String({ description: `The player's UUID` }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
-}).delete(`/`, async ({ error, params, headers, i18n, provider }) => { // Delete tag
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const uuid = stripUUID(params.uuid);
-    const { authorization } = headers;
-    const session = await provider.getSession(authorization, uuid);
-    if(!session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n(`error.notAllowed`) });
 
     const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n(`error.noTag`) });
+    if(!player) return error(404, { error: i18n('error.noTag') });
     if(player.isBanned()) return error(403, { error: i18n(`error.${session.equal ? 'b' : 'playerB'}anned`) });
-    if(!player.tag) return error(404, { error: i18n(`error.noTag`) });
-    const oldTag = player.tag;
+    if(!player.tag) return error(404, { error: i18n('error.noTag') });
 
-    player.tag = null;
     if(!session.equal) {
         sendModLogMessage({
             logType: ModLogType.ClearTag,
@@ -289,24 +191,24 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
             discord: false
         });
         player.clearTag(session.uuid!);
-        sendTagClearEmail(player.connections.email.address!, oldTag, getI18nFunctionByLanguage(player.last_language));
+        sendTagClearEmail(player.connections.email.address!, player.tag, getI18nFunctionByLanguage(player.last_language));
     }
+    player.tag = null;
     await player.save();
 
     return { message: i18n(`resetTag.success.${session.equal ? 'self' : 'admin'}`) };
 }, {
     detail: {
         tags: ['Settings'],
-        description: `Delete your global tag`
+        description: 'Deletes your global tag'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: `The player was successfully reported` }),
-        401: t.Object({ error: t.String() }, { description: "You've passed a malformed authorization header." }),
-        403: t.Object({ error: t.String() }, { description: `You're banned.` }),
-        404: t.Object({ error: t.String() }, { description: `You don't have a tag.` }),
-        429: t.Object({ error: t.String() }, { description: `You're ratelimited.` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        200: t.Object({ message: t.String() }, { description: 'Your tag was deleted' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re banned' }),
+        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    params: t.Object({ uuid: t.String({ description: `Your UUID` }) }),
-    headers: t.Object({ authorization: t.String({ error: `error.notAllowed`, description: `Your LabyConnect JWT` }) }, { error: `error.notAllowed` })
+    params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 });

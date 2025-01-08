@@ -6,10 +6,8 @@ import { snakeCase } from "change-case";
 import { getProfileByUUID } from "../libs/game-profiles";
 import { ElysiaApp } from "..";
 
-export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers, i18n, provider }) => { // Get roles
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const session = await provider.getSession(headers.authorization);
-    if(!session.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n(`error.notAllowed`) });
+export default (app: ElysiaApp) => app.get(`/`, async ({ session, i18n, error }) => { // Get roles
+    if(!session?.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
 
     return getCachedRoles().map((role) => ({
         name: role.name,
@@ -24,18 +22,14 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
     },
     response: {
         200: t.Array(t.Object({ name: t.String(), position: t.Integer(), hasIcon: t.Boolean(), permissions: t.Array(t.String()) }), { description: 'An array of all roles' }),
-        401: t.Object({ error: t.String() }, { description: 'You\'ve passed a malformed authorization header' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: `Your LabyConnect JWT` }) }, { error: 'error.notAllowed' })
-}).get(`/:name`, async ({ error, params, headers, i18n, provider }) => { // Get specific role
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const session = await provider.getSession(headers.authorization);
-    if(!session.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
-
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+}).get(`/:name`, async ({ session, params, i18n, error }) => { // Get specific role
+    if(!session?.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
     const name = snakeCase(decodeURIComponent(params.name));
 
     const role = getCachedRoles().find((role) => snakeCase(role.name) == name);
@@ -54,7 +48,6 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
     },
     response: {
         200: t.Object({ name: t.String(), position: t.Integer(), hasIcon: t.Boolean(), permissions: t.Array(t.String()) }, { description: 'The role info' }),
-        401: t.Object({ error: t.String() }, { description: 'You\'ve passed a malformed authorization header' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
         404: t.Object({ error: t.String() }, { description: 'There is no role with the name you provided' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
@@ -62,11 +55,9 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ name: t.String({ description: 'The role name' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: `Your LabyConnect JWT` }) }, { error: 'error.notAllowed' })
-}).post(`/`, async ({ error, headers, body, i18n, provider }) => { // Create role
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const session = await provider.getSession(headers.authorization);
-    if(!session.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+}).post(`/`, async ({ session, body, i18n, error }) => { // Create role
+    if(!session?.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
 
     const name = snakeCase(body.name.trim());
     if(getCachedRoles().find((role) => snakeCase(role.name) == name)) return error(409, { error: i18n('roles.create.already_exists').replaceAll('<role>', name) });
@@ -94,7 +85,6 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
     },
     response: {
         200: t.Object({ message: t.String() }, { description: 'The role was created successfully' }),
-        401: t.Object({ error: t.String() }, { description: 'You\'ve passed a malformed authorization header' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
         409: t.Object({ error: t.String() }, { description: 'A role with the provided name already exists' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
@@ -102,11 +92,9 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     body: t.Object({ name: t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: `Your LabyConnect JWT` }) }, { error: 'error.notAllowed' })
-}).delete(`/:name`, async ({ error, params, headers, i18n, provider }) => { // Delete role
-    if(!provider) return error(401, { error: i18n('error.malformedAuthHeader') });
-    const session = await provider.getSession(headers.authorization);
-    if(!session.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+}).delete(`/:name`, async ({ session, params, i18n, error }) => { // Delete role
+    if(!session?.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
 
     const name = snakeCase(decodeURIComponent(params.name));
 
@@ -131,7 +119,6 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
     },
     response: {
         200: t.Object({ message: t.String() }, { description: 'The role was deleted successfully' }),
-        401: t.Object({ error: t.String() }, { description: 'You\'ve passed a malformed authorization header' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
         404: t.Object({ error: t.String() }, { description: 'There is no role with the name you provided' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
@@ -139,5 +126,5 @@ export default (app: ElysiaApp) => app.get(`/`, async ({ error, params, headers,
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ name: t.String({ description: 'The role name' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: `Your LabyConnect JWT` }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 });
