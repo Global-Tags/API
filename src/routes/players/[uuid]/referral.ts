@@ -3,7 +3,7 @@ import players from "../../../database/schemas/players";
 import fetchI18n from "../../../middleware/fetch-i18n";
 import getAuthProvider from "../../../middleware/get-auth-provider";
 import { sendReferralMessage } from "../../../libs/discord-notifier";
-import { getProfileByUUID } from "../../../libs/mojang";
+import { getProfileByUUID } from "../../../libs/game-profiles";
 
 export default new Elysia({
     prefix: '/referral'

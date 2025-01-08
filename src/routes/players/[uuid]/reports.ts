@@ -5,7 +5,7 @@ import getAuthProvider from "../../../middleware/get-auth-provider";
 import { formatUUID } from "./root";
 import { Permission } from "../../../types/Permission";
 import { sendReportMessage } from "../../../libs/discord-notifier";
-import { getProfileByUUID } from "../../../libs/mojang";
+import { getProfileByUUID } from "../../../libs/game-profiles";
 
 export default new Elysia({
     prefix: "/reports"

@@ -6,7 +6,7 @@ import { Permission } from "../../types/Permission";
 import roles, { getCachedRoles, getNextPosition, updateRoleCache } from "../../database/schemas/roles";
 import { snakeCase } from "change-case";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { getProfileByUUID } from "../../libs/mojang";
+import { getProfileByUUID } from "../../libs/game-profiles";
 
 export default class RenameRole extends Modal {
     constructor() {

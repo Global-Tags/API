@@ -5,7 +5,7 @@ import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { getCachedRoles, updateRoleCache } from "../../database/schemas/roles";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { getProfileByUUID } from "../../libs/mojang";
+import { getProfileByUUID } from "../../libs/game-profiles";
 import { config } from "../../libs/config";
 
 export default class RenameRole extends Button {

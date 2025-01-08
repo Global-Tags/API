@@ -3,7 +3,7 @@ import Command from "../structs/Command";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { config } from "../../libs/config";
-import { getProfileByUUID } from "../../libs/mojang";
+import { getProfileByUUID } from "../../libs/game-profiles";
 import { onDiscordUnlink } from "../../libs/events";
 
 export default class Unlink extends Command {

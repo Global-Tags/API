@@ -5,7 +5,7 @@ import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { getCachedRoles } from "../../database/schemas/roles";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { getProfileByUUID } from "../../libs/mojang";
+import { getProfileByUUID } from "../../libs/game-profiles";
 
 export default class ToggleIcon extends Button {
     constructor() {

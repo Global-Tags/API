@@ -5,7 +5,7 @@ import { ModLogType, sendBanAppealMessage, sendModLogMessage } from "../../../li
 import getAuthProvider from "../../../middleware/get-auth-provider";
 import { sendBanEmail, sendUnbanEmail } from "../../../libs/mailer";
 import { Permission } from "../../../types/Permission";
-import { getProfileByUUID } from "../../../libs/mojang";
+import { getProfileByUUID } from "../../../libs/game-profiles";
 
 export default new Elysia({
     prefix: `/ban`

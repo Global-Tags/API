@@ -1,6 +1,6 @@
 import * as bot from "../bot/bot";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
-import { Profile } from "./mojang";
+import { Profile } from "./game-profiles";
 import { getCustomIconUrl } from "../routes/players/[uuid]/icon";
 import { capitalCase } from "change-case";
 import { config } from "./config";

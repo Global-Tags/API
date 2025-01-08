@@ -6,7 +6,7 @@ import getAuthProvider from "../../../middleware/get-auth-provider";
 import { formatUUID } from "./root";
 import { config } from "../../../libs/config";
 import { Permission } from "../../../types/Permission";
-import { getProfileByUUID } from "../../../libs/mojang";
+import { getProfileByUUID } from "../../../libs/game-profiles";
 
 const { validation } = config;
 

@@ -7,7 +7,7 @@ import { getCachedRoles, updateRoleCache } from "../../database/schemas/roles";
 import { capitalCase } from "change-case";
 import { config } from "../../libs/config";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { getProfileByUUID } from "../../libs/mojang";
+import { getProfileByUUID } from "../../libs/game-profiles";
 
 export default class ManagePermissions extends SelectMenu {
     constructor() {

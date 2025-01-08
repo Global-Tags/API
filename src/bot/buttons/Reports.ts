@@ -2,7 +2,7 @@ import { ButtonInteraction, Message, GuildMember, User, ButtonBuilder, ActionRow
 import Button from "../structs/Button";
 import { colors } from "../bot";
 import players from "../../database/schemas/players";
-import { getProfileByUUID } from "../../libs/mojang";
+import { getProfileByUUID } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 
 export default class Reports extends Button {

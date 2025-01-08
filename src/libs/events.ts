@@ -1,7 +1,7 @@
 import { fetchGuild } from "../bot/bot";
 import { config } from "./config";
 import { sendDiscordLinkMessage } from "./discord-notifier";
-import { Profile } from "./mojang";
+import { Profile } from "./game-profiles";
 
 export async function onDiscordLink(player: Profile, userId: string) {
     sendDiscordLinkMessage(

@@ -10,7 +10,7 @@ import { config } from "../../libs/config";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon } from "../../types/GlobalIcon";
 import { sendCustomIconUploadMessage } from "../../libs/discord-notifier";
-import { getProfileByUUID } from "../../libs/mojang";
+import { getProfileByUUID } from "../../libs/game-profiles";
 
 export default class CustomIcon extends Command {
     constructor() {

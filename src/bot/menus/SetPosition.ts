@@ -7,7 +7,7 @@ import { snakeCase } from "change-case";
 import { sendPositionChangeEmail } from "../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID } from "../../libs/mojang";
+import { getProfileByUUID } from "../../libs/game-profiles";
 
 export default class SetPosition extends SelectMenu {
     constructor() {

@@ -4,7 +4,7 @@ import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { sendDiscordLinkMessage } from "../../libs/discord-notifier";
 import { config } from "../../libs/config";
-import { getProfileByUUID } from "../../libs/mojang";
+import { getProfileByUUID } from "../../libs/game-profiles";
 import { onDiscordLink } from "../../libs/events";
 
 export default class Link extends Command {

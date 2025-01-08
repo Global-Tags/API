@@ -6,7 +6,7 @@ import { sendEmail } from "../../../libs/mailer";
 import { randomBytes } from "crypto";
 import { config } from "../../../libs/config";
 import { sendDiscordLinkMessage, sendEmailLinkMessage } from "../../../libs/discord-notifier";
-import { getProfileByUUID } from "../../../libs/mojang";
+import { getProfileByUUID } from "../../../libs/game-profiles";
 
 export function generateSecureCode(length: number = 10) {
     return randomBytes(length).toString('hex').slice(0, length);

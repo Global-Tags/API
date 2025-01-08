@@ -12,7 +12,7 @@ import { config } from "../../../libs/config";
 import { Permission, permissions } from "../../../types/Permission";
 import { GlobalIcon } from "../../../types/GlobalIcon";
 import { GlobalPosition } from "../../../types/GlobalPosition";
-import { getProfileByUUID } from "../../../libs/mojang";
+import { getProfileByUUID } from "../../../libs/game-profiles";
 
 const { validation } = config;
 const { min, max, blacklist, watchlist } = validation.tag;

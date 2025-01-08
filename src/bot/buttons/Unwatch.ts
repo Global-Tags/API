@@ -4,7 +4,7 @@ import { colors } from "../bot";
 import players from "../../database/schemas/players";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID } from "../../libs/mojang";
+import { getProfileByUUID } from "../../libs/game-profiles";
 
 export default class Unwatch extends Button {
     constructor() {
