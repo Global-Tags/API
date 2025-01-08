@@ -16,7 +16,7 @@ export default class LabyConnectProvider extends AuthProvider {
 
     async getUUID(token: string): Promise<string | null> {
         try {
-            const payload: LabyPayload = verify(this.trimTokenType(token), publicKey) as LabyPayload;
+            const payload: LabyPayload = verify(AuthProvider.trimTokenType(token), publicKey) as LabyPayload;
             if(payload.iss != `LabyConnect` || !payload.uuid) return null;
     
             return stripUUID(payload.uuid);
