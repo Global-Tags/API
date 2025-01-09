@@ -184,5 +184,15 @@
             "not_found": "Die Notiz wurde nicht gefunden!",
             "success": "Die Notiz wurde erfolgreich gelöscht!"
         }
+    },
+    "roles": {
+        "not_found": "Die Rolle wurde nicht gefunden!",
+        "create": {
+            "already_exists": "Die Rolle '<role>' existiert bereits!",
+            "success": "Die Rolle wurde erfolgreich erstellt!"
+        },
+        "delete": {
+            "success": "Die Rolle wurde erfolgreich gelöscht!"
+        }
     }
 }

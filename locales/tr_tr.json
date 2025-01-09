@@ -63,7 +63,7 @@
         "empty": "Etiket boş bırakılamaz!",
         "sameTag": "Bu etiketiniz zaten var!",
         "blacklisted": "\"<word>\" kelimesi GlobalTag'inizde görünmemelidir!",
-        "validation": "\"Etiket\" alanını <min> ve <max> karakterleri arasında tutun.",
+        "validation": "\"tag\" alanını <min> ve <max> karakterleri arasında tutun.",
         "success": {
             "admin": "Oyuncunun etiketi başarıyla güncellendi!",
             "self": "Etiketiniz başarıyla güncellendi!"
