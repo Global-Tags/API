@@ -7,7 +7,7 @@ export default class ApiKeyProvider extends AuthProvider {
     }
 
     async getUUID(token: string): Promise<string | null> {
-        const player = await players.findOne({ api_keys: this.trimTokenType(token) });
+        const player = await players.findOne({ api_keys: AuthProvider.trimTokenType(token) });
         if(!player) return null;
         return player.uuid;
     }

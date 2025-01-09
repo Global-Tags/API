@@ -2,12 +2,12 @@ import { existsSync, readdirSync } from "fs";
 import { join } from "path";
 import Logger from "../libs/Logger";
 import players from "../database/schemas/players";
-import { Permission } from "../libs/RoleManager";
+import { Permission } from "../types/Permission";
 
 export type SessionData = {
     uuid: string | null,
     equal: boolean,
-    permissions: boolean
+    hasPermission: (permission: Permission) => boolean
 }
 
 export default abstract class AuthProvider {
@@ -18,7 +18,7 @@ export default abstract class AuthProvider {
         this.id = id;
     }
 
-    public async getSession(token: string, uuid: string) {
+    public async getSession(token: string, uuid?: string | null): Promise<SessionData> {
         const tokenUuid = await this.getUUID(token);
         if(!tokenUuid) return { uuid: tokenUuid, equal: tokenUuid == uuid, hasPermission: (permission: Permission) => false };
         const data = await players.findOne({ uuid: tokenUuid });
@@ -31,7 +31,7 @@ export default abstract class AuthProvider {
     }
     public abstract getUUID(token: string): Promise<string | null>;
 
-    public trimTokenType(token: string): string {
+    public static trimTokenType(token: string): string {
         return token.split(/ /).slice(1).join(' ');
     }
 

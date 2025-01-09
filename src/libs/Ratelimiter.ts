@@ -1,5 +1,5 @@
-import { IpContext } from "../middleware/RatelimitChecker";
-import { config } from "./Config";
+import { IpContext } from "../middleware/ratelimit-checker";
+import { config } from "./config";
 import ratelimiterConfig from "../../config/ratelimiter.json";
 
 type RatelimitData = {

@@ -5,11 +5,12 @@ import { colors } from "../bot";
 import { constantCase } from "change-case";
 import { join } from 'path';
 import axios from "axios";
-import { generateSecureCode } from "../../routes/connections";
-import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
-import { config } from "../../libs/Config";
-import { Permission } from "../../libs/RoleManager";
-import GlobalIcon from "../../types/GlobalIcon";
+import { generateSecureCode } from "../../routes/players/[uuid]/connections";
+import { config } from "../../libs/config";
+import { Permission } from "../../types/Permission";
+import { GlobalIcon } from "../../types/GlobalIcon";
+import { sendCustomIconUploadMessage } from "../../libs/discord-notifier";
+import { getProfileByUUID } from "../../libs/game-profiles";
 
 export default class CustomIcon extends Command {
     constructor() {
@@ -65,7 +66,7 @@ export default class CustomIcon extends Command {
 
         if(sub == 'toggle') {
             const shouldEnable = options.getBoolean('enable', true);
-            player.icon.name = shouldEnable ? constantCase(GlobalIcon[GlobalIcon.Custom]) : constantCase(GlobalIcon[GlobalIcon.None]);
+            player.icon.name = constantCase(GlobalIcon[shouldEnable ? GlobalIcon.Custom : GlobalIcon.None]);
             await player.save();
 
             interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ Your custom icon has been ${shouldEnable ? 'enabled' : 'disabled'}!`)] });
@@ -84,11 +85,10 @@ export default class CustomIcon extends Command {
             await player.save();
             await Bun.write(Bun.file(join('icons', player.uuid, `${player.icon.hash}.png`)), request.data, { createPath: true });
 
-            sendMessage({
-                type: NotificationType.CustomIconUpload,
-                uuid: player.uuid,
-                hash: player.icon.hash
-            });
+            sendCustomIconUploadMessage(
+                await getProfileByUUID(player.uuid),
+                player.icon.hash
+            );
 
             interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ Your custom icon was successfully uploaded!\nYou may need to clear your cache ingame for the icon to be shown.`).setThumbnail(`attachment://${file.name}`)], files: [file] });
         } else if(sub == 'unset') {

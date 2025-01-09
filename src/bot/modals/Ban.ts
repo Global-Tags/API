@@ -2,10 +2,11 @@ import { ModalSubmitInteraction, CacheType, Message, ModalSubmitFields, GuildMem
 import Modal from "../structs/Modal";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
-import { sendBanEmail } from "../../libs/Mailer";
-import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
-import { Permission } from "../../libs/RoleManager";
+import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
+import { sendBanEmail } from "../../libs/mailer";
+import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
+import { Permission } from "../../types/Permission";
+import { getProfileByUUID } from "../../libs/game-profiles";
 
 export default class Ban extends Modal {
     constructor() {
@@ -25,13 +26,12 @@ export default class Ban extends Modal {
         player.banPlayer(reason, staff.uuid);
         player.save();
 
-        sendMessage({
-            type: NotificationType.ModLog,
+        sendModLogMessage({
             logType: ModLogType.Ban,
-            uuid: player.uuid,
-            staff: staff.uuid,
-            reason: reason,
-            discord: true
+            staff: await getProfileByUUID(staff.uuid),
+            user: await getProfileByUUID(player.uuid),
+            discord: true,
+            reason: reason
         });
 
         if(player.isEmailVerified()) {

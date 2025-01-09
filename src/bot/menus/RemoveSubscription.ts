@@ -2,7 +2,7 @@ import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder, 
 import SelectMenu from "../structs/SelectMenu";
 import players from "../../database/schemas/players";
 import { client, colors } from "../bot";
-import { Permission } from "../../libs/RoleManager";
+import { Permission } from "../../types/Permission";
 
 export default class RemoveSubscription extends SelectMenu {
     constructor() {

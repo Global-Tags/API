@@ -2,8 +2,8 @@ import { ButtonInteraction, Message, GuildMember, User, ActionRowBuilder, EmbedB
 import Button from "../structs/Button";
 import { colors } from "../bot";
 import players from "../../database/schemas/players";
-import { getProfileByUUID } from "../../libs/Mojang";
-import { Permission } from "../../libs/RoleManager";
+import { getProfileByUUID } from "../../libs/game-profiles";
+import { Permission } from "../../types/Permission";
 
 export default class DeleteNote extends Button {
     constructor() {

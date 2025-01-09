@@ -2,10 +2,11 @@ import { CacheType, Message, GuildMember, User, EmbedBuilder, ModalSubmitInterac
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import Modal from "../structs/Modal";
-import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
-import { sendTagChangeEmail } from "../../libs/Mailer";
-import { getI18nFunctionByLanguage } from "../../middleware/FetchI18n";
-import { Permission } from "../../libs/RoleManager";
+import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
+import { sendTagChangeEmail } from "../../libs/mailer";
+import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
+import { Permission } from "../../types/Permission";
+import { getProfileByUUID } from "../../libs/game-profiles";
 
 export default class SetTag extends Modal {
     constructor() {
@@ -22,13 +23,14 @@ export default class SetTag extends Modal {
         const tag = fields.getTextInputValue('tag');
         const oldTag = player.tag;
 
-        sendMessage({
-            type: NotificationType.ModLog,
+        sendModLogMessage({
             logType: ModLogType.ChangeTag,
-            uuid: player.uuid,
-            staff: staff.uuid,
-            oldTag: player.tag || 'None',
-            newTag: tag,
+            staff: await getProfileByUUID(staff.uuid),
+            user: await getProfileByUUID(player.uuid),
+            tags: {
+                old: player.tag || 'None',
+                new: tag
+            },
             discord: true
         });
 

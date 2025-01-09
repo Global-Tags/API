@@ -2,13 +2,9 @@ import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, StringSele
 import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { constantCase, pascalCase } from "change-case";
-import { Permission } from "../../libs/RoleManager";
-import GlobalIcon from "../../types/GlobalIcon";
-
-const icons = Object.keys(GlobalIcon)
-    .filter((icon) => isNaN(Number(icon)))
-    .map((icon) => constantCase(icon));
+import { capitalCase, pascalCase, snakeCase } from "change-case";
+import { Permission } from "../../types/Permission";
+import { GlobalIcon, icons } from "../../types/GlobalIcon";
 
 export default class SetIconType extends Button {
     constructor() {
@@ -31,15 +27,15 @@ export default class SetIconType extends Button {
 
         const menu = new StringSelectMenuBuilder()
         .setCustomId('setIconType')
-        .setPlaceholder('Please select a role.')
+        .setPlaceholder('Please select an icon.')
         .setMinValues(1)
         .setMaxValues(1)
-        .setOptions(icons.map((icon) => {
-            return new StringSelectMenuOptionBuilder()
-            .setLabel(pascalCase(icon))
-            .setDefault(constantCase(player.icon.name) == icon)
-            .setValue(icon)
-        }).slice(0, 25));
+        .setOptions(icons.map((icon) =>
+            new StringSelectMenuOptionBuilder()
+                .setLabel(capitalCase(GlobalIcon[icon]))
+                .setDefault(snakeCase(GlobalIcon[icon]) == snakeCase(player.icon.name))
+                .setValue(GlobalIcon[icon])
+        ).slice(0, 25));
 
         interaction.reply({ embeds: [embed], components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu)], ephemeral: true });
     }

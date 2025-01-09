@@ -2,13 +2,9 @@ import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, StringSele
 import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { constantCase, pascalCase } from "change-case";
-import { Permission } from "../../libs/RoleManager";
-import GlobalPosition from "../../types/GlobalPosition";
-
-const positions = Object.keys(GlobalPosition)
-    .filter((pos) => isNaN(Number(pos)))
-    .map((pos) => constantCase(pos));
+import { capitalCase, constantCase, pascalCase, snakeCase } from "change-case";
+import { Permission } from "../../types/Permission";
+import { GlobalPosition, positions } from "../../types/GlobalPosition";
 
 export default class SetPosition extends Button {
     constructor() {
@@ -34,12 +30,12 @@ export default class SetPosition extends Button {
         .setPlaceholder('Please select a role.')
         .setMinValues(1)
         .setMaxValues(1)
-        .setOptions(positions.map((position) => {
-            return new StringSelectMenuOptionBuilder()
-            .setLabel(pascalCase(position))
-            .setDefault(player.position == position)
-            .setValue(position)
-        }));
+        .setOptions(positions.map((position) =>
+            new StringSelectMenuOptionBuilder()
+                .setLabel(capitalCase(GlobalPosition[position]))
+                .setDefault(snakeCase(GlobalPosition[position]) == snakeCase(player.position))
+                .setValue(GlobalPosition[position])
+        ));
 
         interaction.reply({ embeds: [embed], components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu)], ephemeral: true });
     }

@@ -20,6 +20,7 @@
     "discord.js": "^14.16.3",
     "dotenv": "^16.4.7",
     "elysia": "1.0.25",
+    "elysia-ip": "^1.0.8",
     "jsonwebtoken": "^9.0.2",
     "minimist": "^1.2.8",
     "moment": "^2.30.1",

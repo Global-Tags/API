@@ -88,7 +88,7 @@ To implement the wrapper, create a class that extends the `GlobalTagsAPI<T>` cla
 
         @Override
         public Agent getAgent() {
-            return new Agent("MyMod", "v1.0.0", "1.21"); // (2)
+            return new Agent("MyMod", "1.0.0", "1.21"); // (2)
         }
 
         @Override
@@ -199,7 +199,7 @@ The wrapper comes with a built-in caching mechanism to minimize redundant API ca
 
         @Override
         public Agent getAgent() {
-            return new Agent("MyMod", "v1.0.0", "1.21");
+            return new Agent("MyMod", "1.0.0", "1.21");
         }
 
         @Override

@@ -121,6 +121,16 @@
             "success": "The note was successfully deleted!"
         }
     },
+    "roles": {
+        "not_found": "The role was not found!",
+        "create": {
+            "already_exists": "The role '<role>' already exists!",
+            "success": "The role was successfully created!"
+        },
+        "delete": {
+            "success": "The role was successfully deleted!"
+        }
+    },
     "email": {
         "footer": "Thank you for using GlobalTags!",
         "greeting": "Hey!",

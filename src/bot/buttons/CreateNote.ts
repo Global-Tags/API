@@ -1,6 +1,6 @@
 import { ButtonInteraction, CacheType, Message, GuildMember, User, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import Button from "../structs/Button";
-import { config } from "../../libs/Config";
+import { config } from "../../libs/config";
 
 export default class CreateNote extends Button {
     constructor() {

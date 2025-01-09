@@ -2,11 +2,10 @@ import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder,
 import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { getRoles, Permission } from "../../libs/RoleManager";
-import { config } from "../../libs/Config";
+import { config } from "../../libs/config";
 import { capitalCase } from "change-case";
-
-const roles = getRoles();
+import { Permission } from "../../types/Permission";
+import { getCachedRoles } from "../../database/schemas/roles";
 
 export default class EditRoles extends Button {
     constructor() {
@@ -22,7 +21,7 @@ export default class EditRoles extends Button {
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll(`\``, ``) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
 
-        const options = roles.filter(key => isNaN(Number(key))).slice(0, 25).map(({ name: role }) => {
+        const options = getCachedRoles().slice(0, 25).map(({ name: role }) => {
             return {
                 label: capitalCase(role),
                 value: role.toUpperCase(),

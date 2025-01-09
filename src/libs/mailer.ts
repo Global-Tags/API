@@ -1,9 +1,9 @@
 import { TransportOptions, createTransport } from "nodemailer";
-import { config } from "./Config";
+import { config } from "./config";
 import { join } from "path";
 import Logger from "./Logger";
 import { pascalCase } from "change-case";
-import { I18nFunction } from "./I18n";
+import { I18nFunction } from "./i18n";
 
 const { mailer } = config;
 

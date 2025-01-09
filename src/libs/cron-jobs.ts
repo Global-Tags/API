@@ -1,9 +1,11 @@
 import { CronJob } from "cron";
-import { checkExpiredEntitlements } from "./EntitlementExpiry";
-import { saveMetrics } from "./Metrics";
+import { checkExpiredEntitlements } from "./entitlement-expiry";
+import { saveMetrics } from "./metrics";
 import Logger from "./Logger";
 import players from "../database/schemas/players";
-import { config } from "./Config";
+import { config } from "./config";
+import { updateRoleCache } from "../database/schemas/roles";
+import { isConnected } from "../database/mongo";
 
 const tz = 'Europe/Berlin';
 
@@ -21,6 +23,7 @@ export function startMetrics() {
 
 export function startReferralReset() {
     new CronJob('0 0 1 * *', async () => {
+        if(!isConnected()) return;
         const data = await players.find({ 'referrals.current_month': { $gt: 0 } });
 
         for(const player of data) {
@@ -28,4 +31,8 @@ export function startReferralReset() {
             player.save();
         }
     }, null, true, tz);
+}
+
+export function startRoleCacheJob() {
+    new CronJob('*/5 * * * *', updateRoleCache, null, true, tz, null, true);
 }

@@ -11,6 +11,7 @@ export default class Ready extends Event {
 
     public fire() {
         Logger.info(`Bot logged in as ${bot.client.user!.tag}`);
+        bot.fetchGuild()?.then(g => g.members.fetch());
 
         setInterval(async () => {
             bot.client.user!.setActivity({
