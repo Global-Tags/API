@@ -40,25 +40,6 @@ Defines all active rate-limiting rules.
 
 ---
 
-### `roles.json`
-
-This file lists all available roles for the system.
-
-- **`name`**: Specifies the name of the role.
-- **`permissions`**: A string array in PascalCase format, listing all the permissions assigned to the role.
-  Those are all valid permissions:
-    - `BypassValidation`
-    - `CustomIcon`
-    - `ManageBans`
-    - `ManageNotes`
-    - `ManageSubscriptions`
-    - `ManageRoles`
-    - `ManageTags`
-    - `ManageWatchlist`
-    - `ReportImmunity`
-
----
-
 ### `skus.json`
 Lists all obtainable entitlement SKUs for subscription management.
 
@@ -76,10 +57,18 @@ Environment variables configure essential application settings. Below is a detai
 ### General Configuration
 
 - **`GT_PORT`**: Specifies the port on which the API runs.
-- **`GT_PROXY_IP_HEADER`**: The header name that may contain the client’s real IP address when behind a proxy.
 - **`GT_STRICT_AUTH`**: Boolean that determines if unauthenticated requests are allowed on the `/players/:uuid` route. Set to `true` to require valid authorization for all requests.
 - **`GT_LOG_LEVEL`**: Specifies the level of logging detail. Valid values: `Error`, `Warn`, `Info`, `Debug`.
+- **`GT_BASE_URL`**: Defines the root URL of the API, excluding any trailing slashes. This is the URL where the API can be accessed and should be consistent with your deployment setup.
+- **`GT_ICON_URL`**: Provides a URL template for accessing role icons. The `{role}` placeholder in the template will be dynamically replaced with the role name.
 - **`GT_MONGODB_CONNECTION`** (**required**): MongoDB connection string. Follow the [MongoDB documentation](https://www.mongodb.com/docs/manual/reference/connection-string/) to construct this string.
+
+---
+
+### Proxy Settings
+
+- **`GT_PROXY_ENABLED`**: Boolean that determines if the API should operate behind a proxy. Set to `true` to enable trusting a header for real client IPs.
+- **`GT_PROXY_IP_HEADER`**: The name of the HTTP header that contains the real client IP address when the API is behind a proxy. Common values include `x-forwarded-for` or `cf-connecting-ip`. Defaults to `x-real-ip`.
 
 ---
 
@@ -92,6 +81,7 @@ Environment variables configure essential application settings. Below is a detai
 - **`GT_VALIDATION_ICON_MAX_RESOLUTION`**: Maximum resolution (e.g., `512` for 512x512) for custom icons.
 - **`GT_VALIDATION_ICON_BLACKLIST`**: Array of disallowed default icons.
 - **`GT_VALIDATION_NOTES_MAX_LENGTH`**: Maximum character length for staff notes.
+- **`GT_VALIDATION_ROLE_NAME_MAX_LENGTH`**: Maximum character length for role names.
 
 ---
 
@@ -137,10 +127,10 @@ Environment variables configure essential application settings. Below is a detai
 - **General**
     - **`GT_DISCORD_BOT_ENABLED`**: Enables or disables the Discord bot.
     - **`GT_DISCORD_BOT_TOKEN`**: Token used for bot authentication.
+    - **`GT_DISCORD_BOT_SERVER`**: ID of the main Discord guild for various feature including role synchronization.
 
 - **Role Synchronization**
     - **`GT_DISCORD_BOT_SYNCED_ROLES_ENABLED`**: Enables role synchronization between GlobalTags and Discord.
-    - **`GT_DISCORD_BOT_SYNCED_ROLES_GUILD`**: ID of the Discord guild for role synchronization.
     - **`GT_DISCORD_BOT_SYNCED_ROLES_{ROLE}`**: Maps GlobalTags roles to Discord role IDs. Example:
         ```env
         GT_DISCORD_BOT_SYNCED_ROLES_ADMIN=123456,987654
@@ -170,6 +160,7 @@ Environment variables configure essential application settings. Below is a detai
 
     - **Account connections**:
         - **`GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_ENABLED`**: Enables or disables the ability for users to link their Discord account (via `/gt link discord` in-game or `/link` on Discord).  
+        - **`GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_HIDE_EMAILS`**: Enables or disables if emails should be redacted in the log or not.
         - **`GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_CHANNEL`**: Specifies the Discord channel ID where new account connection notifications are sent.  
         - **`GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_ROLE`**: Defines the ID of a Discord role treated as a "Verified" role for linked accounts.
 
