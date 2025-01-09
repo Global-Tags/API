@@ -19,7 +19,6 @@ import { handleErrors, initializeSentry } from "./libs/error-handler";
 import minimist from "minimist";
 import cors from "@elysiajs/cors";
 import { verify as verifyMailOptions } from "./libs/mailer";
-import { getLatestCommit, retrieveData } from "./libs/git-commit-data";
 import { startEntitlementExpiry, startMetrics, startReferralReset, startRoleCacheJob } from "./libs/cron-jobs";
 import { config } from "./libs/config";
 import { join } from "path";
@@ -36,8 +35,6 @@ if(config.sentry.enabled) initializeSentry(config.sentry.dsn);
 
 export const args = minimist(process.argv.slice(2));
 loadRequests();
-
-retrieveData();
 
 // Elysia API
 const elysia = new Elysia()
@@ -127,9 +124,9 @@ const elysia = new Elysia()
     version,
     requests: getRequests(),
     commit: {
-        branch: config.github.branch,
-        sha: getLatestCommit(),
-        tree: getLatestCommit() ? `https://github.com/${config.github.owner}/${config.github.repository}/tree/${getLatestCommit()}` : null
+        branch: 'deprecated',
+        sha: 'deprecated',
+        tree: 'deprecated'
     }
 }), {
     detail: {

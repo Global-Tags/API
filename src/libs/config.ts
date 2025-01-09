@@ -43,11 +43,6 @@ export let config = {
             maxLength: getEnvNumber(process.env.GT_VALIDATION_ROLE_NAME_MAX_LENGTH, 20)
         }
     },
-    github: {
-        owner: process.env.GT_GITHUB_OWNER || 'Global-Tags',
-        repository: process.env.GT_GITHUB_REPOSITORY || 'API',
-        branch: process.env.GT_GITHUB_BRANCH || 'master'
-    },
     sentry: {
         enabled: getEnvBoolean(process.env.GT_SENTRY_ENABLED, false),
         dsn: process.env.GT_SENTRY_DSN || ''
