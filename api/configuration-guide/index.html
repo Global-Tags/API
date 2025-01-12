@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/theme/images/icon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.48">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.49">
     
     
       
@@ -570,15 +570,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#rolesjson" class="md-nav__link">
-    <span class="md-ellipsis">
-      roles.json
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#skusjson" class="md-nav__link">
     <span class="md-ellipsis">
       skus.json
@@ -606,6 +597,15 @@
   <a href="#general-configuration" class="md-nav__link">
     <span class="md-ellipsis">
       General Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proxy-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Proxy Settings
     </span>
   </a>
   
@@ -863,15 +863,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#rolesjson" class="md-nav__link">
-    <span class="md-ellipsis">
-      roles.json
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#skusjson" class="md-nav__link">
     <span class="md-ellipsis">
       skus.json
@@ -899,6 +890,15 @@
   <a href="#general-configuration" class="md-nav__link">
     <span class="md-ellipsis">
       General Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proxy-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Proxy Settings
     </span>
   </a>
   
@@ -1014,25 +1014,6 @@ GT_LOG_LEVEL=Warn
 <li><strong><code>seconds</code></strong>: The duration of the time window in seconds.</li>
 </ul>
 <hr />
-<h3 id="rolesjson"><code>roles.json</code><a class="headerlink" href="#rolesjson" title="Permanent link">&para;</a></h3>
-<p>This file lists all available roles for the system.</p>
-<ul>
-<li><strong><code>name</code></strong>: Specifies the name of the role.</li>
-<li><strong><code>permissions</code></strong>: A string array in PascalCase format, listing all the permissions assigned to the role.
-  Those are all valid permissions:<ul>
-<li><code>BypassValidation</code></li>
-<li><code>CustomIcon</code></li>
-<li><code>ManageBans</code></li>
-<li><code>ManageNotes</code></li>
-<li><code>ManageSubscriptions</code></li>
-<li><code>ManageRoles</code></li>
-<li><code>ManageTags</code></li>
-<li><code>ManageWatchlist</code></li>
-<li><code>ReportImmunity</code></li>
-</ul>
-</li>
-</ul>
-<hr />
 <h3 id="skusjson"><code>skus.json</code><a class="headerlink" href="#skusjson" title="Permanent link">&para;</a></h3>
 <p>Lists all obtainable entitlement SKUs for subscription management.</p>
 <ul>
@@ -1047,10 +1028,17 @@ GT_LOG_LEVEL=Warn
 <h3 id="general-configuration">General Configuration<a class="headerlink" href="#general-configuration" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong><code>GT_PORT</code></strong>: Specifies the port on which the API runs.</li>
-<li><strong><code>GT_PROXY_IP_HEADER</code></strong>: The header name that may contain the client’s real IP address when behind a proxy.</li>
 <li><strong><code>GT_STRICT_AUTH</code></strong>: Boolean that determines if unauthenticated requests are allowed on the <code>/players/:uuid</code> route. Set to <code>true</code> to require valid authorization for all requests.</li>
 <li><strong><code>GT_LOG_LEVEL</code></strong>: Specifies the level of logging detail. Valid values: <code>Error</code>, <code>Warn</code>, <code>Info</code>, <code>Debug</code>.</li>
+<li><strong><code>GT_BASE_URL</code></strong>: Defines the root URL of the API, excluding any trailing slashes. This is the URL where the API can be accessed and should be consistent with your deployment setup.</li>
+<li><strong><code>GT_ICON_URL</code></strong>: Provides a URL template for accessing role icons. The <code>{role}</code> placeholder in the template will be dynamically replaced with the role name.</li>
 <li><strong><code>GT_MONGODB_CONNECTION</code></strong> (<strong>required</strong>): MongoDB connection string. Follow the <a href="https://www.mongodb.com/docs/manual/reference/connection-string/">MongoDB documentation</a> to construct this string.</li>
+</ul>
+<hr />
+<h3 id="proxy-settings">Proxy Settings<a class="headerlink" href="#proxy-settings" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><code>GT_PROXY_ENABLED</code></strong>: Boolean that determines if the API should operate behind a proxy. Set to <code>true</code> to enable trusting a header for real client IPs.</li>
+<li><strong><code>GT_PROXY_IP_HEADER</code></strong>: The name of the HTTP header that contains the real client IP address when the API is behind a proxy. Common values include <code>x-forwarded-for</code> or <code>cf-connecting-ip</code>. Defaults to <code>x-real-ip</code>.</li>
 </ul>
 <hr />
 <h3 id="tag-validation-settings">Tag Validation Settings<a class="headerlink" href="#tag-validation-settings" title="Permanent link">&para;</a></h3>
@@ -1062,6 +1050,7 @@ GT_LOG_LEVEL=Warn
 <li><strong><code>GT_VALIDATION_ICON_MAX_RESOLUTION</code></strong>: Maximum resolution (e.g., <code>512</code> for 512x512) for custom icons.</li>
 <li><strong><code>GT_VALIDATION_ICON_BLACKLIST</code></strong>: Array of disallowed default icons.</li>
 <li><strong><code>GT_VALIDATION_NOTES_MAX_LENGTH</code></strong>: Maximum character length for staff notes.</li>
+<li><strong><code>GT_VALIDATION_ROLE_NAME_MAX_LENGTH</code></strong>: Maximum character length for role names.</li>
 </ul>
 <hr />
 <h3 id="github-configuration">GitHub Configuration<a class="headerlink" href="#github-configuration" title="Permanent link">&para;</a></h3>
@@ -1104,13 +1093,13 @@ GT_LOG_LEVEL=Warn
 <ul>
 <li><strong><code>GT_DISCORD_BOT_ENABLED</code></strong>: Enables or disables the Discord bot.</li>
 <li><strong><code>GT_DISCORD_BOT_TOKEN</code></strong>: Token used for bot authentication.</li>
+<li><strong><code>GT_DISCORD_BOT_SERVER</code></strong>: ID of the main Discord guild for various feature including role synchronization.</li>
 </ul>
 </li>
 <li>
 <p><strong>Role Synchronization</strong></p>
 <ul>
 <li><strong><code>GT_DISCORD_BOT_SYNCED_ROLES_ENABLED</code></strong>: Enables role synchronization between GlobalTags and Discord.</li>
-<li><strong><code>GT_DISCORD_BOT_SYNCED_ROLES_GUILD</code></strong>: ID of the Discord guild for role synchronization.</li>
 <li><strong><code>GT_DISCORD_BOT_SYNCED_ROLES_{ROLE}</code></strong>: Maps GlobalTags roles to Discord role IDs. Example:
     <div class="highlight"><pre><span></span><code>GT_DISCORD_BOT_SYNCED_ROLES_ADMIN=123456,987654
 </code></pre></div></li>
@@ -1159,6 +1148,7 @@ GT_LOG_LEVEL=Warn
 <p><strong>Account connections</strong>:</p>
 <ul>
 <li><strong><code>GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_ENABLED</code></strong>: Enables or disables the ability for users to link their Discord account (via <code>/gt link discord</code> in-game or <code>/link</code> on Discord).  </li>
+<li><strong><code>GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_HIDE_EMAILS</code></strong>: Enables or disables if emails should be redacted in the log or not.</li>
 <li><strong><code>GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_CHANNEL</code></strong>: Specifies the Discord channel ID where new account connection notifications are sent.  </li>
 <li><strong><code>GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_ROLE</code></strong>: Defines the ID of a Discord role treated as a "Verified" role for linked accounts.</li>
 </ul>
@@ -1202,7 +1192,7 @@ GT_LOG_LEVEL=Warn
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">December 15, 2024</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">January 9, 2025</span>
   </span>
 
     
@@ -1341,7 +1331,7 @@ GT_LOG_LEVEL=Warn
     <script id="__config" type="application/json">{"base": "../..", "features": ["content.action.edit", "content.code.annotate", "content.code.copy", "content.tabs.link", "navigation.expand", "navigation.footer", "search.share"], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.83f73b43.min.js"></script>
+      <script src="../../assets/javascripts/bundle.88dd0f4e.min.js"></script>
       
     
   </body>
