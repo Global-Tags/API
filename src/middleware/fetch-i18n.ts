@@ -1,5 +1,5 @@
 import Elysia from "elysia";
-import { getLanguage, translate } from "../libs/I18n";
+import { getLanguage, translate } from "../libs/i18n";
 
 export default function fetchI18n(app: Elysia) {
     return app.derive({ as: 'global' }, ({ headers }) => ({

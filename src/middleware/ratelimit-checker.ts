@@ -1,6 +1,6 @@
 import { Context } from "elysia";
 import Ratelimiter from "../libs/Ratelimiter";
-import { I18nFunction } from "../libs/I18n";
+import { I18nFunction } from "../libs/i18n";
 
 export type IpContext = Context & {
     ip: string,

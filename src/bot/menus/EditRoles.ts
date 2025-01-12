@@ -2,8 +2,9 @@ import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder }
 import SelectMenu from "../structs/SelectMenu";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
-import { Permission } from "../../libs/RoleManager";
+import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
+import { Permission } from "../../types/Permission";
+import { getProfileByUUID } from "../../libs/game-profiles";
 
 export default class EditRoles extends SelectMenu {
     constructor() {
@@ -33,16 +34,15 @@ export default class EditRoles extends SelectMenu {
         }
         await player.save();
 
-        sendMessage({
-            type: NotificationType.ModLog,
+        sendModLogMessage({
             logType: ModLogType.EditRoles,
-            uuid: player.uuid,
-            staff: staff.uuid,
+            staff: await getProfileByUUID(staff.uuid),
+            user: await getProfileByUUID(player.uuid),
+            discord: true,
             roles: {
                 added,
                 removed
-            },
-            discord: true
+            }
         });
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The players roles were successfully updated!`)], ephemeral: true });

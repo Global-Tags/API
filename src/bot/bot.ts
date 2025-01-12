@@ -6,7 +6,7 @@ import Command from "./structs/Command";
 import Modal from "./structs/Modal";
 import Button from "./structs/Button";
 import SelectMenu from "./structs/SelectMenu";
-import { config } from "../libs/Config";
+import { config } from "../libs/config";
 
 export const client = new Client({
     intents: [
@@ -25,6 +25,11 @@ export const colors = {
     success: 0x00ee00,
     error: 0xff0000
 };
+
+export const images = {
+    roles: 'https://cdn.rappytv.com/bots/globaltags/roles.png',
+    placeholder: 'https://cdn.rappytv.com/bots/placeholder.png'
+}
 
 export const commands = new Collection<string, Command>();
 export const buttons = new Collection<string, Button>();
@@ -70,3 +75,4 @@ export const modals = new Collection<string, Modal>();
 
 export const spawn = () => client.login(config.discordBot.token);
 export const destroy = () => client.destroy();
+export const fetchGuild = () => client.guilds.fetch(config.discordBot.server);

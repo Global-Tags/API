@@ -2,8 +2,9 @@ import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder }
 import SelectMenu from "../structs/SelectMenu";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { ModLogType, NotificationType, sendMessage } from "../../libs/DiscordNotifier";
-import { Permission } from "../../libs/RoleManager";
+import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
+import { Permission } from "../../types/Permission";
+import { getProfileByUUID } from "../../libs/game-profiles";
 
 export default class DeleteNote extends SelectMenu {
     constructor() {
@@ -23,13 +24,12 @@ export default class DeleteNote extends SelectMenu {
         player.deleteNote(note.id);
         await player.save();
 
-        sendMessage({
-            type: NotificationType.ModLog,
+        sendModLogMessage({
             logType: ModLogType.DeleteNote,
-            uuid: player.uuid,
-            staff: staff.uuid,
-            note: note.text,
-            discord: true
+            staff: await getProfileByUUID(staff.uuid),
+            user: await getProfileByUUID(player.uuid),
+            discord: true,
+            note: note.text
         });
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The note was successfully deleted!`)], ephemeral: true });

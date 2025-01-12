@@ -10,7 +10,7 @@ export default class LabyConnectProvider extends AuthProvider {
         try {
             const response = await axios.get('https://api.minecraftservices.com/minecraft/profile', {
                 headers: {
-                    Authorization: `Bearer ${this.trimTokenType(token)}`
+                    Authorization: `Bearer ${AuthProvider.trimTokenType(token)}`
                 }
             });
 

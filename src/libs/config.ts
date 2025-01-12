@@ -1,5 +1,5 @@
-import { configDotenv } from "dotenv";
-import { Role } from "./RoleManager";
+import { config as loadEnv } from "dotenv";
+import { constantCase, snakeCase } from "change-case";
 
 function getEnvNumber(path: string | undefined, defaultValue: number) {
     const number = Number(path);
@@ -11,16 +11,20 @@ function getEnvBoolean(path: string | undefined, defaultValue: boolean) {
     return path.toLowerCase() === 'true';
 }
 
-configDotenv();
-configDotenv({ path: `./.env.${process.env.NODE_ENV || 'dev'}`, override: true });
+loadEnv();
+loadEnv({ path: `./.env.${process.env.NODE_ENV || 'dev'}`, override: true });
 
 export let config = {
     port: getEnvNumber(process.env.GT_PORT, 5500),
-    ipHeader: process.env.GT_PROXY_IP_HEADER || 'x-real-ip',
     strictAuth: getEnvBoolean(process.env.GT_STRICT_AUTH, true),
     logLevel: process.env.GT_LOG_LEVEL || 'Info',
     mongodb: process.env.GT_MONGODB_CONNECTION || '',
     baseUrl: process.env.GT_BASE_URL || 'http://localhost:5500',
+    iconUrl: (role: string) => (process.env.GT_ICON_URL || 'https://cdn.rappytv.com/globaltags/icons/role/{role}.png').replaceAll('{role}', snakeCase(role)),
+    proxy: {
+        enabled: getEnvBoolean(process.env.GT_PROXY_ENABLED, false),
+        ipHeader: process.env.GT_PROXY_IP_HEADER || 'x-real-ip'
+    },
     validation: {
         tag: {
             min: getEnvNumber(process.env.GT_VALIDATION_TAG_MIN_LENGTH, 1),
@@ -34,12 +38,10 @@ export let config = {
         },
         notes: {
             maxLength: getEnvNumber(process.env.GT_VALIDATION_NOTES_MAX_LENGTH, 100)
+        },
+        roles: {
+            maxLength: getEnvNumber(process.env.GT_VALIDATION_ROLE_NAME_MAX_LENGTH, 20)
         }
-    },
-    github: {
-        owner: process.env.GT_GITHUB_OWNER || 'Global-Tags',
-        repository: process.env.GT_GITHUB_REPOSITORY || 'API',
-        branch: process.env.GT_GITHUB_BRANCH || 'master'
     },
     sentry: {
         enabled: getEnvBoolean(process.env.GT_SENTRY_ENABLED, false),
@@ -48,7 +50,7 @@ export let config = {
     metrics: {
         enabled: getEnvBoolean(process.env.GT_METRICS_ENABLED, true),
         cron: process.env.GT_METRICS_CRON || '0 0 * * *',
-        adminRole: process.env.GT_METRICS_ADMIN_ROLE?.toUpperCase() || 'ADMIN'
+        adminRole: process.env.GT_METRICS_ADMIN_ROLE || ''
     },
     mailer: {
         enabled: getEnvBoolean(process.env.GT_MAILER_ENABLED, false),
@@ -70,10 +72,10 @@ export let config = {
     discordBot: {
         enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_ENABLED, false),
         token: process.env.GT_DISCORD_BOT_TOKEN || '',
+        server: process.env.GT_DISCORD_BOT_SERVER || '',
         syncedRoles: {
             enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_SYNCED_ROLES_ENABLED, false),
-            guild: process.env.GT_DISCORD_BOT_SYNCED_ROLES_GUILD || '',
-            getRoles: (role: Role) => process.env[`GT_DISCORD_BOT_SYNCED_ROLES_${role.name.toUpperCase()}`]?.split(',') || []
+            getRoles: (name: string) => process.env[`GT_DISCORD_BOT_SYNCED_ROLES_${constantCase(name)}`]?.split(',') || []
         },
         notifications: {
             reports: {
@@ -101,6 +103,7 @@ export let config = {
             },
             accountConnections: {
                 enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_ENABLED, false),
+                hideEmails: getEnvBoolean(process.env.GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_HIDE_EMAILS, true),
                 channel: process.env.GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_CHANNEL || '',
                 role: process.env.GT_DISCORD_BOT_ACCOUNT_CONNECTIONS_ROLE || ''
             },

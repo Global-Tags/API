@@ -2,7 +2,7 @@ import { Context } from "elysia";
 import Logger from "../libs/Logger";
 import moment from "moment";
 import AuthProvider from "../auth/AuthProvider";
-import { recordRequest } from "../libs/Metrics";
+import { recordRequest } from "../libs/metrics";
 
 export default function access({ request: { headers, method }, path }: Context) {
     const authorization = headers.get('authorization') || '';

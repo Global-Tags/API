@@ -1,6 +1,6 @@
 import { PreContext } from "elysia";
 import { isConnected } from "../database/mongo";
-import { getI18nFunctionByLanguage } from "./FetchI18n";
+import { getI18nFunctionByLanguage } from "./fetch-i18n";
 
 export default function checkDatabase({ error, request: { headers } }: PreContext) {
     const i18n = getI18nFunctionByLanguage(headers.get('x-language'));

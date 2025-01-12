@@ -1,10 +1,10 @@
 import { Entitlement } from "discord.js";
 import Event from "../structs/Event";
 import players from "../../database/schemas/players";
-import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
+import { sendEntitlementMessage } from "../../libs/discord-notifier";
 import entitlements from "../../database/schemas/entitlement";
-import { config } from "../../libs/Config";
-import { getSkus } from "../../libs/SkuManager";
+import { config } from "../../libs/config";
+import { getSkus } from "../../libs/sku-manager";
 
 const skus = getSkus();
 
@@ -19,12 +19,11 @@ export default class EntitlementDelete extends Event {
         const sku = skus.find((sku) => sku.id == entitlement.skuId);
         if(!sku) return;
 
-        sendMessage({
-            type: NotificationType.Entitlement,
-            description: `[**S**] <@!${entitlement.userId}> has deleted their **${sku.name}** subscription!`,
-            head: !!player,
-            uuid: player?.uuid || ''
-        });
+        sendEntitlementMessage(
+            player?.uuid || '',
+            `[**S**] <@!${entitlement.userId}> has deleted their **${sku.name}** subscription!`,
+            !!player,
+        );
 
         await entitlements.insertMany({
             id: entitlement.id,

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Logger from "../libs/Logger";
 import { destroy, spawn } from "../bot/bot";
-import { config } from "../libs/Config";
+import { config } from "../libs/config";
 
 export async function connect(connectionString: string) {
     _eventHandler(connectionString);

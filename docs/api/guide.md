@@ -76,22 +76,7 @@ https://cdn.rappytv.com/globaltags/icons/role/<name>.png
 
 ## Troubleshooting
 
-### 1. **Malformed authorization header**
-
-**Error message**: `You've entered a malformed authorization header!`
-
-**Cause**: This error occurs when you either omit the `Authorization` header for a protected route or provide an invalid auth provider `id` that doesn't match any registered providers.
-
-**Solution**: Ensure that the `Authorization` header follows the correct format:
-
-```
-Authorization: <auth provider id> <token>
-```
-Verify that the auth provider `id` is valid and corresponds to a registered provider.
-
----
-
-### 2. **Database Connection Issue**
+### 1. **Database Connection Issue**
 
 **Error message**: `The database is not connected. Please try again later!`
 
@@ -101,7 +86,7 @@ Verify that the auth provider `id` is valid and corresponds to a registered prov
 
 ---
 
-### 3. **Unknown Error**
+### 2. **Unknown Error**
 
 **Error message**: `An unknown error ocurred! Please try again later`
 

@@ -54,7 +54,7 @@
         "self": "Du kan ikke melde deg selv!",
         "alreadyReported": "Du har allerede meldt inn denne spillerens tag!",
         "invalidReason": "Du må oppgi en gyldig årsak!",
-        "validation": "Hold \"årsak\"-feltet mellom <min> og <max> tegn.",
+        "validation": "Hold \"reason\"-feltet mellom <min> og <max> tegn.",
         "success": "Spilleren ble meldt inn!",
         "immune": "Denne spilleren kan ikke bli meldt inn!"
     },

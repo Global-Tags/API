@@ -5,11 +5,12 @@
 ### What do the different role icons mean?
 | Icon | Role |
 | ---- | ---- |
-| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/admin.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Admin</p> |
-| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/developer.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Developer</p> |
-| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/moderator.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Discord Moderator</p> |
-| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/partner.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Partner</p> |
-| ![Purple](https://cdn.rappytv.com/globaltags/icons/role/supporter.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">GlobalTags Premium</p> |
+| ![Admin](https://cdn.rappytv.com/globaltags/icons/role/admin.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Admin</p> |
+| ![Developer](https://cdn.rappytv.com/globaltags/icons/role/developer.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Developer</p> |
+| ![Moderator](https://cdn.rappytv.com/globaltags/icons/role/moderator.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Discord Moderator</p> |
+| ![Partner](https://cdn.rappytv.com/globaltags/icons/role/partner.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Partner</p> |
+| ![Translator](https://cdn.rappytv.com/globaltags/icons/role/translator.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">Translator</p> |
+| ![Premium](https://cdn.rappytv.com/globaltags/icons/role/premium.png){ width=32 } | <p style="display: inline-flex;-ms-transform: translateY(25%);transform: translateY(25%);">GlobalTags Premium</p> |
 
 ### Which commands can I use?
 

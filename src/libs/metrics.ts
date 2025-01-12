@@ -2,12 +2,13 @@ import metrics from "../database/schemas/metrics";
 import players from "../database/schemas/players";
 import Logger from "./Logger";
 import axios from "axios";
-import { client } from "../bot/bot";
+import { client, fetchGuild } from "../bot/bot";
 import { args } from "..";
-import { constantCase } from "change-case";
-import { config } from "./Config";
-import GlobalPosition from "../types/GlobalPosition";
-import GlobalIcon from "../types/GlobalIcon";
+import { config } from "./config";
+import { getCachedRoles } from "../database/schemas/roles";
+import { GlobalIcon, icons as iconList } from "../types/GlobalIcon";
+import { snakeCase } from "change-case";
+import { GlobalPosition, positions as positionList } from "../types/GlobalPosition";
 
 let requests: number;
 
@@ -23,14 +24,6 @@ export function recordRequest() {
 export function getRequests(): number {
     return requests;
 }
-
-const positionList = Object.keys(GlobalPosition)
-    .filter((pos) => isNaN(Number(pos)))
-    .map((pos) => pos.toUpperCase());
-
-const iconList = Object.keys(GlobalIcon)
-    .filter((pos) => isNaN(Number(pos)))
-    .map((pos) => pos.toUpperCase());
 
 type Addon = {
     id: number,
@@ -62,17 +55,20 @@ type Addon = {
 }
 
 export async function saveMetrics() {
-    if(config.discordBot.syncedRoles.enabled) await client.guilds.cache.get(config.discordBot.syncedRoles.guild)?.members.fetch();
+    if(config.discordBot.syncedRoles.enabled) await (await fetchGuild())?.members.fetch();
     const users = await players.find();
     const tags = users.filter((user) => user.tag != null).length;
-    const staff = users.filter((user) => user.getRolesSync().includes(constantCase(config.metrics.adminRole))).length;
+    const staff = users.filter((user) => {
+        const adminRole = getCachedRoles().find((role) => role.name == config.metrics.adminRole);
+        return !!adminRole && user.getRolesSync().includes(adminRole);
+    }).length;
     const bans = users.filter((user) => user.isBanned()).length;
     const positions = positionList.reduce((object: any, position) => {
-        object[position.toLowerCase()] = users.filter((user) => user.position.toUpperCase() == position.toUpperCase()).length;
+        object[snakeCase(GlobalPosition[position])] = users.filter((user) => snakeCase(GlobalPosition[position]) == snakeCase(user.position)).length;
         return object;
     }, {});
     const icons = iconList.reduce((object: any, icon) => {
-        object[icon.toLowerCase()] = users.filter((user) => user.icon.name.toUpperCase() == icon.toUpperCase()).length;
+        object[snakeCase(GlobalIcon[icon])] = users.filter((user) => snakeCase(GlobalIcon[icon]) == snakeCase(user.icon.name)).length;
         return object;
     }, {});
     const addon = await fetchAddon('globaltags');

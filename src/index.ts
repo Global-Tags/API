@@ -3,31 +3,30 @@ import { swagger } from "@elysiajs/swagger";
 import Logger from "./libs/Logger";
 import players from "./database/schemas/players";
 import { connect as connectDatabase } from "./database/mongo";
-import { getRouter } from "./libs/RouteLoader";
+import { getRouter } from "./libs/route-loader";
 import { version } from "../package.json";
-import access from "./middleware/AccessLog";
-import checkDatabase from "./middleware/DatabaseChecker";
+import access from "./middleware/access-log";
+import checkDatabase from "./middleware/database-checker";
 import Ratelimiter from "./libs/Ratelimiter";
-import checkRatelimit from "./middleware/RatelimitChecker";
-import { ip } from "./middleware/ObtainIP";
-import { load as loadLanguages } from "./libs/I18n";
-import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/FetchI18n";
-import { getRequests, loadRequests } from "./libs/Metrics";
+import checkRatelimit from "./middleware/ratelimit-checker";
+import { load as loadLanguages } from "./libs/i18n";
+import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/fetch-i18n";
+import { getRequests, loadRequests } from "./libs/metrics";
 import Metrics from "./database/schemas/metrics";
 import AuthProvider from "./auth/AuthProvider";
-import getAuthProvider from "./middleware/GetAuthProvider";
-import { handleErrors, initializeSentry } from "./libs/ErrorHandler";
+import getAuthProvider from "./middleware/get-auth-provider";
+import { handleErrors, initializeSentry } from "./libs/error-handler";
 import minimist from "minimist";
 import cors from "@elysiajs/cors";
-import { verify as verifyMailOptions } from "./libs/Mailer";
-import { getLatestCommit, retrieveData } from "./libs/GitCommitData";
-import { startEntitlementExpiry, startMetrics, startReferralReset } from "./libs/CronJobs";
-import { formatUUID } from "./routes/root";
-import { config } from "./libs/Config";
-import('./libs/RoleManager');
+import { verify as verifyMailOptions } from "./libs/mailer";
+import { startEntitlementExpiry, startMetrics, startReferralReset, startRoleCacheJob } from "./libs/cron-jobs";
+import { config } from "./libs/config";
+import { join } from "path";
+import { formatUUID } from "./libs/game-profiles";
+import { ip } from "elysia-ip";
 
 if(config.mongodb.trim().length == 0) {
-    Logger.error(`Database connection string is empty!`);
+    Logger.error('Database connection string is empty!');
     process.exit(1);
 }
 
@@ -37,14 +36,12 @@ if(config.sentry.enabled) initializeSentry(config.sentry.dsn);
 export const args = minimist(process.argv.slice(2));
 loadRequests();
 
-retrieveData();
-
 // Elysia API
-export const elysia = new Elysia()
+const elysia = new Elysia()
 .onRequest(checkDatabase)
 .onTransform(access)
 .onBeforeHandle(checkRatelimit)
-.use(ip({ checkHeaders: [config.ipHeader] }))
+.use(ip({ headersOnly: config.proxy.enabled, checkHeaders: [config.proxy.ipHeader] }))
 .use(cors())
 .use(fetchI18n)
 .use(getAuthProvider)
@@ -52,44 +49,46 @@ export const elysia = new Elysia()
     path: '/docs',
     autoDarkMode: true,
     exclude: [
-        `/docs`,
-        `/docs/json`
+        '/docs',
+        '/docs/json'
     ],
     documentation: {
         info: {
             version,
-            title: `GlobalTags API`,
-            description: `This is the official GlobalTags API documentation containing detailed descriptions about the API endpoints and their usage.`,
+            title: 'GlobalTags API',
+            description: 'This is the official GlobalTags API documentation containing detailed descriptions about the API endpoints and their usage.',
             license: {
                 name: 'MIT',
                 url: 'https://github.com/Global-Tags/API/blob/master/LICENSE'
             },
             contact: {
-                name: `RappyTV`,
-                url: `https://www.rappytv.com`,
-                email: `contact@rappytv.com`
+                name: 'RappyTV',
+                url: 'https://www.rappytv.com',
+                email: 'contact@rappytv.com'
             }
         },
         tags: [
-            { name: `API`, description: `Get info about the API` },
-            { name: `Interactions`, description: `Interact with other players` },
-            { name: `Settings`, description: `Modify the settings of your GlobalTag` },
-            { name: `Admin`, description: `Moderation actions` },
-            { name: `Connections`, description: `Manage account connections` }
+            { name: 'API', description: 'Get info about the API' },
+            { name: 'Interactions', description: 'Interact with other players' },
+            { name: 'Settings', description: 'Modify the settings of your GlobalTag' },
+            { name: 'Roles', description: 'Holds role management routes' },
+            { name: 'Admin', description: 'Moderation actions' },
+            { name: 'Connections', description: 'Manage account connections' }
         ]
     }
 }))
-.use(getRouter(`/players/:uuid`, __dirname))
-.onStart(() => {
+.use(getRouter(join(__dirname, 'routes')))
+.onStart(async () => {
     Logger.info(`Elysia listening on port ${config.port}!`);
     Ratelimiter.initialize();
     AuthProvider.loadProviders();
-    connectDatabase(config.mongodb);
+    loadLanguages();
     if(config.mailer.enabled) {
         verifyMailOptions();
     }
+    await connectDatabase(config.mongodb);
     
-    loadLanguages();
+    startRoleCacheJob();
     startEntitlementExpiry();
     startMetrics();
     startReferralReset();
@@ -114,32 +113,32 @@ export const elysia = new Elysia()
         return { error: error.trim() };
     } else if(code == 'NOT_FOUND') {
         set.status = 404;
-        return { error: i18n(`error.notFound`) };
+        return { error: i18n('error.notFound') };
     } else {
         set.status = 500;
         Logger.error(error);
-        return { error: i18n(`error.unknownError`) };
+        return { error: i18n('error.unknownError') };
     }
 })
-.get(`/`, () => ({
+.get('/', () => ({
     version,
     requests: getRequests(),
     commit: {
-        branch: config.github.branch,
-        sha: getLatestCommit(),
-        tree: getLatestCommit() ? `https://github.com/${config.github.owner}/${config.github.repository}/tree/${getLatestCommit()}` : null
+        branch: 'deprecated',
+        sha: 'deprecated',
+        tree: 'deprecated'
     }
 }), {
     detail: {
-        tags: [`API`],
-        description: `Returns some basic info about the API.`
+        tags: ['API'],
+        description: 'Returns some basic info about the API.'
     },
     response: {
-        200: t.Object({ version: t.String(), requests: t.Number(), commit: t.Object({ branch: t.String(), sha: t.Union([t.String(), t.Null()]), tree: t.Union([t.String(), t.Null()]) }) }, { description: `Some basic API info` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        200: t.Object({ version: t.String(), requests: t.Number(), commit: t.Object({ branch: t.String(), sha: t.Union([t.String(), t.Null()]), tree: t.Union([t.String(), t.Null()]) }) }, { description: 'Some basic API info' }),
+        503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
     }
 })
-.get(`/metrics`, async ({ query: { latest } }) => {
+.get('/metrics', async ({ query: { latest } }) => {
     const metrics = await Metrics.find();
 
     return metrics.filter((doc) => {
@@ -159,8 +158,8 @@ export const elysia = new Elysia()
     }));
 }, {
     detail: {
-        tags: [`API`],
-        description: `Get API statistics`
+        tags: ['API'],
+        description: 'Get API statistics'
     },
     response: {
         200: t.Array(t.Object({
@@ -174,8 +173,8 @@ export const elysia = new Elysia()
             dailyRequests: t.Number(),
             positions: t.Object({}, { default: {}, additionalProperties: true, description: 'All position counts' }),
             icons: t.Object({}, { default: {}, additionalProperties: true, description: 'All icon counts' })
-        }, { description: `The server is reachable` })),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        }, { description: 'The server is reachable' })),
+        503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
     },
     query: t.Object({
         latest: t.Optional(t.String({ error: 'error.wrongType;;[["field", "element"], ["type", "string"]]' }))
@@ -207,17 +206,19 @@ export const elysia = new Elysia()
             total: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() })),
             current_month: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() }))
         }, { description: 'The referral leaderboards.' }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
     }
 })
-.get(`/ping`, ({ error }: Context) => { return error(204, "") }, {
+.get('/ping', ({ error }: Context) => { return error(204, "") }, {
     detail: {
-        tags: [`API`],
-        description: `Used by uptime checkers. This route is not being logged`
+        tags: ['API'],
+        description: 'Used by uptime checkers. This route is not being logged'
     },
     response: {
-        204: t.Any({ description: `The server is reachable` }),
-        503: t.Object({ error: t.String() }, { description: `Database is not reachable.` })
+        204: t.Any({ description: 'The server is reachable' }),
+        503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
     }
 })
 .listen(config.port);
+
+export type ElysiaApp = typeof elysia;

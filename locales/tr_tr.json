@@ -1,7 +1,7 @@
 {
     "error": {
         "invalidBody": "İstek gövdesi bir JSON nesnesi olmalıdır!",
-        "missingField": "JSON alanı eksik \"<field>\".",
+        "missingField": "<field>JSON alanı eksik \"<field>\".",
         "notAllowed": "Buna erişiminiz yok!",
         "database": "Veritabanı bağlı değil. Lütfen daha sonra tekrar deneyin!",
         "playerNotFound": "Bu oyuncu veritabanımızda yok!",
@@ -9,13 +9,71 @@
         "wrongType": "\"<field>\" alanı <type> türünde olmalıdır!",
         "noTag": "Önce bir gün seçmelisiniz!",
         "playerNoTag": "Bu oyuncunun günü yok!",
-        "playerBanned": "Bu oyuncu yasaklandı!",
+        "playerBanned": "Bu oyuncu banlandı!",
         "noIcon": "Icon bulunamadı!",
         "notFound": "Bulunamadı!",
         "unknownError": "Bilinmeyen bir hata oluştu! Lütfen daha sonra tekrar deneyin!",
         "ratelimit": "Cihaz sınırlıdır! Lütfen <seconds> saniye içinde tekrar deneyin!"
     },
     "ban": {
-        "alreadyBanned": "Bu oyuncu zaten yasaklandı!"
+        "alreadyBanned": "Bu oyuncu zaten yasaklandı!",
+        "noReason": "Hiçbir sebep belirtilmedi",
+        "success": "Oyuncu başarıyla yasaklandı!"
+    },
+    "icon": {
+        "role_icon": {
+            "success": {
+                "shown": "Rolünüzün Ikonu artık gösteriliyor!",
+                "hidden": "Rol ikonunuz artık gizli!"
+            }
+        },
+        "sameIcon": "Bu Icon zaten seçtiniz!",
+        "notAllowed": "Bu Icon seçmenize izin verilmiyor!",
+        "success": {
+            "self": "Ikonuz başarıyla seçildi!",
+            "admin": "Oyuncunun Ikonu başarıyla değiştirildi!"
+        }
+    },
+    "position": {
+        "samePosition": "Etiketiniz zaten bu pozisyonda!",
+        "success": {
+            "self": "Etiket konumunuz başarıyla ayarlandı!",
+            "admin": "Oyuncunun etiket pozisyonu başarıyla ayarlandı!"
+        },
+        "invalid": "Lütfen geçerli bir pozisyon girin!"
+    },
+    "editBan": {
+        "success": "Ban güncellendi!"
+    },
+    "appeal": {
+        "notBanned": "Sen ban değilsin!",
+        "notAppealable": "Yasağınız itiraz edilemez!",
+        "success": "Ban kaldırma isteği başarıyla gönderildi!",
+        "alreadyAppealed": "Zaten bir ban kaldırma isteği gönderdiniz!"
+    },
+    "report": {
+        "alreadyReported": "Bu oyuncunun etiketini zaten rapor yaptıniz!",
+        "invalidReason": "Geçerli bir sebep belirtmelisiniz!",
+        "success": "Oyuncu başarıyla rapor edildi!",
+        "immune": "Bu oyuncu raporlanamaz!",
+        "self": "Kendini rapor edemezsin!",
+        "validation": "\"reason\" alanı yalnızca <min> ile <max> karakter uzunluğunda olabilir."
+    },
+    "setTag": {
+        "empty": "Etiket boş bırakılamaz!",
+        "sameTag": "Bu etiketiniz zaten var!",
+        "blacklisted": "\"<word>\" kelimesi GlobalTag'inizde görünmemelidir!",
+        "validation": "\"tag\" alanını <min> ve <max> karakterleri arasında tutun.",
+        "success": {
+            "admin": "Oyuncunun etiketi başarıyla güncellendi!",
+            "self": "Etiketiniz başarıyla güncellendi!"
+        }
+    },
+    "referral": {
+        "self": "Kendi kendinize aracılık edemezsiniz!"
+    },
+    "unban": {
+        "notBanned": "Bu oyuncu yasaklı değil!",
+        "success": "Oyuncunun yasağı başarıyla kaldırıldı!"
     }
 }

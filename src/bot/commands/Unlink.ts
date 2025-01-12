@@ -2,8 +2,9 @@ import { CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedB
 import Command from "../structs/Command";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { NotificationType, sendMessage } from "../../libs/DiscordNotifier";
-import { config } from "../../libs/Config";
+import { config } from "../../libs/config";
+import { getProfileByUUID } from "../../libs/game-profiles";
+import { onDiscordUnlink } from "../../libs/events";
 
 export default class Unlink extends Command {
     constructor() {
@@ -21,17 +22,11 @@ export default class Unlink extends Command {
         const player = await players.findOne({ "connections.discord.id": user.id });
         if(!player) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Your Discord account is not linked to any Minecraft account!`)] });
 
+        onDiscordUnlink(await getProfileByUUID(player.uuid), player.connections.discord.id!);
+
         player.connections.discord.id = null;
         player.connections.discord.code = null;
         player.save();
-        member.roles.remove(config.discordBot.notifications.accountConnections.role);
-
-        sendMessage({
-            type: NotificationType.DiscordLink,
-            connected: false,
-            userId: user.id,
-            uuid: player.uuid
-        });
 
         interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ Your account was successfully unlinked!`)] });
     }
