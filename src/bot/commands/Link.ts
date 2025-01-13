@@ -28,7 +28,7 @@ export default class Link extends Command {
         if(!config.discordBot.notifications.accountConnections.enabled) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Account linking is deactivated!`)] });
         const code = options.getString('code', true);
 
-        const self = await players.findOne({ "connections.discord.id": user.id });
+        const self = await players.findOne({ 'connections.discord.id': user.id });
         if(self) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Your Discord account is already linked to a Minecraft account! Please use \`/unlink\` to remove the connection.`)] });
 
         const player = await players.findOne({ "connections.discord.code": code });

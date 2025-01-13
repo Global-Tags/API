@@ -15,7 +15,7 @@ export default class EntitlementDelete extends Event {
 
     async fire(entitlement: Entitlement) {
         if(!config.discordBot.notifications.entitlements.enabled || !!entitlement.startsTimestamp) return; // Temporary replacement for Entitlement#isTest. See https://github.com/discordjs/discord.js/issues/10610
-        const player = await players.findOne({ "connections.discord.id": entitlement.userId });
+        const player = await players.findOne({ 'connections.discord.id': entitlement.userId });
         const sku = skus.find((sku) => sku.id == entitlement.skuId);
         if(!sku) return;
 

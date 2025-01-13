@@ -20,9 +20,9 @@ export default class RolesCommand extends Command {
         await interaction.deferReply({ ephemeral: true });
         if(!config.discordBot.notifications.accountConnections.enabled) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Account linking is deactivated!`)] });
 
-        const player = await players.findOne({ "connections.discord.id": user.id });
+        const player = await players.findOne({ 'connections.discord.id': user.id });
         if(!player) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Your account is not linked to a Minecraft account!`)] });
-        if(!player.hasPermissionSync(Permission.ManageRoles)) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to perform this action!`)] });
+        if(!player.hasPermission(Permission.ManageRoles)) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')] });
 
         const roles = getCachedRoles();
 

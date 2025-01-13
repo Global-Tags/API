@@ -15,9 +15,9 @@ export default class RenameRole extends Modal {
 
     async submit(interaction: ModalSubmitInteraction<CacheType>, message: Message<boolean>, fields: ModalSubmitFields, member: GuildMember, user: User) {
         await interaction.deferReply({ ephemeral: true });
-        const staff = await players.findOne({ "connections.discord.id": user.id });
-        if(!staff) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You need to link your Minecraft account with \`/link\`!`)] });
-        if(!staff.hasPermissionSync(Permission.ManageRoles)) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to perform this action!`)] });
+        const staff = await players.findOne({ 'connections.discord.id': user.id });
+        if(!staff) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')] });
+        if(!staff.hasPermission(Permission.ManageRoles)) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')] });
 
         const name = snakeCase(fields.getTextInputValue('name').trim());
         const roles = getCachedRoles();

@@ -14,7 +14,7 @@ export async function checkExpiredEntitlements() {
     const entitlements = await entitlement.find({ done: false, expires_at: { $lt: new Date() } });
     if(!entitlements) return;
     for (const entitlement of entitlements) {
-        const player = await players.findOne({ "connections.discord.id": entitlement.user_id });
+        const player = await players.findOne({ 'connections.discord.id': entitlement.user_id });
         const sku = skus.find((sku) => sku.id == entitlement.sku_id);
         if(!sku) continue;
 

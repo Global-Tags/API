@@ -19,7 +19,7 @@ export default class Unlink extends Command {
         await interaction.deferReply({ ephemeral: true });
         if(!config.discordBot.notifications.accountConnections.enabled) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Account linking is deactivated!`)] });
 
-        const player = await players.findOne({ "connections.discord.id": user.id });
+        const player = await players.findOne({ 'connections.discord.id': user.id });
         if(!player) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Your Discord account is not linked to any Minecraft account!`)] });
 
         onDiscordUnlink(await getProfileByUUID(player.uuid), player.connections.discord.id!);

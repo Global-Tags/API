@@ -58,10 +58,10 @@ export default class CustomIcon extends Command {
         await interaction.deferReply({ ephemeral: true });
         if(!config.discordBot.notifications.accountConnections.enabled) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Account linking is deactivated!`)] });
 
-        const player = await players.findOne({ "connections.discord.id": user.id });
+        const player = await players.findOne({ 'connections.discord.id': user.id });
         if(!player) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Your account is not linked to a Minecraft account!`)] });
         if(player.isBanned()) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Your account is banned!`)] });
-        if(!player.hasPermissionSync(Permission.CustomIcon)) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to have a custom icon!`)] });
+        if(!player.hasPermission(Permission.CustomIcon)) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to have a custom icon!`)] });
         const sub = options.getSubcommand();
 
         if(sub == 'toggle') {

@@ -18,7 +18,7 @@ export default class EntitlementCreate extends Event {
         if(!config.discordBot.notifications.entitlements.enabled) return;
         const sku = skus.find((sku) => sku.id == entitlement.skuId);
         if(!sku) return;
-        const player = await players.findOne({ "connections.discord.id": entitlement.userId });
+        const player = await players.findOne({ 'connections.discord.id': entitlement.userId });
 
         sendEntitlementMessage(
             player?.uuid || '',

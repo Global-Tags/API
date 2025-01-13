@@ -25,20 +25,20 @@ export default class PlayerInfo extends Command {
 
     async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, user: User) {
         await interaction.deferReply();
-        let name, uuid = options.getString(`player`)!;
+        let name, uuid = options.getString('player', true);
         if(!uuidRegex.test(uuid)) {
             const profile = await getProfileByUsername(uuid);
             if(!profile.uuid || profile.error) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ ${profile.error || 'An error ocurred with the request to mojang'}`)] });
-
+            
             name = profile.username;
             uuid = profile.uuid;
         }
         const strippedUUID = stripUUID(uuid);
         const data = await players.findOne({ uuid: strippedUUID });
-        const roles = data?.getRolesSync() || [];
+        const roles = data?.getRoles() || [];
 
         if(!data) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ This player is not in our records!`)] });
-        const staff = await players.findOne({ "connections.discord.id": user.id });
+        const staff = await players.findOne({ 'connections.discord.id': user.id });
         interaction.editReply({
             embeds: [
                 new EmbedBuilder()
@@ -79,7 +79,7 @@ export default class PlayerInfo extends Command {
                 .setImage(`https://cdn.rappytv.com/bots/placeholder.png`)
                 .setFooter({ text: `© RappyTV, ${new Date().getFullYear()}`})
             ],
-            components: staff && staff.canManagePlayersSync() ? [
+            components: staff && staff.canManagePlayers() ? [
                 new ActionRowBuilder<ButtonBuilder>()
                     .addComponents(
                         new ButtonBuilder()
