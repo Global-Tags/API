@@ -38,7 +38,8 @@ export default class EditRoles extends SelectMenu {
                 player.roles.push({
                     name: value,
                     added_at: addedAt,
-                    reason: reason
+                    reason: reason,
+                    manually_added: true
                 });
             }
             added.push(value);

@@ -29,6 +29,7 @@ export interface IPlayer {
     roles: {
         name: string,
         added_at: Date,
+        manually_added: boolean,
         expires_at?: Date | null,
         reason?: string | null
     }[],
@@ -160,6 +161,10 @@ const schema = new Schema<IPlayer>({
             },
             added_at: {
                 type: Date,
+                required: true
+            },
+            manually_added: {
+                type: Boolean,
                 required: true
             },
             expires_at: Date,
