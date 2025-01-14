@@ -20,7 +20,7 @@ export default class DeleteReport extends SelectMenu {
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
 
         const report = player.reports.find((report) => report.id == values[0]);
-        if(!report) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Report not found!`)], ephemeral: true });
+        if(!report) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Report not found!')], ephemeral: true });
         player.deleteReport(report.id);
         await player.save();
 
@@ -32,6 +32,6 @@ export default class DeleteReport extends SelectMenu {
             report: report.reason
         });
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The report was successfully deleted!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The report was successfully deleted!')], ephemeral: true });
     }
 }

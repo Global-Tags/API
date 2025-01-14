@@ -38,6 +38,6 @@ export default class ClearIconTexture extends Button {
             sendIconClearEmail(player.connections.email.address!, getI18nFunctionByLanguage(player.last_language));
         }
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The icon texture was successfully reset!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The icon texture was successfully reset!')], ephemeral: true });
     }
 }

@@ -28,8 +28,8 @@ export default class Reports extends Button {
 
         const embed = new EmbedBuilder()
         .setColor(colors.standart)
-        .setTitle(`Reports`)
-        .setDescription(reports.length > 0 ? reports.join('\n') : `*This player was never reported*`)
+        .setTitle('Reports')
+        .setDescription(reports.length > 0 ? reports.join('\n') : '*This player was never reported*')
         .addFields(message.embeds[0].fields[0]);
 
         const row = new ActionRowBuilder<ButtonBuilder>()

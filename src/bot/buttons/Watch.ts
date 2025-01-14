@@ -8,7 +8,7 @@ import { getProfileByUUID } from "../../libs/game-profiles";
 
 export default class Watch extends Button {
     constructor() {
-        super("watch");
+        super('watch');
     }
 
     async trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
@@ -18,7 +18,7 @@ export default class Watch extends Button {
 
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
-        if(player.watchlist) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player is already on the watchlist!`)], ephemeral: true });
+        if(player.watchlist) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player is already on the watchlist!')], ephemeral: true });
 
         player.watchlist = true;
         player.save();
@@ -30,6 +30,6 @@ export default class Watch extends Button {
             discord: true
         });
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The player is now being watched!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The player is now being watched!')], ephemeral: true });
     }
 }

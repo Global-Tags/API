@@ -19,15 +19,15 @@ export default class RemoveSubscription extends Button {
         
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
-        if(!player.connections.discord.id) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player does not have their account linked!`)], ephemeral: true });
+        if(!player.connections.discord.id) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player does not have their account linked!')], ephemeral: true });
 
         const entitlements = (await client.application!.entitlements.fetch({ user: player.connections.discord.id })).filter(e => !e.startsTimestamp && e.isActive() && skus.some(sku => sku.id == e.skuId));
-        if(entitlements.size == 0) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ The player currently has no removable subscriptions.`)], ephemeral: true });
+        if(entitlements.size == 0) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The player currently has no removable subscriptions.')], ephemeral: true });
 
         const embed = new EmbedBuilder()
         .setColor(0x5865f2)
         .setTitle('Remove subscription')
-        .setDescription(`Here you can remove a subscription gift from the player.`)
+        .setDescription('Here you can remove a subscription gift from the player.')
         .addFields(message.embeds[0].fields[0])
         .setThumbnail(message.embeds[0].thumbnail!.url);
 

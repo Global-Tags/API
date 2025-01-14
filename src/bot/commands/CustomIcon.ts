@@ -56,12 +56,12 @@ export default class CustomIcon extends Command {
 
     async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, user: User) {
         await interaction.deferReply({ ephemeral: true });
-        if(!config.discordBot.notifications.accountConnections.enabled) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Account linking is deactivated!`)] });
+        if(!config.discordBot.notifications.accountConnections.enabled) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Account linking is deactivated!')] });
 
         const player = await players.findOne({ 'connections.discord.id': user.id });
-        if(!player) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Your account is not linked to a Minecraft account!`)] });
-        if(player.isBanned()) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Your account is banned!`)] });
-        if(!player.hasPermission(Permission.CustomIcon)) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to have a custom icon!`)] });
+        if(!player) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Your account is not linked to a Minecraft account!')] });
+        if(player.isBanned()) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Your account is banned!')] });
+        if(!player.hasPermission(Permission.CustomIcon)) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to have a custom icon!')] });
         const sub = options.getSubcommand();
 
         if(sub == 'toggle') {
@@ -73,12 +73,12 @@ export default class CustomIcon extends Command {
         } if(sub == 'upload') {
             const file = options.getAttachment('file', true);
 
-            if(file.contentType != 'image/png') return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ The file you uploaded is not a PNG image!`)] });
-            if(!file.height || file.height != file.width) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ The file you uploaded is not a square image!`)] });
+            if(file.contentType != 'image/png') return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The file you uploaded is not a PNG image!')] });
+            if(!file.height || file.height != file.width) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The file you uploaded is not a square image!')] });
             if(file.height > config.validation.icon.maxResolution) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ The file you uploaded exceeds the max resolution of ${config.validation.icon.maxResolution}x${config.validation.icon.maxResolution}!`)] });
 
             const request = await axios.get(file.url, { responseType: 'arraybuffer' }).catch(() => null);
-            if(!request) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ The upload failed, please try again!`)] });
+            if(!request) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The upload failed, please try again!')] });
 
             player.icon.name = constantCase(GlobalIcon[GlobalIcon.Custom]);
             player.icon.hash = generateSecureCode(32);
@@ -90,13 +90,13 @@ export default class CustomIcon extends Command {
                 player.icon.hash
             );
 
-            interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ Your custom icon was successfully uploaded!\nYou may need to clear your cache ingame for the icon to be shown.`).setThumbnail(`attachment://${file.name}`)], files: [file] });
+            interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ Your custom icon was successfully uploaded!\nYou may need to clear your cache ingame for the icon to be shown.').setThumbnail(`attachment://${file.name}`)], files: [file] });
         } else if(sub == 'unset') {
             player.icon.name = constantCase(GlobalIcon[GlobalIcon.None]);
             player.icon.hash = null;
             await player.save();
 
-            interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ Your custom icon was successfully unset!`)] });
+            interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ Your custom icon was successfully unset!')] });
         }
     }
 }

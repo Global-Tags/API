@@ -92,7 +92,7 @@ export async function saveMetrics() {
     }).catch((error) =>
         Logger.error(`Error while trying to save metrics: ${error}. Request count: ${requests}`)
     ).then(() =>
-        Logger.debug(`New metrics saved!`)
+        Logger.debug('New metrics saved!')
     );
 
     requests = 0;

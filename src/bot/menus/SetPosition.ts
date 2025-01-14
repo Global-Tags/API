@@ -21,7 +21,7 @@ export default class SetPosition extends SelectMenu {
 
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
-        if(player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player is already banned!`)], ephemeral: true });
+        if(player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player is already banned!')], ephemeral: true });
 
         const oldPosition = player.position;
         player.position = snakeCase(values[0]);
@@ -42,6 +42,6 @@ export default class SetPosition extends SelectMenu {
             sendPositionChangeEmail(player.connections.email.address!, oldPosition || '---', player.position, getI18nFunctionByLanguage(player.last_language));
         }
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The players position was successfully updated!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The players position was successfully updated!')], ephemeral: true });
     }
 }

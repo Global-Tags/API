@@ -19,12 +19,12 @@ export default class GrantSubscription extends Button {
         
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
-        if(!player.connections.discord.id) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player does not have their account linked!`)], ephemeral: true });
+        if(!player.connections.discord.id) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player does not have their account linked!')], ephemeral: true });
 
         const embed = new EmbedBuilder()
         .setColor(0x5865f2)
         .setTitle('Add subscription')
-        .setDescription(`Here you can gift a subscription to the player.`)
+        .setDescription('Here you can gift a subscription to the player.')
         .addFields(message.embeds[0].fields[0])
         .setThumbnail(message.embeds[0].thumbnail!.url);
 

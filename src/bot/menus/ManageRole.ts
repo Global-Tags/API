@@ -19,7 +19,7 @@ export default class ManageRole extends SelectMenu {
         if(!staff.hasPermission(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], ephemeral: true });
 
         const role = getCachedRoles().find((role) => role.name == values[0]);
-        if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Role not found!`)], ephemeral: true });
+        if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], ephemeral: true });
 
         const permissions = role.getPermissions();
 
@@ -28,7 +28,7 @@ export default class ManageRole extends SelectMenu {
         .setTitle(`Edit **${capitalCase(role.name)}**`)
         .setDescription(`**ID**: \`${role.name}\`\n**Position**: \`${role.position}\`\n**Has Icon**: \`${role.hasIcon ? '✅' : '❌'}\`\n**Metrics admin**: \`${role.name == config.metrics.adminRole ? '✅' : '❌'}\`\n**Permissions** [\`${permissions.length}\`]:\n>>> ${allPermissions.map((permission) => `- ${capitalCase(Permission[permission])}: \`${role.hasPermission(permission) ? '✅' : '❌'}\``).join('\n')}`)
         .setImage(images.placeholder)
-        .setFooter({ text: `${role.name}` });
+        .setFooter({ text: role.name });
 
         if(role.hasIcon) embed.setThumbnail(config.iconUrl(role.name));
 

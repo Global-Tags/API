@@ -10,7 +10,7 @@ import { getProfileByUUID } from "../../libs/game-profiles";
 
 export default class SetTag extends Modal {
     constructor() {
-        super("setTag");
+        super('setTag');
     }
 
     async submit(interaction: ModalSubmitInteraction<CacheType>, message: Message<boolean>, fields: ModalSubmitFields, member: GuildMember, user: User) {
@@ -41,6 +41,6 @@ export default class SetTag extends Modal {
             sendTagChangeEmail(player.connections.email.address!, oldTag || '---', tag, getI18nFunctionByLanguage(player.last_language));
         }
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The tag was successfully set!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The tag was successfully set!')], ephemeral: true });
     }
 }

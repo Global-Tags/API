@@ -10,7 +10,7 @@ import { getProfileByUUID } from "../../libs/game-profiles";
 
 export default class Ban extends Modal {
     constructor() {
-        super("ban");
+        super('ban');
     }
 
     async submit(interaction: ModalSubmitInteraction<CacheType>, message: Message<boolean>, fields: ModalSubmitFields, member: GuildMember, user: User) {
@@ -20,8 +20,8 @@ export default class Ban extends Modal {
 
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
-        if(player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player is already banned!`)], ephemeral: true });
-        const reason = fields.getTextInputValue(`reason`);
+        if(player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player is already banned!')], ephemeral: true });
+        const reason = fields.getTextInputValue('reason');
 
         player.banPlayer(reason, staff.uuid);
         player.save();
@@ -38,6 +38,6 @@ export default class Ban extends Modal {
             sendBanEmail(player.connections.email.address!, reason || '---', getI18nFunctionByLanguage(player.last_language));
         }
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The player was successfully banned!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The player was successfully banned!')], ephemeral: true });
     }
 }

@@ -21,7 +21,7 @@ export default class SetIconType extends Button {
 
         const embed = new EmbedBuilder()
         .setColor(colors.standart)
-        .setTitle(`Set icon type`)
+        .setTitle('Set icon type')
         .setDescription(`The player's current icon type is \`${pascalCase(player.icon.name)}\`.`)
         .addFields(message.embeds[0].fields[0]);
 

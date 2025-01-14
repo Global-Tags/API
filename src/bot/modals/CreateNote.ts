@@ -34,6 +34,6 @@ export default class CreateNote extends Modal {
         });
         player.save();
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The note was successfully added!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The note was successfully added!')], ephemeral: true });
     }
 }

@@ -28,8 +28,8 @@ export default class Notes extends Button {
 
         const embed = new EmbedBuilder()
         .setColor(colors.standart)
-        .setTitle(`Notes`)
-        .setDescription(notes.length > 0 ? notes.join('\n') : `*This player does not have any notes*`)
+        .setTitle('Notes')
+        .setDescription(notes.length > 0 ? notes.join('\n') : '*This player does not have any notes*')
         .addFields(message.embeds[0].fields[0]);
 
         const row = new ActionRowBuilder<ButtonBuilder>()

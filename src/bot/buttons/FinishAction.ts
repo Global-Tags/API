@@ -21,6 +21,6 @@ export default class FinishAction extends Button {
         embed.setFooter({ text: `Processed by ${user.username}`, iconURL: `https://laby.net/texture/profile/head/${stripUUID(staff.uuid)}.png?size=1024&overlay` });
 
         message.edit({ embeds: [embed], components: [row] });
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ Action completed!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ Action completed!')], ephemeral: true });
     }
 }

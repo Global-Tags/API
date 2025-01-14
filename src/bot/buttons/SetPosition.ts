@@ -21,7 +21,7 @@ export default class SetPosition extends Button {
 
         const embed = new EmbedBuilder()
         .setColor(colors.standart)
-        .setTitle(`Set position`)
+        .setTitle('Set position')
         .setDescription(`The player's current position is \`${pascalCase(player.position)}\`.`)
         .addFields(message.embeds[0].fields[0]);
 

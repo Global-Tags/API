@@ -10,7 +10,7 @@ import { getProfileByUUID } from "../../libs/game-profiles";
 
 export default class Unban extends Button {
     constructor() {
-        super("unban");
+        super('unban');
     }
 
     async trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
@@ -20,7 +20,7 @@ export default class Unban extends Button {
         
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
-        if(!player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player is not banned!`)], ephemeral: true });
+        if(!player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player is not banned!')], ephemeral: true });
 
         player.unban();
         player.save();
@@ -36,6 +36,6 @@ export default class Unban extends Button {
             sendUnbanEmail(player.connections.email.address!, getI18nFunctionByLanguage(player.last_language));
         }
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The player was successfully unbanned!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The player was successfully unbanned!')], ephemeral: true });
     }
 }

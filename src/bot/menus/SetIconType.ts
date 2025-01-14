@@ -21,7 +21,7 @@ export default class SetIconType extends SelectMenu {
 
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
-        if(player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player is already banned!`)], ephemeral: true });
+        if(player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player is already banned!')], ephemeral: true });
 
         const oldIcon = { ...player.icon };
         player.icon.name = snakeCase(values[0]);
@@ -42,6 +42,6 @@ export default class SetIconType extends SelectMenu {
             sendIconTypeChangeEmail(player.connections.email.address!, oldIcon.name, player.icon.name, getI18nFunctionByLanguage(player.last_language));
         }
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The players icon type was successfully updated!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The players icon type was successfully updated!')], ephemeral: true });
     }
 }

@@ -40,6 +40,6 @@ export default class RenameRole extends Modal {
         role.save();
         updateRoleCache();
 
-        interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The role was successfully renamed!`)] });
+        interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The role was successfully renamed!')] });
     }
 }

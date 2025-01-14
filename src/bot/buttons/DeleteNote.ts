@@ -18,7 +18,7 @@ export default class DeleteNote extends Button {
 
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
         if(!player) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')] });
-        if(player.notes.length < 1) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player does not have any notes!`)] });
+        if(player.notes.length < 1) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player does not have any notes!')] });
 
         const options = [];
 

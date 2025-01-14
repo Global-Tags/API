@@ -20,7 +20,7 @@ export default class DeleteNote extends SelectMenu {
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
 
         const note = player.notes.find((note) => note.id == values[0]);
-        if(!note) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Note not found!`)], ephemeral: true });
+        if(!note) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Note not found!')], ephemeral: true });
         player.deleteNote(note.id);
         await player.save();
 
@@ -32,6 +32,6 @@ export default class DeleteNote extends SelectMenu {
             note: note.text
         });
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The note was successfully deleted!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The note was successfully deleted!')], ephemeral: true });
     }
 }

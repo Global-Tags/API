@@ -21,7 +21,7 @@ export default class ManagePermissions extends SelectMenu {
         if(!staff.hasPermission(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], ephemeral: true });
 
         const role = getCachedRoles().find((role) => role.name == message.embeds[1].footer!.text);
-        if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Role not found!`)], ephemeral: true });
+        if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], ephemeral: true });
 
         const permissions = [ ...role.permissions ];
         const added: string[] = [];
@@ -48,6 +48,6 @@ export default class ManagePermissions extends SelectMenu {
             }
         });
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The role permissions were successfully updated!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The role permissions were successfully updated!')], ephemeral: true });
     }
 }

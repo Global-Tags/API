@@ -210,7 +210,7 @@ const elysia = new Elysia()
         503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
     }
 })
-.get('/ping', ({ error }: Context) => { return error(204, "") }, {
+.get('/ping', ({ error }: Context) => { return error(204, '') }, {
     detail: {
         tags: ['API'],
         description: 'Used by uptime checkers. This route is not being logged'

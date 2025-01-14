@@ -16,12 +16,12 @@ export default class GrantSubscription extends SelectMenu {
 
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
-        if(!player.connections.discord.id) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player does not have their account linked!`)], ephemeral: true });
+        if(!player.connections.discord.id) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player does not have their account linked!')], ephemeral: true });
 
         try {
             await client.application!.entitlements.createTest({ sku: values[0], user: player.connections.discord.id });
     
-            interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The subscription was successfully granted!`)], ephemeral: true });
+            interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The subscription was successfully granted!')], ephemeral: true });
         } catch(err: any) {
             interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Entitlement could not be created: ${(err as DiscordAPIError)?.message || 'Unknown error'}`)], ephemeral: true });
         }

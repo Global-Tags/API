@@ -104,22 +104,22 @@ export function sendReportMessage({ user, reporter, tag, reason } : {
         embed: new EmbedBuilder()
         .setColor(0xff0000)
         .setThumbnail(`https://laby.net/texture/profile/head/${user.uuid}.png?size=1024&overlay`)
-        .setTitle(`New report!`)
+        .setTitle('New report!')
         .addFields([
             {
-                name: `Reported player`,
+                name: 'Reported player',
                 value: `[\`${user.username || user.uuid}\`](https://laby.net/@${user.uuid})`
             },
             {
-                name: `Reported Tag`,
+                name: 'Reported Tag',
                 value: `\`\`\`${tag}\`\`\``
             },
             {
-                name: `Reporter`,
+                name: 'Reporter',
                 value: `[\`${reporter.username || reporter.uuid}\`](https://laby.net/@${reporter.uuid})`
             },
             {
-                name: `Reason`,
+                name: 'Reason',
                 value: `\`\`\`${reason}\`\`\``
             }
         ])
@@ -134,18 +134,18 @@ export function sendWatchlistAddMessage({ user, tag, word }: { user: Profile, ta
         content: config.discordBot.notifications.watchlist.content,
         embed: new EmbedBuilder()
         .setColor(0x5865f2)
-        .setTitle(`New watched player`)
+        .setTitle('New watched player')
         .addFields([
             {
-                name: `Watched player`,
+                name: 'Watched player',
                 value: `[\`${user.username || user.uuid}\`](https://laby.net/@${user.uuid})`
             },
             {
-                name: `New tag`,
+                name: 'New tag',
                 value: `\`\`\`${tag}\`\`\``
             },
             {
-                name: `Matched word`,
+                name: 'Matched word',
                 value: `\`\`\`${word}\`\`\``
             }
         ])
@@ -161,14 +161,14 @@ export function sendWatchlistTagUpdateMessage(user: Profile, tag: string) {
         embed: new EmbedBuilder()
             .setColor(0x5865f2)
             .setThumbnail(`https://laby.net/texture/profile/head/${user.uuid}.png?size=1024&overlay`)
-            .setTitle(`New tag change`)
+            .setTitle('New tag change')
             .addFields([
                 {
-                    name: `Watched player`,
+                    name: 'Watched player',
                     value: `[\`${user.username || user.uuid}\`](https://laby.net/@${user.uuid})`
                 },
                 {
-                    name: `New tag`,
+                    name: 'New tag',
                     value: `\`\`\`${tag}\`\`\``
                 }
             ])
@@ -184,14 +184,14 @@ export function sendBanAppealMessage(user: Profile, reason: string) {
         embed: new EmbedBuilder()
             .setColor(0x5865f2)
             .setThumbnail(`https://laby.net/texture/profile/head/${user.uuid}.png?size=1024&overlay`)
-            .setTitle(`New ban appeal`)
+            .setTitle('New ban appeal')
             .addFields([
                 {
-                    name: `Player`,
+                    name: 'Player',
                     value: `[\`${user.username || user.uuid}\`](https://laby.net/@${user.uuid})`
                 },
                 {
-                    name: `Reason`,
+                    name: 'Reason',
                     value: `\`\`\`${reason}\`\`\``
                 }
             ])
@@ -234,12 +234,12 @@ export function sendEmailLinkMessage(user: Profile, email: string | null, connec
             .setTitle(connected ? 'New email connection' : 'Email connection removed')
             .addFields([
                 {
-                    name: `Player`,
+                    name: 'Player',
                     value: `[\`${user.username}\`](https://laby.net/@${user.uuid})`
                 },
                 {
-                    name: connected ? `Email` : 'Previous Email',
-                    value: `${email ? `||${email}||` : '**\`HIDDEN\`**'}`
+                    name: connected ? 'Email' : 'Previous Email',
+                    value: `${email ? `||${email}||` : '**`HIDDEN`**'}`
                 }
             ]),
         actionButton: true
@@ -342,12 +342,12 @@ async function sendMessage({ channel, content, embed, actionButton = true } : {
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
-                .setLabel(`Actions`)
-                .setCustomId(`actions`)
+                .setLabel('Actions')
+                .setCustomId('actions')
                 .setStyle(ButtonStyle.Primary),
                 new ButtonBuilder()
-                .setLabel(`Finish actions`)
-                .setCustomId(`finishAction`)
+                .setLabel('Finish actions')
+                .setCustomId('finishAction')
                 .setStyle(ButtonStyle.Success),
             )
         ] : []

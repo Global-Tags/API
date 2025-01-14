@@ -5,7 +5,7 @@ import { colors } from "../bot";
 
 export default class SetTag extends Button {
     constructor() {
-        super("setTag");
+        super('setTag');
     }
 
     async trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
@@ -13,17 +13,17 @@ export default class SetTag extends Button {
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
 
         const input = new TextInputBuilder()
-        .setLabel(`New tag`)
-        .setCustomId(`tag`)
-        .setPlaceholder(`Enter a tag`)
+        .setLabel('New tag')
+        .setCustomId('tag')
+        .setPlaceholder('Enter a tag')
         .setRequired(true)
         .setStyle(TextInputStyle.Short);
 
         if(player.tag) input.setValue(player.tag);
 
         const modal = new ModalBuilder()
-        .setTitle(`Set new tag`)
-        .setCustomId(`setTag`)
+        .setTitle('Set new tag')
+        .setCustomId('setTag')
         .addComponents(
             new ActionRowBuilder<TextInputBuilder>()
             .addComponents(input)
