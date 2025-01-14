@@ -29,7 +29,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     if(!player) return error(404, { error: i18n('error.playerNoTag') });
 
     if(snakeCase(player.icon.name) == snakeCase(GlobalIcon[GlobalIcon.Custom])) {
-        if(!(await player.hasPermission(Permission.CustomIcon))) {
+        if(!player.hasPermission(Permission.CustomIcon)) {
             player.icon.name = snakeCase(GlobalIcon[GlobalIcon.None]);
             await player.save();
         }
