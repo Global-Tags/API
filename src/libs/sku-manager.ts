@@ -6,7 +6,7 @@ export type SKU = {
     id: string;
     name: string,
     role: string,
-    discordRole: string
+    discordRoles: string[]
 }
 
 for(const role of skuConfig) {
@@ -14,7 +14,7 @@ for(const role of skuConfig) {
         id: role.id,
         name: role.name,
         role: role.role,
-        discordRole: role.discord_role
+        discordRoles: role.discord_roles
     });
 }
 

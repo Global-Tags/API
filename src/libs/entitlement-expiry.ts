@@ -28,12 +28,7 @@ export async function checkExpiredEntitlements() {
             );
         }
 
-        if(player) {
-            player.roles = player.roles.filter((role) => role != sku.role);
-            await player.save();
-        }
-
-        if(sku.discordRole) {
+        if(sku.discordRoles.length > 0) {
             const guild = await fetchGuild().catch(() => {
                 Logger.error(`Couldn't fetch guild '${config.discordBot.server}'!`);
                 return null;
@@ -44,7 +39,9 @@ export async function checkExpiredEntitlements() {
                 return null;
             });
             if(!member) return;
-            member.roles.remove(sku.discordRole);
+            for(const role of sku.discordRoles) {
+                member.roles.remove(role);
+            }
         }
     }
 }
