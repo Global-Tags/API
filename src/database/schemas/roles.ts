@@ -6,6 +6,7 @@ import { isConnected } from "../mongo";
 import Logger from "../../libs/Logger";
 import playerSchema from "./players";
 import { fetchGuild } from "../../bot/bot";
+import players from "./players";
 
 interface IRole {
     name: string,
@@ -14,7 +15,8 @@ interface IRole {
     permissions: string[],
     getPermissions(): Permission[],
     hasPermission(permission: Permission): boolean,
-    getSyncedRoles(): string[]
+    getSyncedRoles(): string[],
+    rename(name: string): Promise<void>
 }
 
 export type Role = HydratedDocument<IRole>;
@@ -39,18 +41,26 @@ const schema = new Schema<IRole>({
     }
 }, {
     methods: {
-        getPermissions() {
+        getPermissions(): Permission[] {
             return this.permissions
                 .filter((permission) => pascalCase(permission) in Permission)
                 .map((permission) => Permission[pascalCase(permission) as keyof typeof Permission]);
         },
 
-        hasPermission(permission: Permission) {
+        hasPermission(permission: Permission): boolean {
             return this.getPermissions().includes(permission);
         },
 
-        getSyncedRoles() {
+        getSyncedRoles(): string[] {
             return config.discordBot.syncedRoles.getRoles(this.name);
+        },
+
+        async rename(name: string): Promise<void> {
+            const oldName = this.name;
+            this.name = name;
+            this.save();
+            await players.updateMany({ 'roles.name': oldName }, { $set: { 'roles.$.name': name } });
+            updateRoleCache();
         }
     }
 });

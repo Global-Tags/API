@@ -36,9 +36,7 @@ export default class RenameRole extends Modal {
             }
         });
     
-        role.name = name;
-        role.save();
-        updateRoleCache();
+        role.rename(name);
 
         interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The role was successfully renamed!')] });
     }
