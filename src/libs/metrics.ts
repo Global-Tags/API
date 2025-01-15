@@ -60,7 +60,7 @@ export async function saveMetrics() {
     const tags = users.filter((user) => user.tag != null).length;
     const staff = users.filter((user) => {
         const adminRole = getCachedRoles().find((role) => role.name == config.metrics.adminRole);
-        return !!adminRole && user.getRolesSync().includes(adminRole);
+        return !!adminRole && user.getRoles().includes(adminRole);
     }).length;
     const bans = users.filter((user) => user.isBanned()).length;
     const positions = positionList.reduce((object: any, position) => {
@@ -92,7 +92,7 @@ export async function saveMetrics() {
     }).catch((error) =>
         Logger.error(`Error while trying to save metrics: ${error}. Request count: ${requests}`)
     ).then(() =>
-        Logger.debug(`New metrics saved!`)
+        Logger.debug('New metrics saved!')
     );
 
     requests = 0;

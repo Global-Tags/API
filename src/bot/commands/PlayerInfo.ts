@@ -14,8 +14,8 @@ export default class PlayerInfo extends Command {
             "Fetches GlobalTag data about a player.",
             [
                 {
-                    name: `player`,
-                    description: `Either the player name or the player's minecraft uuid.`,
+                    name: 'player',
+                    description: 'Either the player name or the player\'s minecraft uuid.',
                     required: true,
                     type: ApplicationCommandOptionType.String
                 }
@@ -25,66 +25,66 @@ export default class PlayerInfo extends Command {
 
     async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, user: User) {
         await interaction.deferReply();
-        let name, uuid = options.getString(`player`)!;
+        let name, uuid = options.getString('player', true);
         if(!uuidRegex.test(uuid)) {
             const profile = await getProfileByUsername(uuid);
             if(!profile.uuid || profile.error) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ ${profile.error || 'An error ocurred with the request to mojang'}`)] });
-
+            
             name = profile.username;
             uuid = profile.uuid;
         }
         const strippedUUID = stripUUID(uuid);
         const data = await players.findOne({ uuid: strippedUUID });
-        const roles = data?.getRolesSync() || [];
+        const roles = data?.getRoles() || [];
 
-        if(!data) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ This player is not in our records!`)] });
-        const staff = await players.findOne({ "connections.discord.id": user.id });
+        if(!data) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ This player is not in our records!')] });
+        const staff = await players.findOne({ 'connections.discord.id': user.id });
         interaction.editReply({
             embeds: [
                 new EmbedBuilder()
                 .setColor(bot.colors.standart)
                 .setThumbnail(`https://laby.net/texture/profile/head/${strippedUUID}.png?size=1024&overlay`)
                 .setURL(`https://laby.net/${uuid}`)
-                .setTitle(`Playerdata${!!name ? ` of ${name}` : ``}`)
+                .setTitle(`Playerdata${!!name ? ` of ${name}` : ''}`)
                 .addFields([
                     {
-                        name: `UUID`,
+                        name: 'UUID',
                         value: `\`\`\`${formatUUID(uuid)}\`\`\``
                     },
                     {
-                        name: `Tag`,
+                        name: 'Tag',
                         value: `\`\`\`ansi\n${translateToAnsi((data.ban.active ? null : data.tag) || '--')}\`\`\``
                     },
                     {
-                        name: `Position`,
+                        name: 'Position',
                         value: `\`\`\`${capitalCase(data.position)}\`\`\``,
                         inline: true
                     },
                     {
-                        name: `Icon`,
+                        name: 'Icon',
                         value: `\`\`\`${capitalCase(data.icon.name)}\`\`\``,
                         inline: true
                     },
                     {
-                        name: `Referrals`,
+                        name: 'Referrals',
                         value: `\`\`\`${data.referrals.total.length}\`\`\``,
                         inline: true
                     },
                     {
                         name: `Roles [${roles.length}]`,
-                        value: `\`\`\`${roles.length > 0 ? roles.map((role) => `- ${capitalCase(role.name)}`).join('\n') : `--`}\`\`\``,
+                        value: `\`\`\`${roles.length > 0 ? roles.map((role) => `- ${capitalCase(role.name)}`).join('\n') : '--'}\`\`\``,
                         inline: false
                     }
                 ])
-                .setImage(`https://cdn.rappytv.com/bots/placeholder.png`)
+                .setImage('https://cdn.rappytv.com/bots/placeholder.png')
                 .setFooter({ text: `© RappyTV, ${new Date().getFullYear()}`})
             ],
-            components: staff && staff.canManagePlayersSync() ? [
+            components: staff && staff.canManagePlayers() ? [
                 new ActionRowBuilder<ButtonBuilder>()
                     .addComponents(
                         new ButtonBuilder()
-                        .setLabel(`Actions`)
-                        .setCustomId(`actions`)
+                        .setLabel('Actions')
+                        .setCustomId('actions')
                         .setStyle(ButtonStyle.Primary)
                     )
             ] : []

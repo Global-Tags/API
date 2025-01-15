@@ -2,9 +2,9 @@ import { CronJob } from "cron";
 import { checkExpiredEntitlements } from "./entitlement-expiry";
 import { saveMetrics } from "./metrics";
 import Logger from "./Logger";
-import players from "../database/schemas/players";
+import playerSchema from "../database/schemas/players";
 import { config } from "./config";
-import { updateRoleCache } from "../database/schemas/roles";
+import { synchronizeRoles, updateRoleCache } from "../database/schemas/roles";
 import { isConnected } from "../database/mongo";
 
 const tz = 'Europe/Berlin';
@@ -24,7 +24,7 @@ export function startMetrics() {
 export function startReferralReset() {
     new CronJob('0 0 1 * *', async () => {
         if(!isConnected()) return;
-        const data = await players.find({ 'referrals.current_month': { $gt: 0 } });
+        const data = await playerSchema.find({ 'referrals.current_month': { $gt: 0 } });
 
         for(const player of data) {
             player.referrals.current_month = 0;
@@ -35,4 +35,10 @@ export function startReferralReset() {
 
 export function startRoleCacheJob() {
     new CronJob('*/5 * * * *', updateRoleCache, null, true, tz, null, true);
+}
+
+export function startRoleSynchronization() {
+    if(!config.discordBot.syncedRoles.enabled) return;
+    Logger.debug('Role syncronization initialized.');
+    new CronJob('*/20 * * * *', synchronizeRoles, null, true, tz, null, true);
 }

@@ -14,7 +14,7 @@ export default class GuildMemberAdd extends Event {
 
     async fire(member: GuildMember) {
         if(!config.discordBot.notifications.entitlements.enabled || member.guild.id != config.discordBot.server) return;
-        const player = await players.findOne({ "connections.discord.id": member.id });
+        const player = await players.findOne({ 'connections.discord.id': member.id });
         if(!player) return;
         const entitlements = (await client.application!.entitlements.fetch({ user: member.id })).filter(e => e.isActive() && skus.some(sku => sku.id == e.skuId));
 

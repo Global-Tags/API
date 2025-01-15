@@ -12,12 +12,12 @@ export default class Notes extends Button {
     
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, user: User) {
         await interaction.deferReply({ ephemeral: true });
-        const staff = await players.findOne({ "connections.discord.id": user.id });
-        if(!staff) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You need to link your Minecraft account with \`/link\`!`)] });
-        if(!staff.hasPermissionSync(Permission.ManageNotes)) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to perform this action!`)] });
+        const staff = await players.findOne({ 'connections.discord.id': user.id });
+        if(!staff) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')] });
+        if(!staff.hasPermission(Permission.ManageNotes)) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')] });
 
-        const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll(`\``, ``) });
-        if(!player) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)] });
+        const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
+        if(!player) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')] });
 
         const notes = [];
 
@@ -28,8 +28,8 @@ export default class Notes extends Button {
 
         const embed = new EmbedBuilder()
         .setColor(colors.standart)
-        .setTitle(`Notes`)
-        .setDescription(notes.length > 0 ? notes.join('\n') : `*This player does not have any notes*`)
+        .setTitle('Notes')
+        .setDescription(notes.length > 0 ? notes.join('\n') : '*This player does not have any notes*')
         .addFields(message.embeds[0].fields[0]);
 
         const row = new ActionRowBuilder<ButtonBuilder>()

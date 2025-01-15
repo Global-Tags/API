@@ -26,7 +26,7 @@ export default abstract class AuthProvider {
         return {
             uuid: tokenUuid,
             equal: uuid == tokenUuid,
-            hasPermission: (permission: Permission) => data.hasPermissionSync(permission)
+            hasPermission: (permission: Permission) => data.hasPermission(permission)
         }
     }
     public abstract getUUID(token: string): Promise<string | null>;
@@ -36,9 +36,9 @@ export default abstract class AuthProvider {
     }
 
     static async loadProviders() {
-        const directory = join(__dirname, `providers`);
+        const directory = join(__dirname, 'providers');
         if(existsSync(directory)) {
-            for(const file of readdirSync(directory).filter(file => file.endsWith(`.ts`))) {
+            for(const file of readdirSync(directory).filter(file => file.endsWith('.ts'))) {
                 const provider = new (await import(join(directory, file))).default as AuthProvider;
     
                 AuthProvider.providers.set(provider.id, provider);

@@ -19,7 +19,7 @@ import { handleErrors, initializeSentry } from "./libs/error-handler";
 import minimist from "minimist";
 import cors from "@elysiajs/cors";
 import { verify as verifyMailOptions } from "./libs/mailer";
-import { startEntitlementExpiry, startMetrics, startReferralReset, startRoleCacheJob } from "./libs/cron-jobs";
+import { startEntitlementExpiry, startMetrics, startReferralReset, startRoleCacheJob, startRoleSynchronization } from "./libs/cron-jobs";
 import { config } from "./libs/config";
 import { join } from "path";
 import { formatUUID } from "./libs/game-profiles";
@@ -90,6 +90,7 @@ const elysia = new Elysia()
     
     startRoleCacheJob();
     startEntitlementExpiry();
+    startRoleSynchronization();
     startMetrics();
     startReferralReset();
 })
@@ -209,7 +210,7 @@ const elysia = new Elysia()
         503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
     }
 })
-.get('/ping', ({ error }: Context) => { return error(204, "") }, {
+.get('/ping', ({ error }: Context) => { return error(204, '') }, {
     detail: {
         tags: ['API'],
         description: 'Used by uptime checkers. This route is not being logged'
