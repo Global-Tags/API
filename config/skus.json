@@ -3,6 +3,6 @@
         "id": "",
         "name": "GlobalTags Premium",
         "role": "premium",
-        "discord_roles": []
+        "discord_role": ""
     }
 ]

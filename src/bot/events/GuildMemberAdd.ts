@@ -19,10 +19,8 @@ export default class GuildMemberAdd extends Event {
         const entitlements = (await client.application!.entitlements.fetch({ user: member.id })).filter(e => e.isActive() && skus.some(sku => sku.id == e.skuId));
 
         for(const sku of skus.filter((sku) => entitlements.find((e) => e.skuId == sku.id))) {
-            if(sku.discordRoles.length > 0) {
-                for(const role of sku.discordRoles) {
-                    member.roles.add(role);
-                }
+            if(sku.discordRole) {
+                member.roles.add(sku.discordRole);
             }
         }
     }

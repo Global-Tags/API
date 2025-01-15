@@ -26,7 +26,11 @@ export default class EntitlementCreate extends Event {
             !!player,
         );
 
-        if(sku.discordRoles.length > 0) {
+        if(player) {
+            player.roles.push(sku.role);
+            await player.save();
+        }
+        if(sku.discordRole) {
             const guild = await fetchGuild().catch(() => {
                 Logger.error(`Couldn't fetch guild ${config.discordBot.server}`);
                 return null;
@@ -37,9 +41,7 @@ export default class EntitlementCreate extends Event {
                 return null;
             });
             if(!member) return;
-            for(const role of sku.discordRoles) {
-                member.roles.add(role);
-            }
+            member.roles.add(sku.discordRole);
         }
     }
 }
