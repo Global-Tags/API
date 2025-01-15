@@ -35,7 +35,14 @@ export interface IPlayer {
     }[],
     api_keys: string[],
     notes: { id: string, text: string, author: string, createdAt: Date }[],
-    ban: { active: boolean, reason?: string | null, appealable: boolean, appealed: boolean, staff?: string | null },
+    bans: {
+        reason: string,
+        staff: string,
+        appealable: boolean,
+        appealed: boolean,
+        banned_at: Date,
+        expires_at: Date | null
+    }[],
     clears: { currentData: string, type: 'tag' | 'icon', staff: string, timestamp: number }[],
     connections: {
         discord: { id?: string | null, code?: string | null },
@@ -47,7 +54,7 @@ export interface IPlayer {
     hasPermission(permission: Permission): boolean,
     canManagePlayers(): boolean,
     isBanned(): boolean,
-    banPlayer(reason: string, staff: string, appealable?: boolean): void,
+    banPlayer({ reason, staff, appealable, expiresAt }: { reason: string, staff: string, appealable?: boolean, expiresAt: Date | null }): void,
     unban(): void,
     clearTag(staff: string): void,
     clearIcon(staff: string): void,
@@ -196,13 +203,15 @@ const schema = new Schema<IPlayer>({
             required: true
         }
     }],
-    ban: {
-        active: {
+    bans: [{
+        reason: {
             type: Boolean,
-            required: true,
-            default: false
+            required: true
         },
-        reason: String,
+        staff: {
+            type: String,
+            required: true
+        },
         appealable: {
             type: Boolean,
             required: true,
@@ -213,8 +222,13 @@ const schema = new Schema<IPlayer>({
             required: true,
             default: false
         },
-        staff: String
-    },
+        banned_at: {
+            type: Date,
+            required: true,
+            default: Date.now
+        },
+        expires_at: Date
+    }],
     clears: [{
         currentData: {
             type: String,
@@ -278,23 +292,24 @@ const schema = new Schema<IPlayer>({
         },
 
         isBanned(): boolean {
-            return this.ban?.active || false;
+            const ban = this.bans.at(0);
+            return !!ban && (!ban.expires_at || ban.expires_at.getTime() > Date.now());
         },
 
-        banPlayer(reason: string, staff: string, appealable: boolean = true) {
-            this.ban.active = true;
-            this.ban.reason = reason;
-            this.ban.appealable = appealable;
-            this.ban.appealed = false;
-            this.ban.staff = staff;
+        banPlayer({ reason, staff, appealable = true, expiresAt }: { reason: string, staff: string, appealable?: boolean, expiresAt?: Date | null }) {
+            this.bans.unshift({
+                reason,
+                staff,
+                appealable,
+                appealed: false,
+                banned_at: new Date(),
+                expires_at: expiresAt || null
+            });
         },
 
         unban() {
-            this.ban.active = false;
-            this.ban.reason = null;
-            this.ban.appealable = true;
-            this.ban.appealed = false;
-            this.ban.staff = null;
+            const ban = this.bans.at(0);
+            if(ban) ban.expires_at = new Date();
         },
 
         clearTag(staff: string) {
