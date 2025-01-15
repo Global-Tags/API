@@ -29,8 +29,11 @@ export async function checkExpiredEntitlements() {
         }
 
         if(player) {
-            player.roles = player.roles.filter((role) => role != sku.role);
-            await player.save();
+            const role = player.roles.find((role) => role.name == sku.role);
+            if(role && !role.manually_added && (!role.expires_at || role.expires_at < new Date())) {
+                role.expires_at = new Date();
+                await player.save();
+            }
         }
 
         if(sku.discordRole) {
