@@ -1,10 +1,6 @@
 import { Schema, model } from "mongoose";
-import { client, fetchGuild } from "../../bot/bot";
-import Logger from "../../libs/Logger";
-import { GuildMember } from "discord.js";
-import { constantCase } from "change-case";
+import { constantCase, snakeCase } from "change-case";
 import { generateSecureCode } from "../../routes/players/[uuid]/connections";
-import { config } from "../../libs/config";
 import { Permission } from "../../types/Permission";
 import { getCachedRoles, Role } from "./roles";
 import { GlobalIcon } from "../../types/GlobalIcon";
@@ -30,7 +26,13 @@ export interface IPlayer {
     },
     reports: { id: string, by: string, reported_tag: string, reason: string, created_at: Date }[],
     hide_role_icon: boolean,
-    roles: string[],
+    roles: {
+        name: string,
+        added_at: Date,
+        manually_added: boolean,
+        expires_at?: Date | null,
+        reason?: string | null
+    }[],
     api_keys: string[],
     notes: { id: string, text: string, author: string, createdAt: Date }[],
     ban: { active: boolean, reason?: string | null, appealable: boolean, appealed: boolean, staff?: string | null },
@@ -41,12 +43,9 @@ export interface IPlayer {
     },
     addReferral(uuid: string): void,
     isEmailVerified(): boolean,
-    getRoles(): Promise<Role[]>,
-    getRolesSync(): Role[],
-    hasPermission(permission: Permission): Promise<boolean>,
-    hasPermissionSync(permission: Permission): boolean,
-    canManagePlayers(): Promise<boolean>,
-    canManagePlayersSync(): boolean,
+    getRoles(): Role[],
+    hasPermission(permission: Permission): boolean,
+    canManagePlayers(): boolean,
     isBanned(): boolean,
     banPlayer(reason: string, staff: string, appealable?: boolean): void,
     unban(): void,
@@ -155,7 +154,22 @@ const schema = new Schema<IPlayer>({
         default: false
     },
     roles: {
-        type: [String],
+        type: [{
+            name: {
+                type: String,
+                required: true
+            },
+            added_at: {
+                type: Date,
+                required: true
+            },
+            manually_added: {
+                type: Boolean,
+                required: true
+            },
+            expires_at: Date,
+            reason: String
+        }],
         required: true,
         default: []
     },
@@ -241,46 +255,26 @@ const schema = new Schema<IPlayer>({
             return this.connections.email.address && !this.connections.email.code;
         },
 
-        async getRoles(): Promise<Role[]> {
-            if(!config.discordBot.syncedRoles.enabled) return getCachedRoles().filter((role) => this.roles.some((name) => name.toLowerCase() == role.name.toLowerCase()));
-            if(!this.connections?.discord?.id) return [];
-            const guild = await fetchGuild();
-            if(!guild) return [];
-            const member = await guild.members.fetch(this.connections.discord.id).catch(() => null);
-            if(!member) return [];
-            return _getRoles(member);
+        getRoles(): Role[] {
+            return getCachedRoles().filter(({ name: role }) => {
+                role = snakeCase(role);
+                const playerRole = this.roles.find((playerRole) => snakeCase(playerRole.name) == role);
+                return playerRole && (!playerRole.expires_at || playerRole.expires_at.getTime() > Date.now());
+            });
         },
 
-        getRolesSync(): Role[] {
-            if(!config.discordBot.syncedRoles.enabled) return getCachedRoles().filter((role) => this.roles.some((name) => name.toUpperCase() == role.name.toUpperCase()));
-            if(!this.connections?.discord?.id) return [];
-            const guild = client.guilds.cache.get(config.discordBot.server);
-            if(!guild) {
-                fetchGuild().catch(() => Logger.error(`Couldn't fetch guild ${config.discordBot.server}`));
-                return [];
-            }
-            const member = guild.members.cache.get(this.connections.discord.id);
-            if(!member) {
-                guild.members.fetch(this.connections.discord.id).catch(() => null);
-                return [];
-            }
-            return _getRoles(member);
+        hasPermission(permission: Permission) {
+            return this.getRoles().some((role) => role.hasPermission(permission));
         },
 
-        async hasPermission(permission: Permission) {
-            return (await this.getRoles()).some((role) => role.hasPermission(permission));
-        },
-
-        hasPermissionSync(permission: Permission) {
-            return this.getRolesSync().some((role) => role.hasPermission(permission));
-        },
-
-        async canManagePlayers() {
-            return _canManagePlayers(await this.getRoles());
-        },
-
-        canManagePlayersSync() {
-            return _canManagePlayers(this.getRolesSync());
+        canManagePlayers() {
+            return this.getRoles().some((role) => [
+                Permission.ManageBans,
+                Permission.ManageNotes,
+                Permission.ManageRoles,
+                Permission.ManageTags,
+                Permission.ManageWatchlist
+            ].some((permission) => role.hasPermission(permission)));
         },
 
         isBanned(): boolean {
@@ -356,25 +350,5 @@ const schema = new Schema<IPlayer>({
         }
     }
 });
-
-function _getRoles(member: GuildMember): Role[] {
-    if(!member) return [];
-
-    return getCachedRoles().filter((role) => {
-        const roleIds = role.getSyncedRoles();
-        if(roleIds.length == 0) return false;
-        return roleIds.some((id) => member.roles.cache.has(id));
-    });
-}
-
-function _canManagePlayers(roles: Role[]): boolean {
-    return roles.some((role) => [
-        Permission.ManageBans,
-        Permission.ManageNotes,
-        Permission.ManageRoles,
-        Permission.ManageTags,
-        Permission.ManageWatchlist
-    ].some((permission) => role.hasPermission(permission)));
-}
 
 export default model<IPlayer>('players', schema);

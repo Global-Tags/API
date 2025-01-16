@@ -16,7 +16,7 @@ export default class EntitlementUpdate extends Event {
     async fire(oldEntitlement: Entitlement, newEntitlement: Entitlement) {
         if(!config.discordBot.notifications.entitlements.enabled) return;
         if(oldEntitlement.endsAt || !newEntitlement.endsAt) return;
-        const player = await players.findOne({ "connections.discord.id": newEntitlement.userId });
+        const player = await players.findOne({ 'connections.discord.id': newEntitlement.userId });
         const sku = skus.find((sku) => sku.id == newEntitlement.skuId);
         if(!sku) return;
 

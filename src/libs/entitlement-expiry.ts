@@ -14,7 +14,7 @@ export async function checkExpiredEntitlements() {
     const entitlements = await entitlement.find({ done: false, expires_at: { $lt: new Date() } });
     if(!entitlements) return;
     for (const entitlement of entitlements) {
-        const player = await players.findOne({ "connections.discord.id": entitlement.user_id });
+        const player = await players.findOne({ 'connections.discord.id': entitlement.user_id });
         const sku = skus.find((sku) => sku.id == entitlement.sku_id);
         if(!sku) continue;
 
@@ -29,8 +29,11 @@ export async function checkExpiredEntitlements() {
         }
 
         if(player) {
-            player.roles = player.roles.filter((role) => role != sku.role);
-            await player.save();
+            const role = player.roles.find((role) => role.name == sku.role);
+            if(role && !role.manually_added && (!role.expires_at || role.expires_at < new Date())) {
+                role.expires_at = new Date();
+                await player.save();
+            }
         }
 
         if(sku.discordRole) {

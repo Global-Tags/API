@@ -4,6 +4,9 @@ import { pascalCase } from "change-case";
 import { Permission } from "../../types/Permission";
 import { isConnected } from "../mongo";
 import Logger from "../../libs/Logger";
+import playerSchema from "./players";
+import { fetchGuild } from "../../bot/bot";
+import players from "./players";
 
 interface IRole {
     name: string,
@@ -12,7 +15,8 @@ interface IRole {
     permissions: string[],
     getPermissions(): Permission[],
     hasPermission(permission: Permission): boolean,
-    getSyncedRoles(): string[]
+    getSyncedRoles(): string[],
+    rename(name: string): Promise<void>
 }
 
 export type Role = HydratedDocument<IRole>;
@@ -37,18 +41,26 @@ const schema = new Schema<IRole>({
     }
 }, {
     methods: {
-        getPermissions() {
+        getPermissions(): Permission[] {
             return this.permissions
                 .filter((permission) => pascalCase(permission) in Permission)
                 .map((permission) => Permission[pascalCase(permission) as keyof typeof Permission]);
         },
 
-        hasPermission(permission: Permission) {
+        hasPermission(permission: Permission): boolean {
             return this.getPermissions().includes(permission);
         },
 
-        getSyncedRoles() {
+        getSyncedRoles(): string[] {
             return config.discordBot.syncedRoles.getRoles(this.name);
+        },
+
+        async rename(name: string): Promise<void> {
+            const oldName = this.name;
+            this.name = name;
+            this.save();
+            await players.updateMany({ 'roles.name': oldName }, { $set: { 'roles.$.name': name } });
+            updateRoleCache();
         }
     }
 });
@@ -99,6 +111,57 @@ export async function getNextPosition(): Promise<number> {
     const roles = await roleModel.find();
     roles.sort((a, b) => a.position - b.position);
     return roles[roles.length - 1].position + 1;
+}
+
+const syncReason = 'Discord role sync';
+
+export async function synchronizeRoles() {
+    if(!isConnected()) return;
+    const players = await playerSchema.find({ 'connections.discord.id': { $exists: true } });
+    const guild = await fetchGuild();
+    const roles = getCachedRoles();
+
+    for(const player of players) {
+        const member = await guild.members.fetch(player.connections.discord.id!).catch(() => null);
+        if(!member || !member.id) continue;
+        let save = false;
+        const playerRoles = player.roles
+            .filter((role) => !role.expires_at || role.expires_at.getTime() > Date.now());
+
+        for(const role of roles) {
+            if(role.getSyncedRoles().length == 0) continue;
+            const hasRole = role.getSyncedRoles().some((role) => member.roles.cache.has(role));
+
+            if(hasRole) {
+                const playerRole = player.roles.find((r) => r.name == role.name);
+                if(!playerRole) {
+                    player.roles.push({
+                        name: role.name,
+                        added_at: new Date(),
+                        reason: syncReason,
+                        manually_added: false
+                    });
+                    save = true;
+                } else if(playerRole.expires_at && playerRole.expires_at.getTime() < Date.now()) {
+                    playerRole.expires_at = null;
+                    playerRole.added_at = new Date();
+                    playerRole.expires_at = null;
+                    playerRole.reason = syncReason;
+                    playerRole.manually_added = false;
+                    save = true;
+                }
+            } else {
+                const playerRole = playerRoles.find((r) => r.name == role.name);
+                if(!playerRole || playerRole.manually_added) continue;
+                playerRole.expires_at = new Date();
+                save = true;
+            }
+        }
+        if(save) {
+            Logger.debug(`Synced roles for ${player.uuid} (${member.id}).`);
+            player.save();
+        }
+    }
 }
 
 export default roleModel;

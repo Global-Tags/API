@@ -11,9 +11,9 @@ const languages = new Map<string, Language>();
 
 export async function load() {
     const languageDirectory = join(__dirname, '..', '..', 'locales');
-    if(!existsSync(languageDirectory)) return Logger.error(`Translation directory not found!`);
-    for(const file of readdirSync(languageDirectory).filter((file) => file.endsWith(`.json`))) {
-        const id = file.replace(`.json`, '');
+    if(!existsSync(languageDirectory)) return Logger.error('Translation directory not found!');
+    for(const file of readdirSync(languageDirectory).filter((file) => file.endsWith('.json'))) {
+        const id = file.replace('.json', '');
         const locales = new Map<string, string>();
         extractTranslations(locales, await import(join(languageDirectory, file)))
         languages.set(id, locales);

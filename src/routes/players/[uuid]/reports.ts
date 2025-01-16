@@ -41,7 +41,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n('error.playerNoTag') });
     if(player.isBanned()) return error(403, { error: i18n('ban.alreadyBanned') });
-    if(player.hasPermissionSync(Permission.ReportImmunity)) return error(403, { error: i18n('report.immune') });
+    if(player.hasPermission(Permission.ReportImmunity)) return error(403, { error: i18n('report.immune') });
     if(!player.tag) return error(404, { error: i18n('report.noTag') });
 
     const reporter = await players.findOneAndUpdate({ uuid: session.uuid }, {

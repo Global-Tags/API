@@ -31,6 +31,12 @@
         "success": {
             "self": "Ikonet ditt ble satt!",
             "admin": "Spillerens ikon ble satt!"
+        },
+        "role_icon": {
+            "success": {
+                "shown": "Din rolle ikon er nå vist!",
+                "hidden": "Din rolle ikon er nå skjult!"
+            }
         }
     },
     "position": {
@@ -70,8 +76,8 @@
     },
     "referral": {
         "self": "Du kan ikke henvise deg selv!",
-        "alreadyReferred": "Du har allerede henvist en spiller!",
-        "success": "Du har henvist spilleren!"
+        "alreadyReferred": "Du har allerede markert en spiller som en henviser!",
+        "success": "Du har markert denne spiller som din henviser!"
     },
     "resetTag": {
         "success": {
@@ -178,5 +184,15 @@
             "not_found": "Notatet ble ikke funnet!",
             "success": "Notatet ble slettet!"
         }
+    },
+    "roles": {
+        "create": {
+            "already_exists": "Rollen '<role>' allerede eksisterer!",
+            "success": "Rollen ble opprettet!"
+        },
+        "delete": {
+            "success": "Rollen ble slettet!"
+        },
+        "not_found": "Rollen ble ikke funnet!"
     }
 }

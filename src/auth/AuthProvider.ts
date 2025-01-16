@@ -3,6 +3,7 @@ import { join } from "path";
 import Logger from "../libs/Logger";
 import players from "../database/schemas/players";
 import { Permission } from "../types/Permission";
+import { stripUUID } from "../libs/game-profiles";
 
 export type SessionData = {
     uuid: string | null,
@@ -20,13 +21,14 @@ export default abstract class AuthProvider {
 
     public async getSession(token: string, uuid?: string | null): Promise<SessionData> {
         const tokenUuid = await this.getUUID(token);
+        if(uuid) uuid = stripUUID(uuid);
         if(!tokenUuid) return { uuid: tokenUuid, equal: tokenUuid == uuid, hasPermission: (permission: Permission) => false };
         const data = await players.findOne({ uuid: tokenUuid });
         if(!data) return { uuid: tokenUuid, equal: tokenUuid == uuid, hasPermission: (permission: Permission) => false };
         return {
             uuid: tokenUuid,
             equal: uuid == tokenUuid,
-            hasPermission: (permission: Permission) => data.hasPermissionSync(permission)
+            hasPermission: (permission: Permission) => data.hasPermission(permission)
         }
     }
     public abstract getUUID(token: string): Promise<string | null>;
@@ -36,9 +38,9 @@ export default abstract class AuthProvider {
     }
 
     static async loadProviders() {
-        const directory = join(__dirname, `providers`);
+        const directory = join(__dirname, 'providers');
         if(existsSync(directory)) {
-            for(const file of readdirSync(directory).filter(file => file.endsWith(`.ts`))) {
+            for(const file of readdirSync(directory).filter(file => file.endsWith('.ts'))) {
                 const provider = new (await import(join(directory, file))).default as AuthProvider;
     
                 AuthProvider.providers.set(provider.id, provider);

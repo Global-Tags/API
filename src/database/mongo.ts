@@ -15,14 +15,14 @@ async function _connect(connectionString: string) {
 
 function _eventHandler(connectionString: string) {
     const connection = mongoose.connection;
-    connection.on(`connected`, () => {
-        Logger.info("Connected to database!");
+    connection.on('connected', () => {
+        Logger.info('Connected to database!');
         if(config.discordBot.enabled) spawn();
-    }).on(`disconnected`, () => {
-        Logger.error("Lost database connection");
+    }).on('disconnected', () => {
+        Logger.error('Lost database connection');
         if(config.discordBot.enabled) destroy();
         setTimeout(() => _connect(connectionString), 10000);
-    }).on(`connecting`, () => Logger.debug(`Connecting to database...`));
+    }).on('connecting', () => Logger.debug('Connecting to database...'));
 }
 
 export function isConnected(): boolean {

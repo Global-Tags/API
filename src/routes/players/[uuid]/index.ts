@@ -29,7 +29,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     if(!player) return error(404, { error: i18n('error.playerNoTag') });
 
     if(snakeCase(player.icon.name) == snakeCase(GlobalIcon[GlobalIcon.Custom])) {
-        if(!(await player.hasPermission(Permission.CustomIcon))) {
+        if(!player.hasPermission(Permission.CustomIcon)) {
             player.icon.name = snakeCase(GlobalIcon[GlobalIcon.None]);
             await player.save();
         }
@@ -43,9 +43,9 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
             type: snakeCase(player.icon.name || GlobalIcon[GlobalIcon.None]),
             hash: player.icon.hash || null
         },
-        roleIcon: !player.hide_role_icon ? player.getRolesSync().find((role) => role.hasIcon)?.name || null : null,
-        roles: player.getRolesSync().map((role) => snakeCase(role.name)),
-        permissions: permissions.filter((permission) => player.hasPermissionSync(permission)).map((permission) => snakeCase(Permission[permission])),
+        roleIcon: !player.hide_role_icon ? player.getRoles().find((role) => role.hasIcon)?.name || null : null,
+        roles: player.getRoles().map((role) => snakeCase(role.name)),
+        permissions: permissions.filter((permission) => player.hasPermission(permission)).map((permission) => snakeCase(Permission[permission])),
         referrals: {
             has_referred: player.referrals.has_referred,
             total_referrals: player.referrals.total.length,

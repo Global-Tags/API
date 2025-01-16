@@ -12,25 +12,42 @@ export default class EditRoles extends SelectMenu {
     }
 
     async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, user: User) {
-        const staff = await players.findOne({ "connections.discord.id": user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You need to link your Minecraft account with \`/link\`!`)], ephemeral: true });
-        if(!staff.hasPermissionSync(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ You're not allowed to perform this action!`)], ephemeral: true });
+        const staff = await players.findOne({ 'connections.discord.id': user.id });
+        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], ephemeral: true });
+        if(!staff.hasPermission(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], ephemeral: true });
 
-        const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll(`\``, ``) });
-        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ Player not found!`)], ephemeral: true });
-        if(player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player is already banned!`)], ephemeral: true });
+        const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
+        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
 
-        const roles = [ ...player.roles ];
+        const staffProfile = await getProfileByUUID(staff.uuid);
+        const username = staffProfile.username || staffProfile.uuid;
+        const addedAt = new Date();
+        const reason = `Added by ${username}`;
+
         const added: string[] = [];
         const removed: string[] = [];
-
-        player.roles = [];
-        for(const role of values) {
-            if(!roles.includes(role)) added.push(role);
-            player.roles.push(role);
+        
+        for(const value of values) {
+            const role = player.roles.find(role => role.name == value);
+            if(role) {
+                if(!role.expires_at || role.expires_at.getTime() < Date.now()) continue;
+                role.added_at = addedAt;
+                role.expires_at = null;
+                role.reason = reason;
+            } else {
+                player.roles.push({
+                    name: value,
+                    added_at: addedAt,
+                    reason: reason,
+                    manually_added: true
+                });
+            }
+            added.push(value);
         }
-        for(const role of roles) {
-            if(!values.includes(role)) removed.push(role);
+        for(const role of player.roles.filter((role) => !role.expires_at || role.expires_at.getTime() > Date.now())) {
+            if(values.includes(role.name)) continue;
+            role.expires_at = new Date();
+            removed.push(role.name);
         }
         await player.save();
 
@@ -45,6 +62,6 @@ export default class EditRoles extends SelectMenu {
             }
         });
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The players roles were successfully updated!`)], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The players roles were successfully updated!')], ephemeral: true });
     }
 }
