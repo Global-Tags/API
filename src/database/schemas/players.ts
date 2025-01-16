@@ -54,7 +54,7 @@ export interface IPlayer {
     hasPermission(permission: Permission): boolean,
     canManagePlayers(): boolean,
     isBanned(): boolean,
-    banPlayer({ reason, staff, appealable, expiresAt }: { reason: string, staff: string, appealable?: boolean, expiresAt: Date | null }): void,
+    banPlayer({ reason, staff, appealable, expiresAt }: { reason: string, staff: string, appealable?: boolean, expiresAt?: Date | null }): void,
     unban(): void,
     clearTag(staff: string): void,
     clearIcon(staff: string): void,

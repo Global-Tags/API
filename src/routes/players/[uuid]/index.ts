@@ -53,8 +53,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         },
         ban: showBan ? {
             active: player.isBanned(),
-            reason: player.ban.reason || null,
-            appealable: player.ban.appealable
+            reason: player.bans.at(0)?.reason || null,
+            appealable: player.bans.at(0)?.appealable || false
         } : null
     };
 }, {

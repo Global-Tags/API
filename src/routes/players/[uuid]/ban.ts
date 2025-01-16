@@ -13,7 +13,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return error(404, { error: i18n('error.playerNotFound') });
 
-    return { banned: player.isBanned(), reason: player.isBanned() ? player.ban.reason || null : null, appealable: player.ban.appealable };
+    return { banned: player.isBanned(), reason: player.isBanned() ? player.bans.at(0)?.reason || null : null, appealable: player.bans.at(0)?.appealable };
 }, {
     detail: {
         tags: ['Admin'],
@@ -37,7 +37,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     if(!player) return error(404, { error: i18n('error.playerNotFound') });
     if(player.isBanned()) return error(409, { error: i18n('ban.alreadyBanned') });
 
-    player.banPlayer(reason, session.uuid!);
+    player.banPlayer({ reason, staff: session.uuid! });
     await player.save();
 
     sendModLogMessage({
@@ -78,8 +78,9 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     if(!player) return error(404, { error: i18n('error.playerNotFound') });
     if(!player.isBanned()) return error(409, { error: i18n('unban.notBanned') });
 
-    player.ban.reason = reason;
-    player.ban.appealable = appealable;
+    const ban = player.bans.at(0)!;
+    ban.reason = reason;
+    ban.appealable = appealable;
     await player.save();
 
     sendModLogMessage({
@@ -106,7 +107,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ reason: t.Optional(t.String()), appealable: t.Boolean({ error: 'error.wrongType;;[["field", "appealable"], ["type", "boolean"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
+    body: t.Object({ reason: t.String(), appealable: t.Boolean({ error: 'error.wrongType;;[["field", "appealable"], ["type", "boolean"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).post('/appeal', async ({ session, body: { reason }, params, i18n, error }) => { // Ban player
@@ -115,10 +116,11 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     const player = await players.findOne({ uuid });
     if(!player || !player.isBanned()) return error(404, { error: i18n('appeal.notBanned') });
-    if(!player.ban.appealable) return error(403, { error: i18n('appeal.notAppealable') });
-    if(player.ban.appealed) return error(403, { error: i18n('appeal.alreadyAppealed') });
+    const ban = player.bans.at(0)!;
+    if(!ban.appealable) return error(403, { error: i18n('appeal.notAppealable') });
+    if(ban.appealed) return error(403, { error: i18n('appeal.alreadyAppealed') });
 
-    player.ban.appealed = true;
+    ban.appealed = true;
     await player.save();
 
     sendBanAppealMessage(
