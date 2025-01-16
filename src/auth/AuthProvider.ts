@@ -3,6 +3,7 @@ import { join } from "path";
 import Logger from "../libs/Logger";
 import players from "../database/schemas/players";
 import { Permission } from "../types/Permission";
+import { stripUUID } from "../libs/game-profiles";
 
 export type SessionData = {
     uuid: string | null,
@@ -20,6 +21,7 @@ export default abstract class AuthProvider {
 
     public async getSession(token: string, uuid?: string | null): Promise<SessionData> {
         const tokenUuid = await this.getUUID(token);
+        if(uuid) uuid = stripUUID(uuid);
         if(!tokenUuid) return { uuid: tokenUuid, equal: tokenUuid == uuid, hasPermission: (permission: Permission) => false };
         const data = await players.findOne({ uuid: tokenUuid });
         if(!data) return { uuid: tokenUuid, equal: tokenUuid == uuid, hasPermission: (permission: Permission) => false };
