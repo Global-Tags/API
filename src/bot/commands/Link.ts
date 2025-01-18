@@ -34,11 +34,11 @@ export default class Link extends Command {
         const player = await players.findOne({ "connections.discord.code": code });
         if(!player) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Invalid code')] });
 
-        onDiscordLink(await getProfileByUUID(player.uuid), player.connections.discord.id!);
-
         player.connections.discord.id = user.id;
         player.connections.discord.code = null;
         player.save();
+
+        onDiscordLink(await getProfileByUUID(player.uuid), user.id);
 
         interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ Your account was successfully linked!')] });
     }
