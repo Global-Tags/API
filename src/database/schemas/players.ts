@@ -40,6 +40,7 @@ export interface IPlayer {
         appealed: boolean,
         banned_at: Date,
         expires_at: Date | null,
+        id: string,
         reason: string,
         staff: string
     }[],
@@ -223,6 +224,10 @@ const schema = new Schema<IPlayer>({
             type: Date,
             required: false
         },
+        id: {
+            type: String,
+            required: true
+        },
         reason: {
             type: String,
             required: true
@@ -301,12 +306,13 @@ const schema = new Schema<IPlayer>({
 
         banPlayer({ reason, staff, appealable = true, expiresAt }: { reason: string, staff: string, appealable?: boolean, expiresAt?: Date | null }) {
             this.bans.unshift({
-                reason,
-                staff,
                 appealable,
                 appealed: false,
                 banned_at: new Date(),
-                expires_at: expiresAt || null
+                expires_at: expiresAt || null,
+                id: generateSecureCode(),
+                reason,
+                staff
             });
         },
 
