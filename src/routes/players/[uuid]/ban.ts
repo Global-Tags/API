@@ -4,7 +4,7 @@ import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 import { ModLogType, sendBanAppealMessage, sendModLogMessage } from "../../../libs/discord-notifier";
 import { sendBanEmail, sendUnbanEmail } from "../../../libs/mailer";
 import { Permission } from "../../../types/Permission";
-import { getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { formatUUID, getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, error }) => { // Get ban info
@@ -12,32 +12,61 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return error(404, { error: i18n('error.playerNotFound') });
+    if(!player.isBanned()) return error(404, { error: i18n('ban.not_banned') });
 
-    return { banned: player.isBanned(), reason: player.isBanned() ? player.bans.at(0)?.reason || null : null, appealable: player.bans.at(0)?.appealable };
+    const { appealable, appealed, banned_at, expires_at, id, reason, staff } = player.bans.at(0)!;
+
+    return { appealable, appealed, banned_at: banned_at.getTime(), expires_at: expires_at?.getTime() || null, id, reason, staff: formatUUID(staff) };
 }, {
     detail: {
         tags: ['Admin'],
-        description: 'Returns info about a player ban'
+        description: 'Returns info about the latest player ban'
     },
     response: {
-        200: t.Object({ banned: t.Boolean(), reason: t.Union([t.String(), t.Null()], { default: '…' }), appealable: t.Boolean() }, { description: 'The ban object' }),
+        200: t.Object({ appealable: t.Boolean(), appealed: t.Boolean(), banned_at: t.Number(), expires_at: t.Union([t.Number(), t.Null()]), id: t.String(), reason: t.String({ default: '…' }), staff: t.String({ default: '00000000-0000-0000-0000-000000000000' }) }, { description: 'The ban object' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage bans' }),
-        404: t.Object({ error: t.String() }, { description: "The player you searched for was not found." }),
+        404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).post('/', async ({ session, body: { reason }, params, i18n, error }) => { // Ban player
+}).get('/:id', async ({ session, params, i18n, error }) => { // Get ban info
+    if(!session?.hasPermission(Permission.ManageBans)) return error(403, { error: i18n('error.notAllowed') });
+
+    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    if(!player) return error(404, { error: i18n('error.playerNotFound') });
+    
+    const ban = player.bans.find(({ id }) => id === params.id);
+    if(!ban) return error(404, { error: i18n('ban.not_found') });
+    const { appealable, appealed, banned_at, expires_at, id, reason, staff } = ban;
+
+    return { appealable, appealed, banned_at: banned_at.getTime(), expires_at: expires_at?.getTime() || null, id, reason, staff: formatUUID(staff) };
+}, {
+    detail: {
+        tags: ['Admin'],
+        description: 'Returns info about a specific player ban'
+    },
+    response: {
+        200: t.Object({ appealable: t.Boolean(), appealed: t.Boolean(), banned_at: t.Number(), expires_at: t.Union([t.Number(), t.Null()]), id: t.String(), reason: t.String({ default: '…' }), staff: t.String({ default: '00000000-0000-0000-0000-000000000000' }) }, { description: 'The ban object' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage bans' }),
+        404: t.Object({ error: t.String() }, { description: 'The player or ban was not found' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+    },
+    params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }), id: t.String({ description: 'The ban ID' }) }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+}).post('/', async ({ session, body: { reason, appealable, duration }, params, i18n, error }) => { // Ban player
     if(!session?.hasPermission(Permission.ManageBans)) return error(403, { error: i18n('error.notAllowed') });
     const uuid = stripUUID(params.uuid);
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n('error.playerNotFound') });
-    if(player.isBanned()) return error(409, { error: i18n('ban.alreadyBanned') });
+    if(player.isBanned()) return error(409, { error: i18n('ban.already_banned') });
 
-    player.banPlayer({ reason, staff: session.uuid! });
+    player.banPlayer({ reason, staff: session.uuid!, appealable, expiresAt: duration ? new Date(Date.now() + duration) : null });
     await player.save();
 
     sendModLogMessage({
@@ -52,7 +81,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         sendBanEmail(player.connections.email.address!, reason || '---', getI18nFunctionByLanguage(player.last_language));
     }
 
-    return { message: i18n('ban.success') };
+    return { message: i18n('ban.banned') };
 }, {
     detail: {
         tags: ['Admin'],
@@ -67,16 +96,16 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ reason: t.String() }, { error: 'error.invalidBody', additionalProperties: true }),
+    body: t.Object({ appealable: t.Optional(t.Boolean({ error: 'error.wrongType;;[["field", "appealable"], ["type", "boolean"]]' })), duration: t.Optional(t.Number({ error: 'error.wrongType;;[["field", "duration"], ["type", "number"]]' })), reason: t.String({ error: 'error.missingField;;[["field", "reason"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).put('/', async ({ session, body: { reason, appealable }, params, i18n, error }) => { // Update ban info - I need to use put here bc labymod's Request system doesn't support PATCH
+}).patch('/', async ({ session, body: { appealable, reason }, params, i18n, error }) => { // Update ban info
     if(!session?.hasPermission(Permission.ManageBans)) return error(403, { error: i18n('error.notAllowed') });
     const uuid = stripUUID(params.uuid);
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n('error.playerNotFound') });
-    if(!player.isBanned()) return error(409, { error: i18n('unban.notBanned') });
+    if(!player.isBanned()) return error(409, { error: i18n('ban.not_banned') });
 
     const ban = player.bans.at(0)!;
     ban.reason = reason;
@@ -107,10 +136,10 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ reason: t.String(), appealable: t.Boolean({ error: 'error.wrongType;;[["field", "appealable"], ["type", "boolean"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
+    body: t.Object({ appealable: t.Boolean({ error: 'error.wrongType;;[["field", "appealable"], ["type", "boolean"]]' }), reason: t.String({ error: 'error.wrongType;;[["field", "reason"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).post('/appeal', async ({ session, body: { reason }, params, i18n, error }) => { // Ban player
+}).post('/appeal', async ({ session, body: { reason }, params, i18n, error }) => { // Appeal ban
     if(!session?.equal) return error(403, { error: i18n('error.notAllowed') });
     const uuid = stripUUID(params.uuid);
 
@@ -151,7 +180,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n('error.playerNotFound') });
-    if(!player.isBanned()) return error(409, { error: i18n('unban.notBanned') });
+    if(!player.isBanned()) return error(409, { error: i18n('ban.not_banned') });
 
     player.unban();
     await player.save();
@@ -167,7 +196,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         sendUnbanEmail(player.connections.email.address!, getI18nFunctionByLanguage(player.last_language));
     }
 
-    return { message: i18n('unban.success') };
+    return { message: i18n('ban.unbanned') };
 }, {
     detail: {
         tags: ['Admin'],
