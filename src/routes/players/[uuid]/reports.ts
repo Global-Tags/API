@@ -40,7 +40,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     if(session.equal) return error(403, { error: i18n('report.self') });
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n('error.playerNoTag') });
-    if(player.isBanned()) return error(403, { error: i18n('ban.alreadyBanned') });
+    if(player.isBanned()) return error(403, { error: i18n('ban.already_banned') });
     if(player.hasPermission(Permission.ReportImmunity)) return error(403, { error: i18n('report.immune') });
     if(!player.tag) return error(404, { error: i18n('report.noTag') });
 

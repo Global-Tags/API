@@ -3,7 +3,7 @@ import SelectMenu from "../structs/SelectMenu";
 import players from "../../database/schemas/players";
 import { colors, images } from "../bot";
 import { Permission, permissions as allPermissions } from "../../types/Permission";
-import { getCachedRoles, updateRoleCache } from "../../database/schemas/roles";
+import roles, { getCachedRoles, updateRoleCache } from "../../database/schemas/roles";
 import { capitalCase } from "change-case";
 import { config } from "../../libs/config";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
@@ -20,7 +20,7 @@ export default class ManagePermissions extends SelectMenu {
         if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], ephemeral: true });
         if(!staff.hasPermission(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], ephemeral: true });
 
-        const role = getCachedRoles().find((role) => role.name == message.embeds[1].footer!.text);
+        const role = await roles.findOne({ name: message.embeds[1].footer!.text});
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], ephemeral: true });
 
         const permissions = [ ...role.permissions ];
