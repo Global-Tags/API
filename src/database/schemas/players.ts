@@ -36,12 +36,12 @@ export interface IPlayer {
     api_keys: string[],
     notes: { id: string, text: string, author: string, createdAt: Date }[],
     bans: {
-        reason: string,
-        staff: string,
         appealable: boolean,
         appealed: boolean,
         banned_at: Date,
-        expires_at: Date | null
+        expires_at: Date | null,
+        reason: string,
+        staff: string
     }[],
     clears: { currentData: string, type: 'tag' | 'icon', staff: string, timestamp: number }[],
     connections: {
@@ -204,14 +204,6 @@ const schema = new Schema<IPlayer>({
         }
     }],
     bans: [{
-        reason: {
-            type: Boolean,
-            required: true
-        },
-        staff: {
-            type: String,
-            required: true
-        },
         appealable: {
             type: Boolean,
             required: true,
@@ -227,7 +219,18 @@ const schema = new Schema<IPlayer>({
             required: true,
             default: Date.now
         },
-        expires_at: Date
+        expires_at: {
+            type: Date,
+            required: false
+        },
+        reason: {
+            type: String,
+            required: true
+        },
+        staff: {
+            type: String,
+            required: true
+        }
     }],
     clears: [{
         currentData: {
