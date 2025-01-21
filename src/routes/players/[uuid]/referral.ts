@@ -24,7 +24,7 @@ export default (app: ElysiaApp) => app.post('/', async ({ session, params, i18n,
     executor.referrals.has_referred = true;
     executor.save();
 
-    sendReferralMessage(await getProfileByUUID(session.uuid), await getProfileByUUID(player.uuid));
+    sendReferralMessage(await getProfileByUUID(player.uuid), await getProfileByUUID(session.uuid));
     return { message: i18n('referral.success') };
 }, {
     detail: {
