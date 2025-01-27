@@ -5,7 +5,25 @@ const requiredNumber = {
     required: true
 }
 
-const schema = new Schema({
+interface IMetrics {
+    players: number,
+    tags: number,
+    admins: number,
+    bans: number,
+    downloads: {
+        flintmc: number,
+        modrinth: number
+    },
+    ratings: {
+        flintmc: number
+    },
+    dailyRequests: number,
+    positions: Record<string, number>,
+    icons: Record<string, number>,
+    createdAt: Date
+}
+
+const schema = new Schema<IMetrics>({
     players: requiredNumber,
     tags: requiredNumber,
     admins: requiredNumber,
@@ -30,4 +48,4 @@ const schema = new Schema({
     timestamps: true
 });
 
-export default model('metrics', schema);
+export default model<IMetrics>('metrics', schema);

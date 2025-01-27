@@ -4,6 +4,7 @@ import { Profile } from "./game-profiles";
 import { getCustomIconUrl } from "../routes/players/[uuid]/icon";
 import { capitalCase } from "change-case";
 import { config } from "./config";
+import { translateToAnsi } from "./chat-color";
 
 export enum ModLogType {
     ChangeTag,
@@ -112,7 +113,7 @@ export function sendReportMessage({ user, reporter, tag, reason } : {
             },
             {
                 name: 'Reported Tag',
-                value: `\`\`\`${tag}\`\`\``
+                value: `\`\`\`ansi\n${translateToAnsi(tag)}\`\`\``
             },
             {
                 name: 'Reporter',
@@ -142,7 +143,7 @@ export function sendWatchlistAddMessage({ user, tag, word }: { user: Profile, ta
             },
             {
                 name: 'New tag',
-                value: `\`\`\`${tag}\`\`\``
+                value: `\`\`\`ansi${translateToAnsi(tag)}\`\`\``
             },
             {
                 name: 'Matched word',
@@ -169,7 +170,7 @@ export function sendWatchlistTagUpdateMessage(user: Profile, tag: string) {
                 },
                 {
                     name: 'New tag',
-                    value: `\`\`\`${tag}\`\`\``
+                    value: `\`\`\`ansi${translateToAnsi(tag)}\`\`\``
                 }
             ])
     });

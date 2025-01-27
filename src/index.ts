@@ -95,7 +95,7 @@ const elysia = new Elysia()
     startReferralReset();
 })
 .onError(({ code, set, error: { message: error }, request }) => {
-    const i18n = getI18nFunctionByLanguage(request.headers.get('x-language'));
+    const i18n = getI18nFunctionByLanguage(request.headers.get('x-language') || undefined);
 
     if(code == 'VALIDATION') {
         set.status = 422;
@@ -135,8 +135,8 @@ const elysia = new Elysia()
         description: 'Returns some basic info about the API.'
     },
     response: {
-        200: t.Object({ version: t.String(), requests: t.Number(), commit: t.Object({ branch: t.String(), sha: t.Union([t.String(), t.Null()]), tree: t.Union([t.String(), t.Null()]) }) }, { description: 'Some basic API info' }),
-        503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
+        200: t.Object({ version: t.String(), requests: t.Number(), commit: t.Object({ branch: t.String(), sha: t.Union([t.String(), t.Null()]), tree: t.Union([t.String(), t.Null()]) }) }, { description: 'The API info' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     }
 })
 .get('/metrics', async ({ query: { latest } }) => {
@@ -160,7 +160,7 @@ const elysia = new Elysia()
 }, {
     detail: {
         tags: ['API'],
-        description: 'Get API statistics'
+        description: 'Returns periodically saved API statistics'
     },
     response: {
         200: t.Array(t.Object({
@@ -174,8 +174,8 @@ const elysia = new Elysia()
             dailyRequests: t.Number(),
             positions: t.Object({}, { default: {}, additionalProperties: true, description: 'All position counts' }),
             icons: t.Object({}, { default: {}, additionalProperties: true, description: 'All icon counts' })
-        }, { description: 'The server is reachable' })),
-        503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
+        }, { description: 'An array of metrics' })),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     query: t.Object({
         latest: t.Optional(t.String({ error: 'error.wrongType;;[["field", "element"], ["type", "string"]]' }))
@@ -200,14 +200,14 @@ const elysia = new Elysia()
 }, {
     detail: {
         tags: ['API'],
-        description: 'Get the referral leaderboard'
+        description: 'Returns the referral leaderboards'
     },
     response: {
         200: t.Object({
             total: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() })),
             current_month: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() }))
-        }, { description: 'The referral leaderboards.' }),
-        503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
+        }, { description: 'The referral leaderboards' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     }
 })
 .get('/ping', ({ error }: Context) => { return error(204, '') }, {
@@ -216,8 +216,8 @@ const elysia = new Elysia()
         description: 'Used by uptime checkers. This route is not being logged'
     },
     response: {
-        204: t.Any({ description: 'The server is reachable' }),
-        503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
+        204: t.Any({ description: 'The API is reachable' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     }
 })
 .listen(config.port);
