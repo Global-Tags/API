@@ -95,7 +95,7 @@ const elysia = new Elysia()
     startReferralReset();
 })
 .onError(({ code, set, error: { message: error }, request }) => {
-    const i18n = getI18nFunctionByLanguage(request.headers.get('x-language'));
+    const i18n = getI18nFunctionByLanguage(request.headers.get('x-language') || undefined);
 
     if(code == 'VALIDATION') {
         set.status = 422;
