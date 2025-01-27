@@ -10,27 +10,27 @@
   "author": "RappyTV",
   "license": "MIT",
   "dependencies": {
-    "@elysiajs/cors": "^1.1.1",
-    "@elysiajs/swagger": "^1.1.6",
-    "@sentry/bun": "^8.45.0",
+    "@elysiajs/cors": "^1.2.0",
+    "@elysiajs/swagger": "1.2.0",
+    "@sentry/bun": "^8.51.0",
     "axios": "^1.7.9",
-    "chalk": "^5.3.0",
+    "chalk": "^5.4.1",
     "change-case": "^5.4.4",
-    "cron": "^3.3.1",
-    "discord.js": "^14.16.3",
+    "cron": "^3.5.0",
+    "discord.js": "^14.17.3",
     "dotenv": "^16.4.7",
-    "elysia": "1.0.25",
+    "elysia": "1.1.27", // Can't use 1.2.0 because of elysia/elysia#733
     "elysia-ip": "^1.0.8",
     "jsonwebtoken": "^9.0.2",
     "minimist": "^1.2.8",
     "moment": "^2.30.1",
-    "mongoose": "latest",
-    "nodemailer": "^6.9.16"
+    "mongoose": "^8.9.5",
+    "nodemailer": "^6.10.0"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.7",
+    "@types/jsonwebtoken": "^9.0.8",
     "@types/minimist": "^1.2.5",
     "@types/nodemailer": "^6.4.17",
-    "bun-types": "^1.1.38"
+    "bun-types": "^1.2.0"
   }
 }
