@@ -7,23 +7,28 @@ import { Permission } from "../../../types/Permission";
 import { formatUUID, getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
-export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, error }) => { // Get ban info
+export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, error }) => { // Get ban list
     if(!session?.hasPermission(Permission.ManageBans)) return error(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return error(404, { error: i18n('error.playerNotFound') });
-    if(!player.isBanned()) return error(404, { error: i18n('ban.not_banned') });
 
-    const { appealable, appealed, banned_at, expires_at, id, reason, staff } = player.bans.at(0)!;
-
-    return { appealable, appealed, banned_at: banned_at.getTime(), expires_at: expires_at?.getTime() || null, id, reason, staff: formatUUID(staff) };
+    return player.bans.map((ban) => ({
+        appealable: ban.appealable,
+        appealed: ban.appealed,
+        banned_at: ban.banned_at.getTime(),
+        expires_at: ban.expires_at?.getTime() || null,
+        id: ban.id,
+        reason: ban.reason,
+        staff: formatUUID(ban.staff)
+    }));
 }, {
     detail: {
         tags: ['Admin'],
-        description: 'Returns info about the latest player ban'
+        description: 'Returns all player bans'
     },
     response: {
-        200: t.Object({ appealable: t.Boolean(), appealed: t.Boolean(), banned_at: t.Number(), expires_at: t.Union([t.Number(), t.Null()]), id: t.String(), reason: t.String({ default: '…' }), staff: t.String({ default: '00000000-0000-0000-0000-000000000000' }) }, { description: 'The ban object' }),
+        200: t.Array(t.Object({ appealable: t.Boolean(), appealed: t.Boolean(), banned_at: t.Number(), expires_at: t.Union([t.Number(), t.Null()]), id: t.String(), reason: t.String({ default: '…' }), staff: t.String({ default: '00000000-0000-0000-0000-000000000000' }) }), { description: 'A list of bans' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage bans' }),
         404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
@@ -32,7 +37,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     },
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).get('/:id', async ({ session, params, i18n, error }) => { // Get ban info
+}).get('/:id', async ({ session, params, i18n, error }) => { // Get ban info of specific ban
     if(!session?.hasPermission(Permission.ManageBans)) return error(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
@@ -66,7 +71,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     if(!player) return error(404, { error: i18n('error.playerNotFound') });
     if(player.isBanned()) return error(409, { error: i18n('ban.already_banned') });
 
-    player.banPlayer({ reason, staff: session.uuid!, appealable, expiresAt: duration ? new Date(Date.now() + duration) : null });
+    const expires = duration ? new Date(Date.now() + duration) : null;
+    player.banPlayer({ reason, staff: session.uuid!, appealable, expiresAt: expires });
     await player.save();
 
     sendModLogMessage({
@@ -74,7 +80,9 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         staff: await getProfileByUUID(session.uuid!),
         user: await getProfileByUUID(uuid),
         discord: false,
-        reason: reason
+        reason: reason,
+        appealable: appealable == undefined ? true : appealable,
+        expires
     });
 
     if(player.isEmailVerified()) {
