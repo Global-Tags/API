@@ -67,7 +67,7 @@ export default class PlayerInfo extends Command {
                     },
                     {
                         name: 'Referrals',
-                        value: `\`\`\`${data.referrals.total.length}\`\`\``,
+                        value: `>>> Total: \`${data.referrals.total.length}\`\nThis month: \`${data.referrals.current_month}\``,
                         inline: true
                     },
                     {
