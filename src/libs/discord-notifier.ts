@@ -243,7 +243,7 @@ export function sendEmailLinkMessage(user: Profile, email: string | null, connec
                     value: `${email ? `||${email}||` : '**`HIDDEN`**'}`
                 }
             ]),
-        actionButton: true
+        actionButton: false
     });
 }
 
