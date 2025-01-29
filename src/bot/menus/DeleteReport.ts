@@ -1,4 +1,4 @@
-import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder } from "discord.js";
+import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder, MessageFlags } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
@@ -13,14 +13,14 @@ export default class DeleteReport extends SelectMenu {
 
     async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, user: User) {
         const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], ephemeral: true });
-        if(!staff.hasPermission(Permission.ManageReports)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], ephemeral: true });
+        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
+        if(!staff.hasPermission(Permission.ManageReports)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
 
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
-        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
+        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const report = player.reports.find((report) => report.id == values[0]);
-        if(!report) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Report not found!')], ephemeral: true });
+        if(!report) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Report not found!')], flags: [MessageFlags.Ephemeral] });
         player.deleteReport(report.id);
         await player.save();
 
@@ -32,6 +32,6 @@ export default class DeleteReport extends SelectMenu {
             report: report.reason
         });
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The report was successfully deleted!')], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The report was successfully deleted!')], flags: [MessageFlags.Ephemeral] });
     }
 }

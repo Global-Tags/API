@@ -1,4 +1,4 @@
-import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder } from "discord.js";
+import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
@@ -15,12 +15,12 @@ export default class ClearIconTexture extends Button {
     
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, user: User) {
         const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], ephemeral: true });
-        if(!staff.hasPermission(Permission.ManageTags)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], ephemeral: true });
+        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
+        if(!staff.hasPermission(Permission.ManageTags)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
 
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
-        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
-        if(!player.icon.hash) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player does not have a custom icon!`)], ephemeral: true });
+        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
+        if(!player.icon.hash) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ This player does not have a custom icon!`)], flags: [MessageFlags.Ephemeral] });
         const oldHash = player.icon.hash;
 
         player.clearIcon(staff.uuid);
@@ -38,6 +38,6 @@ export default class ClearIconTexture extends Button {
             sendIconClearEmail(player.connections.email.address!, getI18nFunctionByLanguage(player.last_language));
         }
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The icon texture was successfully reset!')], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The icon texture was successfully reset!')], flags: [MessageFlags.Ephemeral] });
     }
 }

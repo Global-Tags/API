@@ -1,4 +1,4 @@
-import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
@@ -10,7 +10,7 @@ export default class SetTag extends Button {
 
     async trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
-        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
+        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const input = new TextInputBuilder()
         .setLabel('New tag')
