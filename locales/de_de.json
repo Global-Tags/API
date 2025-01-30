@@ -185,5 +185,13 @@
         "delete": {
             "success": "Die Rolle wurde erfolgreich gelöscht!"
         }
+    },
+    "ban": {
+        "not_found": "Ban nicht gefunden!",
+        "already_banned": "Der Spieler ist bereits gebannt!",
+        "not_banned": "Dieser Spieler ist nicht gebannt!",
+        "no_reason": "Kein Grund angegeben",
+        "banned": "Der Spieler wurde erfolgreich gebannt!",
+        "unbanned": "Der Spieler wurde erfolgreich entbannt!"
     }
 }
