@@ -2,7 +2,7 @@ import metrics from "../database/schemas/metrics";
 import players from "../database/schemas/players";
 import Logger from "./Logger";
 import axios from "axios";
-import { client, fetchGuild } from "../bot/bot";
+import { fetchGuild } from "../bot/bot";
 import { args } from "..";
 import { config } from "./config";
 import { getCachedRoles } from "../database/schemas/roles";
@@ -64,11 +64,13 @@ export async function saveMetrics() {
     }).length;
     const bans = users.filter((user) => user.isBanned()).length;
     const positions = positionList.reduce((object: any, position) => {
-        object[snakeCase(GlobalPosition[position])] = users.filter((user) => snakeCase(GlobalPosition[position]) == snakeCase(user.position)).length;
+        const name = snakeCase(GlobalPosition[position]);
+        object[name] = users.filter((user) => name == snakeCase(user.position)).length;
         return object;
     }, {});
     const icons = iconList.reduce((object: any, icon) => {
-        object[snakeCase(GlobalIcon[icon])] = users.filter((user) => snakeCase(GlobalIcon[icon]) == snakeCase(user.icon.name)).length;
+        const name = snakeCase(GlobalIcon[icon]);
+        object[name] = users.filter((user) => name == snakeCase(user.icon.name)).length;
         return object;
     }, {});
     const addon = await fetchAddon('globaltags');

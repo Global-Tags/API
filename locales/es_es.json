@@ -1,8 +1,4 @@
 {
-    "unban": {
-        "notBanned": "¡Este jugador no está baneado!",
-        "success": "¡El jugador ha sido desbaneado con éxito!"
-    },
     "position": {
         "success": {
             "admin": "¡La posición del tag del jugador se ha fijado con éxito.!",
@@ -148,11 +144,6 @@
             "self": "¡Tu tag se ha borrado con éxito!",
             "admin": "¡El tag del jugador ha sido borrado con éxito!"
         }
-    },
-    "ban": {
-        "alreadyBanned": "Este jugador ya está baneado!",
-        "noReason": "No se da ninguna razón",
-        "success": "¡El jugador fue baneado con éxito!"
     },
     "icon": {
         "sameIcon": "¡Ya has elegido este icono!",

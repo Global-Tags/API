@@ -26,6 +26,8 @@ export enum ModLogType {
     ToggleRoleIcon,
     ChangeRolePermissions,
     DeleteRole,
+    UnlinkConnection,
+    ResetLinkingCode
 }
 
 type ModLogData = {
@@ -40,7 +42,9 @@ type ModLogData = {
     logType: ModLogType.ClearTag
 } | {
     logType: ModLogType.Ban,
-    reason: string
+    reason: string,
+    appealable: boolean,
+    expires?: Date | null
 } | {
     logType: ModLogType.Unban
 } | {
@@ -89,7 +93,17 @@ type ModLogData = {
 } | {
     logType: ModLogType.DeleteRole,
     role: string
+} | {
+    logType: ModLogType.UnlinkConnection,
+    type: 'discord' | 'email' 
+} | {
+    logType: ModLogType.ResetLinkingCode,
+    type: 'discord' | 'email'
 });
+
+export function formatTimestamp(date: Date, style: 't' | 'T' | 'd' | 'D' | 'f' | 'F' | 'R' = 'f') {
+    return `<t:${Math.floor(date.getTime() / 1000 | 0)}:${style}>`;
+}
 
 export function sendReportMessage({ user, reporter, tag, reason } : {
     user: Profile,
@@ -243,7 +257,7 @@ export function sendEmailLinkMessage(user: Profile, email: string | null, connec
                     value: `${email ? `||${email}||` : '**`HIDDEN`**'}`
                 }
             ]),
-        actionButton: true
+        actionButton: false
     });
 }
 
@@ -313,7 +327,7 @@ export function sendModLogMessage(data: ModLogData) {
 function modlogDescription(data: ModLogData): string | null {
     const { logType: type } = data;
     if(type == ModLogType.ChangeTag) return `\`${data.tags.old}\` → \`${data.tags.new}\``;
-    else if(type == ModLogType.Ban) return `**Reason**: \`${data.reason || 'No reason'}\``;
+    else if(type == ModLogType.Ban) return `**Reason**: \`${data.reason || 'No reason'}\`. **Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Expires**: ${data.expires ? `${formatTimestamp(data.expires)} (${formatTimestamp(data.expires, 'R')})` : '`-`'}`;
     else if(type == ModLogType.EditBan) return `**Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Reason**: \`${data.reason || '-- No reason --'}\``;
     else if(type == ModLogType.EditRoles) return `\n\`\`\`diff\n${data.roles.added.map((role) => `+ ${capitalCase(role)}`).join('\n')}${data.roles.added.length > 0 && data.roles.removed.length > 0 ? '\n' : ''}${data.roles.removed.map((role) => `- ${capitalCase(role)}`).join('\n')}\`\`\``;
     else if(type == ModLogType.EditPosition) return `\`${capitalCase(data.positions.old)}\` → \`${capitalCase(data.positions.new)}\``;
@@ -326,6 +340,7 @@ function modlogDescription(data: ModLogData): string | null {
     else if(type == ModLogType.ToggleRoleIcon) return `\`${data.role}\`. \`${data.roleIcon ? '❌' : '✅'}\` → \`${data.roleIcon ? '✅' : '❌'}\``;
     else if(type == ModLogType.ChangeRolePermissions) return `\`${data.role}\`\n\`\`\`diff\n${data.permissions.added.map((permission) => `+ ${capitalCase(permission)}`).join('\n')}${data.permissions.added.length > 0 && data.permissions.removed.length > 0 ? '\n' : ''}${data.permissions.removed.map((permission) => `- ${capitalCase(permission)}`).join('\n')}\`\`\``;
     else if(type == ModLogType.DeleteRole) return `\`${data.role}\``;
+    else if(type == ModLogType.UnlinkConnection || type == ModLogType.ResetLinkingCode) return `**Type**: \`${capitalCase(data.type)}\``;
     return null;
 }
 

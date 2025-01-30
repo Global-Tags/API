@@ -15,15 +15,6 @@
         "playerBanned": "Ten gracz jest zbanowany!",
         "malformedAuthHeader": "Wprowadzono nieprawidłowy nagłówek autoryzacyjny!"
     },
-    "ban": {
-        "alreadyBanned": "Ten gracz już został zbanowany!",
-        "noReason": "Nie podano powodu",
-        "success": "Gracz został pomyślnie zbanowany!"
-    },
-    "unban": {
-        "notBanned": "Ten gracz nie jest zbanowany!",
-        "success": "Gracz został pomyślnie odbanowany!"
-    },
     "icon": {
         "sameIcon": "Już wybrałeś tę ikonę!",
         "notAllowed": "Nie masz uprawnień, aby wybrać tę ikonę!",

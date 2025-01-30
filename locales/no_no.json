@@ -16,15 +16,6 @@
         "malformedAuthHeader": "Du har skrevet inn en feilaktig autorisasjonsoverskrift!",
         "noIcon": "Ikonet ble ikke funnet!"
     },
-    "ban": {
-        "alreadyBanned": "Denne spiller er allerede utstengt!",
-        "noReason": "Ingen årsak oppgitt",
-        "success": "Spilleren ble utstengt!"
-    },
-    "unban": {
-        "notBanned": "Denne spilleren er ikke utestengt!",
-        "success": "Spilleren ble opphevet utestengelsen!"
-    },
     "icon": {
         "sameIcon": "Du har allerede valgt dette ikonet!",
         "notAllowed": "Du har ikke tillatelse å velge dette ikonet!",

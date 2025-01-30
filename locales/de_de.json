@@ -16,15 +16,6 @@
         "malformedAuthHeader": "Du hast einen ungültigen Authorization Header übergeben!",
         "noIcon": "Das Icon wurde nicht gefunden!"
     },
-    "ban": {
-        "alreadyBanned": "Dieser Spieler ist bereits gebannt!",
-        "noReason": "Kein Grund angegeben",
-        "success": "Der Spieler wurde erfolgreich gebannt!"
-    },
-    "unban": {
-        "notBanned": "Dieser Spieler ist nicht gebannt!",
-        "success": "Der Spieler wurde erfolgreich entbannt!"
-    },
     "icon": {
         "sameIcon": "Du hast dieses Icon bereits ausgewählt!",
         "notAllowed": "Du darfst dieses Icon nicht auswählen!",
@@ -194,5 +185,13 @@
         "delete": {
             "success": "Die Rolle wurde erfolgreich gelöscht!"
         }
+    },
+    "ban": {
+        "not_found": "Ban nicht gefunden!",
+        "already_banned": "Der Spieler ist bereits gebannt!",
+        "not_banned": "Dieser Spieler ist nicht gebannt!",
+        "no_reason": "Kein Grund angegeben",
+        "banned": "Der Spieler wurde erfolgreich gebannt!",
+        "unbanned": "Der Spieler wurde erfolgreich entbannt!"
     }
 }

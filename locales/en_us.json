@@ -17,13 +17,12 @@
         "noIcon": "The icon was not found!"
     },
     "ban": {
-        "alreadyBanned": "This player is already banned!",
-        "noReason": "No reason provided",
-        "success": "The player was successfully banned!"
-    },
-    "unban": {
-        "notBanned": "This player is not banned!",
-        "success": "The player was successfully unbanned!"
+        "not_found": "Ban not found!",
+        "already_banned": "This player is already banned!",
+        "not_banned": "This player is not banned!",
+        "no_reason": "No reason provided",
+        "banned": "The player was successfully banned!",
+        "unbanned": "The player was successfully unbanned!"
     },
     "icon": {
         "sameIcon": "You already chose this icon!",

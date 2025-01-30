@@ -15,11 +15,6 @@
         "unknownError": "Bilinmeyen bir hata oluştu! Lütfen daha sonra tekrar deneyin!",
         "ratelimit": "Cihaz sınırlıdır! Lütfen <seconds> saniye içinde tekrar deneyin!"
     },
-    "ban": {
-        "alreadyBanned": "Bu oyuncu zaten yasaklandı!",
-        "noReason": "Hiçbir sebep belirtilmedi",
-        "success": "Oyuncu başarıyla yasaklandı!"
-    },
     "icon": {
         "role_icon": {
             "success": {
@@ -71,9 +66,5 @@
     },
     "referral": {
         "self": "Kendi kendinize aracılık edemezsiniz!"
-    },
-    "unban": {
-        "notBanned": "Bu oyuncu yasaklı değil!",
-        "success": "Oyuncunun yasağı başarıyla kaldırıldı!"
     }
 }
