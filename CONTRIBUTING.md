@@ -18,7 +18,7 @@ Previously, this project did not enforce strict conventions, which may have resu
 - **Database Enum Values**: Use `snake_case` for database enum values.
   _Example_: `admin`, `regular_user`.
 
-- **TypeScript Enum Values**: Use `Capitalcase` for enum values.
+- **TypeScript Enum Values**: Use `PascalCase` for enum values.
   _Example_: `enum Role { Admin, User, Guest }`.
 
 - **TypeScript Classes**: Use `PascalCase` for class names.

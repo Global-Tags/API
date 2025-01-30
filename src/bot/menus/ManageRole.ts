@@ -4,7 +4,7 @@ import players from "../../database/schemas/players";
 import { colors, images } from "../bot";
 import { Permission, permissions as allPermissions } from "../../types/Permission";
 import { getCachedRoles } from "../../database/schemas/roles";
-import { capitalCase } from "change-case";
+import { capitalCase, pascalCase } from "change-case";
 import { config } from "../../libs/config";
 
 export default class ManageRole extends SelectMenu {
@@ -26,7 +26,7 @@ export default class ManageRole extends SelectMenu {
         const embed = new EmbedBuilder()
         .setColor(colors.standart)
         .setTitle(`Edit **${capitalCase(role.name)}**`)
-        .setDescription(`**ID**: \`${role.name}\`\n**Position**: \`${role.position}\`\n**Has Icon**: \`${role.hasIcon ? '✅' : '❌'}\`\n**Metrics admin**: \`${role.name == config.metrics.adminRole ? '✅' : '❌'}\`\n**Permissions** [\`${permissions.length}\`]:\n>>> ${allPermissions.map((permission) => `- ${capitalCase(Permission[permission])}: \`${role.hasPermission(permission) ? '✅' : '❌'}\``).join('\n')}`)
+        .setDescription(`**ID**: \`${role.name}\`\n**Position**: \`${role.position}\`\n**Has Icon**: \`${role.hasIcon ? '✅' : '❌'}\`\n**Metrics admin**: \`${role.name == config.metrics.adminRole ? '✅' : '❌'}\`\n**Permissions** [\`${permissions.length}\`]:\n>>> ${allPermissions.map((permission) => `- ${pascalCase(Permission[permission])}: \`${role.hasPermission(permission) ? '✅' : '❌'}\``).join('\n')}`)
         .setImage(images.placeholder)
         .setFooter({ text: role.name });
 
