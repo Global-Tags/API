@@ -6,9 +6,9 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
 import { getProfileByUUID } from "../../libs/game-profiles";
 
-export default class ResetDiscordLinkingCode extends Button {
+export default class ResetEmailLinkingCode extends Button {
     constructor() {
-        super('resetDiscordLinkingCode');
+        super('resetEmailLinkingCode');
     }
 
     async trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
@@ -18,9 +18,9 @@ export default class ResetDiscordLinkingCode extends Button {
 
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
-        if(!player.connections.discord.code) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player does not have a linking code!')], flags: [MessageFlags.Ephemeral] });
+        if(!player.connections.email.code) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player does not have a linking code!')], flags: [MessageFlags.Ephemeral] });
 
-        player.connections.discord.code = null;
+        player.connections.email.code = null;
         await player.save();
 
         sendModLogMessage({
@@ -28,7 +28,7 @@ export default class ResetDiscordLinkingCode extends Button {
             user: await getProfileByUUID(player.uuid),
             staff: await getProfileByUUID(staff.uuid),
             discord: true,
-            type: 'discord'
+            type: 'email'
         });
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The linking code was successfully reset!')], flags: [MessageFlags.Ephemeral] });
