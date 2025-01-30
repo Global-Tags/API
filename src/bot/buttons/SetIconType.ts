@@ -2,7 +2,7 @@ import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, StringSele
 import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { capitalCase, pascalCase, snakeCase } from "change-case";
+import { capitalCase, snakeCase } from "change-case";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon, icons } from "../../types/GlobalIcon";
 
@@ -22,7 +22,7 @@ export default class SetIconType extends Button {
         const embed = new EmbedBuilder()
         .setColor(colors.standart)
         .setTitle('Set icon type')
-        .setDescription(`The player's current icon type is \`${pascalCase(player.icon.name)}\`.`)
+        .setDescription(`The player's current icon type is \`${capitalCase(player.icon.name)}\`.`)
         .addFields(message.embeds[0].fields[0]);
 
         const menu = new StringSelectMenuBuilder()

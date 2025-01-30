@@ -1,7 +1,7 @@
 import { t } from "elysia";
 import players from "../../../database/schemas/players";
 import { join } from "path";
-import { pascalCase, snakeCase } from "change-case";
+import { capitalCase, snakeCase } from "change-case";
 import { config } from "../../../libs/config";
 import { Permission } from "../../../types/Permission";
 import { GlobalIcon } from "../../../types/GlobalIcon";
@@ -46,7 +46,7 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     const player = await players.findOne({ uuid });
 
     const isCustomIconDisallowed = snakeCase(GlobalIcon[GlobalIcon.Custom]) == icon && !session.hasPermission(Permission.CustomIcon);
-    if(!session.hasPermission(Permission.BypassValidation) && (isCustomIconDisallowed || !(pascalCase(icon) in GlobalIcon) || config.validation.icon.blacklist.includes(pascalCase(icon)))) return error(403, { error: i18n('icon.notAllowed') });
+    if(!session.hasPermission(Permission.BypassValidation) && (isCustomIconDisallowed || !(capitalCase(icon) in GlobalIcon) || config.validation.icon.blacklist.includes(capitalCase(icon)))) return error(403, { error: i18n('icon.notAllowed') });
 
     const oldIcon = player?.icon;
 
