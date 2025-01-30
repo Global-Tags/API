@@ -1,4 +1,4 @@
-import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder } from "discord.js";
+import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder, MessageFlags } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
