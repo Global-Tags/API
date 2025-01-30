@@ -25,6 +25,8 @@ export enum ModLogType {
     ToggleRoleIcon,
     ChangeRolePermissions,
     DeleteRole,
+    UnlinkConnection,
+    ResetLinkingCode
 }
 
 type ModLogData = {
@@ -90,6 +92,12 @@ type ModLogData = {
 } | {
     logType: ModLogType.DeleteRole,
     role: string
+} | {
+    logType: ModLogType.UnlinkConnection,
+    type: 'discord' | 'email' 
+} | {
+    logType: ModLogType.ResetLinkingCode,
+    type: 'discord' | 'email'
 });
 
 export function formatTimestamp(date: Date, style: 't' | 'T' | 'd' | 'D' | 'f' | 'F' | 'R' = 'f') {
@@ -331,6 +339,7 @@ function modlogDescription(data: ModLogData): string | null {
     else if(type == ModLogType.ToggleRoleIcon) return `\`${data.role}\`. \`${data.roleIcon ? '❌' : '✅'}\` → \`${data.roleIcon ? '✅' : '❌'}\``;
     else if(type == ModLogType.ChangeRolePermissions) return `\`${data.role}\`\n\`\`\`diff\n${data.permissions.added.map((permission) => `+ ${capitalCase(permission)}`).join('\n')}${data.permissions.added.length > 0 && data.permissions.removed.length > 0 ? '\n' : ''}${data.permissions.removed.map((permission) => `- ${capitalCase(permission)}`).join('\n')}\`\`\``;
     else if(type == ModLogType.DeleteRole) return `\`${data.role}\``;
+    else if(type == ModLogType.UnlinkConnection || type == ModLogType.ResetLinkingCode) return `**Type**: \`${capitalCase(data.type)}\``;
     return null;
 }
 
