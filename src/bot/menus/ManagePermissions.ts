@@ -1,9 +1,9 @@
-import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } from "discord.js";
+import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
-import { getCachedRoles, updateRoleCache } from "../../database/schemas/roles";
+import roles, { updateRoleCache } from "../../database/schemas/roles";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { getProfileByUUID } from "../../libs/game-profiles";
 
@@ -18,7 +18,7 @@ export default class ManagePermissions extends SelectMenu {
         if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
         if(!staff.hasPermission(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
 
-        const role = getCachedRoles().find((role) => role.name == message.embeds[1].footer!.text);
+        const role = await roles.findOne({ name: message.embeds[1].footer!.text});
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
 
         const permissions = [ ...role.permissions ];
@@ -33,6 +33,7 @@ export default class ManagePermissions extends SelectMenu {
         for(const permission of permissions) {
             if(!values.includes(permission)) removed.push(permission);
         }
+        await role.save();
         updateRoleCache();
 
         sendModLogMessage({

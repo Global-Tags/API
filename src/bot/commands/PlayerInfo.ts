@@ -53,7 +53,7 @@ export default class PlayerInfo extends Command {
                     },
                     {
                         name: 'Tag',
-                        value: `\`\`\`ansi\n${translateToAnsi((data.ban.active ? null : data.tag) || '--')}\`\`\``
+                        value: `\`\`\`ansi\n${translateToAnsi((data.isBanned() ? null : data.tag) || '--')}\`\`\``
                     },
                     {
                         name: 'Position',
@@ -67,7 +67,7 @@ export default class PlayerInfo extends Command {
                     },
                     {
                         name: 'Referrals',
-                        value: `\`\`\`${data.referrals.total.length}\`\`\``,
+                        value: `>>> Total: \`${data.referrals.total.length}\`\nThis month: \`${data.referrals.current_month}\``,
                         inline: true
                     },
                     {

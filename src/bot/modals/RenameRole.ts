@@ -3,10 +3,11 @@ import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { Permission } from "../../types/Permission";
-import roles, { getCachedRoles, getNextPosition, updateRoleCache } from "../../database/schemas/roles";
+import { getCachedRoles } from "../../database/schemas/roles";
 import { snakeCase } from "change-case";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { getProfileByUUID } from "../../libs/game-profiles";
+import roleModel from "../../database/schemas/roles";
 
 export default class RenameRole extends Modal {
     constructor() {
@@ -21,7 +22,7 @@ export default class RenameRole extends Modal {
 
         const name = snakeCase(fields.getTextInputValue('name').trim());
         const roles = getCachedRoles();
-        const role = getCachedRoles().find((role) => role.name == message.embeds[1].footer!.text);
+        const role = await roleModel.findOne({ name: message.embeds[1].footer!.text });
 
         if(!role) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')] });
         if(roles.some((role) => role.name == name)) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ The role \`${name}\` already exists!`)] });

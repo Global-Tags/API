@@ -2,7 +2,7 @@ import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowB
 import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { constantCase } from "change-case";
+import { snakeCase } from "change-case";
 import { getCustomIconUrl } from "../../routes/players/[uuid]/icon";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon } from "../../types/GlobalIcon";
@@ -19,15 +19,14 @@ export default class ManageIcon extends Button {
         
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
-        if(!player.tag) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player does not have a tag!')], flags: [MessageFlags.Ephemeral] });
 
         const embed = new EmbedBuilder()
-        .setColor(0x5865f2)
-        .setTitle('Manage icon')
-        .setDescription('Here you can edit the player\'s icon type and texture.')
-        .addFields(message.embeds[0].fields[0]);
+            .setColor(0x5865f2)
+            .setTitle('Manage icon')
+            .setDescription('Here you can edit the player\'s icon type and texture.')
+            .addFields(message.embeds[0].fields[0]);
 
-        if(constantCase(player.icon.name) == constantCase(GlobalIcon[GlobalIcon.Custom]) && player.icon.hash) {
+        if(snakeCase(player.icon.name) == snakeCase(GlobalIcon[GlobalIcon.Custom]) && player.icon.hash) {
             embed.setThumbnail(getCustomIconUrl(player.uuid, player.icon.hash));
         }
 
@@ -35,13 +34,13 @@ export default class ManageIcon extends Button {
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
-                .setLabel('Change type')
-                .setCustomId('setIconType')
-                .setStyle(ButtonStyle.Primary),
+                    .setLabel('Change type')
+                    .setCustomId('setIconType')
+                    .setStyle(ButtonStyle.Primary),
                 new ButtonBuilder()
-                .setLabel('Clear texture')
-                .setCustomId('clearIconTexture')
-                .setStyle(ButtonStyle.Danger)
+                    .setLabel('Clear texture')
+                    .setCustomId('clearIconTexture')
+                    .setStyle(ButtonStyle.Danger)
             )
         ]
 

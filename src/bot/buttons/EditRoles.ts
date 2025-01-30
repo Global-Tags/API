@@ -20,21 +20,22 @@ export default class EditRoles extends Button {
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const options = getCachedRoles().slice(0, 25).map(({ name: role }) => {
+            role = snakeCase(role);
             return {
                 label: capitalCase(role),
-                value: snakeCase(role),
-                default: player.roles.some((r) => snakeCase(r.name) == snakeCase(role))
+                value: role,
+                default: player.roles.some((r) => snakeCase(r.name) == role)
             }
         });
 
         const row = new ActionRowBuilder<StringSelectMenuBuilder>()
         .addComponents([
             new StringSelectMenuBuilder()
-            .setCustomId('editRoles')
-            .setMinValues(0)
-            .setMaxValues(options.length)
-            .setPlaceholder('Select roles...')
-            .setOptions(options)
+                .setCustomId('editRoles')
+                .setMinValues(0)
+                .setMaxValues(options.length)
+                .setPlaceholder('Select roles...')
+                .setOptions(options)
         ]);
 
         interaction.reply({ embeds: [EmbedBuilder.from(message.embeds[0]).setTitle('Edit roles')], components: [row], flags: [MessageFlags.Ephemeral] });

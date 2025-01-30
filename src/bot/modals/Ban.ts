@@ -23,7 +23,12 @@ export default class Ban extends Modal {
         if(player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player is already banned!')], flags: [MessageFlags.Ephemeral] });
         const reason = fields.getTextInputValue('reason');
 
-        player.banPlayer(reason, staff.uuid);
+        player.banPlayer({
+            appealable: true,
+            reason,
+            staff: staff.uuid,
+            expiresAt: null
+        });
         player.save();
 
         sendModLogMessage({
@@ -31,6 +36,7 @@ export default class Ban extends Modal {
             staff: await getProfileByUUID(staff.uuid),
             user: await getProfileByUUID(player.uuid),
             discord: true,
+            appealable: true,
             reason: reason
         });
 

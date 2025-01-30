@@ -44,7 +44,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
             hash: player.icon.hash || null
         },
         roleIcon: !player.hide_role_icon ? player.getRoles().find((role) => role.hasIcon)?.name || null : null,
-        roles: player.getRoles().map((role) => snakeCase(role.name)),
+        roles: player.getRoles().map((role) => role.name),
         permissions: permissions.filter((permission) => player.hasPermission(permission)).map((permission) => snakeCase(Permission[permission])),
         referrals: {
             has_referred: player.referrals.has_referred,
@@ -53,8 +53,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         },
         ban: showBan ? {
             active: player.isBanned(),
-            reason: player.ban.reason || null,
-            appealable: player.ban.appealable
+            reason: player.bans.at(0)?.reason || null,
+            appealable: player.bans.at(0)?.appealable || false
         } : null
     };
 }, {

@@ -2,7 +2,7 @@ import { TransportOptions, createTransport } from "nodemailer";
 import { config } from "./config";
 import { join } from "path";
 import Logger from "./Logger";
-import { pascalCase } from "change-case";
+import { capitalCase } from "change-case";
 import { I18nFunction } from "./i18n";
 
 const { mailer } = config;
@@ -124,9 +124,9 @@ export function sendPositionChangeEmail(address: string, oldPosition: string, ne
             ['greeting', i18n('email.greeting')],
             ['description', i18n('email.positionChanged.description')],
             ['previous', i18n('email.positionChanged.previous')],
-            ['old_position', pascalCase(oldPosition)],
+            ['old_position', capitalCase(oldPosition)],
             ['new', i18n('email.positionChanged.new')],
-            ['new_position', pascalCase(newPosition)],
+            ['new_position', capitalCase(newPosition)],
             ['warning', i18n('email.positionChanged.warning')],
             ['footer', i18n('email.footer')],
         ]
@@ -143,9 +143,9 @@ export function sendIconTypeChangeEmail(address: string, oldIcon: string, newIco
             ['greeting', i18n('email.greeting')],
             ['description', i18n('email.iconChanged.description')],
             ['previous', i18n('email.iconChanged.previous')],
-            ['old_icon', pascalCase(oldIcon)],
+            ['old_icon', capitalCase(oldIcon)],
             ['new', i18n('email.iconChanged.new')],
-            ['new_icon', pascalCase(newIcon)],
+            ['new_icon', capitalCase(newIcon)],
             ['warning', i18n('email.iconChanged.warning')],
             ['footer', i18n('email.footer')],
         ]

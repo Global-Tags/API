@@ -2,7 +2,7 @@ import { t } from "elysia";
 import players from "../../../database/schemas/players";
 import { Permission } from "../../../types/Permission";
 import { GlobalPosition } from "../../../types/GlobalPosition";
-import { pascalCase, snakeCase } from "change-case";
+import { capitalCase, snakeCase } from "change-case";
 import { getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
@@ -11,7 +11,7 @@ import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 
 export default (app: ElysiaApp) => app.post('/', async ({ session, body: { position }, params, i18n, error }) => { // Change tag position
     if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
-    if(!(pascalCase(position) in GlobalPosition)) return error(422, { error: i18n('position.invalid') });
+    if(!(capitalCase(position) in GlobalPosition)) return error(422, { error: i18n('position.invalid') });
 
     position = snakeCase(position);
     const uuid = stripUUID(params.uuid);

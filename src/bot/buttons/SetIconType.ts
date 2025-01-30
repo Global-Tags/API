@@ -2,7 +2,7 @@ import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, StringSele
 import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { capitalCase, pascalCase, snakeCase } from "change-case";
+import { capitalCase, snakeCase } from "change-case";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon, icons } from "../../types/GlobalIcon";
 
@@ -20,22 +20,24 @@ export default class SetIconType extends Button {
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const embed = new EmbedBuilder()
-        .setColor(colors.standart)
-        .setTitle('Set icon type')
-        .setDescription(`The player's current icon type is \`${pascalCase(player.icon.name)}\`.`)
-        .addFields(message.embeds[0].fields[0]);
+            .setColor(colors.standart)
+            .setTitle('Set icon type')
+            .setDescription(`The player's current icon type is \`${capitalCase(player.icon.name)}\`.`)
+            .addFields(message.embeds[0].fields[0]);
+
+        const playerIcon = snakeCase(player.icon.name);
 
         const menu = new StringSelectMenuBuilder()
-        .setCustomId('setIconType')
-        .setPlaceholder('Please select an icon.')
-        .setMinValues(1)
-        .setMaxValues(1)
-        .setOptions(icons.map((icon) =>
-            new StringSelectMenuOptionBuilder()
-                .setLabel(capitalCase(GlobalIcon[icon]))
-                .setDefault(snakeCase(GlobalIcon[icon]) == snakeCase(player.icon.name))
-                .setValue(GlobalIcon[icon])
-        ).slice(0, 25));
+            .setCustomId('setIconType')
+            .setPlaceholder('Please select an icon.')
+            .setMinValues(1)
+            .setMaxValues(1)
+            .setOptions(icons.map((icon) =>
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(capitalCase(GlobalIcon[icon]))
+                    .setDefault(snakeCase(GlobalIcon[icon]) == playerIcon)
+                    .setValue(GlobalIcon[icon])
+            ).slice(0, 25));
 
         interaction.reply({ embeds: [embed], components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu)], flags: [MessageFlags.Ephemeral] });
     }

@@ -3,7 +3,6 @@ import SelectMenu from "../structs/SelectMenu";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { snakeCase } from "change-case";
 import { sendPositionChangeEmail } from "../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
@@ -24,7 +23,7 @@ export default class SetPosition extends SelectMenu {
         if(player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player is already banned!')], flags: [MessageFlags.Ephemeral] });
 
         const oldPosition = player.position;
-        player.position = snakeCase(values[0]);
+        player.position = values[0];
         await player.save();
 
         sendModLogMessage({
