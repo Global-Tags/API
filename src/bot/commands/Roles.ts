@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, User } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, User } from "discord.js";
 import Command from "../structs/Command";
 import { config } from "../../libs/config";
 import { colors, images } from "../bot";
@@ -17,7 +17,7 @@ export default class RolesCommand extends Command {
     }    
 
     async execute(interaction: CommandInteraction, options: CommandInteractionOptionResolver, member: GuildMember, user: User) {
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
         if(!config.discordBot.notifications.accountConnections.enabled) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Account linking is deactivated!')] });
 
         const player = await players.findOne({ 'connections.discord.id': user.id });

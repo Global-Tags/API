@@ -2,7 +2,7 @@ import * as bot from "../bot/bot";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
 import { Profile } from "./game-profiles";
 import { getCustomIconUrl } from "../routes/players/[uuid]/icon";
-import { capitalCase } from "change-case";
+import { capitalCase, pascalCase } from "change-case";
 import { config } from "./config";
 import { translateToAnsi } from "./chat-color";
 
@@ -338,7 +338,7 @@ function modlogDescription(data: ModLogData): string | null {
     else if(type == ModLogType.CreateRole) return `\`${data.role}\``;
     else if(type == ModLogType.RenameRole) return `\`${data.names.old}\` → \`${data.names.new}\``
     else if(type == ModLogType.ToggleRoleIcon) return `\`${data.role}\`. \`${data.roleIcon ? '❌' : '✅'}\` → \`${data.roleIcon ? '✅' : '❌'}\``;
-    else if(type == ModLogType.ChangeRolePermissions) return `\`${data.role}\`\n\`\`\`diff\n${data.permissions.added.map((permission) => `+ ${capitalCase(permission)}`).join('\n')}${data.permissions.added.length > 0 && data.permissions.removed.length > 0 ? '\n' : ''}${data.permissions.removed.map((permission) => `- ${capitalCase(permission)}`).join('\n')}\`\`\``;
+    else if(type == ModLogType.ChangeRolePermissions) return `\`${data.role}\`\n\`\`\`diff\n${data.permissions.added.map((permission) => `+ ${pascalCase(permission)}`).join('\n')}${data.permissions.added.length > 0 && data.permissions.removed.length > 0 ? '\n' : ''}${data.permissions.removed.map((permission) => `- ${pascalCase(permission)}`).join('\n')}\`\`\``;
     else if(type == ModLogType.DeleteRole) return `\`${data.role}\``;
     else if(type == ModLogType.UnlinkConnection || type == ModLogType.ResetLinkingCode) return `**Type**: \`${capitalCase(data.type)}\``;
     return null;

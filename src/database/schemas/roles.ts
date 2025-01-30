@@ -1,6 +1,6 @@
 import { HydratedDocument, model, Schema } from "mongoose"
 import { config } from "../../libs/config";
-import { capitalCase } from "change-case";
+import { pascalCase } from "change-case";
 import { Permission } from "../../types/Permission";
 import { isConnected } from "../mongo";
 import Logger from "../../libs/Logger";
@@ -43,11 +43,12 @@ const schema = new Schema<IRole>({
     methods: {
         getPermissions(): Permission[] {
             return this.permissions
-                .filter((permission) => capitalCase(permission) in Permission)
-                .map((permission) => Permission[capitalCase(permission) as keyof typeof Permission]);
+                .filter((permission) => pascalCase(permission) in Permission)
+                .map((permission) => Permission[pascalCase(permission) as keyof typeof Permission]);
         },
 
         hasPermission(permission: Permission): boolean {
+            console.log(this.getPermissions(), permission);
             return this.getPermissions().includes(permission);
         },
 
