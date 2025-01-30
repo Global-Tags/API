@@ -3,9 +3,8 @@ import Button from "../structs/Button";
 import { colors } from "../bot";
 import players from "../../database/schemas/players";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
+import { stripUUID } from "../../libs/game-profiles";
 import { config } from "../../libs/config";
-import { formatTimestamp } from "../../libs/discord-notifier";
 
 type InfoEntry = { name: string, value: string };
 type Info = { category: string, entries: InfoEntry[] };
@@ -69,48 +68,25 @@ export default class Actions extends Button {
                 value: `\`\`\`${strippedUUID}\`\`\``
             });
 
-        const rows = [
-            new ActionRowBuilder<ButtonBuilder>()
-            .addComponents(
-                new ButtonBuilder()
-                    .setLabel('Manage account')
-                    .setCustomId('manageAccount')
-                    .setStyle(ButtonStyle.Primary)
-                    .setDisabled(!staff.hasPermission(Permission.ManageBans) && !staff.hasPermission(Permission.ManageWatchlist)),
-                new ButtonBuilder()
-                    .setLabel('Manage tag')
-                    .setCustomId('manageTag')
-                    .setStyle(ButtonStyle.Primary)
-                    .setDisabled(!staff.hasPermission(Permission.ManageTags))
-            ),
-            new ActionRowBuilder<ButtonBuilder>()
-            .addComponents(
-                new ButtonBuilder()
-                    .setLabel(`Reports${player.reports.length > 0 ? ` (${player.reports.length})` : ''}`)
-                    .setCustomId('reports')
-                    .setStyle(ButtonStyle.Primary)
-                    .setDisabled(!staff.hasPermission(Permission.ManageReports)),
-                new ButtonBuilder()
-                    .setLabel(`Notes${player.notes.length > 0 ? ` (${player.notes.length})` : ''}`)
-                    .setCustomId('notes')
-                    .setStyle(ButtonStyle.Primary)
-                    .setDisabled(!staff.hasPermission(Permission.ManageNotes))
-            ),
-            new ActionRowBuilder<ButtonBuilder>()
-            .addComponents(
-                new ButtonBuilder()
-                    .setLabel('Manage subscriptions')
-                    .setCustomId('manageSubscriptions')
-                    .setStyle(ButtonStyle.Primary)
-                    .setDisabled(!staff.hasPermission(Permission.ManageSubscriptions)),
-                new ButtonBuilder()
-                    .setLabel('Edit roles')
-                    .setCustomId('editRoles')
-                    .setStyle(ButtonStyle.Primary)
-                    .setDisabled(!staff.hasPermission(Permission.ManageRoles))
-            )
-        ]
+        const row = new ActionRowBuilder<ButtonBuilder>()
+        .addComponents(
+            new ButtonBuilder()
+                .setLabel('Account')
+                .setCustomId('manageAccount')
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(!staff.hasPermission(Permission.ManageConnections) && !staff.hasPermission(Permission.ManageRoles) && !staff.hasPermission(Permission.ManageSubscriptions)),
+            new ButtonBuilder()
+                .setLabel('Tag Settings')
+                .setCustomId('manageTag')
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(!staff.hasPermission(Permission.ManageTags)),
+            new ButtonBuilder()
+                .setLabel('Moderation')
+                .setCustomId('moderateAccount')
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(!staff.hasPermission(Permission.ManageBans) && !staff.hasPermission(Permission.ManageNotes) && !staff.hasPermission(Permission.ManageReports) && !staff.hasPermission(Permission.ManageWatchlist))
+        );
 
-        interaction.reply({ embeds: [embed], components: rows, ephemeral: true });
+        interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
     }
 }
