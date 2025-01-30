@@ -1,11 +1,9 @@
-import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
 import players from "../../database/schemas/players";
-import { colors, images } from "../bot";
-import { Permission, permissions as allPermissions } from "../../types/Permission";
-import roles, { getCachedRoles, updateRoleCache } from "../../database/schemas/roles";
-import { capitalCase } from "change-case";
-import { config } from "../../libs/config";
+import { colors } from "../bot";
+import { Permission } from "../../types/Permission";
+import roles, { updateRoleCache } from "../../database/schemas/roles";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { getProfileByUUID } from "../../libs/game-profiles";
 
@@ -17,11 +15,11 @@ export default class ManagePermissions extends SelectMenu {
     async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, user: User) {
         if(values.length == 0) return interaction.deferUpdate();
         const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], ephemeral: true });
-        if(!staff.hasPermission(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], ephemeral: true });
+        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
+        if(!staff.hasPermission(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
 
         const role = await roles.findOne({ name: message.embeds[1].footer!.text});
-        if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], ephemeral: true });
+        if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
 
         const permissions = [ ...role.permissions ];
         const added: string[] = [];
@@ -49,6 +47,6 @@ export default class ManagePermissions extends SelectMenu {
             }
         });
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The role permissions were successfully updated!')], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The role permissions were successfully updated!')], flags: [MessageFlags.Ephemeral] });
     }
 }

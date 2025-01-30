@@ -34,11 +34,11 @@ export function startReferralReset() {
 }
 
 export function startRoleCacheJob() {
-    new CronJob('*/5 * * * *', updateRoleCache, null, true, tz, null, true);
+    new CronJob('*/30 * * * *', updateRoleCache, null, true, tz, null, true);
 }
 
 export function startRoleSynchronization() {
     if(!config.discordBot.syncedRoles.enabled) return;
     Logger.debug('Role syncronization initialized.');
-    new CronJob('*/20 * * * *', synchronizeRoles, null, true, tz, null, true);
+    new CronJob('*/10 * * * *', synchronizeRoles, null, true, tz, null, true);
 }

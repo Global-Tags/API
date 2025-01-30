@@ -1,4 +1,4 @@
-import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder } from "discord.js";
+import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import { Permission, permissions } from "../../types/Permission";
 import players from "../../database/schemas/players";
@@ -13,11 +13,11 @@ export default class ManagePermissions extends Button {
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, user: User) {
         const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], ephemeral: true });
-        if(!staff.hasPermission(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], ephemeral: true });
+        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
+        if(!staff.hasPermission(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
 
         const role = getCachedRoles().find((role) => role.name == message.embeds[1].footer!.text);
-        if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], ephemeral: true });
+        if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
 
         const embed = new EmbedBuilder()
         .setColor(colors.standart)
@@ -41,6 +41,6 @@ export default class ManagePermissions extends Button {
             }))
         ]);
 
-        interaction.reply({ embeds: [EmbedBuilder.from(message.embeds[0]), embed], components: [row], ephemeral: true });
+        interaction.reply({ embeds: [EmbedBuilder.from(message.embeds[0]), embed], components: [row], flags: [MessageFlags.Ephemeral] });
     }
 }

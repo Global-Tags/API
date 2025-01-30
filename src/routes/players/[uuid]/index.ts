@@ -110,15 +110,17 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         if(strippedTag.length < min || strippedTag.length > max) return error(422, { error: i18n('setTag.validation').replace('<min>', String(min)).replace('<max>', String(max)) });
         const blacklistedWord = blacklist.find((word) => strippedTag.toLowerCase().includes(word));
         if(blacklistedWord) return error(422, { error: i18n('setTag.blacklisted').replaceAll('<word>', blacklistedWord) });
-        isWatched = (player && player.watchlist) || watchlist.some(async (word) => {
-            if(strippedTag.toLowerCase().includes(word)) {
-                Logger.warn(`Now watching ${uuid} for matching "${word}" in "${tag}".`);
-                sendWatchlistAddMessage({ user: await getProfileByUUID(uuid), tag, word });
-                notifyWatch = false;
-                return true;
+        isWatched = (player && player.watchlist) || await (async () => {
+            for(const word of watchlist) {
+                if(strippedTag.toLowerCase().includes(word)) {
+                    Logger.warn(`Now watching ${uuid} for matching "${word}" in "${tag}".`);
+                    sendWatchlistAddMessage({ user: await getProfileByUUID(uuid), tag, word });
+                    notifyWatch = false;
+                    return true;
+                }
             }
             return false;
-        });
+        })();
     }
 
     const oldTag = player?.tag;

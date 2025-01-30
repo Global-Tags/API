@@ -1,4 +1,4 @@
-import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder } from "discord.js";
+import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder, MessageFlags } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
@@ -15,12 +15,12 @@ export default class SetIconType extends SelectMenu {
 
     async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, user: User) {
         const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], ephemeral: true });
-        if(!staff.hasPermission(Permission.ManageTags)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], ephemeral: true });
+        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
+        if(!staff.hasPermission(Permission.ManageTags)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
 
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
-        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
-        if(player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player is already banned!')], ephemeral: true });
+        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
+        if(player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player is already banned!')], flags: [MessageFlags.Ephemeral] });
 
         const oldIcon = { ...player.icon };
         player.icon.name = values[0];
@@ -41,6 +41,6 @@ export default class SetIconType extends SelectMenu {
             sendIconTypeChangeEmail(player.connections.email.address!, oldIcon.name, player.icon.name, getI18nFunctionByLanguage(player.last_language));
         }
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The players icon type was successfully updated!')], ephemeral: true });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The players icon type was successfully updated!')], flags: [MessageFlags.Ephemeral] });
     }
 }
