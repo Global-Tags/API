@@ -58,7 +58,7 @@ const schema = new Schema<IRole>({
         async rename(name: string): Promise<void> {
             const oldName = this.name;
             this.name = name;
-            this.save();
+            await this.save();
             await players.updateMany({ 'roles.name': oldName }, { $set: { 'roles.$.name': name } });
             updateRoleCache();
         }

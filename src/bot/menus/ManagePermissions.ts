@@ -35,6 +35,7 @@ export default class ManagePermissions extends SelectMenu {
         for(const permission of permissions) {
             if(!values.includes(permission)) removed.push(permission);
         }
+        await role.save();
         updateRoleCache();
 
         sendModLogMessage({
