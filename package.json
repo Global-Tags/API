@@ -1,7 +1,7 @@
 {
   "name": "globaltags",
   "private": true,
-  "version": "1.5.7",
+  "version": "1.5.8",
   "module": "src/index.ts",
   "scripts": {
     "dev": "NODE_ENV=dev bun --watch src/index.ts",
@@ -12,7 +12,7 @@
   "dependencies": {
     "@elysiajs/cors": "^1.2.0",
     "@elysiajs/swagger": "1.2.0",
-    "@sentry/bun": "^8.51.0",
+    "@sentry/bun": "^8.52.0",
     "axios": "^1.7.9",
     "chalk": "^5.4.1",
     "change-case": "^5.4.4",
@@ -31,6 +31,6 @@
     "@types/jsonwebtoken": "^9.0.8",
     "@types/minimist": "^1.2.5",
     "@types/nodemailer": "^6.4.17",
-    "bun-types": "^1.2.0"
+    "bun-types": "^1.2.1"
   }
 }
