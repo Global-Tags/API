@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { constantCase, snakeCase } from "change-case";
+import { snakeCase } from "change-case";
 import { generateSecureCode } from "../../routes/players/[uuid]/connections";
 import { Permission } from "../../types/Permission";
 import { getCachedRoles, Role } from "./roles";
@@ -338,7 +338,7 @@ const schema = new Schema<IPlayer>({
                 staff,
                 timestamp: new Date().getTime()
             })
-            this.icon.name = constantCase(GlobalIcon[GlobalIcon.None]);
+            this.icon.name = GlobalIcon[GlobalIcon.None];
             this.icon.hash = null;
         },
 

@@ -2,7 +2,7 @@ import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowB
 import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { constantCase } from "change-case";
+import { snakeCase } from "change-case";
 import { getCustomIconUrl } from "../../routes/players/[uuid]/icon";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon } from "../../types/GlobalIcon";
@@ -27,7 +27,7 @@ export default class ManageIcon extends Button {
         .setDescription('Here you can edit the player\'s icon type and texture.')
         .addFields(message.embeds[0].fields[0]);
 
-        if(constantCase(player.icon.name) == constantCase(GlobalIcon[GlobalIcon.Custom]) && player.icon.hash) {
+        if(snakeCase(player.icon.name) == snakeCase(GlobalIcon[GlobalIcon.Custom]) && player.icon.hash) {
             embed.setThumbnail(getCustomIconUrl(player.uuid, player.icon.hash));
         }
 

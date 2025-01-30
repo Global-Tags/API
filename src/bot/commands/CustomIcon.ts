@@ -2,7 +2,6 @@ import { ApplicationCommandOptionType, CacheType, CommandInteraction, CommandInt
 import Command from "../structs/Command";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { constantCase } from "change-case";
 import { join } from 'path';
 import axios from "axios";
 import { generateSecureCode } from "../../routes/players/[uuid]/connections";
@@ -66,7 +65,7 @@ export default class CustomIcon extends Command {
 
         if(sub == 'toggle') {
             const shouldEnable = options.getBoolean('enable', true);
-            player.icon.name = constantCase(GlobalIcon[shouldEnable ? GlobalIcon.Custom : GlobalIcon.None]);
+            player.icon.name = GlobalIcon[shouldEnable ? GlobalIcon.Custom : GlobalIcon.None];
             await player.save();
 
             interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ Your custom icon has been ${shouldEnable ? 'enabled' : 'disabled'}!`)] });
@@ -80,7 +79,7 @@ export default class CustomIcon extends Command {
             const request = await axios.get(file.url, { responseType: 'arraybuffer' }).catch(() => null);
             if(!request) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The upload failed, please try again!')] });
 
-            player.icon.name = constantCase(GlobalIcon[GlobalIcon.Custom]);
+            player.icon.name = GlobalIcon[GlobalIcon.Custom];
             player.icon.hash = generateSecureCode(32);
             await player.save();
             await Bun.write(Bun.file(join('icons', player.uuid, `${player.icon.hash}.png`)), request.data, { createPath: true });
@@ -92,7 +91,7 @@ export default class CustomIcon extends Command {
 
             interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ Your custom icon was successfully uploaded!\nYou may need to clear your cache ingame for the icon to be shown.').setThumbnail(`attachment://${file.name}`)], files: [file] });
         } else if(sub == 'unset') {
-            player.icon.name = constantCase(GlobalIcon[GlobalIcon.None]);
+            player.icon.name = GlobalIcon[GlobalIcon.None];
             player.icon.hash = null;
             await player.save();
 
