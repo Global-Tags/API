@@ -20,20 +20,22 @@ export default class SetPosition extends Button {
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
 
         const embed = new EmbedBuilder()
-        .setColor(colors.standart)
-        .setTitle('Set position')
-        .setDescription(`The player's current position is \`${capitalCase(player.position)}\`.`)
-        .addFields(message.embeds[0].fields[0]);
+            .setColor(colors.standart)
+            .setTitle('Set position')
+            .setDescription(`The player's current position is \`${capitalCase(player.position)}\`.`)
+            .addFields(message.embeds[0].fields[0]);
+
+        const playerPosition = snakeCase(player.position);
 
         const menu = new StringSelectMenuBuilder()
         .setCustomId('setPosition')
-        .setPlaceholder('Please select a role.')
+        .setPlaceholder('Please select a position.')
         .setMinValues(1)
         .setMaxValues(1)
         .setOptions(positions.map((position) =>
             new StringSelectMenuOptionBuilder()
                 .setLabel(capitalCase(GlobalPosition[position]))
-                .setDefault(snakeCase(GlobalPosition[position]) == snakeCase(player.position))
+                .setDefault(snakeCase(GlobalPosition[position]) == playerPosition)
                 .setValue(GlobalPosition[position])
         ));
 

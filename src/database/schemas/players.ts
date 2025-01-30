@@ -338,7 +338,7 @@ const schema = new Schema<IPlayer>({
                 staff,
                 timestamp: new Date().getTime()
             })
-            this.icon.name = GlobalIcon[GlobalIcon.None];
+            this.icon.name = snakeCase(GlobalIcon[GlobalIcon.None]);
             this.icon.hash = null;
         },
 

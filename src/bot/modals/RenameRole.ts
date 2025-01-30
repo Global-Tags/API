@@ -3,7 +3,7 @@ import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { Permission } from "../../types/Permission";
-import roles, { getCachedRoles, getNextPosition, updateRoleCache } from "../../database/schemas/roles";
+import { getCachedRoles } from "../../database/schemas/roles";
 import { snakeCase } from "change-case";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { getProfileByUUID } from "../../libs/game-profiles";

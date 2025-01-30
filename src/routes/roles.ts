@@ -30,9 +30,9 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).get('/:name', async ({ session, params, i18n, error }) => { // Get specific role
     if(!session?.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
-    const name = snakeCase(decodeURIComponent(params.name));
+    const name = snakeCase(decodeURIComponent(params.name).trim());
 
-    const role = getCachedRoles().find((role) => snakeCase(role.name) == name);
+    const role = getCachedRoles().find((role) => role.name == name);
     if(!role) return error(404, { error: i18n('roles.not_found') });
 
     return {
@@ -60,7 +60,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
     if(!session?.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
 
     const name = snakeCase(body.name.trim());
-    if(getCachedRoles().find((role) => snakeCase(role.name) == name)) return error(409, { error: i18n('roles.create.already_exists').replaceAll('<role>', name) });
+    if(getCachedRoles().find((role) => role.name == name)) return error(409, { error: i18n('roles.create.already_exists').replaceAll('<role>', name) });
 
     await roles.insertMany([{
         name,
@@ -96,9 +96,9 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
 }).delete('/:name', async ({ session, params, i18n, error }) => { // Delete role
     if(!session?.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
 
-    const name = snakeCase(decodeURIComponent(params.name));
+    const name = snakeCase(decodeURIComponent(params.name).trim());
 
-    const role = getCachedRoles().find((role) => snakeCase(role.name) == name);
+    const role = getCachedRoles().find((role) => role.name == name);
     if(!role) return error(404, { error: i18n('roles.not_found') });
 
     sendModLogMessage({

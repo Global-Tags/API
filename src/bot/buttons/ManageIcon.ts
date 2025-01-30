@@ -19,13 +19,12 @@ export default class ManageIcon extends Button {
         
         const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], ephemeral: true });
-        if(!player.tag) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player does not have a tag!')], ephemeral: true });
 
         const embed = new EmbedBuilder()
-        .setColor(0x5865f2)
-        .setTitle('Manage icon')
-        .setDescription('Here you can edit the player\'s icon type and texture.')
-        .addFields(message.embeds[0].fields[0]);
+            .setColor(0x5865f2)
+            .setTitle('Manage icon')
+            .setDescription('Here you can edit the player\'s icon type and texture.')
+            .addFields(message.embeds[0].fields[0]);
 
         if(snakeCase(player.icon.name) == snakeCase(GlobalIcon[GlobalIcon.Custom]) && player.icon.hash) {
             embed.setThumbnail(getCustomIconUrl(player.uuid, player.icon.hash));
@@ -35,13 +34,13 @@ export default class ManageIcon extends Button {
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
-                .setLabel('Change type')
-                .setCustomId('setIconType')
-                .setStyle(ButtonStyle.Primary),
+                    .setLabel('Change type')
+                    .setCustomId('setIconType')
+                    .setStyle(ButtonStyle.Primary),
                 new ButtonBuilder()
-                .setLabel('Clear texture')
-                .setCustomId('clearIconTexture')
-                .setStyle(ButtonStyle.Danger)
+                    .setLabel('Clear texture')
+                    .setCustomId('clearIconTexture')
+                    .setStyle(ButtonStyle.Danger)
             )
         ]
 
