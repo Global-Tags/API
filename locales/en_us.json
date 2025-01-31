@@ -84,9 +84,11 @@
             "admin": "The player's tag was successfully reset!"
         }
     },
-    "watch": {
-        "alreadyWatched": "This player is already on the watchlist!",
-        "success": "The player is now on the watchlist!"
+    "watchlist": {
+        "success": {
+            "watch": "The player is now on the watchlist!",
+            "unwatch": "The player is no longer on the watchlist!"
+        }
     },
     "connections": {
         "discord": {
@@ -105,10 +107,6 @@
             "invalidCode": "The code is invalid!",
             "verified": "Your email was successfully verified!"
         }
-    },
-    "unwatch": {
-        "notWatched": "This player is not on the watchlist!",
-        "success": "The player is no longer on the watchlist!"
     },
     "notes": {
         "create": {

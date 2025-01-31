@@ -69,9 +69,11 @@
             "admin": "Tag gracza został pomyślnie zresetowany!"
         }
     },
-    "watch": {
-        "alreadyWatched": "Ten gracz jest już na liście obserwowanych!",
-        "success": "Gracz jest teraz na liście obserwowanych!"
+    "watchlist": {
+        "success": {
+            "watch": "Gracz jest teraz na liście obserwowanych!",
+            "unwatch": "Gracz nie znajduje się już na liście obserwowanych!"
+        }
     },
     "connections": {
         "discord": {
@@ -80,9 +82,5 @@
             "notConnected": "Nie masz połączonego konta Discord. Użyj '/gt link', aby połączyć konto!",
             "unlinked": "Konto Discord zostało pomyślnie odłączone!"
         }
-    },
-    "unwatch": {
-        "notWatched": "Nie ma tego gracza na liście obserwowanych!",
-        "success": "Gracz nie znajduje się już na liście obserwowanych!"
     }
 }

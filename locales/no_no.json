@@ -76,9 +76,11 @@
             "admin": "Spillerens tag ble tilbakestilt!"
         }
     },
-    "watch": {
-        "alreadyWatched": "Denne spilleren er allerede på overvåkningslisten!",
-        "success": "Spilleren er nå på overvåkningslisten!"
+    "watchlist": {
+        "success": {
+            "watch": "Spilleren er nå på overvåkningslisten!",
+            "unwatch": "Spilleren er ikke lenger på overvåkningslisten!"
+        }
     },
     "connections": {
         "discord": {
@@ -97,10 +99,6 @@
             "invalidCode": "Koden er ugyldig!",
             "verified": "E-posten din ble bekreftet!"
         }
-    },
-    "unwatch": {
-        "notWatched": "Denne spilleren er ikke på overvåkningslisten!",
-        "success": "Spilleren er ikke lenger på overvåkningslisten!"
     },
     "email": {
         "footer": "Takk for å bruke GlobalTags!",

@@ -95,9 +95,11 @@
             "warning": "Considera esto como una advertencia, no te daremos una segunda oportunidad."
         }
     },
-    "unwatch": {
-        "notWatched": "¡Este jugador no está en la lista de observación!",
-        "success": "¡El jugador fue eliminado de la lista de observación!"
+    "watchlist": {
+        "success": {
+            "watch": "¡El jugador fue añadido a la lista de observación!",
+            "unwatch": "¡El jugador fue eliminado de la lista de observación!"
+        }
     },
     "error": {
         "unknownError": "¡Ha ocurrido un error desconocido! ¡Por favor, vuelva a intentarlo más tarde!",
@@ -152,10 +154,6 @@
             "self": "¡Tu icono se ha configurado con éxito!",
             "admin": "¡El icono del jugador se ha configurado correctamente!"
         }
-    },
-    "watch": {
-        "success": "¡El jugador fue añadido a la lista de observación!",
-        "alreadyWatched": "¡Este jugador ya está en la lista de observación!"
     },
     "editBan": {
         "success": "¡Se ha actualizado la suspensión!"

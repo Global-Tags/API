@@ -94,13 +94,11 @@
             "verified": "Deine Email-Adresse wurde erfolgreich verifiziert!"
         }
     },
-    "watch": {
-        "alreadyWatched": "Dieser Spieler ist bereits auf der Watchlist!",
-        "success": "Der Spieler ist jetzt auf der Watchlist!"
-    },
-    "unwatch": {
-        "notWatched": "Dieser Spieler ist nicht auf der Watchlist!",
-        "success": "Der Spieler ist nicht mehr auf der Watchlist!"
+    "watchlist": {
+        "success": {
+            "watch": "Der Spieler ist nun auf der Watchlist!",
+            "unwatch": "Der Spieler ist nun nicht mehr auf der Watchlist!"
+        }
     },
     "email": {
         "footer": "Danke, dass du GlobalTags benutzt!",
