@@ -20,7 +20,7 @@ import { verify as verifyMailOptions } from "./libs/mailer";
 import { startEntitlementExpiry, startMetrics, startReferralReset, startRoleCacheJob, startRoleSynchronization } from "./libs/cron-jobs";
 import { config } from "./libs/config";
 import { join } from "path";
-import { ip } from "elysia-ip";
+import ip from "./middleware/ip";
 
 if(config.mongodb.trim().length == 0) {
     Logger.error('Database connection string is empty!');
@@ -38,7 +38,7 @@ const elysia = new Elysia()
     .onRequest(checkDatabase)
     .onTransform(access)
     .onBeforeHandle(checkRatelimit)
-    .use(ip({ headersOnly: config.proxy.enabled, checkHeaders: [config.proxy.ipHeader] }))
+    .use(ip)
     .use(cors())
     .use(fetchI18n)
     .use(getAuthProvider)
@@ -92,7 +92,7 @@ const elysia = new Elysia()
         startReferralReset();
     })
     .onError(({ code, set, error: { message: error }, request }) => {
-        const i18n = getI18nFunctionByLanguage(request.headers.get('x-language'));
+        const i18n = getI18nFunctionByLanguage(request.headers.get('x-language') || undefined);
 
         if(code == 'VALIDATION') {
             set.status = 422;
