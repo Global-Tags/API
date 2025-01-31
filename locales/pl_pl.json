@@ -3,7 +3,6 @@
         "notFound": "Nie znaleziono!",
         "unknownError": "Wystąpił nieznany błąd! Spróbuj ponownie później!",
         "invalidBody": "Treść żądania musi być obiektem JSON!",
-        "missingField": "Brak pola \"<field>\".",
         "database": "Baza danych nie jest połączona. Spróbuj ponownie później!",
         "notAllowed": "Nie masz uprawnień do wykonania tego polecenia!",
         "playerNotFound": "Nie ma takiego gracza w naszych rejestrach!",

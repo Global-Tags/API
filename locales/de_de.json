@@ -5,7 +5,6 @@
         "invalidBody": "Der Request body muss ein JSON Objekt sein!",
         "database": "Die Datenbank ist nicht verbunden. Bitte versuche es später erneut!",
         "notAllowed": "Darauf hast du keinen Zugriff!",
-        "missingField": "Fehlendes JSON Feld \"<field>\".",
         "playerNotFound": "Dieser Spieler befindet sich nicht in unserer Datenbank!",
         "wrongType": "Das Feld \"<field>\" muss von Typ <type> sein!",
         "ratelimit": "Du bist geratelimited! Bitte versuche es in <seconds> Sekunden erneut!",
