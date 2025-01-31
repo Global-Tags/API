@@ -28,6 +28,8 @@
         "sameIcon": "You already chose this icon!",
         "notAllowed": "You're not allowed to choose this icon!",
         "role_icon": {
+            "already_hidden": "Your role icon is already hidden!",
+            "already_shown": "Your role icon is already shown!",
             "success": {
                 "hidden": "Your role icon is now hidden!",
                 "shown": "Your role icon is now shown!"
@@ -85,6 +87,8 @@
         }
     },
     "watchlist": {
+        "already_watched": "This player is already on the watchlist!",
+        "not_watched": "This player is not on the watchlist!",
         "success": {
             "watch": "The player is now on the watchlist!",
             "unwatch": "The player is no longer on the watchlist!"
