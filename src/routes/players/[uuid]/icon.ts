@@ -104,8 +104,9 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return error(404, { error: i18n('error.noTag') });
     if(session.equal && player.isBanned()) return error(403, { error: i18n('error.banned') });
+    if(player.hide_role_icon == !visible) return error(409, { error: i18n(`icon.role_icon.already_${player.hide_role_icon ? 'hidden' : 'shown'}`) });
 
-    player.hide_role_icon = visible;
+    player.hide_role_icon = !visible;
     await player.save();
 
     return { message: i18n(`icon.role_icon.success.${player.hide_role_icon ? 'hidden' : 'shown'}`) };
@@ -118,6 +119,7 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
         200: t.Object({ message: t.String() }, { description: 'The role icon visibility was updated' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to toggle your role icon' }),
         404: t.Object({ error: t.String() }, { description: 'You don\'t have an account' }),
+        409: t.Object({ error: t.String() }, { description: 'That role icon visibility is already set' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
