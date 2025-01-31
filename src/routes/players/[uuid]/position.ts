@@ -16,6 +16,7 @@ export default (app: ElysiaApp) => app.post('/', async ({ session, body: { posit
     position = snakeCase(position);
     const uuid = stripUUID(params.uuid);
     const player = await players.findOne({ uuid });
+    if(session.equal && player?.isBanned()) return error(403, { error: i18n('error.banned') });
 
     const oldPosition = player?.position;
 
