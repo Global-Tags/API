@@ -26,7 +26,9 @@
             "success": {
                 "hidden": "Dein Rollenicon ist nun versteckt!",
                 "shown": "Dein Rollenicon wird nun angezeigt!"
-            }
+            },
+            "already_shown": "Dein Rollenicon wird bereits angezeigt!",
+            "already_hidden": "Dein Rollenicon ist bereits versteckt!"
         }
     },
     "position": {
@@ -97,7 +99,9 @@
         "success": {
             "watch": "Der Spieler ist nun auf der Watchlist!",
             "unwatch": "Der Spieler ist nun nicht mehr auf der Watchlist!"
-        }
+        },
+        "already_watched": "Dieser Spieler ist bereits auf der Watchlist!",
+        "not_watched": "Dieser Spieler ist nicht auf der Watchlist!"
     },
     "email": {
         "footer": "Danke, dass du GlobalTags benutzt!",
