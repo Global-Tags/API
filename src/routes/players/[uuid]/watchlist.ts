@@ -11,6 +11,7 @@ export default (app: ElysiaApp) => app.patch('/', async ({ session, body: { watc
     
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n('error.playerNotFound') });
+    if(player.watchlist == watched) return error(409, { error: i18n(`watchlist.${player.watchlist ? 'already' : 'not'}_watched`) });
 
     player.watchlist = watched;
     await player.save();
@@ -32,6 +33,7 @@ export default (app: ElysiaApp) => app.patch('/', async ({ session, body: { watc
         200: t.Object({ message: t.String() }, { description: 'The player\'s watchlist status was updated' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage the watchlist' }),
         404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
+        409: t.Object({ error: t.String() }, { description: 'This watchlist state is already set' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
