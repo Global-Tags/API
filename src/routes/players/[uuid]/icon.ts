@@ -97,14 +97,14 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     body: t.Object({ icon: t.String({ error: 'error.missingField;;[["field", "icon"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).post('/role', async ({ session, params, i18n, error }) => { // Toggle role icon
+}).post('/role', async ({ session, body: { hidden }, params, i18n, error }) => { // Toggle role icon
     if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return error(404, { error: i18n('error.noTag') });
     if(player.isBanned()) return error(403, { error: i18n('error.banned') });
 
-    player.hide_role_icon = !player.hide_role_icon;
+    player.hide_role_icon = hidden;
     await player.save();
 
     return { message: i18n(`icon.role_icon.success.${player.hide_role_icon ? 'hidden' : 'shown'}`) };
@@ -121,6 +121,7 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
+    body: t.Object({ hidden: t.Boolean({ error: 'error.wrongType;;[["field", "hidden"], ["type", "boolean"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 });
