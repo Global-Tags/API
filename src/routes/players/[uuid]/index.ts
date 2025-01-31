@@ -100,7 +100,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid });
-    if(player && player.isBanned()) return error(403, { error: i18n(`error.${session.equal ? 'b' : 'playerB'}anned`) });
+    if(session.equal && player?.isBanned()) return error(403, { error: i18n('error.banned') });
 
     let isWatched = false;
     let notifyWatch = true;
@@ -182,7 +182,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
 
     const player = await players.findOne({ uuid });
     if(!player) return error(404, { error: i18n('error.noTag') });
-    if(player.isBanned()) return error(403, { error: i18n(`error.${session.equal ? 'b' : 'playerB'}anned`) });
+    if(session.equal && player.isBanned()) return error(403, { error: i18n('error.banned') });
     if(!player.tag) return error(404, { error: i18n('error.noTag') });
 
     if(!session.equal) {

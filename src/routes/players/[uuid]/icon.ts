@@ -44,6 +44,7 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     icon = snakeCase(icon);
     const uuid = stripUUID(params.uuid);
     const player = await players.findOne({ uuid });
+    if(session.equal && player?.isBanned()) return error(403, { error: i18n('error.banned') });
 
     const isCustomIconDisallowed = snakeCase(GlobalIcon[GlobalIcon.Custom]) == icon && !session.hasPermission(Permission.CustomIcon);
     if(!session.hasPermission(Permission.BypassValidation) && (isCustomIconDisallowed || !(capitalCase(icon) in GlobalIcon) || config.validation.icon.blacklist.includes(capitalCase(icon)))) return error(403, { error: i18n('icon.notAllowed') });
@@ -102,7 +103,7 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return error(404, { error: i18n('error.noTag') });
-    if(player.isBanned()) return error(403, { error: i18n('error.banned') });
+    if(session.equal && player.isBanned()) return error(403, { error: i18n('error.banned') });
 
     player.hide_role_icon = hidden;
     await player.save();
