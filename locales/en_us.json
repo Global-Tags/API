@@ -3,7 +3,6 @@
         "notFound": "Not found!",
         "unknownError": "An unknown error occurred! Please try again later!",
         "invalidBody": "Request body needs to be a json object!",
-        "missingField": "Missing field \"<field>\".",
         "notAllowed": "You're not allowed to perform that request!",
         "database": "The database is not connected. Please try again later!",
         "playerNotFound": "There is no such player in our records!",

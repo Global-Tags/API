@@ -1,7 +1,6 @@
 {
     "error": {
         "invalidBody": "İstek gövdesi bir JSON nesnesi olmalıdır!",
-        "missingField": "<field>JSON alanı eksik \"<field>\".",
         "notAllowed": "Buna erişiminiz yok!",
         "database": "Veritabanı bağlı değil. Lütfen daha sonra tekrar deneyin!",
         "playerNotFound": "Bu oyuncu veritabanımızda yok!",

@@ -4,7 +4,6 @@
         "unknownError": "Det oppstod en ukjent feil! Prøv igjen senere!",
         "invalidBody": "Forespørselsteksten må være et json-objekt!",
         "notAllowed": "Du har ikke tillatelse til å utføre denne forspørsel!",
-        "missingField": "Manglende felt \"<field>\".",
         "database": "Databasen er ikke tilkoblet. Vennligst prøv igjen senere!",
         "playerNotFound": "Det er ingen slik spiller i våre rulleblad!",
         "banned": "Du er utstengt!",

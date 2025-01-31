@@ -114,7 +114,6 @@
         "playerBanned": "Este jugador está baneado!",
         "database": "La base de datos no está conectada. ¡Por favor, inténtelo de nuevo más tarde!",
         "playerNoTag": "Este jugador no tiene un tag!",
-        "missingField": "Falta la clave \"<field>\".",
         "wrongType": "Propriedad \"<field>\" tiene que ser de tipo <type>!",
         "noIcon": "!El icono no se ha encontrado!"
     },
