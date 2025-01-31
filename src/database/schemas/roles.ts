@@ -48,7 +48,6 @@ const schema = new Schema<IRole>({
         },
 
         hasPermission(permission: Permission): boolean {
-            console.log(this.getPermissions(), permission);
             return this.getPermissions().includes(permission);
         },
 
