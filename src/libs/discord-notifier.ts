@@ -157,7 +157,7 @@ export function sendWatchlistAddMessage({ user, tag, word }: { user: Profile, ta
             },
             {
                 name: 'New tag',
-                value: `\`\`\`ansi${translateToAnsi(tag)}\`\`\``
+                value: `\`\`\`ansi\n${translateToAnsi(tag)}\`\`\``
             },
             {
                 name: 'Matched word',
@@ -184,7 +184,7 @@ export function sendWatchlistTagUpdateMessage(user: Profile, tag: string) {
                 },
                 {
                     name: 'New tag',
-                    value: `\`\`\`ansi${translateToAnsi(tag)}\`\`\``
+                    value: `\`\`\`ansi\n${translateToAnsi(tag)}\`\`\``
                 }
             ])
     });
