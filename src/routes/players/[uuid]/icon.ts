@@ -15,7 +15,7 @@ export function getCustomIconUrl(uuid: string, hash: string) {
     return `${config.baseUrl}/players/${uuid}/icon/${hash}`;
 }
 
-export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, hash }, i18n, error }) => { // Get custom icon. Ignore the TS errors. Probably a bun bug
+export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, hash }, i18n, error }) => { // Get custom icon
     const player = await players.findOne({ uuid: stripUUID(uuid) });
     if(!player) return error(404, { error: i18n('error.noTag') });
     if(player.isBanned()) return error(403, { error: i18n('error.playerBanned') });
