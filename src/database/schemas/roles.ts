@@ -12,6 +12,7 @@ interface IRole {
     name: string,
     position: number,
     hasIcon: boolean,
+    sku?: string | null,
     permissions: string[],
     getPermissions(): Permission[],
     hasPermission(permission: Permission): boolean,
@@ -34,6 +35,10 @@ const schema = new Schema<IRole>({
     hasIcon: {
         type: Boolean,
         required: true
+    },
+    sku: {
+        type: String,
+        required: false
     },
     permissions: {
         type: [String],
@@ -76,6 +81,7 @@ const defaultRoles = [
         name: 'admin',
         position: 0,
         hasIcon: false,
+        sku: null,
         permissions: [
             'bypass_validation',
             'custom_icon',
@@ -102,7 +108,7 @@ export async function updateRoleCache(): Promise<void> {
     for(const role of roles) {
         cachedRoles.push(role);
     }
-    cachedRoles.sort();
+    cachedRoles.sort((a, b) => a.position - b.position);
     Logger.debug('Updated role cache.');
 }
 
