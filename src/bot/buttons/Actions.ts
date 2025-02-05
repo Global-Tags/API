@@ -75,7 +75,7 @@ export default class Actions extends Button {
                 .setLabel('Account')
                 .setCustomId('manageAccount')
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(!staff.hasPermission(Permission.ManageConnections) && !staff.hasPermission(Permission.ManageRoles) && !staff.hasPermission(Permission.ManageSubscriptions)),
+                .setDisabled(!staff.hasPermission(Permission.ManageConnections) && !staff.hasPermission(Permission.ManageRoles)),
             new ButtonBuilder()
                 .setLabel('Tag Settings')
                 .setCustomId('manageTag')

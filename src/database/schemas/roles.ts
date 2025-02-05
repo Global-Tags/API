@@ -87,7 +87,6 @@ const defaultRoles = [
             'custom_icon',
             'manage_bans',
             'manage_notes',
-            'manage_subscriptions',
             'manage_reports',
             'manage_roles',
             'manage_tags',
