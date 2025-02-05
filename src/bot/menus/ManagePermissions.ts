@@ -18,7 +18,7 @@ export default class ManagePermissions extends SelectMenu {
         if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
         if(!staff.hasPermission(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
 
-        const role = await roles.findOne({ name: message.embeds[1].footer!.text});
+        const role = await roles.findOne({ name: message.embeds[1].footer!.text });
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
 
         const permissions = [ ...role.permissions ];

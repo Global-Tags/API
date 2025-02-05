@@ -6,7 +6,7 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendTagChangeEmail } from "../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID } from "../../libs/game-profiles";
+import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
 
 export default class SetTag extends Modal {
     constructor() {
@@ -18,10 +18,11 @@ export default class SetTag extends Modal {
         if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
         if(!staff.hasPermission(Permission.ManageTags)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
 
-        const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
+        const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
-        const tag = fields.getTextInputValue('tag');
+        const tag = fields.getTextInputValue('tag').trim();
         const oldTag = player.tag;
+        if(tag == oldTag) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The tag is already set to this value!')], flags: [MessageFlags.Ephemeral] });
 
         sendModLogMessage({
             logType: ModLogType.ChangeTag,

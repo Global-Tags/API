@@ -5,6 +5,7 @@ import { colors } from "../bot";
 import { capitalCase, snakeCase } from "change-case";
 import { Permission } from "../../types/Permission";
 import { getCachedRoles } from "../../database/schemas/roles";
+import { stripUUID } from "../../libs/game-profiles";
 
 export default class EditRoles extends Button {
     constructor() {
@@ -16,7 +17,7 @@ export default class EditRoles extends Button {
         if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
         if(!staff.hasPermission(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
 
-        const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
+        const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const options = getCachedRoles().slice(0, 25).map(({ name: role }) => {
@@ -29,14 +30,14 @@ export default class EditRoles extends Button {
         });
 
         const row = new ActionRowBuilder<StringSelectMenuBuilder>()
-        .addComponents([
-            new StringSelectMenuBuilder()
-                .setCustomId('editRoles')
-                .setMinValues(0)
-                .setMaxValues(options.length)
-                .setPlaceholder('Select roles...')
-                .setOptions(options)
-        ]);
+            .addComponents([
+                new StringSelectMenuBuilder()
+                    .setCustomId('editRoles')
+                    .setMinValues(0)
+                    .setMaxValues(options.length)
+                    .setPlaceholder('Select roles...')
+                    .setOptions(options)
+            ]);
 
         interaction.reply({ embeds: [EmbedBuilder.from(message.embeds[0]).setTitle('Edit roles')], components: [row], flags: [MessageFlags.Ephemeral] });
     }

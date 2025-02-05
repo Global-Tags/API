@@ -2,7 +2,7 @@ import { ButtonInteraction, Message, GuildMember, User, ButtonBuilder, ActionRow
 import Button from "../structs/Button";
 import { colors } from "../bot";
 import players from "../../database/schemas/players";
-import { getProfileByUUID } from "../../libs/game-profiles";
+import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 
 export default class Reports extends Button {
@@ -16,7 +16,7 @@ export default class Reports extends Button {
         if(!staff) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')] });
         if(!staff.hasPermission(Permission.ManageReports)) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')] });
 
-        const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
+        const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!player) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')] });
 
         const reports = [];
@@ -26,19 +26,17 @@ export default class Reports extends Button {
             reports.push(`**${username || uuid}**: \`${report.reported_tag}\` - \`${report.reason}\` [<t:${report.created_at.getTime() / 1000 | 0}:R>]`);
         }
 
-        const embed = new EmbedBuilder()
-        .setColor(colors.standart)
-        .setTitle('Reports')
-        .setDescription(reports.length > 0 ? reports.join('\n') : '*This player was never reported*')
-        .addFields(message.embeds[0].fields[0]);
+        const embed = EmbedBuilder.from(message.embeds[0])
+            .setTitle('Reports')
+            .setDescription(reports.length > 0 ? reports.join('\n') : '*This player was never reported*');
 
         const row = new ActionRowBuilder<ButtonBuilder>()
-        .addComponents(
-            new ButtonBuilder()
-            .setLabel('Delete report')
-            .setCustomId('deleteReport')
-            .setStyle(ButtonStyle.Danger)
-        )
+            .addComponents(
+                new ButtonBuilder()
+                    .setLabel('Delete report')
+                    .setCustomId('deleteReport')
+                    .setStyle(ButtonStyle.Danger)
+            );
 
         interaction.editReply({ embeds: [embed], components: [row] });
     }
