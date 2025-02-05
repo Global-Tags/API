@@ -30,7 +30,7 @@ export default class ManageRole extends SelectMenu {
         .setImage(images.placeholder)
         .setFooter({ text: role.name });
 
-        if(role.hasIcon) embed.setThumbnail(config.iconUrl(role.name));
+        if(role.hasIcon) embed.setThumbnail(config.roleIconUrl(role.name));
 
         const components = [
             new ActionRowBuilder<ButtonBuilder>()
