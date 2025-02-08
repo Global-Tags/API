@@ -25,7 +25,7 @@ export default class EditRoles extends Button {
             return {
                 label: capitalCase(role),
                 value: role,
-                default: player.roles.some((r) => snakeCase(r.name) == role)
+                default: player.getRoles().some((r) => snakeCase(r.role.name) == role)
             }
         });
 
