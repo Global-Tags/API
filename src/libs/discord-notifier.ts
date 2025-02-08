@@ -2,7 +2,7 @@ import * as bot from "../bot/bot";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
 import { Profile } from "./game-profiles";
 import { getCustomIconUrl } from "../routes/players/[uuid]/icon";
-import { capitalCase, pascalCase } from "change-case";
+import { capitalCase, pascalCase, sentenceCase } from "change-case";
 import { config } from "./config";
 import { translateToAnsi } from "./chat-color";
 
@@ -318,7 +318,7 @@ export function sendModLogMessage(data: ModLogData) {
     const description = modlogDescription(data);
     sendMessage({
         channel: config.discordBot.notifications.mogLog.channel,
-        content: `[**${ModLogType[data.logType]}**] [\`${data.staff.username || data.staff.uuid}\`](<https://laby.net/@${data.staff.uuid}>)${data.discord ? ' [**D**]' : ''}${data.user ? ` → [\`${data.user.username || data.user.uuid}\`](<https://laby.net/@${data.user.uuid}>)` : ''}${description ? `: ${description}` : ''}`,
+        content: `[**${sentenceCase(ModLogType[data.logType])}**] [\`${data.staff.username || data.staff.uuid}\`](<https://laby.net/@${data.staff.uuid}>)${data.discord ? ' [**D**]' : ''}${data.user ? ` → [\`${data.user.username || data.user.uuid}\`](<https://laby.net/@${data.user.uuid}>)` : ''}${description ? `: ${description}` : ''}`,
         embed: null,
         actionButton: false
     });
