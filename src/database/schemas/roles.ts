@@ -135,11 +135,17 @@ export async function synchronizeRoles() {
 
             if(playerRoles.some((playerRole) => playerRole.name == role.name)) {
                 for(const syncedRole of role.getSyncedRoles()) {
-                    member.roles.add(syncedRole).catch(() => null);
+                    if(member.roles.cache.has(syncedRole)) continue;
+                    member.roles.add(syncedRole)
+                        .then(() => Logger.debug(`Added synced role "${syncedRole}" (${role.name}) to member "${member.id}".`))
+                        .catch((error) => Logger.error(`Failed to add synced role "${syncedRole}" (${role.name}) to member "${member.id}": ${error}`));
                 }
             } else {
                 for(const syncedRole of role.getSyncedRoles()) {
-                    member.roles.remove(syncedRole).catch(() => null);
+                    if(!member.roles.cache.has(syncedRole)) continue;
+                    member.roles.remove(syncedRole)
+                        .then(() => Logger.debug(`Removed synced role "${syncedRole}" (${role.name}) from member "${member.id}".`))
+                        .catch((error) => Logger.error(`Failed to remove synced role "${syncedRole}" (${role.name}) from member "${member.id}": ${error}`));
                 }
             }
         }
