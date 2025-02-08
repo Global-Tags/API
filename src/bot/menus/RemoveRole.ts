@@ -6,9 +6,9 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
 import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
 
-export default class EditRoles extends SelectMenu {
+export default class RemoveRole extends SelectMenu {
     constructor() {
-        super('editRoles');
+        super('removeRole');
     }
 
     async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, user: User) {
@@ -19,49 +19,21 @@ export default class EditRoles extends SelectMenu {
         const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
-        const staffProfile = await getProfileByUUID(staff.uuid);
-        const username = staffProfile.username || staffProfile.uuid;
-        const addedAt = new Date();
-        const reason = `Added by ${username}`;
-
-        const added: string[] = [];
-        const removed: string[] = [];
+        const roleName = values[0];
         
-        for(const value of values) {
-            const role = player.roles.find(role => role.name == value);
-            if(role) {
-                if(!role.expires_at || role.expires_at.getTime() < Date.now()) continue;
-                role.added_at = addedAt;
-                role.expires_at = null;
-                role.reason = reason;
-            } else {
-                player.roles.push({
-                    name: value,
-                    added_at: addedAt,
-                    reason: reason,
-                    manually_added: true
-                });
-            }
-            added.push(value);
-        }
-        for(const role of player.roles.filter((role) => !role.expires_at || role.expires_at.getTime() > Date.now())) {
-            if(values.includes(role.name)) continue;
-            role.expires_at = new Date();
-            removed.push(role.name);
-        }
+        const role = player.roles.find(role => role.name == roleName);
+        if(!role || (role.expires_at && role.expires_at.getTime() < Date.now())) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is not active!')], flags: [MessageFlags.Ephemeral] });
+        role.expires_at = new Date();
         await player.save();
 
         sendModLogMessage({
-            logType: ModLogType.EditRoles,
+            logType: ModLogType.RemoveRole,
             staff: await getProfileByUUID(staff.uuid),
             user: await getProfileByUUID(player.uuid),
             discord: true,
-            roles: {
-                added,
-                removed
-            }
+            role: roleName
         });
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The players roles were successfully updated!')], flags: [MessageFlags.Ephemeral] });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The role was successfully removed!')], flags: [MessageFlags.Ephemeral] });
     }
 }

@@ -31,7 +31,7 @@ export default class ManageAccount extends Button {
                 .setDisabled(!staff.hasPermission(Permission.ManageConnections)),
             new ButtonBuilder()
                 .setLabel('Roles')
-                .setCustomId('editRoles')
+                .setCustomId('manageRoles')
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(!staff.hasPermission(Permission.ManageRoles))
         );
