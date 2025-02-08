@@ -60,7 +60,7 @@ type ModLogData = {
 } | {
     logType: ModLogType.EditRoleNote,
     role: string,
-    note: string
+    note: string | null
 } | {
     logType: ModLogType.SetRoleExpiration,
     role: string,
@@ -329,7 +329,7 @@ function modlogDescription(data: ModLogData): string | null {
     else if(type == ModLogType.Ban) return `**Reason**: \`${data.reason || 'No reason'}\`. **Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Expires**: ${data.expires ? `${formatTimestamp(data.expires)} (${formatTimestamp(data.expires, 'R')})` : '`-`'}`;
     else if(type == ModLogType.EditBan) return `**Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Reason**: \`${data.reason || '-- No reason --'}\``;
     else if(type == ModLogType.AddRole || type == ModLogType.RemoveRole) return `\`${data.role}\``;
-    else if(type == ModLogType.EditRoleNote) return `**Role**: \`${data.role}\`. **Note**: \`${data.note}\``;
+    else if(type == ModLogType.EditRoleNote) return `**Role**: \`${data.role}\`. **Note**: \`${data.note || '-'}\``;
     else if(type == ModLogType.SetRoleExpiration) return `**Role**: \`${data.role}\`. **Expires**: ${data.expires ? `${formatTimestamp(data.expires)} (${formatTimestamp(data.expires, 'R')})` : '`-`'}`;
     else if(type == ModLogType.EditPosition) return `\`${capitalCase(data.positions.old)}\` → \`${capitalCase(data.positions.new)}\``;
     else if(type == ModLogType.ChangeIconType) return `\`${capitalCase(data.icons.old)}\` → \`${capitalCase(data.icons.new)}\``;
