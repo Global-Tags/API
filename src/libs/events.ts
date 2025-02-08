@@ -1,4 +1,6 @@
-import { fetchGuild } from "../bot/bot";
+import { client, fetchGuild } from "../bot/bot";
+import players from "../database/schemas/players";
+import { getCachedRoles, synchronizeRoles } from "../database/schemas/roles";
 import { config } from "./config";
 import { sendDiscordLinkMessage } from "./discord-notifier";
 import { Profile } from "./game-profiles";
@@ -9,6 +11,27 @@ export async function onDiscordLink(player: Profile, userId: string) {
         userId,
         true
     );
+
+    const playerData = await players.findOne({ 'connections.discord.id': userId });
+    if(playerData) {
+        let save = false;
+        const entitlements = (await client.application!.entitlements.fetch({ user: userId })).filter(e => e.isActive());
+        for(const entitlement of entitlements.values()) {
+            const role = getCachedRoles().find((role) => role.sku == entitlement.skuId);
+            if(role) {
+                playerData.roles.push({
+                    name: role.name,
+                    added_at: new Date(),
+                    manually_added: false,
+                    expires_at: entitlement.endsAt,
+                    reason: `Discord entitlement: ${entitlement.id}`
+                });
+                save = true;
+            }
+        }
+        if(save) await playerData.save();
+        synchronizeRoles();
+    }
 
     const guild = await fetchGuild();
     if(!guild) return;
