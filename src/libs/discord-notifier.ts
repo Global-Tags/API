@@ -12,7 +12,10 @@ export enum ModLogType {
     Ban,
     Unban,
     EditBan,
-    EditRoles,
+    AddRole,
+    RemoveRole,
+    EditRoleNote,
+    SetRoleExpiration,
     EditPosition,
     ChangeIconType,
     ClearIconTexture,
@@ -52,8 +55,16 @@ type ModLogData = {
     reason?: string,
     appealable: boolean
 } | {
-    logType: ModLogType.EditRoles,
-    roles: { added: string[], removed: string[] }
+    logType: ModLogType.AddRole | ModLogType.RemoveRole | ModLogType.CreateRole | ModLogType.DeleteRole,
+    role: string
+} | {
+    logType: ModLogType.EditRoleNote,
+    role: string,
+    note: string
+} | {
+    logType: ModLogType.SetRoleExpiration,
+    role: string,
+    expires: Date | null
 } | {
     logType: ModLogType.EditPosition,
     positions: { old: string, new: string }
@@ -68,17 +79,11 @@ type ModLogData = {
 } | {
     logType: ModLogType.Unwatch
 } | {
-    logType: ModLogType.CreateNote,
-    note: string
-} | {
-    logType: ModLogType.DeleteNote,
+    logType: ModLogType.CreateNote | ModLogType.DeleteNote,
     note: string
 } | {
     logType: ModLogType.DeleteReport,
     report: string
-} | {
-    logType: ModLogType.CreateRole,
-    role: string
 } | {
     logType: ModLogType.RenameRole,
     names: { old: string, new: string }
@@ -91,14 +96,8 @@ type ModLogData = {
     role: string,
     permissions: { added: string[], removed: string[] }
 } | {
-    logType: ModLogType.DeleteRole,
-    role: string
-} | {
-    logType: ModLogType.UnlinkConnection,
+    logType: ModLogType.UnlinkConnection | ModLogType.ResetLinkingCode,
     type: 'discord' | 'email' 
-} | {
-    logType: ModLogType.ResetLinkingCode,
-    type: 'discord' | 'email'
 });
 
 export function formatTimestamp(date: Date, style: 't' | 'T' | 'd' | 'D' | 'f' | 'F' | 'R' = 'f') {
@@ -329,7 +328,9 @@ function modlogDescription(data: ModLogData): string | null {
     if(type == ModLogType.ChangeTag) return `\`${data.tags.old}\` → \`${data.tags.new}\``;
     else if(type == ModLogType.Ban) return `**Reason**: \`${data.reason || 'No reason'}\`. **Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Expires**: ${data.expires ? `${formatTimestamp(data.expires)} (${formatTimestamp(data.expires, 'R')})` : '`-`'}`;
     else if(type == ModLogType.EditBan) return `**Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Reason**: \`${data.reason || '-- No reason --'}\``;
-    else if(type == ModLogType.EditRoles) return `\n\`\`\`diff\n${data.roles.added.map((role) => `+ ${capitalCase(role)}`).join('\n')}${data.roles.added.length > 0 && data.roles.removed.length > 0 ? '\n' : ''}${data.roles.removed.map((role) => `- ${capitalCase(role)}`).join('\n')}\`\`\``;
+    else if(type == ModLogType.AddRole || type == ModLogType.RemoveRole) return `\`${data.role}\``;
+    else if(type == ModLogType.EditRoleNote) return `**Role**: \`${data.role}\`. **Note**: \`${data.note}\``;
+    else if(type == ModLogType.SetRoleExpiration) return `**Role**: \`${data.role}\`. **Expires**: ${data.expires ? `${formatTimestamp(data.expires)} (${formatTimestamp(data.expires, 'R')})` : '`-`'}`;
     else if(type == ModLogType.EditPosition) return `\`${capitalCase(data.positions.old)}\` → \`${capitalCase(data.positions.new)}\``;
     else if(type == ModLogType.ChangeIconType) return `\`${capitalCase(data.icons.old)}\` → \`${capitalCase(data.icons.new)}\``;
     else if(type == ModLogType.ClearIconTexture) return `[${data.hash}](${getCustomIconUrl(data.user!.uuid!, data.hash)})`;
