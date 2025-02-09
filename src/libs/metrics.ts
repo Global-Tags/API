@@ -102,7 +102,7 @@ export async function saveMetrics() {
 
 async function fetchAddon(namespace: string): Promise<Addon | null> {
     try {
-        const data = await axios.get(`https://flintmc.net/api/client-store/get-modification/${namespace}`, { headers: { 'Accept-Encoding': 'gzip' } });
+        const data = await axios.get(`https://flintmc.net/api/client-store/get-modification/${namespace}?now=${Date.now()}`, { headers: { 'Accept-Encoding': 'gzip' } });
         return data.data as Addon;
     } catch(error) {
         Logger.error(`Error while trying to fetch addon "${namespace}": ${error}`);
