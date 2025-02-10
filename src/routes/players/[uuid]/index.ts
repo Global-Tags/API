@@ -63,7 +63,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         description: 'Returns a players\' tag info'
     },
     response: {
-        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referrals: t.Object({ has_referred: t.Boolean(), total_referrals: t.Integer(), current_month_referrals: t.Integer() }), roleIcon: t.Union([t.String(), t.Null()]), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]) }), t.Null()]) }, { description: 'The tag data' }),
+        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referrals: t.Object({ has_referred: t.Boolean(), total_referrals: t.Integer(), current_month_referrals: t.Integer() }), roleIcon: t.Union([t.String(), t.Null()]), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]), appealable: t.Boolean() }), t.Null()]) }, { description: 'The tag data' }),
         403: t.Object({ error: t.String() }, { description: 'The player is banned' }),
         404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
