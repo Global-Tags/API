@@ -3,10 +3,10 @@ import players from "../database/schemas/players";
 import { getCachedRoles, synchronizeRoles } from "../database/schemas/roles";
 import { config } from "./config";
 import { sendDiscordLinkMessage } from "./discord-notifier";
-import { Profile } from "./game-profiles";
+import { GameProfile } from "./game-profiles";
 import Logger from "./Logger";
 
-export async function onDiscordLink(player: Profile, userId: string) {
+export async function onDiscordLink(player: GameProfile, userId: string) {
     sendDiscordLinkMessage(
         player,
         userId,
@@ -41,7 +41,7 @@ export async function onDiscordLink(player: Profile, userId: string) {
     member.roles.add(config.discordBot.notifications.accountConnections.role);
 }
 
-export function onDiscordUnlink(player: Profile, userId: string): Promise<void> {
+export function onDiscordUnlink(player: GameProfile, userId: string): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
         sendDiscordLinkMessage(
             player,

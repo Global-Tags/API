@@ -4,7 +4,7 @@ import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
 export default class DeleteNote extends SelectMenu {
     constructor() {
@@ -26,8 +26,8 @@ export default class DeleteNote extends SelectMenu {
 
         sendModLogMessage({
             logType: ModLogType.DeleteNote,
-            staff: await getProfileByUUID(staff.uuid),
-            user: await getProfileByUUID(player.uuid),
+            staff: await GameProfile.getProfileByUUID(staff.uuid),
+            user: await GameProfile.getProfileByUUID(player.uuid),
             discord: true,
             note: note.text
         });

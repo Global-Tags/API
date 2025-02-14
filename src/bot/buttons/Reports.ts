@@ -2,7 +2,7 @@ import { ButtonInteraction, Message, GuildMember, User, ButtonBuilder, ActionRow
 import Button from "../structs/Button";
 import { colors } from "../bot";
 import players from "../../database/schemas/players";
-import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 
 export default class Reports extends Button {
@@ -22,8 +22,7 @@ export default class Reports extends Button {
         const reports = [];
 
         for(const report of player.reports) {
-            const { username, uuid } = await getProfileByUUID(report.by);
-            reports.push(`**${username || uuid}**: \`${report.reported_tag}\` - \`${report.reason}\` [<t:${report.created_at.getTime() / 1000 | 0}:R>]`);
+            reports.push(`**${(await GameProfile.getProfileByUUID(report.by)).getUsernameOrUUID()}**: \`${report.reported_tag}\` - \`${report.reason}\` [<t:${report.created_at.getTime() / 1000 | 0}:R>]`);
         }
 
         const embed = EmbedBuilder.from(message.embeds[0])

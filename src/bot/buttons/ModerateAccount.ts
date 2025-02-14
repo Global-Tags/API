@@ -3,7 +3,7 @@ import Button from "../structs/Button";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { formatTimestamp } from "../../libs/discord-notifier";
 
 export default class ModerateAccount extends Button {
@@ -21,8 +21,7 @@ export default class ModerateAccount extends Button {
 
         const banInfo = player.isBanned() ? await (async () => {
             const ban = player.bans[0];
-            const staff = await getProfileByUUID(ban.staff);
-            return `\n> Ban ID: \`${ban.id}\`\n> Ban reason: \`${ban.reason}\`\n> Banned by: [\`${staff.username || staff.uuid}\`](https://laby.net/@${staff.uuid})\n> Banned since: ${formatTimestamp(ban.banned_at)}\n> Expiration date: ${ban.expires_at ? `${formatTimestamp(ban.expires_at)}` : '`-`'}\n> Is ban appealable: \`${ban.appealable ? '✅' : '❌'}\`\n> Was ban appealed: \`${ban.appealed ? '✅' : '❌'}\``;
+            return `\n> Ban ID: \`${ban.id}\`\n> Ban reason: \`${ban.reason}\`\n> Banned by: [\`${(await GameProfile.getProfileByUUID(ban.staff)).getUsernameOrUUID()}\`](https://laby.net/@${staff.uuid})\n> Banned since: ${formatTimestamp(ban.banned_at)}\n> Expiration date: ${ban.expires_at ? `${formatTimestamp(ban.expires_at)}` : '`-`'}\n> Is ban appealable: \`${ban.appealable ? '✅' : '❌'}\`\n> Was ban appealed: \`${ban.appealed ? '✅' : '❌'}\``;
         })() : '';
 
         const embed = EmbedBuilder.from(message.embeds[0])

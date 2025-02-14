@@ -4,7 +4,7 @@ import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
 export default class CreateNote extends Modal {
     constructor() {
@@ -22,8 +22,8 @@ export default class CreateNote extends Modal {
 
         sendModLogMessage({
             logType: ModLogType.CreateNote,
-            staff: await getProfileByUUID(staff.uuid),
-            user: await getProfileByUUID(player.uuid),
+            staff: await GameProfile.getProfileByUUID(staff.uuid),
+            user: await GameProfile.getProfileByUUID(player.uuid),
             discord: true,
             note
         });

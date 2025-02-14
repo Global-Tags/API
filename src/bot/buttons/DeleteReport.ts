@@ -2,7 +2,7 @@ import { ButtonInteraction, Message, GuildMember, User, ActionRowBuilder, EmbedB
 import Button from "../structs/Button";
 import { colors } from "../bot";
 import players from "../../database/schemas/players";
-import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 
 export default class DeleteReport extends Button {
@@ -23,11 +23,10 @@ export default class DeleteReport extends Button {
         const options = [];
 
         for(const report of player.reports) {
-            const { username, uuid } = await getProfileByUUID(report.by);
             options.push(
                 new StringSelectMenuOptionBuilder()
                     .setLabel(`${report.reported_tag} - ${report.reason}`.substring(0, 100))
-                    .setDescription(`created by ${username || uuid!} on ${report.created_at.toDateString()} (#${report.id})`)
+                    .setDescription(`created by ${(await GameProfile.getProfileByUUID(report.by)).getUsernameOrUUID()} on ${report.created_at.toDateString()} (#${report.id})`)
                     .setValue(report.id)
             );
         }

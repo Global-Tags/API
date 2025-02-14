@@ -6,7 +6,7 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendBanEmail } from "../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import ms, { StringValue } from "ms";
 
 export default class Ban extends Modal {
@@ -37,8 +37,8 @@ export default class Ban extends Modal {
 
         sendModLogMessage({
             logType: ModLogType.Ban,
-            staff: await getProfileByUUID(staff.uuid),
-            user: await getProfileByUUID(player.uuid),
+            staff: await GameProfile.getProfileByUUID(staff.uuid),
+            user: await GameProfile.getProfileByUUID(player.uuid),
             discord: true,
             appealable: true,
             reason: reason,

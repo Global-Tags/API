@@ -3,8 +3,8 @@ import { Permission } from "../types/Permission";
 import { ModLogType, sendModLogMessage } from "../libs/discord-notifier";
 import roles, { getCachedRoles, getNextPosition, updateRoleCache } from "../database/schemas/roles";
 import { snakeCase } from "change-case";
-import { getProfileByUUID } from "../libs/game-profiles";
 import { ElysiaApp } from "..";
+import { GameProfile } from "../libs/game-profiles";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error }) => { // Get roles
     if(!session?.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
@@ -72,7 +72,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
 
     sendModLogMessage({
         logType: ModLogType.CreateRole,
-        staff: await getProfileByUUID(session.uuid!),
+        staff: await GameProfile.getProfileByUUID(session.uuid!),
         discord: false,
         role: name
     });
@@ -103,7 +103,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
 
     sendModLogMessage({
         logType: ModLogType.DeleteRole,
-        staff: await getProfileByUUID(session.uuid!),
+        staff: await GameProfile.getProfileByUUID(session.uuid!),
         discord: false,
         role: role.name
     });

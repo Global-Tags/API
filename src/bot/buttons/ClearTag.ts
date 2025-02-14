@@ -6,7 +6,7 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendTagClearEmail } from "../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
 export default class ClearTag extends Button {
     constructor() {
@@ -28,8 +28,8 @@ export default class ClearTag extends Button {
 
         sendModLogMessage({
             logType: ModLogType.ClearTag,
-            user: await getProfileByUUID(player.uuid),
-            staff: await getProfileByUUID(staff.uuid),
+            user: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await GameProfile.getProfileByUUID(staff.uuid),
             discord: true
         });
 

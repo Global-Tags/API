@@ -4,7 +4,7 @@ import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
 export default class EditRoleNote extends Modal {
     constructor() {
@@ -21,7 +21,7 @@ export default class EditRoleNote extends Modal {
 
         const role = player.roles.find(role => role.name == message.embeds[0].footer!.text);
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is not active!')], flags: [MessageFlags.Ephemeral] });
-        const profile = await getProfileByUUID(player.uuid);
+        const profile = await GameProfile.getProfileByUUID(player.uuid);
 
         let note: string | null = fields.getTextInputValue('note');
         if(note.trim() == '') note = null;
@@ -29,13 +29,13 @@ export default class EditRoleNote extends Modal {
         sendModLogMessage({
             logType: ModLogType.EditRoleNote,
             staff: profile,
-            user: await getProfileByUUID(player.uuid),
+            user: await GameProfile.getProfileByUUID(player.uuid),
             discord: true,
             role: role.name,
             note
         });
 
-        role.reason = note != null ? `${profile.username || profile.uuid}: ${note}` : null;
+        role.reason = note != null ? `${profile.getUsernameOrUUID()}: ${note}` : null;
         player.save();
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The note note was successfully updated!')], flags: [MessageFlags.Ephemeral] });

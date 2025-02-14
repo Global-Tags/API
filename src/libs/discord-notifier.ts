@@ -1,6 +1,6 @@
 import * as bot from "../bot/bot";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
-import { Profile } from "./game-profiles";
+import { GameProfile } from "./game-profiles";
 import { getCustomIconUrl } from "../routes/players/[uuid]/icon";
 import { capitalCase, pascalCase, sentenceCase } from "change-case";
 import { config } from "./config";
@@ -35,8 +35,8 @@ export enum ModLogType {
 
 type ModLogData = {
     logType: ModLogType,
-    staff: Profile,
-    user?: Profile,
+    staff: GameProfile,
+    user?: GameProfile,
     discord: boolean
 } & ({
     logType: ModLogType.ChangeTag,
@@ -105,8 +105,8 @@ export function formatTimestamp(date: Date, style: 't' | 'T' | 'd' | 'D' | 'f' |
 }
 
 export function sendReportMessage({ user, reporter, tag, reason } : {
-    user: Profile,
-    reporter: Profile,
+    user: GameProfile,
+    reporter: GameProfile,
     tag: string,
     reason: string
 }) {
@@ -122,7 +122,7 @@ export function sendReportMessage({ user, reporter, tag, reason } : {
         .addFields([
             {
                 name: 'Reported player',
-                value: `[\`${user.username || user.uuid}\`](https://laby.net/@${user.uuid})`
+                value: user.getFormattedHyperlink()
             },
             {
                 name: 'Reported Tag',
@@ -130,7 +130,7 @@ export function sendReportMessage({ user, reporter, tag, reason } : {
             },
             {
                 name: 'Reporter',
-                value: `[\`${reporter.username || reporter.uuid}\`](https://laby.net/@${reporter.uuid})`
+                value: reporter.getFormattedHyperlink()
             },
             {
                 name: 'Reason',
@@ -140,7 +140,7 @@ export function sendReportMessage({ user, reporter, tag, reason } : {
     });
 }
 
-export function sendWatchlistAddMessage({ user, tag, word }: { user: Profile, tag: string, word: string }) {
+export function sendWatchlistAddMessage({ user, tag, word }: { user: GameProfile, tag: string, word: string }) {
     if(!config.discordBot.notifications.watchlist.enabled) return;
 
     sendMessage({
@@ -152,7 +152,7 @@ export function sendWatchlistAddMessage({ user, tag, word }: { user: Profile, ta
         .addFields([
             {
                 name: 'Watched player',
-                value: `[\`${user.username || user.uuid}\`](https://laby.net/@${user.uuid})`
+                value: user.getFormattedHyperlink()
             },
             {
                 name: 'New tag',
@@ -166,7 +166,7 @@ export function sendWatchlistAddMessage({ user, tag, word }: { user: Profile, ta
     });
 }
 
-export function sendWatchlistTagUpdateMessage(user: Profile, tag: string) {
+export function sendWatchlistTagUpdateMessage(user: GameProfile, tag: string) {
     if(!config.discordBot.notifications.watchlist.enabled) return;
 
     sendMessage({
@@ -179,7 +179,7 @@ export function sendWatchlistTagUpdateMessage(user: Profile, tag: string) {
             .addFields([
                 {
                     name: 'Watched player',
-                    value: `[\`${user.username || user.uuid}\`](https://laby.net/@${user.uuid})`
+                    value: user.getFormattedHyperlink()
                 },
                 {
                     name: 'New tag',
@@ -189,7 +189,7 @@ export function sendWatchlistTagUpdateMessage(user: Profile, tag: string) {
     });
 }
 
-export function sendBanAppealMessage(user: Profile, reason: string) {
+export function sendBanAppealMessage(user: GameProfile, reason: string) {
     if(!config.discordBot.notifications.banAppeals.enabled) return;
 
     sendMessage({
@@ -202,7 +202,7 @@ export function sendBanAppealMessage(user: Profile, reason: string) {
             .addFields([
                 {
                     name: 'Player',
-                    value: `[\`${user.username || user.uuid}\`](https://laby.net/@${user.uuid})`
+                    value: user.getFormattedHyperlink()
                 },
                 {
                     name: 'Reason',
@@ -212,7 +212,7 @@ export function sendBanAppealMessage(user: Profile, reason: string) {
     });
 }
 
-export function sendDiscordLinkMessage(user: Profile, userId: string, connected: boolean) {
+export function sendDiscordLinkMessage(user: GameProfile, userId: string, connected: boolean) {
     if(!config.discordBot.notifications.accountConnections.enabled) return;
 
     sendMessage({
@@ -225,7 +225,7 @@ export function sendDiscordLinkMessage(user: Profile, userId: string, connected:
             .addFields([
                 {
                     name: 'Player',
-                    value: `[\`${user.username || user.uuid}\`](https://laby.net/@${user.uuid})`
+                    value: user.getFormattedHyperlink()
                 },
                 {
                     name: connected ? 'User ID' : 'Previous User ID',
@@ -236,7 +236,7 @@ export function sendDiscordLinkMessage(user: Profile, userId: string, connected:
     });
 }
 
-export function sendEmailLinkMessage(user: Profile, email: string | null, connected: boolean) {
+export function sendEmailLinkMessage(user: GameProfile, email: string | null, connected: boolean) {
     if(!config.discordBot.notifications.accountConnections.enabled) return;
 
     sendMessage({
@@ -260,12 +260,12 @@ export function sendEmailLinkMessage(user: Profile, email: string | null, connec
     });
 }
 
-export function sendReferralMessage(inviter: Profile, invited: Profile) {
+export function sendReferralMessage(inviter: GameProfile, invited: GameProfile) {
     if(!config.discordBot.notifications.referrals.enabled) return;
 
     sendMessage({
         channel: config.discordBot.notifications.referrals.channel,
-        content: `[\`${inviter.username || inviter.uuid}\`](<https://laby.net/@${inviter.uuid}>) has invited [\`${invited.username || invited.uuid}\`](<https://laby.net/@${invited.uuid}>).`,
+        content: `${inviter.getFormattedHyperlink()} has invited ${inviter.getFormattedHyperlink()}.`,
         embed: null,
         actionButton: false
     });
@@ -289,7 +289,7 @@ export function sendEntitlementMessage(uuid: string, description: string, head: 
     });
 }
 
-export function sendCustomIconUploadMessage(user: Profile, hash: string) {
+export function sendCustomIconUploadMessage(user: GameProfile, hash: string) {
     if(!config.discordBot.notifications.customIcons.enabled) return;
 
     const embed = new EmbedBuilder()
@@ -299,7 +299,7 @@ export function sendCustomIconUploadMessage(user: Profile, hash: string) {
         .addFields([
             {
                 name: 'Player:',
-                value: `[\`${user.username || user.uuid}\`](<https://laby.net/@${user.uuid}>)`
+                value: user.getFormattedHyperlink()
             }
         ])
         .setThumbnail(getCustomIconUrl(user.uuid!, hash));
@@ -317,7 +317,7 @@ export function sendModLogMessage(data: ModLogData) {
     const description = modlogDescription(data);
     sendMessage({
         channel: config.discordBot.notifications.mogLog.channel,
-        content: `[**${sentenceCase(ModLogType[data.logType])}**] [\`${data.staff.username || data.staff.uuid}\`](<https://laby.net/@${data.staff.uuid}>)${data.discord ? ' [**D**]' : ''}${data.user ? ` → [\`${data.user.username || data.user.uuid}\`](<https://laby.net/@${data.user.uuid}>)` : ''}${description ? `: ${description}` : ''}`,
+        content: `[**${sentenceCase(ModLogType[data.logType])}**] ${data.staff.getFormattedHyperlink()}${data.discord ? ' [**D**]' : ''}${data.user ? ` → ${data.user.getFormattedHyperlink()}` : ''}${description ? `: ${description}` : ''}`,
         embed: null,
         actionButton: false
     });

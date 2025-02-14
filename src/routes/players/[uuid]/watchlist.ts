@@ -2,7 +2,7 @@ import { t } from "elysia";
 import { ElysiaApp } from "../../..";
 import players from "../../../database/schemas/players";
 import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
-import { getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { Permission } from "../../../types/Permission";
 
 export default (app: ElysiaApp) => app.patch('/', async ({ session, body: { watched }, params, i18n, error }) => { // Watch player
@@ -18,8 +18,8 @@ export default (app: ElysiaApp) => app.patch('/', async ({ session, body: { watc
     
     sendModLogMessage({
         logType: player.watchlist ? ModLogType.Watch : ModLogType.Unwatch,
-        staff: await getProfileByUUID(session.uuid!),
-        user: await getProfileByUUID(uuid),
+        staff: await GameProfile.getProfileByUUID(session.uuid!),
+        user: await GameProfile.getProfileByUUID(uuid),
         discord: false
     });
 

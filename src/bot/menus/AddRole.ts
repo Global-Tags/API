@@ -4,7 +4,7 @@ import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
 export default class AddRole extends SelectMenu {
     constructor() {
@@ -19,11 +19,10 @@ export default class AddRole extends SelectMenu {
         const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
-        const staffProfile = await getProfileByUUID(staff.uuid);
-        const username = staffProfile.username || staffProfile.uuid;
+        const staffProfile = await GameProfile.getProfileByUUID(staff.uuid);
         const roleName = values[0];
         const addedAt = new Date();
-        const reason = `Added by ${username}`;
+        const reason = `Added by ${staffProfile.getUsernameOrUUID()}`;
         
         const role = player.roles.find(role => role.name == roleName);
         if(role) {
@@ -44,7 +43,7 @@ export default class AddRole extends SelectMenu {
         sendModLogMessage({
             logType: ModLogType.AddRole,
             staff: staffProfile,
-            user: await getProfileByUUID(player.uuid),
+            user: await GameProfile.getProfileByUUID(player.uuid),
             discord: true,
             role: roleName
         });

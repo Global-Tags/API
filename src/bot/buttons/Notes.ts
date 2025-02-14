@@ -2,7 +2,7 @@ import { ButtonInteraction, Message, GuildMember, User, ButtonBuilder, ActionRow
 import Button from "../structs/Button";
 import { colors } from "../bot";
 import players from "../../database/schemas/players";
-import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 
 export default class Notes extends Button {
@@ -22,8 +22,7 @@ export default class Notes extends Button {
         const notes = [];
 
         for(const note of player.notes) {
-            const { username, uuid } = await getProfileByUUID(note.author);
-            notes.push(`**${username || uuid}**: \`${note.text}\` [<t:${note.createdAt.getTime() / 1000 | 0}:R>]`);
+            notes.push(`**${(await GameProfile.getProfileByUUID(note.author)).getUsernameOrUUID()}**: \`${note.text}\` [<t:${note.createdAt.getTime() / 1000 | 0}:R>]`);
         }
 
         const embed = EmbedBuilder.from(message.embeds[0])

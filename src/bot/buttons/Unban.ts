@@ -6,7 +6,7 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendUnbanEmail } from "../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
 export default class Unban extends Button {
     constructor() {
@@ -27,8 +27,8 @@ export default class Unban extends Button {
 
         sendModLogMessage({
             logType: ModLogType.Unban,
-            staff: await getProfileByUUID(staff.uuid),
-            user: await getProfileByUUID(player.uuid),
+            staff: await GameProfile.getProfileByUUID(staff.uuid),
+            user: await GameProfile.getProfileByUUID(player.uuid),
             discord: true
         });
 

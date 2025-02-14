@@ -2,7 +2,7 @@ import { ButtonInteraction, Message, GuildMember, User, ActionRowBuilder, EmbedB
 import Button from "../structs/Button";
 import { colors } from "../bot";
 import players from "../../database/schemas/players";
-import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 
 export default class DeleteNote extends Button {
@@ -23,11 +23,10 @@ export default class DeleteNote extends Button {
         const options = [];
 
         for(const note of player.notes) {
-            const { username, uuid } = await getProfileByUUID(note.author);
             options.push(
                 new StringSelectMenuOptionBuilder()
                     .setLabel(note.text.substring(0, 100))
-                    .setDescription(`created by ${username || uuid!} on ${note.createdAt.toDateString()} (#${note.id})`)
+                    .setDescription(`created by ${(await GameProfile.getProfileByUUID(note.author)).getUsernameOrUUID()} on ${note.createdAt.toDateString()} (#${note.id})`)
                     .setValue(note.id)
             );
         }

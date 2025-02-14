@@ -6,7 +6,7 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendIconTypeChangeEmail } from "../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
 export default class SetIconType extends SelectMenu {
     constructor() {
@@ -28,8 +28,8 @@ export default class SetIconType extends SelectMenu {
 
         sendModLogMessage({
             logType: ModLogType.ChangeIconType,
-            staff: await getProfileByUUID(staff.uuid),
-            user: await getProfileByUUID(player.uuid),
+            staff: await GameProfile.getProfileByUUID(staff.uuid),
+            user: await GameProfile.getProfileByUUID(player.uuid),
             discord: true,
             icons: {
                 old: oldIcon.name,

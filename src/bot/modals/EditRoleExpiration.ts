@@ -4,7 +4,7 @@ import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import ms, { StringValue } from "ms";
 
 export default class EditRoleExpiration extends Modal {
@@ -22,7 +22,7 @@ export default class EditRoleExpiration extends Modal {
 
         const role = player.roles.find(role => role.name == message.embeds[0].footer!.text);
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is not active!')], flags: [MessageFlags.Ephemeral] });
-        const profile = await getProfileByUUID(player.uuid);
+        const profile = await GameProfile.getProfileByUUID(player.uuid);
 
         const duration = fields.getTextInputValue('duration');
         const expiresAt = duration.trim() != '' ? new Date(Date.now() + ms(duration as StringValue)): null;
@@ -31,7 +31,7 @@ export default class EditRoleExpiration extends Modal {
         sendModLogMessage({
             logType: ModLogType.SetRoleExpiration,
             staff: profile,
-            user: await getProfileByUUID(player.uuid),
+            user: await GameProfile.getProfileByUUID(player.uuid),
             discord: true,
             role: role.name,
             expires: expiresAt

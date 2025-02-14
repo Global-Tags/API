@@ -4,7 +4,7 @@ import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID, stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
 export default class ResetEmailLinkingCode extends Button {
     constructor() {
@@ -25,8 +25,8 @@ export default class ResetEmailLinkingCode extends Button {
 
         sendModLogMessage({
             logType: ModLogType.ResetLinkingCode,
-            user: await getProfileByUUID(player.uuid),
-            staff: await getProfileByUUID(staff.uuid),
+            user: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await GameProfile.getProfileByUUID(staff.uuid),
             discord: true,
             type: 'email'
         });
