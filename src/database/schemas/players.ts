@@ -5,6 +5,14 @@ import { Permission } from "../../types/Permission";
 import { getCachedRoles, Role } from "./roles";
 import { GlobalIcon } from "../../types/GlobalIcon";
 
+export type PlayerRole = {
+    role: Role,
+    added_at: Date,
+    manually_added: boolean,
+    expires_at?: Date | null,
+    reason?: string | null
+}
+
 export interface IPlayer {
     uuid: string,
     tag?: string | null,
@@ -51,7 +59,7 @@ export interface IPlayer {
     },
     addReferral(uuid: string): void,
     isEmailVerified(): boolean,
-    getRoles(): Role[],
+    getRoles(): PlayerRole[],
     hasPermission(permission: Permission): boolean,
     canManagePlayers(): boolean,
     isBanned(): boolean,
@@ -277,26 +285,37 @@ const schema = new Schema<IPlayer>({
             return this.connections.email.address && !this.connections.email.code;
         },
 
-        getRoles(): Role[] {
+        getRoles(): PlayerRole[] {
             return getCachedRoles().filter(({ name: role }) => {
                 role = snakeCase(role);
                 const playerRole = this.roles.find((playerRole) => snakeCase(playerRole.name) == role);
                 return playerRole && (!playerRole.expires_at || playerRole.expires_at.getTime() > Date.now());
+            }).map((role) => {
+                const name = snakeCase(role.name);
+                const playerRole = this.roles.find((playerRole) => snakeCase(playerRole.name) == name)!;
+
+                return {
+                    role,
+                    added_at: playerRole.added_at,
+                    manually_added: playerRole.manually_added,
+                    expires_at: playerRole.expires_at,
+                    reason: playerRole.reason
+                }
             });
         },
 
-        hasPermission(permission: Permission) {
-            return this.getRoles().some((role) => role.hasPermission(permission));
+        hasPermission(permission: Permission): boolean {
+            return this.getRoles().some((role) => role.role.hasPermission(permission));
         },
 
-        canManagePlayers() {
-            return this.getRoles().some((role) => [
+        canManagePlayers(): boolean {
+            return [
                 Permission.ManageBans,
                 Permission.ManageNotes,
                 Permission.ManageRoles,
                 Permission.ManageTags,
                 Permission.ManageWatchlist
-            ].some((permission) => role.hasPermission(permission)));
+            ].some((permission) => this.hasPermission(permission));
         },
 
         isBanned(): boolean {

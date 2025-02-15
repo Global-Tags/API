@@ -3,7 +3,7 @@ import players from "../../../database/schemas/players";
 import { Permission } from "../../../types/Permission";
 import { GlobalPosition } from "../../../types/GlobalPosition";
 import { capitalCase, snakeCase } from "change-case";
-import { getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
 import { sendTagChangeEmail } from "../../../libs/mailer";
@@ -36,8 +36,8 @@ export default (app: ElysiaApp) => app.post('/', async ({ session, body: { posit
     if(!session.equal) {
         sendModLogMessage({
             logType: ModLogType.EditPosition,
-            staff: await getProfileByUUID(session.uuid!),
-            user: await getProfileByUUID(uuid),
+            staff: await GameProfile.getProfileByUUID(session.uuid!),
+            user: await GameProfile.getProfileByUUID(uuid),
             discord: false,
             positions: {
                 old: oldPosition || '---',

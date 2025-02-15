@@ -40,16 +40,6 @@ Defines all active rate-limiting rules.
 
 ---
 
-### `skus.json`
-Lists all obtainable entitlement SKUs for subscription management.
-
-- **`id`**: The Discord SKU ID associated with the entitlement.
-- **`name`**: The internal identifier for the SKU.
-- **`role`**: The role granted to the subscriber within GlobalTags.
-- **`discord_role`**: The Discord role assigned to subscribers if role synchronization is enabled.
-
----
-
 ## Environment Variables
 
 Environment variables configure essential application settings. Below is a detailed description of each variable:

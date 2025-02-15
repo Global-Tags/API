@@ -4,9 +4,10 @@ import getAuthProvider from "../../../middleware/get-auth-provider";
 import { sendEmail } from "../../../libs/mailer";
 import { randomBytes } from "crypto";
 import { config } from "../../../libs/config";
-import { sendDiscordLinkMessage, sendEmailLinkMessage } from "../../../libs/discord-notifier";
-import { getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { sendEmailLinkMessage } from "../../../libs/discord-notifier";
+import { GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
+import { onDiscordUnlink } from "../../../libs/events";
 
 export function generateSecureCode(length: number = 10) {
     return randomBytes(length).toString('hex').slice(0, length);
@@ -49,11 +50,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     if(!player) return error(404, { error: i18n('error.noTag') });
     if(!player.connections.discord.id && !player.connections.discord.code) return error(409, { error: i18n('connections.discord.notConnected') });
 
-    sendDiscordLinkMessage(
-        await getProfileByUUID(player.uuid),
-        player.connections.discord.id!,
-        false
-    );
+    await onDiscordUnlink(await GameProfile.getProfileByUUID(player.uuid), player.connections.discord.id!);
 
     player.connections.discord.id = null;
     player.connections.discord.code = null;
@@ -133,7 +130,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     await player.save();
 
     sendEmailLinkMessage(
-        await getProfileByUUID(player.uuid),
+        await GameProfile.getProfileByUUID(player.uuid),
         config.discordBot.notifications.accountConnections.hideEmails ? null : player.connections.email.address!,
         true
     );
@@ -177,7 +174,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     if(!player.connections.email.address && !player.connections.email.code) return error(400, { error: i18n('connections.email.notConnected') });
 
     sendEmailLinkMessage(
-        await getProfileByUUID(player.uuid),
+        await GameProfile.getProfileByUUID(player.uuid),
         config.discordBot.notifications.accountConnections.hideEmails ? null : player.connections.email.address!,
         false
     );

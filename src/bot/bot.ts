@@ -76,3 +76,4 @@ export const modals = new Collection<string, Modal>();
 export const spawn = () => client.login(config.discordBot.token);
 export const destroy = () => client.destroy();
 export const fetchGuild = () => client.guilds.fetch(config.discordBot.server);
+export const fetchSku = async (id: string) => (await client.application!.fetchSKUs()).find((sku) => sku.id == id);

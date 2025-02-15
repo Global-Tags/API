@@ -4,9 +4,7 @@ import entitlement from "../../database/schemas/entitlement";
 import { sendEntitlementMessage } from "../../libs/discord-notifier";
 import players from "../../database/schemas/players";
 import { config } from "../../libs/config";
-import { getSkus } from "../../libs/sku-manager";
-
-const skus = getSkus();
+import { fetchSku } from "../bot";
 
 export default class EntitlementUpdate extends Event {
     constructor() {
@@ -17,12 +15,12 @@ export default class EntitlementUpdate extends Event {
         if(!config.discordBot.notifications.entitlements.enabled) return;
         if(oldEntitlement.endsAt || !newEntitlement.endsAt) return;
         const player = await players.findOne({ 'connections.discord.id': newEntitlement.userId });
-        const sku = skus.find((sku) => sku.id == newEntitlement.skuId);
+        const sku = await fetchSku(newEntitlement.skuId);
         if(!sku) return;
 
         sendEntitlementMessage(
             player?.uuid || '',
-            `<@!${newEntitlement.userId}> has cancelled their **${sku.name}** subscription!`,
+            `<@!${newEntitlement.userId}> has cancelled their **${sku?.name || 'Unknown SKU'}** subscription!`,
             !!player,
         );
 
@@ -31,7 +29,7 @@ export default class EntitlementUpdate extends Event {
             sku_id: newEntitlement.skuId,
             user_id: newEntitlement.userId,
             expires_at: newEntitlement.endsAt,
-            test: !newEntitlement.startsTimestamp
+            test: newEntitlement.isTest()
         });
     }
 }

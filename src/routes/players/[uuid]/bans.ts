@@ -4,7 +4,7 @@ import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 import { ModLogType, sendBanAppealMessage, sendModLogMessage } from "../../../libs/discord-notifier";
 import { sendBanEmail, sendUnbanEmail } from "../../../libs/mailer";
 import { Permission } from "../../../types/Permission";
-import { formatUUID, getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { formatUUID, GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, error }) => { // Get ban list
@@ -77,8 +77,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     sendModLogMessage({
         logType: ModLogType.Ban,
-        staff: await getProfileByUUID(session.uuid!),
-        user: await getProfileByUUID(uuid),
+        staff: await GameProfile.getProfileByUUID(session.uuid!),
+        user: await GameProfile.getProfileByUUID(uuid),
         discord: false,
         reason: reason,
         appealable: appealable == undefined ? true : appealable,
@@ -122,8 +122,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     sendModLogMessage({
         logType: ModLogType.EditBan,
-        user: await getProfileByUUID(uuid),
-        staff: await getProfileByUUID(session.uuid!),
+        user: await GameProfile.getProfileByUUID(uuid),
+        staff: await GameProfile.getProfileByUUID(session.uuid!),
         discord: false,
         appealable: appealable,
         reason
@@ -161,7 +161,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     await player.save();
 
     sendBanAppealMessage(
-        await getProfileByUUID(uuid),
+        await GameProfile.getProfileByUUID(uuid),
         reason
     );
 
@@ -195,8 +195,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     sendModLogMessage({
         logType: ModLogType.Unban,
-        staff: await getProfileByUUID(session.uuid!),
-        user: await getProfileByUUID(uuid),
+        staff: await GameProfile.getProfileByUUID(session.uuid!),
+        user: await GameProfile.getProfileByUUID(uuid),
         discord: false
     });
 

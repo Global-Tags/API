@@ -11,19 +11,18 @@ import { config } from "../../../libs/config";
 import { Permission, permissions } from "../../../types/Permission";
 import { GlobalIcon } from "../../../types/GlobalIcon";
 import { GlobalPosition } from "../../../types/GlobalPosition";
-import { formatUUID, getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { formatUUID, GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
 const { validation } = config;
 const { min, max, blacklist, watchlist } = validation.tag;
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, language, params, i18n, error }) => { // Get player info
-    let showBan = false;
     if(!!session?.uuid && !!language) saveLastLanguage(session.uuid, language);
     if(config.strictAuth) {
         if(!session?.uuid) return error(403, { error: i18n('error.notAllowed') });
-        showBan = session.equal || session.hasPermission(Permission.ManageBans);
     }
+    const showBan = session?.equal || session?.hasPermission(Permission.ManageBans) || false;
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return error(404, { error: i18n('error.playerNoTag') });
@@ -43,19 +42,26 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
             type: snakeCase(player.icon.name || GlobalIcon[GlobalIcon.None]),
             hash: player.icon.hash || null
         },
-        roleIcon: !player.hide_role_icon ? player.getRoles().find((role) => role.hasIcon)?.name || null : null,
-        roles: player.getRoles().map((role) => role.name),
+        roleIcon: !player.hide_role_icon ? player.getRoles().find((role) => role.role.hasIcon)?.role.name || null : null,
+        roles: player.getRoles().map((role) => role.role.name),
         permissions: permissions.filter((permission) => player.hasPermission(permission)).map((permission) => snakeCase(Permission[permission])),
         referrals: {
             has_referred: player.referrals.has_referred,
             total_referrals: player.referrals.total.length,
             current_month_referrals: player.referrals.current_month
         },
-        ban: showBan ? {
-            active: player.isBanned(),
-            reason: player.bans.at(0)?.reason || null,
-            appealable: player.bans.at(0)?.appealable || false
-        } : null
+        ban: showBan && player.isBanned() ? (() => {
+            const { appealable, appealed, banned_at, expires_at, id, reason, staff } = player.bans.at(0)!;
+            return {
+                appealable,
+                appealed,
+                banned_at: banned_at.getTime(),
+                expires_at: expires_at?.getTime() || null,
+                id,
+                reason,
+                staff: formatUUID(staff)
+            }
+        })() : null
     };
 }, {
     detail: {
@@ -63,7 +69,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         description: 'Returns a players\' tag info'
     },
     response: {
-        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referrals: t.Object({ has_referred: t.Boolean(), total_referrals: t.Integer(), current_month_referrals: t.Integer() }), roleIcon: t.Union([t.String(), t.Null()]), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ active: t.Boolean(), reason: t.Union([t.String(), t.Null()]), appealable: t.Boolean() }), t.Null()]) }, { description: 'The tag data' }),
+        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referrals: t.Object({ has_referred: t.Boolean(), total_referrals: t.Integer(), current_month_referrals: t.Integer() }), roleIcon: t.Union([t.String(), t.Null()]), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ appealable: t.Boolean(), appealed: t.Boolean(), banned_at: t.Number(), expires_at: t.Union([t.Number(), t.Null()]), id: t.String(), reason: t.Union([t.String(), t.Null()]), staff: t.String() }), t.Null()]) }, { description: 'The tag data' }),
         403: t.Object({ error: t.String() }, { description: 'The player is banned' }),
         404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
@@ -104,23 +110,22 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
 
     let isWatched = false;
     let notifyWatch = true;
+    const gameProfile = await GameProfile.getProfileByUUID(uuid);
     if(!session.hasPermission(Permission.BypassValidation)) {
         const strippedTag = stripColors(tag);
         if(strippedTag == '') return error(422, { error: i18n('setTag.empty') });
         if(strippedTag.length < min || strippedTag.length > max) return error(422, { error: i18n('setTag.validation').replace('<min>', String(min)).replace('<max>', String(max)) });
         const blacklistedWord = blacklist.find((word) => strippedTag.toLowerCase().includes(word));
         if(blacklistedWord) return error(422, { error: i18n('setTag.blacklisted').replaceAll('<word>', blacklistedWord) });
-        isWatched = (player && player.watchlist) || await (async () => {
-            for(const word of watchlist) {
-                if(strippedTag.toLowerCase().includes(word)) {
-                    Logger.warn(`Now watching ${uuid} for matching "${word}" in "${tag}".`);
-                    sendWatchlistAddMessage({ user: await getProfileByUUID(uuid), tag, word });
-                    notifyWatch = false;
-                    return true;
-                }
+        isWatched = (player && player.watchlist) || watchlist.some((word) => {
+            if(strippedTag.toLowerCase().includes(word)) {
+                Logger.warn(`Now watching ${uuid} for matching "${word}" in "${tag}".`);
+                sendWatchlistAddMessage({ user: gameProfile, tag, word });
+                notifyWatch = false;
+                return true;
             }
             return false;
-        })();
+        });
     }
 
     const oldTag = player?.tag;
@@ -144,8 +149,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     if(!session.equal) {
         sendModLogMessage({
             logType: ModLogType.ChangeTag,
-            staff: await getProfileByUUID(session.uuid!),
-            user: await getProfileByUUID(uuid),
+            staff: await GameProfile.getProfileByUUID(session.uuid!),
+            user: gameProfile,
             discord: false,
             tags: {
                 old: oldTag || 'None',
@@ -158,7 +163,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         }
     }
 
-    if(isWatched && notifyWatch) sendWatchlistTagUpdateMessage(await getProfileByUUID(uuid), tag);
+    if(isWatched && notifyWatch) sendWatchlistTagUpdateMessage(await gameProfile, tag);
     return { message: i18n(`setTag.success.${session.equal ? 'self' : 'admin'}`) };
 }, {
     detail: {
@@ -188,8 +193,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     if(!session.equal) {
         sendModLogMessage({
             logType: ModLogType.ClearTag,
-            staff: await getProfileByUUID(session.uuid!),
-            user: await getProfileByUUID(uuid),
+            staff: await GameProfile.getProfileByUUID(session.uuid!),
+            user: await GameProfile.getProfileByUUID(uuid),
             discord: false
         });
         player.clearTag(session.uuid!);

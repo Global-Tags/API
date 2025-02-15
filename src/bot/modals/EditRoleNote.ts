@@ -6,9 +6,9 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
-export default class CreateNote extends Modal {
+export default class EditRoleNote extends Modal {
     constructor() {
-        super('createNote');
+        super('editRoleNote');
     }
 
     async submit(interaction: ModalSubmitInteraction<CacheType>, message: Message<boolean>, fields: ModalSubmitFields, member: GuildMember, user: User) {
@@ -18,22 +18,26 @@ export default class CreateNote extends Modal {
 
         const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
-        const note = fields.getTextInputValue('note');
+
+        const role = player.roles.find(role => role.name == message.embeds[0].footer!.text);
+        if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is not active!')], flags: [MessageFlags.Ephemeral] });
+        const profile = await GameProfile.getProfileByUUID(player.uuid);
+
+        let note: string | null = fields.getTextInputValue('note');
+        if(note.trim() == '') note = null;
 
         sendModLogMessage({
-            logType: ModLogType.CreateNote,
-            staff: await GameProfile.getProfileByUUID(staff.uuid),
+            logType: ModLogType.EditRoleNote,
+            staff: profile,
             user: await GameProfile.getProfileByUUID(player.uuid),
             discord: true,
+            role: role.name,
             note
         });
 
-        player.createNote({
-            text: note,
-            author: staff.uuid
-        });
+        role.reason = note != null ? `${profile.getUsernameOrUUID()}: ${note}` : null;
         player.save();
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The note was successfully added!')], flags: [MessageFlags.Ephemeral] });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The note note was successfully updated!')], flags: [MessageFlags.Ephemeral] });
     }
 }
