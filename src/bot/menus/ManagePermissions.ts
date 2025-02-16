@@ -21,18 +21,17 @@ export default class ManagePermissions extends SelectMenu {
         const role = await roles.findOne({ name: message.embeds[1].footer!.text });
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
 
-        const permissions = [ ...role.permissions ];
+        const permissions = [...role.permissions];
         const added: string[] = [];
         const removed: string[] = [];
 
-        role.permissions = [];
         for(const permission of values) {
             if(!permissions.includes(permission)) added.push(permission);
-            if(permission in Permission) role.permissions.push(permission);
         }
         for(const permission of permissions) {
             if(!values.includes(permission)) removed.push(permission);
         }
+        role.permissions = values.filter(permission => Object.values(Permission).includes(permission));
         await role.save();
         updateRoleCache();
 
