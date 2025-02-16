@@ -50,7 +50,8 @@ Environment variables configure essential application settings. Below is a detai
 - **`GT_STRICT_AUTH`**: Boolean that determines if unauthenticated requests are allowed on the `/players/:uuid` route. Set to `true` to require valid authorization for all requests.
 - **`GT_LOG_LEVEL`**: Specifies the level of logging detail. Valid values: `Error`, `Warn`, `Info`, `Debug`.
 - **`GT_BASE_URL`**: Defines the root URL of the API, excluding any trailing slashes. This is the URL where the API can be accessed and should be consistent with your deployment setup.
-- **`GT_ICON_URL`**: Provides a URL template for accessing role icons. The `{role}` placeholder in the template will be dynamically replaced with the role name.
+- **`GT_ICON_URL`**: Provides a URL template for accessing the default GlobalIcons. The `{icon}` placeholder in the template will be dynamically replaced with the icon name.
+- **`GT_ROLE_ICON_URL`**: Provides a URL template for accessing role icons. The `{role}` placeholder in the template will be dynamically replaced with the role name.
 - **`GT_MONGODB_CONNECTION`** (**required**): MongoDB connection string. Follow the [MongoDB documentation](https://www.mongodb.com/docs/manual/reference/connection-string/) to construct this string.
 
 ---
@@ -75,18 +76,15 @@ Environment variables configure essential application settings. Below is a detai
 
 ---
 
-### GitHub Configuration
-
-- **`GT_GITHUB_OWNER`**: GitHub repository owner's username.
-- **`GT_GITHUB_REPOSITORY`**: Name of the GitHub repository.
-- **`GT_GITHUB_BRANCH`**: Branch name to fetch the latest commit.
-
----
-
-### Error Reporting and Metrics
+### Error Reporting
 
 - **`GT_SENTRY_ENABLED`**: Enables or disables error reporting using Sentry.
 - **`GT_SENTRY_DSN`**: Sentry DSN (Data Source Name) for exception logging.
+
+---
+
+### Metrics
+
 - **`GT_METRICS_ENABLED`**: Enables or disables periodic metrics generation.
 - **`GT_METRICS_CRON`**: Cron expression defining the schedule for metric generation.
 - **`GT_METRICS_ADMIN_ROLE`**: Role required for a player to be recognized as an admin in metrics.
@@ -135,10 +133,12 @@ Environment variables configure essential application settings. Below is a detai
     - **Watchlist**:
         - **`GT_DISCORD_BOT_WATCHLIST_ENABLED`**: Enables logging watchlist events to a channel.
         - **`GT_DISCORD_BOT_WATCHLIST_CHANNEL`**: ID of the channel for watchlist logs.
+        - **`GT_DISCORD_BOT_WATCHLIST_CONTENT`**: Message content template (e.g., to mention roles).
 
     - **Ban Appeals**:
         - **`GT_DISCORD_BOT_APPEALS_ENABLED`**: Enables ban appeals and their notifications.
         - **`GT_DISCORD_BOT_APPEALS_CHANNEL`**: ID of the channel for ban appeals.
+        - **`GT_DISCORD_BOT_APPEALS_CONTENT`**: Message content template (e.g., to mention roles).
 
     - **Moderation Logs**:
         - **`GT_DISCORD_BOT_MODLOG_ENABLED`**: Enables staff action logging to a channel.
