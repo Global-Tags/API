@@ -5,6 +5,7 @@ import Modal from "../structs/Modal";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { snakeCase } from "change-case";
 
 export default class CreateApiKey extends Modal {
     constructor() {
@@ -18,9 +19,9 @@ export default class CreateApiKey extends Modal {
 
         const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
-        const name = fields.getTextInputValue('name').trim();
+        const name = snakeCase(fields.getTextInputValue('name').trim());
 
-        if(player.api_keys.find((key) => key.name.toLowerCase() == name.toLowerCase())) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ An API key with this name already exists!')], flags: [MessageFlags.Ephemeral] });
+        if(player.api_keys.find((key) => key.name == name)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ An API key with this name already exists!')], flags: [MessageFlags.Ephemeral] });
 
         sendModLogMessage({
             logType: ModLogType.CreateApiKey,
