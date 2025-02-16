@@ -85,7 +85,9 @@ const defaultRoles = [
         permissions: [
             'bypass_validation',
             'custom_icon',
+            'manage_api_keys',
             'manage_bans',
+            'manage_connections',
             'manage_notes',
             'manage_reports',
             'manage_roles',

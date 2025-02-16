@@ -179,7 +179,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ reason: t.String() }, { error: 'error.invalidBody', additionalProperties: true }),
+    body: t.Object({ reason: t.String({ error: 'error.wrongType;;[["field", "reason"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).delete('/', async ({ session, params, i18n, error }) => { // Unban player
@@ -212,7 +212,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     },
     response: {
         200: t.Object({ message: t.String() }, { description: 'The player was unbanned' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage bans.' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage bans' }),
         404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
         409: t.Object({ error: t.String() }, { description: 'The player is not banned' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),

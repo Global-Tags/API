@@ -41,7 +41,12 @@ export interface IPlayer {
         expires_at?: Date | null,
         reason?: string | null
     }[],
-    api_keys: string[],
+    api_keys: {
+        name: string,
+        key: string,
+        created_at: Date,
+        last_used?: Date | null
+    }[],
     notes: { id: string, text: string, author: string, createdAt: Date }[],
     bans: {
         appealable: boolean,
@@ -67,6 +72,7 @@ export interface IPlayer {
     unban(): void,
     clearTag(staff: string): void,
     clearIcon(staff: string): void,
+    createApiKey(name: string): string,
     createNote({ text, author }: { text: string, author: string }): void,
     existsNote(id: string): boolean,
     deleteNote(id: string): void,
@@ -190,7 +196,21 @@ const schema = new Schema<IPlayer>({
         default: []
     },
     api_keys: {
-        type: [String],
+        type: [{
+            name: {
+                type: String,
+                required: true
+            },
+            key: {
+                type: String,
+                required: true
+            },
+            created_at: {
+                type: Date,
+                required: true
+            },
+            last_used: Date
+        }],
         required: true,
         default: []
     },
@@ -359,6 +379,19 @@ const schema = new Schema<IPlayer>({
             })
             this.icon.name = snakeCase(GlobalIcon[GlobalIcon.None]);
             this.icon.hash = null;
+        },
+
+        createApiKey(name: string): string {
+            const key = `sk_${generateSecureCode(32)}`;
+            
+            this.api_keys.push({
+                name,
+                key: key,
+                created_at: new Date(),
+                last_used: null
+            });
+
+            return key;
         },
 
         createNote({ text, author }: { text: string, author: string }) {

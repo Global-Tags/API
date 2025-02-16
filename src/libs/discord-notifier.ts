@@ -21,6 +21,9 @@ export enum ModLogType {
     ClearIconTexture,
     Watch,
     Unwatch,
+    CreateApiKey,
+    RegenerateApiKey,
+    DeleteApiKey,
     CreateNote,
     DeleteNote,
     DeleteReport,
@@ -78,6 +81,9 @@ type ModLogData = {
     logType: ModLogType.Watch
 } | {
     logType: ModLogType.Unwatch
+} | {
+    logType: ModLogType.CreateApiKey | ModLogType.RegenerateApiKey | ModLogType.DeleteApiKey,
+    key: string
 } | {
     logType: ModLogType.CreateNote | ModLogType.DeleteNote,
     note: string
@@ -334,6 +340,7 @@ function modlogDescription(data: ModLogData): string | null {
     else if(type == ModLogType.EditPosition) return `\`${capitalCase(data.positions.old)}\` → \`${capitalCase(data.positions.new)}\``;
     else if(type == ModLogType.ChangeIconType) return `\`${capitalCase(data.icons.old)}\` → \`${capitalCase(data.icons.new)}\``;
     else if(type == ModLogType.ClearIconTexture) return `[${data.hash}](${getCustomIconUrl(data.user!.uuid!, data.hash)})`;
+    else if(type == ModLogType.CreateApiKey || type == ModLogType.RegenerateApiKey || type == ModLogType.DeleteApiKey) return `**Key name**: \`${data.key}\``;
     else if(type == ModLogType.CreateNote || type == ModLogType.DeleteNote) return `\`${data.note}\``;
     else if(type == ModLogType.DeleteReport) return `\`${data.report}\``;
     else if(type == ModLogType.CreateRole) return `\`${data.role}\``;

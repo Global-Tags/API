@@ -34,7 +34,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     response: {
         200: t.Object({ code: t.String() }, { description: 'You received a linking code' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage connections for this player' }),
-        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account.' }),
+        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account' }),
         409: t.Object({ error: t.String() }, { description: 'Account linking is deactivated / You already have a Discord account connected' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
@@ -65,7 +65,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     response: {
         200: t.Object({ message: t.String() }, { description: 'Your account was unlinked' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage connections for this player' }),
-        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account.' }),
+        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account' }),
         409: t.Object({ error: t.String() }, { description: 'Account linking is deactivated / You don\'t have a Discord account connected' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
@@ -109,7 +109,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     response: {
         200: t.Object({ message: t.String() }, { description: 'The verification email was sent' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage connections for this player' }),
-        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account.' }),
+        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account' }),
         409: t.Object({ error: t.String() }, { description: 'You already have an email address linked' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),

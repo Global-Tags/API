@@ -2,6 +2,7 @@ export enum Permission {
     BypassValidation,
     CustomIcon,
     ManageBans,
+    ManageApiKeys,
     ManageConnections,
     ManageNotes,
     ManageReports,
