@@ -1,14 +1,13 @@
-import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, MessageFlags } from "discord.js";
+import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, MessageFlags, StringSelectMenuBuilder } from "discord.js";
 import Button from "../structs/Button";
-import { Permission, permissions } from "../../types/Permission";
-import players from "../../database/schemas/players";
-import { colors, images } from "../bot";
+import { client, colors, images } from "../bot";
 import { getCachedRoles } from "../../database/schemas/roles";
-import { capitalCase } from "change-case";
+import players from "../../database/schemas/players";
+import { Permission } from "../../types/Permission";
 
-export default class ManagePermissions extends Button {
+export default class SetSku extends Button {
     constructor() {
-        super('managePermissions');
+        super('setSku');
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, user: User) {
@@ -19,26 +18,29 @@ export default class ManagePermissions extends Button {
         const role = getCachedRoles().find((role) => role.name == message.embeds[1].footer!.text);
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
 
+        const skus = (await client.application!.fetchSKUs()).map((sku) => ({ id: sku.id, name: sku.name }));
+        if(skus.length == 0) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ No SKUs found!')], flags: [MessageFlags.Ephemeral] });
+
         const embed = new EmbedBuilder()
-        .setColor(colors.standart)
-        .setTitle(`Select roles for \`${role.name}\``)
+        .setTitle(`Select an SKU for \`${role.name}\``)
         .setImage(images.placeholder)
         .setFooter({ text: role.name });
 
         const row = new ActionRowBuilder<StringSelectMenuBuilder>()
-            .addComponents([
+            .addComponents(
                 new StringSelectMenuBuilder()
-                    .setCustomId('managePermissions')
+                    .setCustomId('sku')
+                    .setPlaceholder('Please select an SKU...')
                     .setMinValues(0)
-                    .setMaxValues(Math.min(25, permissions.length))
-                    .setPlaceholder('Select the permissions...')
-                    .setOptions(permissions.slice(0, 25).map((permission) => ({
-                        label: capitalCase(Permission[permission]),
-                        value: Permission[permission],
-                        default: role.hasPermission(permission)
+                    .setMaxValues(1)
+                    .setOptions(skus.slice(0, 25).map((sku) => ({
+                        label: sku.name,
+                        value: sku.id,
+                        emoji: '💳',
+                        default: role.sku == sku.id
                     })))
-            ]);
-
+            );
+        
         interaction.reply({ embeds: [EmbedBuilder.from(message.embeds[0]), embed], components: [row], flags: [MessageFlags.Ephemeral] });
     }
 }
