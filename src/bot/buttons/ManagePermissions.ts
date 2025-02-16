@@ -26,20 +26,18 @@ export default class ManagePermissions extends Button {
         .setFooter({ text: role.name });
 
         const row = new ActionRowBuilder<StringSelectMenuBuilder>()
-        .addComponents([
-            new StringSelectMenuBuilder()
-            .setCustomId('managePermissions')
-            .setMinValues(0)
-            .setMaxValues(Math.min(25, permissions.length))
-            .setPlaceholder('Select the permissions...')
-            .setOptions(permissions.slice(0, 25).map((permission) => {
-                return {
-                    label: capitalCase(Permission[permission]),
-                    value: Permission[permission],
-                    default: role.hasPermission(permission)
-                }
-            }))
-        ]);
+            .addComponents([
+                new StringSelectMenuBuilder()
+                    .setCustomId('managePermissions')
+                    .setMinValues(0)
+                    .setMaxValues(Math.min(25, permissions.length))
+                    .setPlaceholder('Select the permissions...')
+                    .setOptions(permissions.slice(0, 25).map((permission) => ({
+                        label: capitalCase(Permission[permission]),
+                        value: Permission[permission],
+                        default: role.hasPermission(permission)
+                    })))
+            ]);
 
         interaction.reply({ embeds: [EmbedBuilder.from(message.embeds[0]), embed], components: [row], flags: [MessageFlags.Ephemeral] });
     }

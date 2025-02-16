@@ -194,5 +194,12 @@
         "no_reason": "Kein Grund angegeben",
         "banned": "Der Spieler wurde erfolgreich gebannt!",
         "unbanned": "Der Spieler wurde erfolgreich entbannt!"
+    },
+    "api_keys": {
+        "created": "Der API Key wurde erfolgreich erstellt!",
+        "not_found": "Der API Key wurde nicht gefunden!",
+        "already_exists": "Es existiert bereits ein API Key mit diesem Namen!",
+        "regenerated": "Der API Key wurde erfolgreich neu generiert!",
+        "deleted": "Der API Key wurde erfolgreich gelöscht!"
     }
 }

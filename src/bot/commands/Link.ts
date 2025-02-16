@@ -2,9 +2,8 @@ import { ApplicationCommandOptionType, CacheType, CommandInteraction, CommandInt
 import Command from "../structs/Command";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import { sendDiscordLinkMessage } from "../../libs/discord-notifier";
 import { config } from "../../libs/config";
-import { getProfileByUUID } from "../../libs/game-profiles";
+import { GameProfile } from "../../libs/game-profiles";
 import { onDiscordLink } from "../../libs/events";
 
 export default class Link extends Command {
@@ -38,7 +37,7 @@ export default class Link extends Command {
         player.connections.discord.code = null;
         player.save();
 
-        onDiscordLink(await getProfileByUUID(player.uuid), user.id);
+        onDiscordLink(await GameProfile.getProfileByUUID(player.uuid), user.id);
 
         interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ Your account was successfully linked!')] });
     }

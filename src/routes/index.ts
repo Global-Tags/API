@@ -17,11 +17,11 @@ export default (app: ElysiaApp) => app.get('/', () => ({
 }), {
     detail: {
         tags: ['API'],
-        description: 'Returns some basic info about the API.'
+        description: 'Returns some basic info about the API'
     },
     response: {
         200: t.Object({ version: t.String(), requests: t.Number(), commit: t.Object({ branch: t.String(), sha: t.Union([t.String(), t.Null()]), tree: t.Union([t.String(), t.Null()]) }) }, { description: 'Some basic API info' }),
-        503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
+        503: t.Object({ error: t.String() }, { description: 'Database is not reachable' })
     }
 })
 .get('/metrics', async ({ query: { latest } }) => {
@@ -60,7 +60,7 @@ export default (app: ElysiaApp) => app.get('/', () => ({
             positions: t.Object({}, { default: {}, additionalProperties: true, description: 'All position counts' }),
             icons: t.Object({}, { default: {}, additionalProperties: true, description: 'All icon counts' })
         }, { description: 'The server is reachable' })),
-        503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
+        503: t.Object({ error: t.String() }, { description: 'Database is not reachable' })
     },
     query: t.Object({
         latest: t.Optional(t.String({ error: 'error.wrongType;;[["field", "element"], ["type", "string"]]' }))
@@ -91,8 +91,8 @@ export default (app: ElysiaApp) => app.get('/', () => ({
         200: t.Object({
             total: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() })),
             current_month: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() }))
-        }, { description: 'The referral leaderboards.' }),
-        503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
+        }, { description: 'The referral leaderboards' }),
+        503: t.Object({ error: t.String() }, { description: 'Database is not reachable' })
     }
 })
 .get('/ping', ({ error }: Context) => { return error(204, '') }, {
@@ -102,6 +102,6 @@ export default (app: ElysiaApp) => app.get('/', () => ({
     },
     response: {
         204: t.Any({ description: 'The server is reachable' }),
-        503: t.Object({ error: t.String() }, { description: 'Database is not reachable.' })
+        503: t.Object({ error: t.String() }, { description: 'Database is not reachable' })
     }
 })

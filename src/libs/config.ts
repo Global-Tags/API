@@ -20,7 +20,8 @@ export let config = {
     logLevel: process.env.GT_LOG_LEVEL || 'Info',
     mongodb: process.env.GT_MONGODB_CONNECTION || '',
     baseUrl: process.env.GT_BASE_URL || 'http://localhost:5500',
-    iconUrl: (role: string) => (process.env.GT_ICON_URL || 'https://cdn.rappytv.com/globaltags/icons/role/{role}.png').replaceAll('{role}', snakeCase(role)),
+    iconUrl: (icon: string) => (process.env.GT_ICON_URL || 'https://cdn.rappytv.com/globaltags/icons/{icon}.png').replaceAll('{icon}', snakeCase(icon)),
+    roleIconUrl: (role: string) => (process.env.GT_ROLE_ICON_URL || 'https://cdn.rappytv.com/globaltags/icons/role/{role}.png').replaceAll('{role}', snakeCase(role)),
     proxy: {
         enabled: getEnvBoolean(process.env.GT_PROXY_ENABLED, false),
         ipHeader: process.env.GT_PROXY_IP_HEADER || 'x-real-ip'

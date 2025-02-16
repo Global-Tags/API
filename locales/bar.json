@@ -1,1 +1,8 @@
-{}
+{
+    "error": {
+        "notFound": "Ned g'funden!",
+        "unknownError": "A unbekannter Fehler is passiert! Bitte versuch’s später nomoi!",
+        "invalidBody": "De Anfrage-Body muass a JSON-Objekt sei!",
+        "notAllowed": "Du derfst de Anfrag ned durchführn!"
+    }
+}

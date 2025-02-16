@@ -1,55 +1,57 @@
 import axios from "axios";
 
-export type Profile = {
-    uuid: string | null,
-    username: string | null,
+export class GameProfile {
+    uuid: string | null
+    username: string | null
     error: string | null
-}
 
-export async function getProfileByUUID(uuid: string): Promise<Profile> {
-    try {
-        const res = await axios({
-            method: 'get',
-            url: `https://api.mojang.com/user/profile/${uuid}`,
-            headers: {
-                'Accept-Encoding': 'gzip'
-            }
-        });
+    constructor(uuid: string | null, username: string | null, error: string | null) {
+        this.uuid = uuid;
+        this.username = username;
+        this.error = error;
+    }
 
-        return {
-            uuid: res.data.id,
-            username: res.data.name,
-            error: null
-        }
-    } catch(err: any) {
-        return {
-            uuid,
-            username: null,
-            error: err?.response?.data.errorMessage
+    getUsernameOrUUID(): string {
+        return this.username ?? this.uuid ?? 'Unknown';
+    }
+
+    getUuidOrUsername(): string {
+        return this.uuid ?? this.username ?? 'Unknown';
+    }
+
+    getFormattedHyperlink(bold = false): string {
+        return `${bold ? '**' : ''}[\`${this.getUsernameOrUUID()}\`](<https://laby.net/@${this.uuid}>)${bold ? '**' : ''}`;
+    }
+
+    static async getProfileByUsername(username: string): Promise<GameProfile> {
+        try {
+            const res = await axios({
+                method: 'get',
+                url: `https://api.mojang.com/users/profiles/minecraft/${username}`,
+                headers: {
+                    'Accept-Encoding': 'gzip'
+                }
+            });
+
+            return new GameProfile(res.data.id, res.data.name, null);
+        } catch(err: any) {
+            return new GameProfile(null, username, err?.response?.data.errorMessage);
         }
     }
-}
 
-export async function getProfileByUsername(username: string): Promise<Profile> {
-    try {
-        const res = await axios({
-            method: 'get',
-            url: `https://api.mojang.com/users/profiles/minecraft/${username}`,
-            headers: {
-                'Accept-Encoding': 'gzip'
-            }
-        });
-
-        return {
-            uuid: res.data.id,
-            username: res.data.name,
-            error: null
-        }
-    } catch(err: any) {
-        return {
-            uuid: null,
-            username: username,
-            error: err?.response?.data.errorMessage
+    static async getProfileByUUID(uuid: string): Promise<GameProfile> {
+        try {
+            const res = await axios({
+                method: 'get',
+                url: `https://api.mojang.com/user/profile/${uuid}`,
+                headers: {
+                    'Accept-Encoding': 'gzip'
+                }
+            });
+    
+            return new GameProfile(res.data.id, res.data.name, null);
+        } catch(err: any) {
+            return new GameProfile(uuid, null, err?.response?.data.errorMessage);
         }
     }
 }

@@ -6,7 +6,8 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendBanEmail } from "../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import ms, { StringValue } from "ms";
 
 export default class Ban extends Modal {
     constructor() {
@@ -18,26 +19,30 @@ export default class Ban extends Modal {
         if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
         if(!staff.hasPermission(Permission.ManageBans)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
 
-        const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
+        const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
         if(player.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player is already banned!')], flags: [MessageFlags.Ephemeral] });
         const reason = fields.getTextInputValue('reason');
+        const duration = fields.getTextInputValue('duration');
+        const expiresAt = duration.trim() != '' ? new Date(Date.now() + ms(duration as StringValue)): null;
+        if(expiresAt && isNaN(expiresAt.getTime())) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Invalid expiration date!')], flags: [MessageFlags.Ephemeral] });
 
         player.banPlayer({
             appealable: true,
             reason,
             staff: staff.uuid,
-            expiresAt: null
+            expiresAt: expiresAt
         });
         player.save();
 
         sendModLogMessage({
             logType: ModLogType.Ban,
-            staff: await getProfileByUUID(staff.uuid),
-            user: await getProfileByUUID(player.uuid),
+            staff: await GameProfile.getProfileByUUID(staff.uuid),
+            user: await GameProfile.getProfileByUUID(player.uuid),
             discord: true,
             appealable: true,
-            reason: reason
+            reason: reason,
+            expires: expiresAt
         });
 
         if(player.isEmailVerified()) {

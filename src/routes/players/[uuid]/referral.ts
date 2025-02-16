@@ -1,7 +1,7 @@
 import { t } from "elysia";
 import players from "../../../database/schemas/players";
 import { sendReferralMessage } from "../../../libs/discord-notifier";
-import { getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
 export default (app: ElysiaApp) => app.post('/', async ({ session, params, i18n, error }) => { // Mark player as referrer
@@ -24,7 +24,7 @@ export default (app: ElysiaApp) => app.post('/', async ({ session, params, i18n,
     executor.referrals.has_referred = true;
     executor.save();
 
-    sendReferralMessage(await getProfileByUUID(player.uuid), await getProfileByUUID(session.uuid));
+    sendReferralMessage(await GameProfile.getProfileByUUID(player.uuid), await GameProfile.getProfileByUUID(session.uuid));
     return { message: i18n('referral.success') };
 }, {
     detail: {

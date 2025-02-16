@@ -3,9 +3,9 @@ import Button from "../structs/Button";
 import { Permission } from "../../types/Permission";
 import players from "../../database/schemas/players";
 import { colors } from "../bot";
-import roles, { getCachedRoles, updateRoleCache } from "../../database/schemas/roles";
+import roles, { updateRoleCache } from "../../database/schemas/roles";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { getProfileByUUID } from "../../libs/game-profiles";
+import { GameProfile } from "../../libs/game-profiles";
 
 export default class ToggleIcon extends Button {
     constructor() {
@@ -26,7 +26,7 @@ export default class ToggleIcon extends Button {
 
         sendModLogMessage({
             logType: ModLogType.ToggleRoleIcon,
-            staff: await getProfileByUUID(staff.uuid),
+            staff: await GameProfile.getProfileByUUID(staff.uuid),
             discord: true,
             role: role.name,
             roleIcon: role.hasIcon

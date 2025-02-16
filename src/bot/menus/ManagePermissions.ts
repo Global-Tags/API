@@ -5,7 +5,7 @@ import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 import roles, { updateRoleCache } from "../../database/schemas/roles";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { getProfileByUUID } from "../../libs/game-profiles";
+import { GameProfile } from "../../libs/game-profiles";
 
 export default class ManagePermissions extends SelectMenu {
     constructor() {
@@ -18,27 +18,26 @@ export default class ManagePermissions extends SelectMenu {
         if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
         if(!staff.hasPermission(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
 
-        const role = await roles.findOne({ name: message.embeds[1].footer!.text});
+        const role = await roles.findOne({ name: message.embeds[1].footer!.text });
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
 
-        const permissions = [ ...role.permissions ];
+        const permissions = [...role.permissions];
         const added: string[] = [];
         const removed: string[] = [];
 
-        role.permissions = [];
         for(const permission of values) {
             if(!permissions.includes(permission)) added.push(permission);
-            if(permission in Permission) role.permissions.push(permission);
         }
         for(const permission of permissions) {
             if(!values.includes(permission)) removed.push(permission);
         }
+        role.permissions = values.filter(permission => Object.values(Permission).includes(permission));
         await role.save();
         updateRoleCache();
 
         sendModLogMessage({
             logType: ModLogType.ChangeRolePermissions,
-            staff: await getProfileByUUID(staff.uuid),
+            staff: await GameProfile.getProfileByUUID(staff.uuid),
             discord: true,
             role: role.name,
             permissions: {

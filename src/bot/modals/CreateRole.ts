@@ -6,7 +6,7 @@ import { Permission } from "../../types/Permission";
 import roles, { getNextPosition, updateRoleCache } from "../../database/schemas/roles";
 import { snakeCase } from "change-case";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { getProfileByUUID } from "../../libs/game-profiles";
+import { GameProfile } from "../../libs/game-profiles";
 
 export default class CreateRole extends Modal {
     constructor() {
@@ -32,7 +32,7 @@ export default class CreateRole extends Modal {
 
         sendModLogMessage({
             logType: ModLogType.CreateRole,
-            staff: await getProfileByUUID(staff.uuid),
+            staff: await GameProfile.getProfileByUUID(staff.uuid),
             discord: true,
             role: name
         });
