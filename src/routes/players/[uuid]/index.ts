@@ -172,7 +172,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     },
     response: {
         200: t.Object({ message: t.String() }, { description: 'Your tag was changed' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re banned.' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re banned' }),
         409: t.Object({ error: t.String() }, { description: 'You already have this tag' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
