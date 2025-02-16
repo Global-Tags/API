@@ -38,7 +38,7 @@ export default class Actions extends Button {
         general.push({ name: 'Language', value: `\`${player.last_language}\`` });
         general.push({ name: 'Hidden role icon', value: `\`${player.hide_role_icon ? '✅' : '❌'}\`` });
         general.push({ name: 'Got referred', value: `\`${player.referrals.has_referred ? '✅' : '❌'}\`` });
-        general.push({ name: 'API Keys', value: `\`${player.api_keys.length}\`` });
+        if(staff.hasPermission(Permission.ManageApiKeys)) general.push({ name: 'API Keys', value: `\`${player.api_keys.length}\`` });
 
         if(staff.hasPermission(Permission.ManageNotes)) moderation.push({ name: 'Notes', value: `\`${player.notes.length}\`` });
         if(staff.hasPermission(Permission.ManageReports)) moderation.push({ name: 'Reports', value: `\`${player.reports.length}\`` });
