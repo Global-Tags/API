@@ -2,7 +2,7 @@ import { t } from "elysia";
 import players from "../../../database/schemas/players";
 import { Permission } from "../../../types/Permission";
 import { sendReportMessage } from "../../../libs/discord-notifier";
-import { formatUUID, getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { formatUUID, GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, error }) => { // Get reports
@@ -61,8 +61,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     await player.save();
 
     sendReportMessage({
-        user: await getProfileByUUID(uuid),
-        reporter: await getProfileByUUID(session.uuid),
+        user: await GameProfile.getProfileByUUID(uuid),
+        reporter: await GameProfile.getProfileByUUID(session.uuid),
         tag: player.tag,
         reason
     });

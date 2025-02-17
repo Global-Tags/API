@@ -4,9 +4,7 @@ import players from "../../database/schemas/players";
 import { sendEntitlementMessage } from "../../libs/discord-notifier";
 import entitlements from "../../database/schemas/entitlement";
 import { config } from "../../libs/config";
-import { getSkus } from "../../libs/sku-manager";
-
-const skus = getSkus();
+import { fetchSku } from "../bot";
 
 export default class EntitlementDelete extends Event {
     constructor() {
@@ -14,14 +12,14 @@ export default class EntitlementDelete extends Event {
     }
 
     async fire(entitlement: Entitlement) {
-        if(!config.discordBot.notifications.entitlements.enabled || !!entitlement.startsTimestamp) return; // Temporary replacement for Entitlement#isTest. See https://github.com/discordjs/discord.js/issues/10610
+        if(!config.discordBot.notifications.entitlements.enabled || !entitlement.isTest()) return;
         const player = await players.findOne({ 'connections.discord.id': entitlement.userId });
-        const sku = skus.find((sku) => sku.id == entitlement.skuId);
+        const sku = await fetchSku(entitlement.skuId);
         if(!sku) return;
 
         sendEntitlementMessage(
             player?.uuid || '',
-            `[**S**] <@!${entitlement.userId}> has deleted their **${sku.name}** subscription!`,
+            `[**S**] <@!${entitlement.userId}> has deleted their **${sku?.name || 'Unknown SKU'}** subscription!`,
             !!player,
         );
 

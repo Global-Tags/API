@@ -12,6 +12,7 @@ interface IRole {
     name: string,
     position: number,
     hasIcon: boolean,
+    sku?: string | null,
     permissions: string[],
     getPermissions(): Permission[],
     hasPermission(permission: Permission): boolean,
@@ -34,6 +35,10 @@ const schema = new Schema<IRole>({
     hasIcon: {
         type: Boolean,
         required: true
+    },
+    sku: {
+        type: String,
+        required: false
     },
     permissions: {
         type: [String],
@@ -76,12 +81,14 @@ const defaultRoles = [
         name: 'admin',
         position: 0,
         hasIcon: false,
+        sku: null,
         permissions: [
             'bypass_validation',
             'custom_icon',
+            'manage_api_keys',
             'manage_bans',
+            'manage_connections',
             'manage_notes',
-            'manage_subscriptions',
             'manage_reports',
             'manage_roles',
             'manage_tags',
@@ -102,7 +109,7 @@ export async function updateRoleCache(): Promise<void> {
     for(const role of roles) {
         cachedRoles.push(role);
     }
-    cachedRoles.sort();
+    cachedRoles.sort((a, b) => a.position - b.position);
     Logger.debug('Updated role cache.');
 }
 
@@ -113,8 +120,6 @@ export async function getNextPosition(): Promise<number> {
     return roles[roles.length - 1].position + 1;
 }
 
-const syncReason = 'Discord role sync';
-
 export async function synchronizeRoles() {
     if(!isConnected()) return;
     const players = await playerSchema.find({ 'connections.discord.id': { $exists: true } });
@@ -124,42 +129,27 @@ export async function synchronizeRoles() {
     for(const player of players) {
         const member = await guild.members.fetch(player.connections.discord.id!).catch(() => null);
         if(!member || !member.id) continue;
-        let save = false;
         const playerRoles = player.roles
             .filter((role) => !role.expires_at || role.expires_at.getTime() > Date.now());
 
         for(const role of roles) {
             if(role.getSyncedRoles().length == 0) continue;
-            const hasRole = role.getSyncedRoles().some((role) => member.roles.cache.has(role));
 
-            if(hasRole) {
-                const playerRole = player.roles.find((r) => r.name == role.name);
-                if(!playerRole) {
-                    player.roles.push({
-                        name: role.name,
-                        added_at: new Date(),
-                        reason: syncReason,
-                        manually_added: false
-                    });
-                    save = true;
-                } else if(playerRole.expires_at && playerRole.expires_at.getTime() < Date.now()) {
-                    playerRole.expires_at = null;
-                    playerRole.added_at = new Date();
-                    playerRole.expires_at = null;
-                    playerRole.reason = syncReason;
-                    playerRole.manually_added = false;
-                    save = true;
+            if(playerRoles.some((playerRole) => playerRole.name == role.name)) {
+                for(const syncedRole of role.getSyncedRoles()) {
+                    if(member.roles.cache.has(syncedRole)) continue;
+                    member.roles.add(syncedRole)
+                        .then(() => Logger.debug(`Added synced role "${syncedRole}" (${role.name}) to member "${member.id}".`))
+                        .catch((error) => Logger.error(`Failed to add synced role "${syncedRole}" (${role.name}) to member "${member.id}": ${error}`));
                 }
             } else {
-                const playerRole = playerRoles.find((r) => r.name == role.name);
-                if(!playerRole || playerRole.manually_added) continue;
-                playerRole.expires_at = new Date();
-                save = true;
+                for(const syncedRole of role.getSyncedRoles()) {
+                    if(!member.roles.cache.has(syncedRole)) continue;
+                    member.roles.remove(syncedRole)
+                        .then(() => Logger.debug(`Removed synced role "${syncedRole}" (${role.name}) from member "${member.id}".`))
+                        .catch((error) => Logger.error(`Failed to remove synced role "${syncedRole}" (${role.name}) from member "${member.id}": ${error}`));
+                }
             }
-        }
-        if(save) {
-            Logger.debug(`Synced roles for ${player.uuid} (${member.id}).`);
-            player.save();
         }
     }
 }

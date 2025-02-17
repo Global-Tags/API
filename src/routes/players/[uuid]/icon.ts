@@ -5,7 +5,7 @@ import { capitalCase, snakeCase } from "change-case";
 import { config } from "../../../libs/config";
 import { Permission } from "../../../types/Permission";
 import { GlobalIcon } from "../../../types/GlobalIcon";
-import { getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
 import { sendTagChangeEmail } from "../../../libs/mailer";
@@ -67,8 +67,8 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     if(!session.equal) {
         sendModLogMessage({
             logType: ModLogType.ChangeIconType,
-            staff: await getProfileByUUID(session.uuid!),
-            user: await getProfileByUUID(uuid),
+            staff: await GameProfile.getProfileByUUID(session.uuid!),
+            user: await GameProfile.getProfileByUUID(uuid),
             discord: false,
             icons: {
                 old: oldIcon?.name || '---',

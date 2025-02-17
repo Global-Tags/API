@@ -1,8 +1,8 @@
 import * as bot from "../bot/bot";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
-import { Profile } from "./game-profiles";
+import { GameProfile } from "./game-profiles";
 import { getCustomIconUrl } from "../routes/players/[uuid]/icon";
-import { capitalCase, pascalCase } from "change-case";
+import { capitalCase, pascalCase, sentenceCase } from "change-case";
 import { config } from "./config";
 import { translateToAnsi } from "./chat-color";
 
@@ -12,12 +12,18 @@ export enum ModLogType {
     Ban,
     Unban,
     EditBan,
-    EditRoles,
+    AddRole,
+    RemoveRole,
+    EditRoleNote,
+    SetRoleExpiration,
     EditPosition,
     ChangeIconType,
     ClearIconTexture,
     Watch,
     Unwatch,
+    CreateApiKey,
+    RegenerateApiKey,
+    DeleteApiKey,
     CreateNote,
     DeleteNote,
     DeleteReport,
@@ -25,6 +31,7 @@ export enum ModLogType {
     RenameRole,
     ToggleRoleIcon,
     ChangeRolePermissions,
+    SetRoleSku,
     DeleteRole,
     UnlinkConnection,
     ResetLinkingCode
@@ -32,8 +39,8 @@ export enum ModLogType {
 
 type ModLogData = {
     logType: ModLogType,
-    staff: Profile,
-    user?: Profile,
+    staff: GameProfile,
+    user?: GameProfile,
     discord: boolean
 } & ({
     logType: ModLogType.ChangeTag,
@@ -52,8 +59,16 @@ type ModLogData = {
     reason?: string,
     appealable: boolean
 } | {
-    logType: ModLogType.EditRoles,
-    roles: { added: string[], removed: string[] }
+    logType: ModLogType.AddRole | ModLogType.RemoveRole | ModLogType.CreateRole | ModLogType.DeleteRole,
+    role: string
+} | {
+    logType: ModLogType.EditRoleNote,
+    role: string,
+    note: string | null
+} | {
+    logType: ModLogType.SetRoleExpiration,
+    role: string,
+    expires: Date | null
 } | {
     logType: ModLogType.EditPosition,
     positions: { old: string, new: string }
@@ -68,17 +83,14 @@ type ModLogData = {
 } | {
     logType: ModLogType.Unwatch
 } | {
-    logType: ModLogType.CreateNote,
-    note: string
+    logType: ModLogType.CreateApiKey | ModLogType.RegenerateApiKey | ModLogType.DeleteApiKey,
+    key: string
 } | {
-    logType: ModLogType.DeleteNote,
+    logType: ModLogType.CreateNote | ModLogType.DeleteNote,
     note: string
 } | {
     logType: ModLogType.DeleteReport,
     report: string
-} | {
-    logType: ModLogType.CreateRole,
-    role: string
 } | {
     logType: ModLogType.RenameRole,
     names: { old: string, new: string }
@@ -91,14 +103,12 @@ type ModLogData = {
     role: string,
     permissions: { added: string[], removed: string[] }
 } | {
-    logType: ModLogType.DeleteRole,
-    role: string
+    logType: ModLogType.SetRoleSku,
+    role: string,
+    sku: { old: string | null, new: string | null }
 } | {
-    logType: ModLogType.UnlinkConnection,
+    logType: ModLogType.UnlinkConnection | ModLogType.ResetLinkingCode,
     type: 'discord' | 'email' 
-} | {
-    logType: ModLogType.ResetLinkingCode,
-    type: 'discord' | 'email'
 });
 
 export function formatTimestamp(date: Date, style: 't' | 'T' | 'd' | 'D' | 'f' | 'F' | 'R' = 'f') {
@@ -106,8 +116,8 @@ export function formatTimestamp(date: Date, style: 't' | 'T' | 'd' | 'D' | 'f' |
 }
 
 export function sendReportMessage({ user, reporter, tag, reason } : {
-    user: Profile,
-    reporter: Profile,
+    user: GameProfile,
+    reporter: GameProfile,
     tag: string,
     reason: string
 }) {
@@ -123,7 +133,7 @@ export function sendReportMessage({ user, reporter, tag, reason } : {
         .addFields([
             {
                 name: 'Reported player',
-                value: `[\`${user.username || user.uuid}\`](https://laby.net/@${user.uuid})`
+                value: user.getFormattedHyperlink()
             },
             {
                 name: 'Reported Tag',
@@ -131,7 +141,7 @@ export function sendReportMessage({ user, reporter, tag, reason } : {
             },
             {
                 name: 'Reporter',
-                value: `[\`${reporter.username || reporter.uuid}\`](https://laby.net/@${reporter.uuid})`
+                value: reporter.getFormattedHyperlink()
             },
             {
                 name: 'Reason',
@@ -141,7 +151,7 @@ export function sendReportMessage({ user, reporter, tag, reason } : {
     });
 }
 
-export function sendWatchlistAddMessage({ user, tag, word }: { user: Profile, tag: string, word: string }) {
+export function sendWatchlistAddMessage({ user, tag, word }: { user: GameProfile, tag: string, word: string }) {
     if(!config.discordBot.notifications.watchlist.enabled) return;
 
     sendMessage({
@@ -153,7 +163,7 @@ export function sendWatchlistAddMessage({ user, tag, word }: { user: Profile, ta
         .addFields([
             {
                 name: 'Watched player',
-                value: `[\`${user.username || user.uuid}\`](https://laby.net/@${user.uuid})`
+                value: user.getFormattedHyperlink()
             },
             {
                 name: 'New tag',
@@ -167,7 +177,7 @@ export function sendWatchlistAddMessage({ user, tag, word }: { user: Profile, ta
     });
 }
 
-export function sendWatchlistTagUpdateMessage(user: Profile, tag: string) {
+export function sendWatchlistTagUpdateMessage(user: GameProfile, tag: string) {
     if(!config.discordBot.notifications.watchlist.enabled) return;
 
     sendMessage({
@@ -180,7 +190,7 @@ export function sendWatchlistTagUpdateMessage(user: Profile, tag: string) {
             .addFields([
                 {
                     name: 'Watched player',
-                    value: `[\`${user.username || user.uuid}\`](https://laby.net/@${user.uuid})`
+                    value: user.getFormattedHyperlink()
                 },
                 {
                     name: 'New tag',
@@ -190,7 +200,7 @@ export function sendWatchlistTagUpdateMessage(user: Profile, tag: string) {
     });
 }
 
-export function sendBanAppealMessage(user: Profile, reason: string) {
+export function sendBanAppealMessage(user: GameProfile, reason: string) {
     if(!config.discordBot.notifications.banAppeals.enabled) return;
 
     sendMessage({
@@ -203,7 +213,7 @@ export function sendBanAppealMessage(user: Profile, reason: string) {
             .addFields([
                 {
                     name: 'Player',
-                    value: `[\`${user.username || user.uuid}\`](https://laby.net/@${user.uuid})`
+                    value: user.getFormattedHyperlink()
                 },
                 {
                     name: 'Reason',
@@ -213,7 +223,7 @@ export function sendBanAppealMessage(user: Profile, reason: string) {
     });
 }
 
-export function sendDiscordLinkMessage(user: Profile, userId: string, connected: boolean) {
+export function sendDiscordLinkMessage(user: GameProfile, userId: string, connected: boolean) {
     if(!config.discordBot.notifications.accountConnections.enabled) return;
 
     sendMessage({
@@ -226,7 +236,7 @@ export function sendDiscordLinkMessage(user: Profile, userId: string, connected:
             .addFields([
                 {
                     name: 'Player',
-                    value: `[\`${user.username || user.uuid}\`](https://laby.net/@${user.uuid})`
+                    value: user.getFormattedHyperlink()
                 },
                 {
                     name: connected ? 'User ID' : 'Previous User ID',
@@ -237,7 +247,7 @@ export function sendDiscordLinkMessage(user: Profile, userId: string, connected:
     });
 }
 
-export function sendEmailLinkMessage(user: Profile, email: string | null, connected: boolean) {
+export function sendEmailLinkMessage(user: GameProfile, email: string | null, connected: boolean) {
     if(!config.discordBot.notifications.accountConnections.enabled) return;
 
     sendMessage({
@@ -261,12 +271,12 @@ export function sendEmailLinkMessage(user: Profile, email: string | null, connec
     });
 }
 
-export function sendReferralMessage(inviter: Profile, invited: Profile) {
+export function sendReferralMessage(inviter: GameProfile, invited: GameProfile) {
     if(!config.discordBot.notifications.referrals.enabled) return;
 
     sendMessage({
         channel: config.discordBot.notifications.referrals.channel,
-        content: `[\`${inviter.username || inviter.uuid}\`](<https://laby.net/@${inviter.uuid}>) has invited [\`${invited.username || invited.uuid}\`](<https://laby.net/@${invited.uuid}>).`,
+        content: `${inviter.getFormattedHyperlink()} has invited ${inviter.getFormattedHyperlink()}.`,
         embed: null,
         actionButton: false
     });
@@ -290,7 +300,7 @@ export function sendEntitlementMessage(uuid: string, description: string, head: 
     });
 }
 
-export function sendCustomIconUploadMessage(user: Profile, hash: string) {
+export function sendCustomIconUploadMessage(user: GameProfile, hash: string) {
     if(!config.discordBot.notifications.customIcons.enabled) return;
 
     const embed = new EmbedBuilder()
@@ -300,7 +310,7 @@ export function sendCustomIconUploadMessage(user: Profile, hash: string) {
         .addFields([
             {
                 name: 'Player:',
-                value: `[\`${user.username || user.uuid}\`](<https://laby.net/@${user.uuid}>)`
+                value: user.getFormattedHyperlink()
             }
         ])
         .setThumbnail(getCustomIconUrl(user.uuid!, hash));
@@ -318,7 +328,7 @@ export function sendModLogMessage(data: ModLogData) {
     const description = modlogDescription(data);
     sendMessage({
         channel: config.discordBot.notifications.mogLog.channel,
-        content: `[**${ModLogType[data.logType]}**] [\`${data.staff.username || data.staff.uuid}\`](<https://laby.net/@${data.staff.uuid}>)${data.discord ? ' [**D**]' : ''}${data.user ? ` → [\`${data.user.username || data.user.uuid}\`](<https://laby.net/@${data.user.uuid}>)` : ''}${description ? `: ${description}` : ''}`,
+        content: `[**${sentenceCase(ModLogType[data.logType])}**] ${data.staff.getFormattedHyperlink()}${data.discord ? ' [**D**]' : ''}${data.user ? ` → ${data.user.getFormattedHyperlink()}` : ''}${description ? `: ${description}` : ''}`,
         embed: null,
         actionButton: false
     });
@@ -329,16 +339,20 @@ function modlogDescription(data: ModLogData): string | null {
     if(type == ModLogType.ChangeTag) return `\`${data.tags.old}\` → \`${data.tags.new}\``;
     else if(type == ModLogType.Ban) return `**Reason**: \`${data.reason || 'No reason'}\`. **Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Expires**: ${data.expires ? `${formatTimestamp(data.expires)} (${formatTimestamp(data.expires, 'R')})` : '`-`'}`;
     else if(type == ModLogType.EditBan) return `**Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Reason**: \`${data.reason || '-- No reason --'}\``;
-    else if(type == ModLogType.EditRoles) return `\n\`\`\`diff\n${data.roles.added.map((role) => `+ ${capitalCase(role)}`).join('\n')}${data.roles.added.length > 0 && data.roles.removed.length > 0 ? '\n' : ''}${data.roles.removed.map((role) => `- ${capitalCase(role)}`).join('\n')}\`\`\``;
+    else if(type == ModLogType.AddRole || type == ModLogType.RemoveRole) return `\`${data.role}\``;
+    else if(type == ModLogType.EditRoleNote) return `**Role**: \`${data.role}\`. **Note**: \`${data.note || '-'}\``;
+    else if(type == ModLogType.SetRoleExpiration) return `**Role**: \`${data.role}\`. **Expires**: ${data.expires ? `${formatTimestamp(data.expires)} (${formatTimestamp(data.expires, 'R')})` : '`-`'}`;
     else if(type == ModLogType.EditPosition) return `\`${capitalCase(data.positions.old)}\` → \`${capitalCase(data.positions.new)}\``;
     else if(type == ModLogType.ChangeIconType) return `\`${capitalCase(data.icons.old)}\` → \`${capitalCase(data.icons.new)}\``;
     else if(type == ModLogType.ClearIconTexture) return `[${data.hash}](${getCustomIconUrl(data.user!.uuid!, data.hash)})`;
+    else if(type == ModLogType.CreateApiKey || type == ModLogType.RegenerateApiKey || type == ModLogType.DeleteApiKey) return `**Key name**: \`${data.key}\``;
     else if(type == ModLogType.CreateNote || type == ModLogType.DeleteNote) return `\`${data.note}\``;
     else if(type == ModLogType.DeleteReport) return `\`${data.report}\``;
     else if(type == ModLogType.CreateRole) return `\`${data.role}\``;
     else if(type == ModLogType.RenameRole) return `\`${data.names.old}\` → \`${data.names.new}\``
     else if(type == ModLogType.ToggleRoleIcon) return `\`${data.role}\`. \`${data.roleIcon ? '❌' : '✅'}\` → \`${data.roleIcon ? '✅' : '❌'}\``;
     else if(type == ModLogType.ChangeRolePermissions) return `\`${data.role}\`\n\`\`\`diff\n${data.permissions.added.map((permission) => `+ ${pascalCase(permission)}`).join('\n')}${data.permissions.added.length > 0 && data.permissions.removed.length > 0 ? '\n' : ''}${data.permissions.removed.map((permission) => `- ${pascalCase(permission)}`).join('\n')}\`\`\``;
+    else if(type == ModLogType.SetRoleSku) return `**Role**: \`${data.role}\`. **SKU**: \`${data.sku.old || '-'}\` → \`${data.sku.new || '-'}\``;
     else if(type == ModLogType.DeleteRole) return `\`${data.role}\``;
     else if(type == ModLogType.UnlinkConnection || type == ModLogType.ResetLinkingCode) return `**Type**: \`${capitalCase(data.type)}\``;
     return null;

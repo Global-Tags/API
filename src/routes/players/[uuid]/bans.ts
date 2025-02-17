@@ -4,7 +4,7 @@ import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 import { ModLogType, sendBanAppealMessage, sendModLogMessage } from "../../../libs/discord-notifier";
 import { sendBanEmail, sendUnbanEmail } from "../../../libs/mailer";
 import { Permission } from "../../../types/Permission";
-import { formatUUID, getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { formatUUID, GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, error }) => { // Get ban list
@@ -77,8 +77,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     sendModLogMessage({
         logType: ModLogType.Ban,
-        staff: await getProfileByUUID(session.uuid!),
-        user: await getProfileByUUID(uuid),
+        staff: await GameProfile.getProfileByUUID(session.uuid!),
+        user: await GameProfile.getProfileByUUID(uuid),
         discord: false,
         reason: reason,
         appealable: appealable == undefined ? true : appealable,
@@ -122,8 +122,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     sendModLogMessage({
         logType: ModLogType.EditBan,
-        user: await getProfileByUUID(uuid),
-        staff: await getProfileByUUID(session.uuid!),
+        user: await GameProfile.getProfileByUUID(uuid),
+        staff: await GameProfile.getProfileByUUID(session.uuid!),
         discord: false,
         appealable: appealable,
         reason
@@ -161,7 +161,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     await player.save();
 
     sendBanAppealMessage(
-        await getProfileByUUID(uuid),
+        await GameProfile.getProfileByUUID(uuid),
         reason
     );
 
@@ -179,7 +179,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ reason: t.String() }, { error: 'error.invalidBody', additionalProperties: true }),
+    body: t.Object({ reason: t.String({ error: 'error.wrongType;;[["field", "reason"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).delete('/', async ({ session, params, i18n, error }) => { // Unban player
@@ -195,8 +195,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     sendModLogMessage({
         logType: ModLogType.Unban,
-        staff: await getProfileByUUID(session.uuid!),
-        user: await getProfileByUUID(uuid),
+        staff: await GameProfile.getProfileByUUID(session.uuid!),
+        user: await GameProfile.getProfileByUUID(uuid),
         discord: false
     });
 
@@ -212,7 +212,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     },
     response: {
         200: t.Object({ message: t.String() }, { description: 'The player was unbanned' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage bans.' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage bans' }),
         404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
         409: t.Object({ error: t.String() }, { description: 'The player is not banned' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),

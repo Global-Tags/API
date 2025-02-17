@@ -19,7 +19,7 @@ export default class Actions extends Button {
         const staff = await players.findOne({ 'connections.discord.id': user.id });
         if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
         if(!staff.canManagePlayers()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
-        const uuid = message.embeds[0].fields[0].value.replaceAll('`', '').match(uuidRegex)?.[0];
+        const uuid = message.embeds[0].author?.name || message.embeds[0].fields[0].value.match(uuidRegex)?.[0];
         if(!uuid) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
         const strippedUUID = stripUUID(uuid);
         const player = await players.findOne({ uuid: strippedUUID });
@@ -38,7 +38,7 @@ export default class Actions extends Button {
         general.push({ name: 'Language', value: `\`${player.last_language}\`` });
         general.push({ name: 'Hidden role icon', value: `\`${player.hide_role_icon ? '✅' : '❌'}\`` });
         general.push({ name: 'Got referred', value: `\`${player.referrals.has_referred ? '✅' : '❌'}\`` });
-        general.push({ name: 'API Keys', value: `\`${player.api_keys.length}\`` });
+        if(staff.hasPermission(Permission.ManageApiKeys)) general.push({ name: 'API Keys', value: `\`${player.api_keys.length}\`` });
 
         if(staff.hasPermission(Permission.ManageNotes)) moderation.push({ name: 'Notes', value: `\`${player.notes.length}\`` });
         if(staff.hasPermission(Permission.ManageReports)) moderation.push({ name: 'Reports', value: `\`${player.reports.length}\`` });
@@ -59,34 +59,31 @@ export default class Actions extends Button {
 
         const embed = new EmbedBuilder()
             .setColor(0x5865f2)
+            .setAuthor({ name: uuid })
             .setThumbnail(`https://laby.net/texture/profile/head/${strippedUUID}.png?size=1024&overlay`)
             .setTitle('Action menu')
             .setDescription(info.filter(({ entries }) => entries.length > 0).map(({ category, entries }) =>
                 `__${category}__\n${entries.map(({ name, value }) => `> ${name}: ${value}`).join('\n')}`
-            ).join('\n\n'))
-            .addFields({
-                name: 'Target UUID',
-                value: `\`\`\`${strippedUUID}\`\`\``
-            });
+            ).join('\n\n'));
 
         const row = new ActionRowBuilder<ButtonBuilder>()
-        .addComponents(
-            new ButtonBuilder()
-                .setLabel('Account')
-                .setCustomId('manageAccount')
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(!staff.hasPermission(Permission.ManageConnections) && !staff.hasPermission(Permission.ManageRoles) && !staff.hasPermission(Permission.ManageSubscriptions)),
-            new ButtonBuilder()
-                .setLabel('Tag Settings')
-                .setCustomId('manageTag')
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(!staff.hasPermission(Permission.ManageTags)),
-            new ButtonBuilder()
-                .setLabel('Moderation')
-                .setCustomId('moderateAccount')
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(!staff.hasPermission(Permission.ManageBans) && !staff.hasPermission(Permission.ManageNotes) && !staff.hasPermission(Permission.ManageReports) && !staff.hasPermission(Permission.ManageWatchlist))
-        );
+            .addComponents(
+                new ButtonBuilder()
+                    .setLabel('Account')
+                    .setCustomId('manageAccount')
+                    .setStyle(ButtonStyle.Primary)
+                    .setDisabled(!staff.hasPermission(Permission.ManageConnections) && !staff.hasPermission(Permission.ManageRoles)),
+                new ButtonBuilder()
+                    .setLabel('Tag Settings')
+                    .setCustomId('manageTag')
+                    .setStyle(ButtonStyle.Primary)
+                    .setDisabled(!staff.hasPermission(Permission.ManageTags)),
+                new ButtonBuilder()
+                    .setLabel('Moderation')
+                    .setCustomId('moderateAccount')
+                    .setStyle(ButtonStyle.Primary)
+                    .setDisabled(!staff.hasPermission(Permission.ManageBans) && !staff.hasPermission(Permission.ManageNotes) && !staff.hasPermission(Permission.ManageReports) && !staff.hasPermission(Permission.ManageWatchlist))
+            );
 
         interaction.reply({ embeds: [embed], components: [row], flags: [MessageFlags.Ephemeral] });
     }

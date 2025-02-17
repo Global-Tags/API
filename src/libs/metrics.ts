@@ -60,7 +60,7 @@ export async function saveMetrics() {
     const tags = users.filter((user) => user.tag != null).length;
     const staff = users.filter((user) => {
         const adminRole = getCachedRoles().find((role) => role.name == config.metrics.adminRole);
-        return !!adminRole && user.getRoles().includes(adminRole);
+        return !!adminRole && user.getRoles().some((role) => role.role.name == adminRole.name);
     }).length;
     const bans = users.filter((user) => user.isBanned()).length;
     const positions = positionList.reduce((object: any, position) => {
@@ -102,7 +102,7 @@ export async function saveMetrics() {
 
 async function fetchAddon(namespace: string): Promise<Addon | null> {
     try {
-        const data = await axios.get(`https://flintmc.net/api/client-store/get-modification/${namespace}`, { headers: { 'Accept-Encoding': 'gzip' } });
+        const data = await axios.get(`https://flintmc.net/api/client-store/get-modification/${namespace}?now=${Date.now()}`, { headers: { 'Accept-Encoding': 'gzip' } });
         return data.data as Addon;
     } catch(error) {
         Logger.error(`Error while trying to fetch addon "${namespace}": ${error}`);

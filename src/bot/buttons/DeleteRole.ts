@@ -5,7 +5,7 @@ import players from "../../database/schemas/players";
 import { colors } from "../bot";
 import { getCachedRoles, updateRoleCache } from "../../database/schemas/roles";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { getProfileByUUID } from "../../libs/game-profiles";
+import { GameProfile } from "../../libs/game-profiles";
 
 export default class DeleteRole extends Button {
     constructor() {
@@ -22,7 +22,7 @@ export default class DeleteRole extends Button {
 
         sendModLogMessage({
             logType: ModLogType.DeleteRole,
-            staff: await getProfileByUUID(staff.uuid),
+            staff: await GameProfile.getProfileByUUID(staff.uuid),
             discord: true,
             role: role.name
         });

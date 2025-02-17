@@ -4,7 +4,7 @@ import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { getProfileByUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
 export default class CreateNote extends Modal {
     constructor() {
@@ -16,14 +16,14 @@ export default class CreateNote extends Modal {
         if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
         if(!staff.hasPermission(Permission.ManageNotes)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
 
-        const player = await players.findOne({ uuid: message.embeds[0].fields[0].value.replaceAll('`', '') });
+        const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
         const note = fields.getTextInputValue('note');
 
         sendModLogMessage({
             logType: ModLogType.CreateNote,
-            staff: await getProfileByUUID(staff.uuid),
-            user: await getProfileByUUID(player.uuid),
+            staff: await GameProfile.getProfileByUUID(staff.uuid),
+            user: await GameProfile.getProfileByUUID(player.uuid),
             discord: true,
             note
         });

@@ -5,6 +5,14 @@ import { Permission } from "../../types/Permission";
 import { getCachedRoles, Role } from "./roles";
 import { GlobalIcon } from "../../types/GlobalIcon";
 
+export type PlayerRole = {
+    role: Role,
+    added_at: Date,
+    manually_added: boolean,
+    expires_at?: Date | null,
+    reason?: string | null
+}
+
 export interface IPlayer {
     uuid: string,
     tag?: string | null,
@@ -33,7 +41,12 @@ export interface IPlayer {
         expires_at?: Date | null,
         reason?: string | null
     }[],
-    api_keys: string[],
+    api_keys: {
+        name: string,
+        key: string,
+        created_at: Date,
+        last_used?: Date | null
+    }[],
     notes: { id: string, text: string, author: string, createdAt: Date }[],
     bans: {
         appealable: boolean,
@@ -51,7 +64,7 @@ export interface IPlayer {
     },
     addReferral(uuid: string): void,
     isEmailVerified(): boolean,
-    getRoles(): Role[],
+    getRoles(): PlayerRole[],
     hasPermission(permission: Permission): boolean,
     canManagePlayers(): boolean,
     isBanned(): boolean,
@@ -59,6 +72,7 @@ export interface IPlayer {
     unban(): void,
     clearTag(staff: string): void,
     clearIcon(staff: string): void,
+    createApiKey(name: string): string,
     createNote({ text, author }: { text: string, author: string }): void,
     existsNote(id: string): boolean,
     deleteNote(id: string): void,
@@ -182,7 +196,21 @@ const schema = new Schema<IPlayer>({
         default: []
     },
     api_keys: {
-        type: [String],
+        type: [{
+            name: {
+                type: String,
+                required: true
+            },
+            key: {
+                type: String,
+                required: true
+            },
+            created_at: {
+                type: Date,
+                required: true
+            },
+            last_used: Date
+        }],
         required: true,
         default: []
     },
@@ -277,26 +305,37 @@ const schema = new Schema<IPlayer>({
             return this.connections.email.address && !this.connections.email.code;
         },
 
-        getRoles(): Role[] {
+        getRoles(): PlayerRole[] {
             return getCachedRoles().filter(({ name: role }) => {
                 role = snakeCase(role);
                 const playerRole = this.roles.find((playerRole) => snakeCase(playerRole.name) == role);
                 return playerRole && (!playerRole.expires_at || playerRole.expires_at.getTime() > Date.now());
+            }).map((role) => {
+                const name = snakeCase(role.name);
+                const playerRole = this.roles.find((playerRole) => snakeCase(playerRole.name) == name)!;
+
+                return {
+                    role,
+                    added_at: playerRole.added_at,
+                    manually_added: playerRole.manually_added,
+                    expires_at: playerRole.expires_at,
+                    reason: playerRole.reason
+                }
             });
         },
 
-        hasPermission(permission: Permission) {
-            return this.getRoles().some((role) => role.hasPermission(permission));
+        hasPermission(permission: Permission): boolean {
+            return this.getRoles().some((role) => role.role.hasPermission(permission));
         },
 
-        canManagePlayers() {
-            return this.getRoles().some((role) => [
+        canManagePlayers(): boolean {
+            return [
                 Permission.ManageBans,
                 Permission.ManageNotes,
                 Permission.ManageRoles,
                 Permission.ManageTags,
                 Permission.ManageWatchlist
-            ].some((permission) => role.hasPermission(permission)));
+            ].some((permission) => this.hasPermission(permission));
         },
 
         isBanned(): boolean {
@@ -340,6 +379,19 @@ const schema = new Schema<IPlayer>({
             })
             this.icon.name = snakeCase(GlobalIcon[GlobalIcon.None]);
             this.icon.hash = null;
+        },
+
+        createApiKey(name: string): string {
+            const key = `sk_${generateSecureCode(32)}`;
+            
+            this.api_keys.push({
+                name,
+                key: key,
+                created_at: new Date(),
+                last_used: null
+            });
+
+            return key;
         },
 
         createNote({ text, author }: { text: string, author: string }) {

@@ -1,4 +1,4 @@
-import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } from "discord.js";
+import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, parseEmoji } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
 import players from "../../database/schemas/players";
 import { colors, images } from "../bot";
@@ -30,30 +30,40 @@ export default class ManageRole extends SelectMenu {
         .setImage(images.placeholder)
         .setFooter({ text: role.name });
 
-        if(role.hasIcon) embed.setThumbnail(config.iconUrl(role.name));
+        if(role.hasIcon) embed.setThumbnail(config.roleIconUrl(role.name));
 
         const components = [
             new ActionRowBuilder<ButtonBuilder>()
-            .addComponents(
-                new ButtonBuilder()
-                .setLabel('Rename')
-                .setCustomId('renameRole')
-                .setStyle(ButtonStyle.Primary)
-                .setEmoji('🏷️'),
-                new ButtonBuilder()
-                .setLabel('Toggle Icon')
-                .setCustomId('toggleIcon')
-                .setStyle(ButtonStyle.Primary)
-                .setEmoji('🖼️'),
-                new ButtonBuilder()
-                .setLabel('Manage permissions')
-                .setCustomId('managePermissions')
-                .setStyle(ButtonStyle.Primary),
-                new ButtonBuilder()
-                .setLabel('Delete role')
-                .setCustomId('deleteRole')
-                .setStyle(ButtonStyle.Danger)
-            )
+                .addComponents(
+                    new ButtonBuilder()
+                        .setLabel('Rename')
+                        .setCustomId('renameRole')
+                        .setStyle(ButtonStyle.Primary)
+                        .setEmoji('🏷️'),
+                    new ButtonBuilder()
+                        .setLabel('Toggle Icon')
+                        .setCustomId('toggleIcon')
+                        .setStyle(ButtonStyle.Primary)
+                        .setEmoji('🖼️'),
+                    new ButtonBuilder()
+                        .setLabel('Manage permissions')
+                        .setCustomId('managePermissions')
+                        .setStyle(ButtonStyle.Primary)
+                        .setEmoji('🔒')
+                ),
+            new ActionRowBuilder<ButtonBuilder>()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setLabel('Set SKU')
+                        .setCustomId('setSku')
+                        .setStyle(ButtonStyle.Primary)
+                        .setEmoji('💳'),
+                    new ButtonBuilder()
+                        .setLabel('Delete role')
+                        .setCustomId('deleteRole')
+                        .setStyle(ButtonStyle.Danger)
+                        .setEmoji('🗑️')
+                )
         ];
 
         interaction.reply({ embeds: [EmbedBuilder.from(message.embeds[0]), embed], components, flags: [MessageFlags.Ephemeral] });

@@ -4,9 +4,10 @@ import getAuthProvider from "../../../middleware/get-auth-provider";
 import { sendEmail } from "../../../libs/mailer";
 import { randomBytes } from "crypto";
 import { config } from "../../../libs/config";
-import { sendDiscordLinkMessage, sendEmailLinkMessage } from "../../../libs/discord-notifier";
-import { getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { sendEmailLinkMessage } from "../../../libs/discord-notifier";
+import { GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
+import { onDiscordUnlink } from "../../../libs/events";
 
 export function generateSecureCode(length: number = 10) {
     return randomBytes(length).toString('hex').slice(0, length);
@@ -33,7 +34,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     response: {
         200: t.Object({ code: t.String() }, { description: 'You received a linking code' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage connections for this player' }),
-        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account.' }),
+        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account' }),
         409: t.Object({ error: t.String() }, { description: 'Account linking is deactivated / You already have a Discord account connected' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
@@ -49,11 +50,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     if(!player) return error(404, { error: i18n('error.noTag') });
     if(!player.connections.discord.id && !player.connections.discord.code) return error(409, { error: i18n('connections.discord.notConnected') });
 
-    sendDiscordLinkMessage(
-        await getProfileByUUID(player.uuid),
-        player.connections.discord.id!,
-        false
-    );
+    await onDiscordUnlink(await GameProfile.getProfileByUUID(player.uuid), player.connections.discord.id!);
 
     player.connections.discord.id = null;
     player.connections.discord.code = null;
@@ -68,7 +65,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     response: {
         200: t.Object({ message: t.String() }, { description: 'Your account was unlinked' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage connections for this player' }),
-        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account.' }),
+        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account' }),
         409: t.Object({ error: t.String() }, { description: 'Account linking is deactivated / You don\'t have a Discord account connected' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
@@ -112,7 +109,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     response: {
         200: t.Object({ message: t.String() }, { description: 'The verification email was sent' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage connections for this player' }),
-        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account.' }),
+        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account' }),
         409: t.Object({ error: t.String() }, { description: 'You already have an email address linked' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
@@ -133,7 +130,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     await player.save();
 
     sendEmailLinkMessage(
-        await getProfileByUUID(player.uuid),
+        await GameProfile.getProfileByUUID(player.uuid),
         config.discordBot.notifications.accountConnections.hideEmails ? null : player.connections.email.address!,
         true
     );
@@ -177,7 +174,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     if(!player.connections.email.address && !player.connections.email.code) return error(400, { error: i18n('connections.email.notConnected') });
 
     sendEmailLinkMessage(
-        await getProfileByUUID(player.uuid),
+        await GameProfile.getProfileByUUID(player.uuid),
         config.discordBot.notifications.accountConnections.hideEmails ? null : player.connections.email.address!,
         false
     );

@@ -3,7 +3,7 @@ import players from "../../../database/schemas/players";
 import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
 import { config } from "../../../libs/config";
 import { Permission } from "../../../types/Permission";
-import { formatUUID, getProfileByUUID, stripUUID } from "../../../libs/game-profiles";
+import { formatUUID, GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
 const { validation } = config;
@@ -77,8 +77,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     sendModLogMessage({
         logType: ModLogType.CreateNote,
-        staff: await getProfileByUUID(session.uuid!),
-        user: await getProfileByUUID(uuid),
+        staff: await GameProfile.getProfileByUUID(session.uuid!),
+        user: await GameProfile.getProfileByUUID(uuid),
         discord: false,
         note
     });
@@ -115,8 +115,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     sendModLogMessage({
         logType: ModLogType.DeleteNote,
-        staff: await getProfileByUUID(session.uuid!),
-        user: await getProfileByUUID(uuid),
+        staff: await GameProfile.getProfileByUUID(session.uuid!),
+        user: await GameProfile.getProfileByUUID(uuid),
         discord: false,
         note: note.text
     });
