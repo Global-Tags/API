@@ -1,7 +1,7 @@
 {
   "name": "globaltags",
   "private": true,
-  "version": "1.5.9",
+  "version": "1.6.0",
   "module": "src/index.ts",
   "scripts": {
     "dev": "NODE_ENV=dev bun --watch src/index.ts",
