@@ -19,7 +19,7 @@
     "cron": "^3.5.0",
     "discord.js": "^14.18.0",
     "dotenv": "^16.4.7",
-    "elysia": "1.2.12",
+    "elysia": "1.2.14",
     "elysia-ip": "^1.0.8",
     "jsonwebtoken": "^9.0.2",
     "minimist": "^1.2.8",
