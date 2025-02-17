@@ -3,7 +3,7 @@ import players from "../../../database/schemas/players";
 import Logger from "../../../libs/Logger";
 import { ModLogType, sendModLogMessage, sendWatchlistAddMessage, sendWatchlistTagUpdateMessage } from "../../../libs/discord-notifier";
 import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
-import { stripColors } from "../../../libs/chat-color";
+import { colorCodesWithSpaces, hexColorCodesWithSpaces, stripColors } from "../../../libs/chat-color";
 import { snakeCase } from "change-case";
 import { sendTagChangeEmail, sendTagClearEmail } from "../../../libs/mailer";
 import { saveLastLanguage } from "../../../libs/i18n";
@@ -112,6 +112,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     let notifyWatch = true;
     const gameProfile = await GameProfile.getProfileByUUID(uuid);
     if(!session.hasPermission(Permission.BypassValidation)) {
+        tag = tag.trim().replace(colorCodesWithSpaces, '').replace(hexColorCodesWithSpaces, '');
         const strippedTag = stripColors(tag);
         if(strippedTag == '') return error(422, { error: i18n('setTag.empty') });
         if(strippedTag.length < min || strippedTag.length > max) return error(422, { error: i18n('setTag.validation').replace('<min>', String(min)).replace('<max>', String(max)) });

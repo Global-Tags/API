@@ -1,4 +1,6 @@
-const colorCodes = /(&|§)[0-9A-FK-ORX]/gi;
+export const colorCodesWithSpaces = /(?<=(&|§)[0-9A-FK-ORX])\s+/gi;
+export const hexColorCodesWithSpaces = /(?<=<#[0-9a-fA-F]{1,8}>)\s+/gi;
+const colorCodes = /(&|§)[0-9A-FK-OR]/gi;
 const hexColorCodes = /<#[0-9a-fA-F]{1,8}>/gi;
 
 export function stripColors(text: string): string {
