@@ -99,14 +99,14 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
     code.uses.push(player.uuid);
     await code.save();
 
-    return { message: i18n(`gift_codes.redeemed_${expiration ? 'temporarily' : 'permanently'}`).replace('<role>', code.gift.value), expiresAt: expiration?.getTime() || null };
+    return { message: i18n(`gift_codes.redeemed_${expiration ? 'temporarily' : 'permanently'}`).replace('<role>', code.gift.value), expires_at: expiration?.getTime() || null };
 }, {
     detail: {
         tags: ['Gift codes'],
         description: 'Redeems a gift code'
     },
     response: {
-        200: t.Object({ message: t.String(), expiresAt: t.Union([t.Number(), t.Null()]) }, { description: 'The gift code was redeemed' }),
+        200: t.Object({ message: t.String(), expires_at: t.Union([t.Number(), t.Null()]) }, { description: 'The gift code was redeemed' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not authenticated' }),
         404: t.Object({ error: t.String() }, { description: 'The gift code was not found' }),
         409: t.Object({ error: t.String() }, { description: 'You already have the reward role' }),
