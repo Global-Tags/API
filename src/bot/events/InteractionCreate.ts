@@ -43,7 +43,7 @@ export default class InteractionCreate extends Event {
             }
         } else if(interaction.isModalSubmit()) {
             const { member, user, customId, fields, message } = interaction;
-            const modal = bot.modals.get(customId);
+            const modal = bot.modals.find((modal) => customId.startsWith(modal.id));
 
             if(!modal) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ Unknown modal!')], flags: [MessageFlags.Ephemeral] });
 

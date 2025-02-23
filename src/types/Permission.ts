@@ -4,6 +4,7 @@ export enum Permission {
     ManageBans,
     ManageApiKeys,
     ManageConnections,
+    ManageGiftCodes,
     ManageNotes,
     ManageReports,
     ManageRoles,
