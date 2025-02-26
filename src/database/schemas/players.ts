@@ -331,7 +331,10 @@ const schema = new Schema<IPlayer>({
         canManagePlayers(): boolean {
             return [
                 Permission.ManageBans,
+                Permission.ManageApiKeys,
+                Permission.ManageConnections,
                 Permission.ManageNotes,
+                Permission.ManageReports,
                 Permission.ManageRoles,
                 Permission.ManageTags,
                 Permission.ManageWatchlist
