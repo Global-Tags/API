@@ -104,7 +104,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ appealable: t.Optional(t.Boolean({ error: 'error.wrongType;;[["field", "appealable"], ["type", "boolean"]]' })), duration: t.Optional(t.Number({ error: 'error.wrongType;;[["field", "duration"], ["type", "number"]]' })), reason: t.String({ error: 'error.wrongType;;[["field", "reason"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
+    body: t.Object({ appealable: t.Optional(t.Boolean({ error: 'error.wrongType;;[["field", "appealable"], ["type", "boolean"]]' })), duration: t.Optional(t.Number({ error: 'error.wrongType;;[["field", "duration"], ["type", "number"]]' })), reason: t.String({ minLength: 1, error: 'error.wrongType;;[["field", "reason"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).patch('/', async ({ session, body: { appealable, reason }, params, i18n, error }) => { // Update ban info

@@ -70,7 +70,8 @@ const elysia = new Elysia()
                 { name: 'Interactions', description: 'Interact with other players' },
                 { name: 'Settings', description: 'Modify the settings of your GlobalTag' },
                 { name: 'Roles', description: 'Holds role management routes' },
-                { name: 'Admin', description: 'Moderation actions' },
+                { name: 'Gift codes', description: 'Holds gift code actions' },
+                { name: 'Admin', description: 'Admininstrative actions' },
                 { name: 'Connections', description: 'Manage account connections' }
             ]
         }

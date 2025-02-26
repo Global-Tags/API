@@ -25,7 +25,7 @@ export default class EditRoleExpiration extends Modal {
         const profile = await GameProfile.getProfileByUUID(player.uuid);
 
         const duration = fields.getTextInputValue('duration');
-        const expiresAt = duration.trim() != '' ? new Date(Date.now() + ms(duration as StringValue)): null;
+        const expiresAt = duration.trim() != '' ? new Date(Date.now() + ms(duration as StringValue)) : null;
         if(expiresAt && isNaN(expiresAt.getTime())) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Invalid expiration date!')], flags: [MessageFlags.Ephemeral] });
 
         sendModLogMessage({

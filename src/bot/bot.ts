@@ -28,6 +28,7 @@ export const colors = {
 
 export const images = {
     roles: 'https://cdn.rappytv.com/bots/globaltags/roles.png',
+    giftCodes: 'https://cdn.rappytv.com/bots/globaltags/codes.png',
     placeholder: 'https://cdn.rappytv.com/bots/placeholder.png'
 }
 

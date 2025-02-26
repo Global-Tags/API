@@ -24,6 +24,8 @@ export enum ModLogType {
     CreateApiKey,
     RegenerateApiKey,
     DeleteApiKey,
+    CreateGiftCode,
+    DeleteGiftCode,
     CreateNote,
     DeleteNote,
     DeleteReport,
@@ -85,6 +87,16 @@ type ModLogData = {
 } | {
     logType: ModLogType.CreateApiKey | ModLogType.RegenerateApiKey | ModLogType.DeleteApiKey,
     key: string
+} | {
+    logType: ModLogType.CreateGiftCode,
+    code: string,
+    role: string,
+    maxUses: number,
+    codeExpiration: Date | null,
+    giftDuration: number | null
+} | {
+    logType: ModLogType.DeleteGiftCode,
+    code: string
 } | {
     logType: ModLogType.CreateNote | ModLogType.DeleteNote,
     note: string
@@ -346,6 +358,8 @@ function modlogDescription(data: ModLogData): string | null {
     else if(type == ModLogType.ChangeIconType) return `\`${capitalCase(data.icons.old)}\` → \`${capitalCase(data.icons.new)}\``;
     else if(type == ModLogType.ClearIconTexture) return `[${data.hash}](${getCustomIconUrl(data.user!.uuid!, data.hash)})`;
     else if(type == ModLogType.CreateApiKey || type == ModLogType.RegenerateApiKey || type == ModLogType.DeleteApiKey) return `**Key name**: \`${data.key}\``;
+    else if(type == ModLogType.CreateGiftCode) return `**Name**: \`${data.code}\`. **Role**: \`${data.role}\`. **Max uses**: \`${data.maxUses}\`. **Code expires**: ${data.codeExpiration ? formatTimestamp(data.codeExpiration, 'R') : '`Never`'}. **Gift duration**: \`${data.giftDuration ? data.giftDuration.toString() : 'Permanent'}\``;
+    else if(type == ModLogType.DeleteGiftCode) return `\`${data.code}\``;
     else if(type == ModLogType.CreateNote || type == ModLogType.DeleteNote) return `\`${data.note}\``;
     else if(type == ModLogType.DeleteReport) return `\`${data.report}\``;
     else if(type == ModLogType.CreateRole) return `\`${data.role}\``;
