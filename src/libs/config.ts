@@ -74,6 +74,7 @@ export let config = {
         enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_ENABLED, false),
         token: process.env.GT_DISCORD_BOT_TOKEN || '',
         server: process.env.GT_DISCORD_BOT_SERVER || '',
+        boosterRole: process.env.GT_DISCORD_BOOSTER_ROLE || '',
         syncedRoles: {
             enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_SYNCED_ROLES_ENABLED, false),
             getRoles: (name: string) => process.env[`GT_DISCORD_BOT_SYNCED_ROLES_${constantCase(name)}`]?.split(',') || []
