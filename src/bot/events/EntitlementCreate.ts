@@ -27,7 +27,7 @@ export default class EntitlementCreate extends Event {
         );
 
         if(player) {
-            const { success } = player.addRole({ name: role.name, automated: true, reason: roleReason(entitlement.id) });
+            const { success } = player.addRole({ name: role.name, autoRemove: true, reason: roleReason(entitlement.id) });
             if(success) await player.save();
         }
     }

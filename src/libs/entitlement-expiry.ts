@@ -25,7 +25,7 @@ export async function checkExpiredEntitlements() {
 
         if(player) {
             let save = false;
-            const roles = player.getActiveRoles().filter((role) => role.role.sku == sku.id && !role.manually_added);
+            const roles = player.getActiveRoles().filter((role) => role.role.sku == sku.id && role.autoRemove);
             for(const role of roles) {
                 if(player.removeRole(role.role.name)) save = true;
             }

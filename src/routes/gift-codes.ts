@@ -69,7 +69,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
     if(!code || !code.isValid()) return error(404, { error: i18n('gift_codes.not_found') });
     if(code.uses.includes(player.uuid)) return error(422, { error: i18n('gift_codes.already_redeemed') });
 
-    const { success, expiresAt } = player.addRole({ name: code.gift.value, reason: `Gift code: ${code.code}`, automated: false, duration: code.gift.duration });
+    const { success, expiresAt } = player.addRole({ name: code.gift.value, reason: `Gift code: ${code.code}`, autoRemove: false, duration: code.gift.duration });
     if(!success) return error(409, { error: i18n('gift_codes.already_have_role') });
     code.uses.push(player.uuid);
     await player.save();

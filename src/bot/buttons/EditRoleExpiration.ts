@@ -29,7 +29,7 @@ export default class EditRoleExpiration extends Button {
             .setMaxLength(50)
             .setStyle(TextInputStyle.Short);
 
-        if(role.expires_at) input.setValue((role.expires_at.getTime() - Date.now()).toString());
+        if(role.expiresAt) input.setValue((role.expiresAt.getTime() - Date.now()).toString());
 
         interaction.showModal(
             new ModalBuilder()

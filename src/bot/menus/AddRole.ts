@@ -24,7 +24,7 @@ export default class AddRole extends SelectMenu {
         const addedAt = new Date();
         const reason = `Added by ${staffProfile.getUsernameOrUUID()}`;
         
-        const { success } = player.addRole({ name: roleName, automated: false, reason })
+        const { success } = player.addRole({ name: roleName, autoRemove: false, reason })
         if(!success) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is already active!')], flags: [MessageFlags.Ephemeral] });
         await player.save();
 
