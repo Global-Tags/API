@@ -116,6 +116,7 @@ Environment variables configure essential application settings. Below is a detai
     - **`GT_DISCORD_BOT_ENABLED`**: Enables or disables the Discord bot.
     - **`GT_DISCORD_BOT_TOKEN`**: Token used for bot authentication.
     - **`GT_DISCORD_BOT_SERVER`**: ID of the main Discord guild for various feature including role synchronization.
+    - **`GT_DISCORD_BOOSTER_ROLE`**: The GlobalTags role name for players who boost the server.
 
 - **Role Synchronization**
     - **`GT_DISCORD_BOT_SYNCED_ROLES_ENABLED`**: Enables role synchronization between GlobalTags and Discord.
