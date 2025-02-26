@@ -24,9 +24,9 @@ export default class EditRole extends SelectMenu {
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is not active!')], flags: [MessageFlags.Ephemeral] });
 
         const embed = EmbedBuilder.from(message.embeds[0])
-        .setTitle('Edit role properties')
-        .setDescription(`>>> **Note**: \`${role.reason || '-'}\`\n**Expiration**: ${role.expires_at ? `${formatTimestamp(role.expires_at)} (${formatTimestamp(role.expires_at, 'R')})` : '`-`'}`)
-        .setFooter({ text: values[0] });
+            .setTitle('Edit role properties')
+            .setDescription(`>>> **Note**: \`${role.reason || '-'}\`\n**Expiration**: ${role.expiresAt ? `${formatTimestamp(role.expiresAt)} (${formatTimestamp(role.expiresAt, 'R')})` : '`-`'}`)
+            .setFooter({ text: values[0] });
 
         const row = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(

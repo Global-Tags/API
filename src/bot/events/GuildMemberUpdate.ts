@@ -19,10 +19,10 @@ export default class InteractionCreate extends Event {
         if(!player) return;
 
         if(startedBoosting) {
-            if(player.addRole({ name: boosterRole, reason: 'Server boost', automated: true }).success) player.save();
+            if(player.addRole({ name: boosterRole, reason: 'Server boost', autoRemove: true }).success) player.save();
         } else if(stoppedBoosting) {
             const role = player.getRole(boosterRole);
-            if(role && !role.manually_added && player.removeRole(boosterRole)) player.save();
+            if(role && role.autoRemove && player.removeRole(boosterRole)) player.save();
         }
     }
 }

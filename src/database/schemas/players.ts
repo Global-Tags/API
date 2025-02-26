@@ -8,8 +8,8 @@ import { GlobalIcon } from "../../types/GlobalIcon";
 export type PlayerRole = {
     role: Role,
     added_at: Date,
-    manually_added: boolean,
-    expires_at?: Date | null,
+    autoRemove: boolean,
+    expiresAt?: Date | null,
     reason?: string | null
 }
 
@@ -37,7 +37,7 @@ export interface IPlayer {
     roles: {
         name: string,
         added_at: Date,
-        manually_added: boolean,
+        auto_remove: boolean,
         expires_at?: Date | null,
         reason?: string | null
     }[],
@@ -67,7 +67,7 @@ export interface IPlayer {
     getAllRoles(): PlayerRole[],
     getActiveRoles(): PlayerRole[],
     getRole(role: string): PlayerRole | null,
-    addRole(info: { name: string, reason: string, automated: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null },
+    addRole(info: { name: string, reason: string, autoRemove: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null },
     removeRole(role: string): boolean,
     hasPermission(permission: Permission): boolean,
     canManagePlayers(): boolean,
@@ -189,7 +189,7 @@ const schema = new Schema<IPlayer>({
                 type: Date,
                 required: true
             },
-            manually_added: {
+            auto_remove: {
                 type: Boolean,
                 required: true
             },
@@ -321,7 +321,7 @@ const schema = new Schema<IPlayer>({
                 return {
                     role,
                     added_at: playerRole.added_at,
-                    manually_added: playerRole.manually_added,
+                    autoRemove: playerRole.auto_remove,
                     expires_at: playerRole.expires_at,
                     reason: playerRole.reason
                 }
@@ -329,7 +329,7 @@ const schema = new Schema<IPlayer>({
         },
 
         getActiveRoles(): PlayerRole[] {
-            return this.getAllRoles().filter((role) => role.expires_at == null || role.expires_at.getTime() > Date.now());
+            return this.getAllRoles().filter((role) => role.expiresAt == null || role.expiresAt.getTime() > Date.now());
         },
 
         getRole(role: string): PlayerRole | null {
@@ -337,19 +337,19 @@ const schema = new Schema<IPlayer>({
             return this.getActiveRoles().find((playerRole) => playerRole.role.name == role) || null;
         },
 
-        addRole({ name, reason, automated, expiresAt, duration }: { name: string, reason: string, automated: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null } {
+        addRole({ name, reason, autoRemove, expiresAt, duration }: { name: string, reason: string, autoRemove: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null } {
             name = snakeCase(name);
             const role = this.roles.find((playerRole) => playerRole.name == name);
             if(role) {
                 if(!role.expires_at) return { success: false, expiresAt: null };
                 if(role.expires_at.getTime() > Date.now()) {
                     role.reason += ` | ${reason}`;
-                    role.manually_added = !automated;
+                    role.auto_remove = autoRemove;
                     role.expires_at = expiresAt ? expiresAt : duration ? new Date(role.expires_at.getTime() + duration) : null;
                     return { success: true, expiresAt: role.expires_at };
                 } else {
                     role.reason = reason;
-                    role.manually_added = !automated;
+                    role.auto_remove = autoRemove;
                     role.expires_at = expiresAt ? expiresAt : duration ? new Date(Date.now() + duration) : null;
                     return { success: true, expiresAt: role.expires_at };
                 }
@@ -358,7 +358,7 @@ const schema = new Schema<IPlayer>({
                     name,
                     reason,
                     added_at: new Date(),
-                    manually_added: !automated,
+                    auto_remove: autoRemove,
                     expires_at: expiresAt ? expiresAt : duration ? new Date(Date.now() + duration) : null
                 };
                 this.roles.push(role);

@@ -30,7 +30,7 @@ export default class Link extends Command {
         if(!code || !code.isValid()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Code not found!')], flags: [MessageFlags.Ephemeral] });
         if(code.uses.includes(player.uuid)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You already redeemed this code!')], flags: [MessageFlags.Ephemeral] });
 
-        const { success, expiresAt } = player.addRole({ name: code.gift.value, reason: `Gift code: ${code.code}`, automated: false, duration: code.gift.duration });
+        const { success, expiresAt } = player.addRole({ name: code.gift.value, reason: `Gift code: ${code.code}`, autoRemove: false, duration: code.gift.duration });
         if(!success) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You already have this role!')], flags: [MessageFlags.Ephemeral] });
         code.uses.push(player.uuid);
         await player.save();
