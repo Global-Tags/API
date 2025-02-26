@@ -20,7 +20,7 @@ export default class EditRole extends SelectMenu {
         const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
-        const role = player.roles.find(role => role.name == values[0]);
+        const role = player.getActiveRoles().find(role => role.role.name == values[0]);
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is not active!')], flags: [MessageFlags.Ephemeral] });
 
         const embed = EmbedBuilder.from(message.embeds[0])

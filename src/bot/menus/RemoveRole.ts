@@ -21,9 +21,9 @@ export default class RemoveRole extends SelectMenu {
 
         const roleName = values[0];
         
-        const role = player.roles.find(role => role.name == roleName);
-        if(!role || (role.expires_at && role.expires_at.getTime() < Date.now())) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is not active!')], flags: [MessageFlags.Ephemeral] });
-        role.expires_at = new Date();
+        const role = player.getActiveRoles().find(role => role.role.name == roleName);
+        if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is not active!')], flags: [MessageFlags.Ephemeral] });
+        player.removeRole(role.role.name);
         await player.save();
 
         sendModLogMessage({

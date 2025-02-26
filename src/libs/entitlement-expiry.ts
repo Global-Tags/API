@@ -3,7 +3,6 @@ import players from "../database/schemas/players";
 import { fetchSku } from "../bot/bot";
 import { isConnected } from "../database/mongo";
 import { sendEntitlementMessage } from "./discord-notifier";
-import { getCachedRoles } from "../database/schemas/roles";
 
 export async function checkExpiredEntitlements() {
     if(!isConnected()) return;
@@ -25,15 +24,12 @@ export async function checkExpiredEntitlements() {
         }
 
         if(player) {
-            const roles = player.roles.filter((playerRole) => 
-                getCachedRoles().find((role) => playerRole.name == role.name)?.sku == sku.id
-                && !playerRole.manually_added
-                && (!playerRole.expires_at || playerRole.expires_at.getTime() > Date.now())
-            );
+            let save = false;
+            const roles = player.getActiveRoles().filter((role) => role.role.sku == sku.id && !role.manually_added);
             for(const role of roles) {
-                role.expires_at = new Date();
-                await player.save();
+                if(player.removeRole(role.role.name)) save = true;
             }
+            if(save) await player.save();
         }
     }
 }

@@ -24,20 +24,8 @@ export default class AddRole extends SelectMenu {
         const addedAt = new Date();
         const reason = `Added by ${staffProfile.getUsernameOrUUID()}`;
         
-        const role = player.roles.find(role => role.name == roleName);
-        if(role) {
-            if(!role.expires_at || role.expires_at.getTime() > Date.now()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is already active!')], flags: [MessageFlags.Ephemeral] });
-            role.added_at = addedAt;
-            role.expires_at = null;
-            role.reason = reason;
-        } else {
-            player.roles.push({
-                name: roleName,
-                added_at: addedAt,
-                reason: reason,
-                manually_added: true
-            });
-        }
+        const { success } = player.addRole({ name: roleName, automated: false, reason })
+        if(!success) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is already active!')], flags: [MessageFlags.Ephemeral] });
         await player.save();
 
         sendModLogMessage({

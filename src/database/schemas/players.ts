@@ -64,7 +64,11 @@ export interface IPlayer {
     },
     addReferral(uuid: string): void,
     isEmailVerified(): boolean,
-    getRoles(): PlayerRole[],
+    getAllRoles(): PlayerRole[],
+    getActiveRoles(): PlayerRole[],
+    getRole(role: string): PlayerRole | null,
+    addRole(info: { name: string, reason: string, automated: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null },
+    removeRole(role: string): boolean,
     hasPermission(permission: Permission): boolean,
     canManagePlayers(): boolean,
     isBanned(): boolean,
@@ -305,7 +309,7 @@ const schema = new Schema<IPlayer>({
             return this.connections.email.address && !this.connections.email.code;
         },
 
-        getRoles(): PlayerRole[] {
+        getAllRoles(): PlayerRole[] {
             return getCachedRoles().filter(({ name: role }) => {
                 role = snakeCase(role);
                 const playerRole = this.roles.find((playerRole) => snakeCase(playerRole.name) == role);
@@ -324,8 +328,54 @@ const schema = new Schema<IPlayer>({
             });
         },
 
+        getActiveRoles(): PlayerRole[] {
+            return this.getAllRoles().filter((role) => role.expires_at == null || role.expires_at.getTime() > Date.now());
+        },
+
+        getRole(role: string): PlayerRole | null {
+            role = snakeCase(role);
+            return this.getActiveRoles().find((playerRole) => playerRole.role.name == role) || null;
+        },
+
+        addRole({ name, reason, automated, expiresAt, duration }: { name: string, reason: string, automated: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null } {
+            name = snakeCase(name);
+            const role = this.roles.find((playerRole) => playerRole.name == name);
+            if(role) {
+                if(!role.expires_at) return { success: false, expiresAt: null };
+                if(role.expires_at.getTime() > Date.now()) {
+                    role.reason += ` | ${reason}`;
+                    role.manually_added = !automated;
+                    role.expires_at = expiresAt ? expiresAt : duration ? new Date(role.expires_at.getTime() + duration) : null;
+                    return { success: true, expiresAt: role.expires_at };
+                } else {
+                    role.reason = reason;
+                    role.manually_added = !automated;
+                    role.expires_at = expiresAt ? expiresAt : duration ? new Date(Date.now() + duration) : null;
+                    return { success: true, expiresAt: role.expires_at };
+                }
+            } else {
+                const role = {
+                    name,
+                    reason,
+                    added_at: new Date(),
+                    manually_added: !automated,
+                    expires_at: expiresAt ? expiresAt : duration ? new Date(Date.now() + duration) : null
+                };
+                this.roles.push(role);
+                return { success: true, expiresAt: role.expires_at };
+            }
+        },
+
+        removeRole(role: string): boolean {
+            role = snakeCase(role);
+            const playerRole = this.roles.find((playerRole) => playerRole.name == role);
+            if(!playerRole) return false;
+            playerRole.expires_at = new Date();
+            return true;
+        },
+
         hasPermission(permission: Permission): boolean {
-            return this.getRoles().some((role) => role.role.hasPermission(permission));
+            return this.getActiveRoles().some((role) => role.role.hasPermission(permission));
         },
 
         canManagePlayers(): boolean {

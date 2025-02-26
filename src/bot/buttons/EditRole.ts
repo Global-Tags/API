@@ -19,7 +19,7 @@ export default class EditRole extends Button {
         const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
-        const options = player.getRoles().slice(0, 25).map(({ role: { name: role } }) => {
+        const options = player.getActiveRoles().slice(0, 25).map(({ role: { name: role } }) => {
             role = snakeCase(role);
             return {
                 label: capitalCase(role),

@@ -42,8 +42,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
             type: snakeCase(player.icon.name || GlobalIcon[GlobalIcon.None]),
             hash: player.icon.hash || null
         },
-        roleIcon: !player.hide_role_icon ? player.getRoles().find((role) => role.role.hasIcon)?.role.name || null : null,
-        roles: player.getRoles().map((role) => role.role.name),
+        roleIcon: !player.hide_role_icon ? player.getActiveRoles().find((role) => role.role.hasIcon)?.role.name || null : null,
+        roles: player.getActiveRoles().map((role) => role.role.name),
         permissions: permissions.filter((permission) => player.hasPermission(permission)).map((permission) => snakeCase(Permission[permission])),
         referrals: {
             has_referred: player.referrals.has_referred,

@@ -18,7 +18,7 @@ export default class EditRoleNote extends Button {
         const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
-        const role = player.roles.find(role => role.name == message.embeds[0].footer!.text);
+        const role = player.getActiveRoles().find((role) => role.role.name == message.embeds[0].footer!.text);
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is not active!')], flags: [MessageFlags.Ephemeral] });
 
         const input = new TextInputBuilder()

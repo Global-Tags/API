@@ -20,7 +20,7 @@ export default class EditRoleExpiration extends Modal {
         const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
-        const role = player.roles.find(role => role.name == message.embeds[0].footer!.text);
+        const role = player.getRole(message.embeds[0].footer!.text);
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is not active!')], flags: [MessageFlags.Ephemeral] });
         const profile = await GameProfile.getProfileByUUID(player.uuid);
 
@@ -33,7 +33,7 @@ export default class EditRoleExpiration extends Modal {
             staff: profile,
             user: await GameProfile.getProfileByUUID(player.uuid),
             discord: true,
-            role: role.name,
+            role: role.role.name,
             expires: expiresAt
         });
 

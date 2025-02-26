@@ -69,37 +69,13 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
     if(!code || !code.isValid()) return error(404, { error: i18n('gift_codes.not_found') });
     if(code.uses.includes(player.uuid)) return error(422, { error: i18n('gift_codes.already_redeemed') });
 
-    let expiration: Date | null = null;
-    const role = player.roles.find(role => role.name == code.gift.value);
-    if(role) {
-        if(!role.expires_at) return error(409, { error: i18n('gift_codes.already_have_role') });
-        if(role.expires_at.getTime() > Date.now()) {
-            expiration = code.gift.duration ? new Date(role.expires_at.getTime() + code.gift.duration) : null;
-            role.reason += ` | Gift code: ${code.code}`;
-            role.expires_at = expiration;
-            await player.save();
-        } else {
-            expiration = code.gift.duration ? new Date(Date.now() + code.gift.duration) : null;
-            role.expires_at = expiration;
-            role.manually_added = false;
-            role.reason = `Gift code: ${code.code}`;
-            await player.save();
-        }
-    } else {
-        expiration = code.gift.duration ? new Date(Date.now() + code.gift.duration) : null;
-        player.roles.push({
-            name: code.gift.value,
-            added_at: new Date(),
-            manually_added: false,
-            reason: `Gift code: ${code.code}`,
-            expires_at: expiration
-        });
-        await player.save();
-    }
+    const { success, expiresAt } = player.addRole({ name: code.gift.value, reason: `Gift code: ${code.code}`, automated: false, duration: code.gift.duration });
+    if(!success) return error(409, { error: i18n('gift_codes.already_have_role') });
     code.uses.push(player.uuid);
+    await player.save();
     await code.save();
 
-    return { message: i18n(`gift_codes.redeemed_${expiration ? 'temporarily' : 'permanently'}`).replace('<role>', code.gift.value), expires_at: expiration?.getTime() || null };
+    return { message: i18n(`gift_codes.redeemed_${expiresAt ? 'temporarily' : 'permanently'}`).replace('<role>', code.gift.value), expires_at: expiresAt?.getTime() || null };
 }, {
     detail: {
         tags: ['Gift codes'],

@@ -20,12 +20,11 @@ export default class AddRole extends Button {
         const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
-        const options = getCachedRoles().filter((role) => !player.getRoles().some((r) => r.role.name == role.name)).slice(0, 25).map(({ name: role }) => {
+        const options = getCachedRoles().filter((role) => !player.getActiveRoles().some((r) => r.role.name == role.name)).slice(0, 25).map(({ name: role }) => {
             role = snakeCase(role);
             return {
                 label: capitalCase(role),
-                value: role,
-                default: player.getRoles().some((r) => snakeCase(r.role.name) == role)
+                value: role
             }
         });
 

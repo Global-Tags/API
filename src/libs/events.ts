@@ -20,14 +20,12 @@ export async function onDiscordLink(player: GameProfile, userId: string) {
         for(const entitlement of entitlements.values()) {
             const role = getCachedRoles().find((role) => role.sku == entitlement.skuId);
             if(role) {
-                playerData.roles.push({
+                save = playerData.addRole({
                     name: role.name,
-                    added_at: new Date(),
-                    manually_added: false,
-                    expires_at: entitlement.endsAt,
+                    automated: true,
+                    expiresAt: entitlement.endsAt,
                     reason: `Discord entitlement: ${entitlement.id}`
-                });
-                save = true;
+                }).success;
             }
         }
         if(save) await playerData.save();
@@ -56,7 +54,7 @@ export function onDiscordUnlink(player: GameProfile, userId: string): Promise<vo
         member.roles.remove(config.discordBot.notifications.accountConnections.role);
         const playerData = await players.findOne({ 'connections.discord.id': userId });
         if(playerData) {
-            for(const role of playerData.getRoles()) {
+            for(const role of playerData.getActiveRoles()) {
                 const syncedRoles = role.role.getSyncedRoles();
                 if(syncedRoles.length == 0) continue;
                 for(const syncedRole of syncedRoles) {

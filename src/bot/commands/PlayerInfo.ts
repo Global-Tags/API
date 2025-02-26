@@ -35,7 +35,7 @@ export default class PlayerInfo extends Command {
         }
         const strippedUUID = stripUUID(uuid);
         const data = await players.findOne({ uuid: strippedUUID });
-        const roles = data?.getRoles() || [];
+        const roles = data?.getActiveRoles() || [];
 
         if(!data) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ This player is not in our records!')] });
         const staff = await players.findOne({ 'connections.discord.id': user.id });
