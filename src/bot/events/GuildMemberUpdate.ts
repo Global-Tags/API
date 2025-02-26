@@ -13,15 +13,16 @@ export default class InteractionCreate extends Event {
         const stoppedBoosting = oldMember.premiumSince && !newMember.premiumSince;
         
         if(!startedBoosting && !stoppedBoosting) return;
-        const role = config.discordBot.boosterRole;
-        if(role.trim().length == 0) return;
+        const boosterRole = config.discordBot.boosterRole;
+        if(boosterRole.trim().length == 0) return;
         const player = await players.findOne({ 'connections.discord.id': newMember.id });
         if(!player) return;
 
         if(startedBoosting) {
-            if(player.addRole({ name: role, reason: 'Server boost', automated: true }).success) player.save();
+            if(player.addRole({ name: boosterRole, reason: 'Server boost', automated: true }).success) player.save();
         } else if(stoppedBoosting) {
-            if(player.removeRole(role)) player.save();
+            const role = player.getRole(boosterRole);
+            if(role && !role.manually_added && player.removeRole(boosterRole)) player.save();
         }
     }
 }

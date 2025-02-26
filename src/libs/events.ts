@@ -13,6 +13,10 @@ export async function onDiscordLink(player: GameProfile, userId: string) {
         true
     );
 
+    const guild = await fetchGuild();
+    const member = await guild?.members.fetch(userId);
+    if(member) member.roles.add(config.discordBot.notifications.accountConnections.role);
+
     const playerData = await players.findOne({ 'connections.discord.id': userId });
     if(playerData) {
         let save = false;
@@ -20,23 +24,22 @@ export async function onDiscordLink(player: GameProfile, userId: string) {
         for(const entitlement of entitlements.values()) {
             const role = getCachedRoles().find((role) => role.sku == entitlement.skuId);
             if(role) {
-                save = playerData.addRole({
+                if(playerData.addRole({
                     name: role.name,
                     automated: true,
                     expiresAt: entitlement.endsAt,
                     reason: `Discord entitlement: ${entitlement.id}`
-                }).success;
+                }).success) save = true;
             }
+        }
+        if(member?.premiumSince) {
+            const role = config.discordBot.boosterRole;
+            if(role.trim().length == 0) return;
+            if(playerData.addRole({ name: role, reason: 'Server boost', automated: true }).success) save = true;
         }
         if(save) await playerData.save();
         synchronizeRoles();
     }
-
-    const guild = await fetchGuild();
-    if(!guild) return;
-    const member = await guild.members.fetch(userId);
-    if(!member) return;
-    member.roles.add(config.discordBot.notifications.accountConnections.role);
 }
 
 export function onDiscordUnlink(player: GameProfile, userId: string): Promise<void> {
@@ -52,8 +55,15 @@ export function onDiscordUnlink(player: GameProfile, userId: string): Promise<vo
         const member = await guild.members.fetch(userId);
         if(!member) return;
         member.roles.remove(config.discordBot.notifications.accountConnections.role);
+
         const playerData = await players.findOne({ 'connections.discord.id': userId });
         if(playerData) {
+            if(member.premiumSince) {
+                const boosterRole = config.discordBot.boosterRole;
+                if(boosterRole.trim().length == 0) return;
+                const role = playerData.getRole(boosterRole);
+                if(role && !role.manually_added && playerData.removeRole(boosterRole)) playerData.save();
+            }
             for(const role of playerData.getActiveRoles()) {
                 const syncedRoles = role.role.getSyncedRoles();
                 if(syncedRoles.length == 0) continue;
