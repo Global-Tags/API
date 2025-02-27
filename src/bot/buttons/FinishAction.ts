@@ -2,7 +2,7 @@ import { ButtonInteraction, CacheType, Message, GuildMember, User, ActionRowBuil
 import Button from "../structs/Button";
 import { colors } from "../bot";
 import players from "../../database/schemas/players";
-import { stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
 export default class FinishAction extends Button {
     constructor() {
@@ -18,7 +18,7 @@ export default class FinishAction extends Button {
         row.components.forEach(component => component.setDisabled(true));
 
         const embed = EmbedBuilder.from(message.embeds[0]);
-        embed.setFooter({ text: `Processed by ${user.username}`, iconURL: `https://laby.net/texture/profile/head/${stripUUID(staff.uuid)}.png?size=1024&overlay` });
+        embed.setFooter({ text: `Processed by ${(await GameProfile.getProfileByUUID(staff.uuid)).username || user.username}`, iconURL: `https://laby.net/texture/profile/head/${stripUUID(staff.uuid)}.png?size=1024&overlay` });
 
         message.edit({ embeds: [embed], components: [row] });
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ Action completed!')], flags: [MessageFlags.Ephemeral] });
