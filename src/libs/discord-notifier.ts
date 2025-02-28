@@ -5,6 +5,7 @@ import { getCustomIconUrl } from "../routes/players/[uuid]/icon";
 import { capitalCase, pascalCase, sentenceCase } from "change-case";
 import { config } from "./config";
 import { translateToAnsi } from "./chat-color";
+import { GiftCode } from "../database/schemas/gift-codes";
 
 export enum ModLogType {
     ChangeTag,
@@ -331,6 +332,53 @@ export function sendCustomIconUploadMessage(user: GameProfile, hash: string) {
         channel: config.discordBot.notifications.customIcons.channel,
         content: null,
         embed
+    });
+}
+
+export function sendGiftCodeRedeemMessage(user: GameProfile, code: GiftCode, expiresAt?: Date | null) {
+    if(!config.discordBot.notifications.giftCodes.enabled) return;
+
+    const embed = new EmbedBuilder()
+        .setColor(bot.colors.standart)
+        .setTitle('🎁 Gift code redeemed')
+        .addFields([
+            {
+                name: 'Player:',
+                value: user.getFormattedHyperlink(),
+                inline: true
+            },
+            {
+                name: 'Gift code:',
+                value: `\`\`\`${code.name}\`\`\``,
+                inline: true
+            },
+            {
+                name: 'Uses:',
+                value: `\`\`\`${code.uses.length}/${code.max_uses}\`\`\``,
+                inline: true
+            },
+            {
+                name: 'Gift type:',
+                value: `\`\`\`${capitalCase(code.gift.type)}\`\`\``,
+                inline: true
+            },
+            {
+                name: 'Gift value:',
+                value: `\`\`\`${code.gift.value}\`\`\``,
+                inline: true
+            },
+            {
+                name: 'Gift expires:',
+                value: `${expiresAt ? `${formatTimestamp(expiresAt)} (${formatTimestamp(expiresAt, 'R')})` : '```-```'}`,
+                inline: true
+            }
+        ]);
+
+    sendMessage({
+        channel: config.discordBot.notifications.giftCodes.channel,
+        content: null,
+        embed,
+        actionButton: false
     });
 }
 

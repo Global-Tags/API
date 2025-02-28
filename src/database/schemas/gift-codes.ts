@@ -1,7 +1,7 @@
-import { Schema, model as createModel } from "mongoose";
+import { HydratedDocument, Schema, model as createModel } from "mongoose";
 import { generateSecureCode } from "../../routes/players/[uuid]/connections";
 
-interface IGiftCode {
+export interface IGiftCode {
     name: string,
     code: string,
     uses: string[],
@@ -15,6 +15,7 @@ interface IGiftCode {
     expires_at?: Date | null,
     isValid(): boolean
 }
+export type GiftCode = HydratedDocument<IGiftCode>;
 
 const schema = new Schema<IGiftCode>({
     name: {

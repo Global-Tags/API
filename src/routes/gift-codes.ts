@@ -1,7 +1,7 @@
 import { t } from "elysia";
 import { Permission } from "../types/Permission";
 import { ElysiaApp } from "..";
-import { ModLogType, sendModLogMessage } from "../libs/discord-notifier";
+import { ModLogType, sendGiftCodeRedeemMessage, sendModLogMessage } from "../libs/discord-notifier";
 import { formatUUID, GameProfile } from "../libs/game-profiles";
 import giftCodes, { createGiftCode } from "../database/schemas/gift-codes";
 import players from "../database/schemas/players";
@@ -74,6 +74,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
     code.uses.push(player.uuid);
     await player.save();
     await code.save();
+    
+    sendGiftCodeRedeemMessage(await GameProfile.getProfileByUUID(player.uuid), code, expiresAt);
 
     return { message: i18n(`gift_codes.redeemed_${expiresAt ? 'temporarily' : 'permanently'}`).replace('<role>', code.gift.value), expires_at: expiresAt?.getTime() || null };
 }, {

@@ -3,8 +3,9 @@ import Command from "../structs/Command";
 import players from "../../database/schemas/players";
 import { colors, images } from "../bot";
 import giftCodes from "../../database/schemas/gift-codes";
-import { formatTimestamp } from "../../libs/discord-notifier";
+import { formatTimestamp, sendGiftCodeRedeemMessage } from "../../libs/discord-notifier";
 import { capitalCase } from "change-case";
+import { GameProfile } from "../../libs/game-profiles";
 
 export default class Link extends Command {
     constructor() {
@@ -35,6 +36,8 @@ export default class Link extends Command {
         code.uses.push(player.uuid);
         await player.save();
         await code.save();
+
+        sendGiftCodeRedeemMessage(await GameProfile.getProfileByUUID(player.uuid), code, expiresAt);
 
         const header = new EmbedBuilder()
             .setColor(colors.standart)
