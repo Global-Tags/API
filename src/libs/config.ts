@@ -116,6 +116,10 @@ export let config = {
             entitlements: {
                 enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_ENTITLEMENTS_ENABLED, false),
                 channel: process.env.GT_DISCORD_BOT_ENTITLEMENTS_CHANNEL || ''
+            },
+            giftCodes: {
+                enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_GIFT_CODES_ENABLED, false),
+                channel: process.env.GT_DISCORD_BOT_GIFT_CODES_CHANNEL || ''
             }
         }
     }
