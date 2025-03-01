@@ -289,7 +289,7 @@ export function sendReferralMessage(inviter: GameProfile, invited: GameProfile) 
 
     sendMessage({
         channel: config.discordBot.notifications.referrals.channel,
-        content: `${inviter.getFormattedHyperlink()} has invited ${inviter.getFormattedHyperlink()}.`,
+        content: `${inviter.getFormattedHyperlink()} has invited ${invited.getFormattedHyperlink()}.`,
         embed: null,
         actionButton: false
     });
