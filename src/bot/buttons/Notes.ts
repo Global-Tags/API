@@ -4,6 +4,7 @@ import { colors } from "../bot";
 import players from "../../database/schemas/players";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
+import { formatTimestamp } from "../../libs/discord-notifier";
 
 export default class Notes extends Button {
     constructor() {
@@ -22,7 +23,7 @@ export default class Notes extends Button {
         const notes = [];
 
         for(const note of player.notes) {
-            notes.push(`**${(await GameProfile.getProfileByUUID(note.author)).getUsernameOrUUID()}**: \`${note.text}\` [<t:${note.createdAt.getTime() / 1000 | 0}:R>]`);
+            notes.push(`**${(await GameProfile.getProfileByUUID(note.author)).getUsernameOrUUID()}**: \`${note.text}\` [${formatTimestamp(note.createdAt, 'R')}]`);
         }
 
         const embed = EmbedBuilder.from(message.embeds[0])

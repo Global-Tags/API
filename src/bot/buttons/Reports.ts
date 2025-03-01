@@ -4,6 +4,7 @@ import { colors } from "../bot";
 import players from "../../database/schemas/players";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
+import { formatTimestamp } from "../../libs/discord-notifier";
 
 export default class Reports extends Button {
     constructor() {
@@ -22,7 +23,7 @@ export default class Reports extends Button {
         const reports = [];
 
         for(const report of player.reports) {
-            reports.push(`**${(await GameProfile.getProfileByUUID(report.by)).getUsernameOrUUID()}**: \`${report.reported_tag}\` - \`${report.reason}\` [<t:${report.created_at.getTime() / 1000 | 0}:R>]`);
+            reports.push(`**${(await GameProfile.getProfileByUUID(report.by)).getUsernameOrUUID()}**: \`${report.reported_tag}\` - \`${report.reason}\` [${formatTimestamp(report.created_at, 'R')}]`);
         }
 
         const embed = EmbedBuilder.from(message.embeds[0])
