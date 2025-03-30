@@ -23,11 +23,14 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         if(!session?.uuid) return error(403, { error: i18n('error.notAllowed') });
     }
     const showBan = session?.equal || session?.hasPermission(Permission.ManageBans) || false;
+    const showRoleIconVisibility = session?.equal || session?.hasPermission(Permission.ManageRoles) || false;
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return error(404, { error: i18n('error.playerNoTag') });
 
-    if(snakeCase(player.icon.name) == snakeCase(GlobalIcon[GlobalIcon.Custom])) {
+    const playerIcon = snakeCase(player.icon.name);
+
+    if(playerIcon == snakeCase(GlobalIcon[GlobalIcon.Custom])) {
         if(!player.hasPermission(Permission.CustomIcon)) {
             player.icon.name = snakeCase(GlobalIcon[GlobalIcon.None]);
             await player.save();
@@ -39,10 +42,11 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         tag: player.isBanned() ? null : player.tag || null,
         position: snakeCase(player.position || GlobalPosition[GlobalPosition.Above]),
         icon: {
-            type: snakeCase(player.icon.name || GlobalIcon[GlobalIcon.None]),
+            type: playerIcon,
             hash: player.icon.hash || null
         },
         roleIcon: !player.hide_role_icon ? player.getActiveRoles().find((role) => role.role.hasIcon)?.role.name || null : null,
+        hideRoleIcon: showRoleIconVisibility ? player.hide_role_icon : false,
         roles: player.getActiveRoles().map((role) => role.role.name),
         permissions: permissions.filter((permission) => player.hasPermission(permission)).map((permission) => snakeCase(Permission[permission])),
         referrals: {
@@ -69,7 +73,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         description: 'Returns a players\' tag info'
     },
     response: {
-        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referrals: t.Object({ has_referred: t.Boolean(), total_referrals: t.Integer(), current_month_referrals: t.Integer() }), roleIcon: t.Union([t.String(), t.Null()]), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ appealable: t.Boolean(), appealed: t.Boolean(), banned_at: t.Number(), expires_at: t.Union([t.Number(), t.Null()]), id: t.String(), reason: t.Union([t.String(), t.Null()]), staff: t.String() }), t.Null()]) }, { description: 'The tag data' }),
+        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referrals: t.Object({ has_referred: t.Boolean(), total_referrals: t.Integer(), current_month_referrals: t.Integer() }), roleIcon: t.Union([t.String(), t.Null()]), hideRoleIcon: t.Boolean(), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ appealable: t.Boolean(), appealed: t.Boolean(), banned_at: t.Number(), expires_at: t.Union([t.Number(), t.Null()]), id: t.String(), reason: t.Union([t.String(), t.Null()]), staff: t.String() }), t.Null()]) }, { description: 'The tag data' }),
         403: t.Object({ error: t.String() }, { description: 'The player is banned' }),
         404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
