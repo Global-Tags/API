@@ -1,6 +1,11 @@
 import { CommandInteractionOptionResolver, EmbedBuilder, GuildMember, Interaction, MessageFlags } from "discord.js";
 import Event from "../structs/Event";
 import * as bot from "../bot";
+import { captureException } from "@sentry/bun";
+
+const errorEmbed = new EmbedBuilder()
+    .setColor(bot.colors.error)
+    .setDescription('❌ An error ocurred! Our team has been notified.');
 
 export default class InteractionCreate extends Event {
     constructor() {
@@ -10,25 +15,27 @@ export default class InteractionCreate extends Event {
     async fire(interaction: Interaction) {
         if(interaction.isChatInputCommand()) {
             const { member, user, commandName, options } = interaction;
-            const cmd = bot.commands.get(commandName);
+            const command = bot.commands.get(commandName);
 
-            if(!cmd) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ Unknown command!')], flags: [MessageFlags.Ephemeral] });
+            if(!command) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ Unknown command!')], flags: [MessageFlags.Ephemeral] });
 
             try {
-                cmd.execute(interaction, options as CommandInteractionOptionResolver, member as GuildMember, user);
+                command.execute(interaction, options as CommandInteractionOptionResolver, member as GuildMember, user);
             } catch(err: any) {
-                if(!interaction.replied) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setTitle('❌ An error ocurred!').setDescription(err)], flags: [MessageFlags.Ephemeral] });
+                captureException(err);
+                interaction.replied ? interaction.followUp({ embeds: [errorEmbed], flags: [MessageFlags.Ephemeral] }) : interaction.reply({ embeds: [errorEmbed], flags: [MessageFlags.Ephemeral] });
             }
         } else if(interaction.isButton()) {
             const { member, user, customId, message } = interaction;
-            const btn = bot.buttons.get(customId);
+            const button = bot.buttons.get(customId);
 
-            if(!btn) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ Unknown button!')], flags: [MessageFlags.Ephemeral] });
+            if(!button) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ Unknown button!')], flags: [MessageFlags.Ephemeral] });
 
             try {
-                btn.trigger(interaction, message, member as GuildMember, user);
+                button.trigger(interaction, message, member as GuildMember, user);
             } catch(err: any) {
-                if(!interaction.replied) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setTitle('❌ An error ocurred!').setDescription(err)], flags: [MessageFlags.Ephemeral] });
+                captureException(err);
+                interaction.replied ? interaction.followUp({ embeds: [errorEmbed], flags: [MessageFlags.Ephemeral] }) : interaction.reply({ embeds: [errorEmbed], flags: [MessageFlags.Ephemeral] });
             }
         } else if(interaction.isStringSelectMenu()) {
             const { member, user, customId, values, message } = interaction;
@@ -39,7 +46,8 @@ export default class InteractionCreate extends Event {
             try {
                 menu.selection(interaction, message!, values, member as GuildMember, user);
             } catch(err: any) {
-                if(!interaction.replied) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setTitle('❌ An error ocurred!').setDescription(err)], flags: [MessageFlags.Ephemeral] });
+                captureException(err);
+                interaction.replied ? interaction.followUp({ embeds: [errorEmbed], flags: [MessageFlags.Ephemeral] }) : interaction.reply({ embeds: [errorEmbed], flags: [MessageFlags.Ephemeral] });
             }
         } else if(interaction.isModalSubmit()) {
             const { member, user, customId, fields, message } = interaction;
@@ -50,7 +58,8 @@ export default class InteractionCreate extends Event {
             try {
                 modal.submit(interaction, message!, fields, member as GuildMember, user);
             } catch(err: any) {
-                if(!interaction.replied) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setTitle('❌ An error ocurred!').setDescription(err)], flags: [MessageFlags.Ephemeral] });
+                captureException(err);
+                interaction.replied ? interaction.followUp({ embeds: [errorEmbed], flags: [MessageFlags.Ephemeral] }) : interaction.reply({ embeds: [errorEmbed], flags: [MessageFlags.Ephemeral] });
             }
         }
     }
