@@ -1,15 +1,18 @@
-import { CommandInteraction, CommandInteractionOptionResolver, GuildMember, User } from "discord.js";
+import { CommandInteraction, CommandInteractionOptionResolver, GuildMember } from "discord.js";
+import { Player } from "../../database/schemas/players";
+import Interaction, { InteractionOptions } from "./Interaction";
 
-export default abstract class Command {
+export default abstract class Command extends Interaction {
     public name: string;
     public description: string;
     public options: any;
 
-    constructor(name: string, description: string, options: any) {
+    constructor({ name, description, options = [], requiredPermissions, requireDiscordLink }: { name: string, description: string, options?: any } & InteractionOptions) {
+        super({ requiredPermissions, requireDiscordLink });
         this.name = name;
         this.description = description;
         this.options = options;
     }
 
-    public abstract execute(interaction: CommandInteraction, options: CommandInteractionOptionResolver, member: GuildMember, user: User): any;
+    public abstract execute(interaction: CommandInteraction, options: CommandInteractionOptionResolver, member: GuildMember, player: Player | null): any;
 }

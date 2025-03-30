@@ -1,6 +1,6 @@
-import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, User } from "discord.js";
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember } from "discord.js";
 import Command from "../structs/Command";
-import players from "../../database/schemas/players";
+import players, { Player } from "../../database/schemas/players";
 import * as bot from "../bot";
 import { translateToAnsi } from "../../libs/chat-color";
 import { formatUUID, GameProfile, stripUUID } from "../../libs/game-profiles";
@@ -9,21 +9,22 @@ export const uuidRegex = /[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}|[a-f0-9]{8}(
 
 export default class PlayerInfo extends Command {
     constructor() {
-        super(
-            "playerinfo",
-            "Fetches GlobalTag data about a player.",
-            [
+        super({
+            name: 'playerinfo',
+            description: 'Fetches GlobalTag data about a player.',
+            options: [
                 {
                     name: 'player',
                     description: 'Either the player name or the player\'s minecraft uuid.',
                     required: true,
                     type: ApplicationCommandOptionType.String
                 }
-            ]
-        );
+            ],
+            allowWhenBanned: true
+        });
     }
 
-    async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, user: User) {
+    async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, player: Player | null) {
         await interaction.deferReply();
         let name, uuid = options.getString('player', true);
         if(!uuidRegex.test(uuid)) {
@@ -38,7 +39,6 @@ export default class PlayerInfo extends Command {
         const roles = data?.getActiveRoles() || [];
 
         if(!data) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ This player is not in our records!')] });
-        const staff = await players.findOne({ 'connections.discord.id': user.id });
         interaction.editReply({
             embeds: [
                 new EmbedBuilder()
@@ -76,7 +76,7 @@ export default class PlayerInfo extends Command {
                     .setImage('https://cdn.rappytv.com/bots/placeholder.png')
                     .setFooter({ text: `© RappyTV, ${new Date().getFullYear()}`})
             ],
-            components: staff && staff.canManagePlayers() ? [
+            components: player && player.canManagePlayers() ? [
                 new ActionRowBuilder<ButtonBuilder>()
                     .addComponents(
                         new ButtonBuilder()

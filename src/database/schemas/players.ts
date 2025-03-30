@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { HydratedDocument, Schema, model } from "mongoose";
 import { snakeCase } from "change-case";
 import { generateSecureCode } from "../../routes/players/[uuid]/connections";
 import { Permission } from "../../types/Permission";
@@ -83,6 +83,8 @@ export interface IPlayer {
     createReport({ by, reported_tag, reason }: { by: string, reported_tag: string, reason: string }): void,
     deleteReport(id: string): void
 }
+
+export type Player = HydratedDocument<IPlayer>;
 
 const schema = new Schema<IPlayer>({
     uuid: {

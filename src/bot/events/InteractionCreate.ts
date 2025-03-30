@@ -2,6 +2,8 @@ import { CommandInteractionOptionResolver, EmbedBuilder, GuildMember, Interactio
 import Event from "../structs/Event";
 import * as bot from "../bot";
 import { captureException } from "@sentry/bun";
+import players from "../../database/schemas/players";
+import { config } from "../../libs/config";
 
 const errorEmbed = new EmbedBuilder()
     .setColor(bot.colors.error)
@@ -13,14 +15,22 @@ export default class InteractionCreate extends Event {
     }
 
     async fire(interaction: Interaction) {
+        const player = await players.findOne({ 'connections.discord.id': interaction.user.id });
+
         if(interaction.isChatInputCommand()) {
-            const { member, user, commandName, options } = interaction;
+            const { member, commandName, options } = interaction;
             const command = bot.commands.get(commandName);
 
             if(!command) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ Unknown command!')], flags: [MessageFlags.Ephemeral] });
+            if(command.requireDiscordLink) {
+                if(!config.discordBot.notifications.accountConnections.enabled) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ Account linking is deactivated!')] });
+                if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
+                if(command.requiredPermissions.some(perm => !player.hasPermission(perm))) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
+            }
+            if(player?.isBanned() && !command.allowWhenBanned) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ You are banned!')], flags: [MessageFlags.Ephemeral] });
 
             try {
-                command.execute(interaction, options as CommandInteractionOptionResolver, member as GuildMember, user);
+                command.execute(interaction, options as CommandInteractionOptionResolver, member as GuildMember, player);
             } catch(err: any) {
                 captureException(err);
                 interaction.replied ? interaction.followUp({ embeds: [errorEmbed], flags: [MessageFlags.Ephemeral] }) : interaction.reply({ embeds: [errorEmbed], flags: [MessageFlags.Ephemeral] });

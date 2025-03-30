@@ -1,32 +1,30 @@
-import { ApplicationCommandOptionType, CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags, User } from "discord.js";
+import { ApplicationCommandOptionType, CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
 import Command from "../structs/Command";
-import players from "../../database/schemas/players";
+import players, { Player } from "../../database/schemas/players";
 import { colors, images } from "../bot";
 import giftCodes from "../../database/schemas/gift-codes";
 import { formatTimestamp, sendGiftCodeRedeemMessage } from "../../libs/discord-notifier";
 import { capitalCase } from "change-case";
 import { GameProfile } from "../../libs/game-profiles";
 
-export default class Link extends Command {
+export default class Redeem extends Command {
     constructor() {
-        super(
-            'redeem',
-            'Redeem a gift code.',
-            [
+        super({
+            name: 'redeem',
+            description: 'Redeem a gift code.',
+            options: [
                 {
                     name: 'code',
                     description: 'The code you want to redeem.',
                     type: ApplicationCommandOptionType.String,
                     required: true
                 }
-            ]
-        );
+            ],
+            requireDiscordLink: true
+        });
     }
 
-    async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, user: User) {
-        const player = await players.findOne({ 'connections.discord.id': user.id });
-        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
-
+    async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, player: Player) {
         const code = await giftCodes.findOne({ code: options.getString('code', true) });
         if(!code || !code.isValid()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Code not found!')], flags: [MessageFlags.Ephemeral] });
         if(code.uses.includes(player.uuid)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You already redeemed this code!')], flags: [MessageFlags.Ephemeral] });

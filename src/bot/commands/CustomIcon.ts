@@ -1,6 +1,6 @@
-import { ApplicationCommandOptionType, CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags, User } from "discord.js";
+import { ApplicationCommandOptionType, CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
 import Command from "../structs/Command";
-import players from "../../database/schemas/players";
+import { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { join } from 'path';
 import axios from "axios";
@@ -14,10 +14,10 @@ import { snakeCase } from "change-case";
 
 export default class CustomIcon extends Command {
     constructor() {
-        super(
-            "icon",
-            "Manage your custom icon if you're a partner or financial supporter.",
-            [
+        super({
+            name: 'icon',
+            description: 'Manage your custom icon if you\'re a partner or financial supporter.',
+            options: [
                 {
                     name: 'toggle',
                     description: 'Toggle your custom icon on or off.',
@@ -50,18 +50,13 @@ export default class CustomIcon extends Command {
                     type: ApplicationCommandOptionType.Subcommand,
                     options: []
                 }
-            ]
-        );
+            ],
+            requiredPermissions: [Permission.CustomIcon]
+        });
     }
 
-    async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, user: User) {
+    async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, player: Player) {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
-        if(!config.discordBot.notifications.accountConnections.enabled) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Account linking is deactivated!')] });
-
-        const player = await players.findOne({ 'connections.discord.id': user.id });
-        if(!player) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Your account is not linked to a Minecraft account!')] });
-        if(player.isBanned()) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Your account is banned!')] });
-        if(!player.hasPermission(Permission.CustomIcon)) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to have a custom icon!')] });
         const sub = options.getSubcommand();
 
         if(sub == 'toggle') {

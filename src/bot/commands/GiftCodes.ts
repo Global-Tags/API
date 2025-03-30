@@ -1,25 +1,21 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags, User } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
 import Command from "../structs/Command";
-import players from "../../database/schemas/players";
+import { Player } from "../../database/schemas/players";
 import { colors, images } from "../bot";
 import { Permission } from "../../types/Permission";
 import giftCodes from "../../database/schemas/gift-codes";
 import { formatTimestamp } from "../../libs/discord-notifier";
 
-export default class Link extends Command {
+export default class GiftCodes extends Command {
     constructor() {
-        super(
-            'gift-codes',
-            'Manage gift codes.',
-            []
-        );
+        super({
+            name: 'gift-codes',
+            description: 'Manage gift codes.',
+            requiredPermissions: [Permission.ManageGiftCodes]
+        });
     }
 
-    async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, user: User) {
-        const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
-        if(!staff.hasPermission(Permission.ManageGiftCodes)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
-
+    async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, player: Player) {
         const codes = await giftCodes.find();
         const codeMap = codes.filter((code) => code.isValid()).map((code) => 
             `↝ \`${code.name}\` [||**${code.code}**||] - \`${code.uses.length}/${code.max_uses}\` Uses${code.expires_at ? ` (Expires ${formatTimestamp(code.expires_at, 'R')})` : ''}`
