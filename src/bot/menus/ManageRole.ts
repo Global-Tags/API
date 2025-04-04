@@ -1,6 +1,6 @@
-import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, parseEmoji } from "discord.js";
+import { StringSelectMenuInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, parseEmoji } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
-import players from "../../database/schemas/players";
+import { Player } from "../../database/schemas/players";
 import { colors, images } from "../bot";
 import { Permission, permissions as allPermissions } from "../../types/Permission";
 import { getCachedRoles } from "../../database/schemas/roles";
@@ -9,14 +9,14 @@ import { config } from "../../libs/config";
 
 export default class ManageRole extends SelectMenu {
     constructor() {
-        super('manageRole');
+        super({
+            id: 'manageRole',
+            requiredPermissions: [Permission.ManageRoles]
+        });
     }
 
-    async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, user: User) {
+    async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: Player) {
         if(values.length == 0) return interaction.deferUpdate();
-        const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
-        if(!staff.hasPermission(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
 
         const role = getCachedRoles().find((role) => role.name == values[0]);
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
@@ -24,7 +24,7 @@ export default class ManageRole extends SelectMenu {
         const permissions = role.getPermissions();
 
         const embed = new EmbedBuilder()
-        .setColor(colors.standart)
+        .setColor(colors.gray)
         .setTitle(`Edit **${capitalCase(role.name)}**`)
         .setDescription(`**ID**: \`${role.name}\`\n**Position**: \`${role.position}\`\n**Has Icon**: \`${role.hasIcon ? '✅' : '❌'}\`\n**Metrics admin**: \`${role.name == config.metrics.adminRole ? '✅' : '❌'}\`\n**Permissions** [\`${permissions.length}\`]:\n>>> ${allPermissions.map((permission) => `- ${pascalCase(Permission[permission])}: \`${role.hasPermission(permission) ? '✅' : '❌'}\``).join('\n')}`)
         .setImage(images.placeholder)

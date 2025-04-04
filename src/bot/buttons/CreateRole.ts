@@ -1,13 +1,18 @@
-import { ButtonInteraction, CacheType, Message, GuildMember, User, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ButtonInteraction, Message, GuildMember, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import Button from "../structs/Button";
 import { config } from "../../libs/config";
+import { Permission } from "../../types/Permission";
+import { Player } from "../../database/schemas/players";
 
 export default class CreateRole extends Button {
     constructor() {
-        super('createRole');
+        super({
+            id: 'createRole',
+            requiredPermissions: [Permission.ManageRoles]
+        });
     }
 
-    public trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
+    public trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         const modal = new ModalBuilder()
         .setTitle('Create role')
         .setCustomId('createRole')

@@ -1,12 +1,17 @@
-import { ButtonInteraction, Message, GuildMember, User, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ButtonInteraction, Message, GuildMember, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import Button from "../structs/Button";
+import { Permission } from "../../types/Permission";
+import { Player } from "../../database/schemas/players";
 
 export default class CreateApiKey extends Button {
     constructor() {
-        super('createApiKey');
+        super({
+            id: 'createApiKey',
+            requiredPermissions: [Permission.ManageApiKeys]
+        });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, user: User) {
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         const modal = new ModalBuilder()
             .setTitle('Create API key')
             .setCustomId('createApiKey')

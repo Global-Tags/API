@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags, User } from "discord.js";
+import { ApplicationCommandOptionType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags, User } from "discord.js";
 import Command from "../structs/Command";
 import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
@@ -23,7 +23,7 @@ export default class Link extends Command {
         });
     }
 
-    async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, player: Player | null) {
+    async execute(interaction: CommandInteraction, options: CommandInteractionOptionResolver, member: GuildMember, player: Player | null) {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
         if(!config.discordBot.notifications.accountConnections.enabled) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Account linking is deactivated!')] });
         const code = options.getString('code', true);

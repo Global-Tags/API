@@ -1,4 +1,4 @@
-import { CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags, User } from "discord.js";
+import { CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags, User } from "discord.js";
 import Command from "../structs/Command";
 import { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
@@ -15,7 +15,7 @@ export default class Unlink extends Command {
         });
     }
 
-    async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, player: Player) {
+    async execute(interaction: CommandInteraction, options: CommandInteractionOptionResolver, member: GuildMember, player: Player) {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
         await onDiscordUnlink(await GameProfile.getProfileByUUID(player.uuid), player.connections.discord.id!);

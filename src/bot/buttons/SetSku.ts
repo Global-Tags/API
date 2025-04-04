@@ -22,7 +22,7 @@ export default class SetSku extends Button {
         if(skus.length == 0) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ No SKUs found!')], flags: [MessageFlags.Ephemeral] });
 
         const embed = new EmbedBuilder()
-        .setColor(colors.standart)
+        .setColor(colors.gray)
         .setTitle(`Select an SKU for \`${role.name}\``)
         .setImage(images.placeholder)
         .setFooter({ text: role.name });

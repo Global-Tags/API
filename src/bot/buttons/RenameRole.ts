@@ -1,15 +1,20 @@
-import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle, MessageFlags } from "discord.js";
+import { ButtonInteraction, Message, GuildMember, EmbedBuilder, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import { colors } from "../bot";
 import { getCachedRoles } from "../../database/schemas/roles";
 import { config } from "../../libs/config";
+import { Permission } from "../../types/Permission";
+import { Player } from "../../database/schemas/players";
 
 export default class RenameRole extends Button {
     constructor() {
-        super('renameRole');
+        super({
+            id: 'renameRole',
+            requiredPermissions: [Permission.ManageRoles]
+        });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, user: User) {
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         const role = getCachedRoles().find((role) => role.name == message.embeds[1].footer!.text);
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
 

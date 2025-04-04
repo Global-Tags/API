@@ -1,12 +1,17 @@
-import { ButtonInteraction, CacheType, Message, GuildMember, User, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ButtonInteraction, Message, GuildMember, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import Button from "../structs/Button";
+import { Permission } from "../../types/Permission";
+import { Player } from "../../database/schemas/players";
 
 export default class Ban extends Button {
     constructor() {
-        super('ban');
+        super({
+            id: 'ban',
+            requiredPermissions: [Permission.ManageBans]
+        });
     }
 
-    public trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
+    public trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         const modal = new ModalBuilder()
             .setTitle('Ban player')
             .setCustomId('ban')

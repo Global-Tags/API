@@ -1,19 +1,18 @@
-import { StringSelectMenuInteraction, Message, GuildMember, User, EmbedBuilder, MessageFlags, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { StringSelectMenuInteraction, Message, GuildMember, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
-import players from "../../database/schemas/players";
-import { colors } from "../bot";
+import { Player } from "../../database/schemas/players";
 import { Permission } from "../../types/Permission";
 
 export default class CreateGiftCode extends SelectMenu {
     constructor() {
-        super('createGiftCode');
+        super({
+            id: 'createGiftCode',
+            requiredPermissions: [Permission.ManageApiKeys]
+        });
     }
 
-    async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, user: User) {
+    async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: Player) {
         if(values.length == 0) return interaction.deferUpdate();
-        const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
-        if(!staff.hasPermission(Permission.ManageApiKeys)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
 
         const modal = new ModalBuilder()
             .setTitle('Create gift code')

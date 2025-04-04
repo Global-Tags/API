@@ -1,5 +1,5 @@
-import { CacheType, Message, GuildMember, User, EmbedBuilder, ModalSubmitInteraction, ModalSubmitFields, MessageFlags } from "discord.js";
-import players from "../../database/schemas/players";
+import { Message, GuildMember, User, EmbedBuilder, ModalSubmitInteraction, ModalSubmitFields, MessageFlags } from "discord.js";
+import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
@@ -10,36 +10,35 @@ import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
 export default class SetTag extends Modal {
     constructor() {
-        super('setTag');
+        super({
+            id: 'setTag',
+            requiredPermissions: [Permission.ManageTags]
+        });
     }
 
-    async submit(interaction: ModalSubmitInteraction<CacheType>, message: Message<boolean>, fields: ModalSubmitFields, member: GuildMember, user: User) {
-        const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
-        if(!staff.hasPermission(Permission.ManageTags)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
-
-        const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
-        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
+    async submit(interaction: ModalSubmitInteraction, message: Message, fields: ModalSubmitFields, member: GuildMember, player: Player) {
+        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
         const tag = fields.getTextInputValue('tag').trim();
-        const oldTag = player.tag;
+        const oldTag = target.tag;
         if(tag == oldTag) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The tag is already set to this value!')], flags: [MessageFlags.Ephemeral] });
 
         sendModLogMessage({
             logType: ModLogType.ChangeTag,
-            staff: await GameProfile.getProfileByUUID(staff.uuid),
-            user: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await GameProfile.getProfileByUUID(player.uuid),
+            user: await GameProfile.getProfileByUUID(target.uuid),
             tags: {
-                old: player.tag || 'None',
+                old: target.tag || 'None',
                 new: tag
             },
             discord: true
         });
 
-        player.tag = tag;
-        player.save();
+        target.tag = tag;
+        target.save();
 
-        if(player.isEmailVerified()) {
-            sendTagChangeEmail(player.connections.email.address!, oldTag || '---', tag, getI18nFunctionByLanguage(player.last_language));
+        if(target.isEmailVerified()) {
+            sendTagChangeEmail(target.connections.email.address!, oldTag || '---', tag, getI18nFunctionByLanguage(target.last_language));
         }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The tag was successfully set!')], flags: [MessageFlags.Ephemeral] });

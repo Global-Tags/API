@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember } from "discord.js";
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember } from "discord.js";
 import Command from "../structs/Command";
 import players, { Player } from "../../database/schemas/players";
 import * as bot from "../bot";
@@ -24,7 +24,7 @@ export default class PlayerInfo extends Command {
         });
     }
 
-    async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, player: Player | null) {
+    async execute(interaction: CommandInteraction, options: CommandInteractionOptionResolver, member: GuildMember, player: Player | null) {
         await interaction.deferReply();
         let name, uuid = options.getString('player', true);
         if(!uuidRegex.test(uuid)) {
@@ -42,7 +42,7 @@ export default class PlayerInfo extends Command {
         interaction.editReply({
             embeds: [
                 new EmbedBuilder()
-                    .setColor(bot.colors.standart)
+                    .setColor(bot.colors.gray)
                     .setThumbnail(`https://laby.net/texture/profile/head/${strippedUUID}.png?size=1024&overlay`)
                     .setAuthor({ name: formatUUID(uuid) })
                     .setURL(`https://laby.net/${uuid}`)

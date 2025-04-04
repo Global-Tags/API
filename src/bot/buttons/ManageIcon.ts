@@ -1,6 +1,6 @@
-import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } from "discord.js";
+import { ButtonInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
-import players from "../../database/schemas/players";
+import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { snakeCase } from "change-case";
 import { getCustomIconUrl } from "../../routes/players/[uuid]/icon";
@@ -11,29 +11,28 @@ import { stripUUID } from "../../libs/game-profiles";
 
 export default class ManageIcon extends Button {
     constructor() {
-        super('manageIcon');
+        super({
+            id: 'manageIcon',
+            requiredPermissions: [Permission.ManageTags]
+        });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, user: User) {
-        const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
-        if(!staff.hasPermission(Permission.ManageTags)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
-        
-        const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
-        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const embed = EmbedBuilder.from(message.embeds[0])
             .setTitle('Manage icon')
             .setDescription('Here you can edit the player\'s icon type and texture.');
 
-        const icon = snakeCase(player.icon.name);
+        const icon = snakeCase(target.icon.name);
         if(icon != snakeCase(GlobalIcon[GlobalIcon.None])) {
             if(icon == snakeCase(GlobalIcon[GlobalIcon.Custom])) {
-                if(!!player.icon.hash) {
-                    embed.setThumbnail(getCustomIconUrl(player.uuid, player.icon.hash));
+                if(!!target.icon.hash) {
+                    embed.setThumbnail(getCustomIconUrl(target.uuid, target.icon.hash));
                 }
             } else {
-                embed.setThumbnail(config.iconUrl(player.icon.name));
+                embed.setThumbnail(config.iconUrl(target.icon.name));
             }
         }
 

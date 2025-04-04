@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
 import Command from "../structs/Command";
 import { Player } from "../../database/schemas/players";
 import { colors, images } from "../bot";
@@ -15,18 +15,18 @@ export default class GiftCodes extends Command {
         });
     }
 
-    async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, player: Player) {
+    async execute(interaction: CommandInteraction, options: CommandInteractionOptionResolver, member: GuildMember, player: Player) {
         const codes = await giftCodes.find();
         const codeMap = codes.filter((code) => code.isValid()).map((code) => 
             `↝ \`${code.name}\` [||**${code.code}**||] - \`${code.uses.length}/${code.max_uses}\` Uses${code.expires_at ? ` (Expires ${formatTimestamp(code.expires_at, 'R')})` : ''}`
         ).join('\n');
 
         const header = new EmbedBuilder()
-            .setColor(colors.standart)
+            .setColor(colors.gray)
             .setImage(images.giftCodes)
 
         const embed = new EmbedBuilder()
-            .setColor(colors.standart)
+            .setColor(colors.gray)
             .setTitle('🎁 Gift codes')
             .setDescription(`**Active gift codes**\n${codeMap.length == 0 ? '*No active gift codes.*' : codeMap}`)
             .setImage(images.placeholder);

@@ -1,6 +1,6 @@
-import { ModalSubmitInteraction, CacheType, Message, ModalSubmitFields, GuildMember, User, EmbedBuilder, MessageFlags } from "discord.js";
+import { ModalSubmitInteraction, Message, ModalSubmitFields, GuildMember, EmbedBuilder, MessageFlags } from "discord.js";
 import Modal from "../structs/Modal";
-import players from "../../database/schemas/players";
+import { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 import ms, { StringValue } from "ms";
@@ -10,14 +10,13 @@ import { GameProfile } from "../../libs/game-profiles";
 
 export default class CreateGiftCode extends Modal {
     constructor() {
-        super('createGiftCode_');
+        super({
+            id: 'createGiftCode_',
+            requiredPermissions: [Permission.ManageGiftCodes]
+        });
     }
 
-    async submit(interaction: ModalSubmitInteraction<CacheType>, message: Message<boolean>, fields: ModalSubmitFields, member: GuildMember, user: User) {
-        const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
-        if(!staff.hasPermission(Permission.ManageBans)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
-
+    async submit(interaction: ModalSubmitInteraction, message: Message, fields: ModalSubmitFields, member: GuildMember, player: Player) {
         const name = fields.getTextInputValue('name');
         const role = interaction.customId.split('_')[1];
         const maxUses = parseInt(fields.getTextInputValue('uses') || '1');
@@ -45,7 +44,7 @@ export default class CreateGiftCode extends Modal {
 
         sendModLogMessage({
             logType: ModLogType.CreateGiftCode,
-            staff: await GameProfile.getProfileByUUID(staff.uuid),
+            staff: await GameProfile.getProfileByUUID(player.uuid),
             discord: true,
             code: name,
             role,

@@ -7,8 +7,8 @@ export default abstract class Command extends Interaction {
     public description: string;
     public options: any;
 
-    constructor({ name, description, options = [], requiredPermissions, requireDiscordLink }: { name: string, description: string, options?: any } & InteractionOptions) {
-        super({ requiredPermissions, requireDiscordLink });
+    constructor({ name, description, options = [], allowWhenBanned, requiredPermissions, requireDiscordLink }: { name: string, description: string, options?: any } & InteractionOptions) {
+        super({ allowWhenBanned, requiredPermissions, requireDiscordLink });
         this.name = name;
         this.description = description;
         this.options = options;

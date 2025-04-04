@@ -21,11 +21,11 @@ export default class RolesCommand extends Command {
         const roles = getCachedRoles();
 
         const header = new EmbedBuilder()
-            .setColor(colors.standart)
+            .setColor(colors.gray)
             .setImage(images.roles);
 
         const embed = new EmbedBuilder()
-            .setColor(colors.standart)
+            .setColor(colors.gray)
             .setTitle('Manage roles')
             .addFields(roles.slice(0, 25).map((role) => ({
                 name: `🎭 ${capitalCase(role.name)} (\`${role.name}\`)`,

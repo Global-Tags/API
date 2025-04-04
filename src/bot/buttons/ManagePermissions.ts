@@ -1,26 +1,25 @@
-import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, MessageFlags } from "discord.js";
+import { ButtonInteraction, Message, GuildMember, EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import { Permission, permissions } from "../../types/Permission";
-import players from "../../database/schemas/players";
+import { Player } from "../../database/schemas/players";
 import { colors, images } from "../bot";
 import { getCachedRoles } from "../../database/schemas/roles";
 import { capitalCase } from "change-case";
 
 export default class ManagePermissions extends Button {
     constructor() {
-        super('managePermissions');
+        super({
+            id: 'managePermissions',
+            requiredPermissions: [Permission.ManageRoles]
+        });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, user: User) {
-        const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
-        if(!staff.hasPermission(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
-
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         const role = getCachedRoles().find((role) => role.name == message.embeds[1].footer!.text);
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
 
         const embed = new EmbedBuilder()
-        .setColor(colors.standart)
+        .setColor(colors.gray)
         .setTitle(`Select roles for \`${role.name}\``)
         .setImage(images.placeholder)
         .setFooter({ text: role.name });

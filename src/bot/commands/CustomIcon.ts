@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, CacheType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
+import { ApplicationCommandOptionType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
 import Command from "../structs/Command";
 import { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
@@ -55,7 +55,7 @@ export default class CustomIcon extends Command {
         });
     }
 
-    async execute(interaction: CommandInteraction<CacheType>, options: CommandInteractionOptionResolver<CacheType>, member: GuildMember, player: Player) {
+    async execute(interaction: CommandInteraction, options: CommandInteractionOptionResolver, member: GuildMember, player: Player) {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
         const sub = options.getSubcommand();
 

@@ -171,7 +171,7 @@ export function sendWatchlistAddMessage({ user, tag, word }: { user: GameProfile
         channel: config.discordBot.notifications.watchlist.channel,
         content: config.discordBot.notifications.watchlist.content,
         embed: new EmbedBuilder()
-        .setColor(0x5865f2)
+        .setColor(bot.colors.blurple)
         .setTitle('New watched player')
         .addFields([
             {
@@ -197,7 +197,7 @@ export function sendWatchlistTagUpdateMessage(user: GameProfile, tag: string) {
         channel: config.discordBot.notifications.watchlist.channel,
         content: config.discordBot.notifications.watchlist.content,
         embed: new EmbedBuilder()
-            .setColor(0x5865f2)
+            .setColor(bot.colors.blurple)
             .setThumbnail(`https://laby.net/texture/profile/head/${user.uuid}.png?size=1024&overlay`)
             .setTitle('New tag change')
             .addFields([
@@ -220,7 +220,7 @@ export function sendBanAppealMessage(user: GameProfile, reason: string) {
         channel: config.discordBot.notifications.banAppeals.channel,
         content: config.discordBot.notifications.banAppeals.content,
         embed: new EmbedBuilder()
-            .setColor(0x5865f2)
+            .setColor(bot.colors.blurple)
             .setThumbnail(`https://laby.net/texture/profile/head/${user.uuid}.png?size=1024&overlay`)
             .setTitle('New ban appeal')
             .addFields([
@@ -243,7 +243,7 @@ export function sendDiscordLinkMessage(user: GameProfile, userId: string, connec
         channel: config.discordBot.notifications.accountConnections.channel,
         content: null,
         embed: new EmbedBuilder()
-            .setColor(0x5865f2)
+            .setColor(bot.colors.blurple)
             .setThumbnail(`https://laby.net/texture/profile/head/${user.uuid}.png?size=1024&overlay`)
             .setTitle(connected ? 'New discord connection' : 'Discord connection removed')
             .addFields([
@@ -267,7 +267,7 @@ export function sendEmailLinkMessage(user: GameProfile, email: string | null, co
         channel: config.discordBot.notifications.accountConnections.channel,
         content: null,
         embed: new EmbedBuilder()
-            .setColor(0x5865f2)
+            .setColor(bot.colors.blurple)
             .setThumbnail(`https://laby.net/texture/profile/head/${user.uuid}.png?size=1024&overlay`)
             .setTitle(connected ? 'New email connection' : 'Email connection removed')
             .addFields([
@@ -299,7 +299,7 @@ export function sendEntitlementMessage(uuid: string, description: string, head: 
     if(!config.discordBot.notifications.entitlements.enabled) return;
 
     const embed = new EmbedBuilder()
-        .setColor(bot.colors.standart)
+        .setColor(bot.colors.gray)
         .setTitle('💵 Entitlement update')
         .setDescription(description);
 
@@ -317,7 +317,7 @@ export function sendCustomIconUploadMessage(user: GameProfile, hash: string) {
     if(!config.discordBot.notifications.customIcons.enabled) return;
 
     const embed = new EmbedBuilder()
-        .setColor(bot.colors.standart)
+        .setColor(bot.colors.gray)
         .setTitle(':frame_photo: New icon upload')
         .setDescription(`Hash: [\`${hash}\`](<${getCustomIconUrl(user.uuid!, hash)}>)`)
         .addFields([
@@ -339,7 +339,7 @@ export function sendGiftCodeRedeemMessage(user: GameProfile, code: GiftCode, exp
     if(!config.discordBot.notifications.giftCodes.enabled) return;
 
     const embed = new EmbedBuilder()
-        .setColor(bot.colors.standart)
+        .setColor(bot.colors.gray)
         .setTitle('🎁 Gift code redeemed')
         .addFields([
             {

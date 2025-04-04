@@ -1,17 +1,21 @@
-import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, MessageFlags } from "discord.js";
+import { ButtonInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
-import players from "../../database/schemas/players";
+import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { stripUUID } from "../../libs/game-profiles";
+import { Permission } from "../../types/Permission";
 
 export default class SetTag extends Button {
     constructor() {
-        super('setTag');
+        super({
+            id: 'setTag',
+            requiredPermissions: [Permission.ManageTags]
+        });
     }
 
-    async trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
-        const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
-        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const input = new TextInputBuilder()
             .setLabel('New tag')
@@ -20,7 +24,7 @@ export default class SetTag extends Button {
             .setRequired(true)
             .setStyle(TextInputStyle.Short);
 
-        if(player.tag) input.setValue(player.tag);
+        if(target.tag) input.setValue(target.tag);
 
         const modal = new ModalBuilder()
             .setTitle('Set new tag')
