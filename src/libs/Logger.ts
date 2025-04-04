@@ -14,24 +14,24 @@ export default class Logger {
         return chalk.gray(`[${moment(new Date()).format('YYYY-MM-DD HH:mm:ss')}]`);
     }
     
-    public static debug(text: any) {
+    public static debug(...text: any) {
         if(LogLevel.Debug > Logger.getLoglevel()) return;
-        console.log(Logger.getTimestamp(), chalk.blueBright('[DEBUG]'), text);
+        console.log(Logger.getTimestamp(), chalk.blueBright('[DEBUG]'), ...text);
     }
 
-    public static info(text: any) {
+    public static info(...text: any) {
         if(LogLevel.Info > Logger.getLoglevel()) return;
-        console.log(Logger.getTimestamp(), chalk.blue('[INFO]'), text);
+        console.log(Logger.getTimestamp(), chalk.blue('[INFO]'), ...text);
     }
 
-    public static warn(text: any) {
+    public static warn(...text: any) {
         if(LogLevel.Warn > Logger.getLoglevel()) return;
-        console.log(Logger.getTimestamp(), chalk.yellow('[WARN]'), text);
+        console.log(Logger.getTimestamp(), chalk.yellow('[WARN]'), ...text);
     }
 
-    public static error(text: any) {
+    public static error(...text: any) {
         if(LogLevel.Error > Logger.getLoglevel()) return;
-        console.log(Logger.getTimestamp(), chalk.red('[ERROR]'), text);
+        console.log(Logger.getTimestamp(), chalk.red('[ERROR]'), ...text);
     }
 
     public static getLoglevel(): LogLevel {
