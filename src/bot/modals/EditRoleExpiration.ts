@@ -19,25 +19,22 @@ export default class EditRoleExpiration extends Modal {
         const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
-        const role = target.roles.find((role) => role.name == message.embeds[0].footer!.text);
-        if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is not active!')], flags: [MessageFlags.Ephemeral] });
-        const profile = await GameProfile.getProfileByUUID(target.uuid);
-
         const duration = fields.getTextInputValue('duration');
         const expiresAt = duration.trim() != '' ? new Date(Date.now() + ms(duration as StringValue)) : null;
         if(expiresAt && isNaN(expiresAt.getTime())) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Invalid expiration date!')], flags: [MessageFlags.Ephemeral] });
+        const name = message.embeds[0].footer!.text;
+
+        if(!target.setRoleExpiration(name, expiresAt)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is not active!')], flags: [MessageFlags.Ephemeral] });
+        target.save();
 
         sendModLogMessage({
             logType: ModLogType.SetRoleExpiration,
-            staff: profile,
+            staff: await GameProfile.getProfileByUUID(player.uuid),
             user: await GameProfile.getProfileByUUID(target.uuid),
             discord: true,
-            role: role.name,
+            role: name,
             expires: expiresAt
         });
-
-        role.expires_at = expiresAt;
-        target.save();
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The expiration date was successfully updated!')], flags: [MessageFlags.Ephemeral] });
     }

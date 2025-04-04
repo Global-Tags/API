@@ -68,6 +68,8 @@ export interface IPlayer {
     getActiveRoles(): PlayerRole[],
     getRole(role: string): PlayerRole | null,
     addRole(info: { name: string, reason: string, autoRemove: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null },
+    setRoleExpiration(name: string, expiration: Date | null): boolean,
+    setRoleNote(name: string, note: string | null): boolean,
     removeRole(role: string): boolean,
     hasPermission(permission: Permission): boolean,
     canManagePlayers(): boolean,
@@ -366,6 +368,20 @@ const schema = new Schema<IPlayer>({
                 this.roles.push(role);
                 return { success: true, expiresAt: role.expires_at };
             }
+        },
+
+        setRoleExpiration(name: string, expiration: Date | null): boolean {
+            const role = this.roles.find((role) => role.name == name);
+            if(!role) return false;
+            role.expires_at = expiration;
+            return true;
+        },
+
+        setRoleNote(name: string, note: string): boolean {
+            const role = this.roles.find((role) => role.name == name);
+            if(!role) return false;
+            role.reason = note;
+            return true;
         },
 
         removeRole(role: string): boolean {
