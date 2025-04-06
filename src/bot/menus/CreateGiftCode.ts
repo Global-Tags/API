@@ -31,11 +31,22 @@ export default class CreateGiftCode extends SelectMenu {
                 new ActionRowBuilder<TextInputBuilder>()
                     .addComponents(
                         new TextInputBuilder()
+                            .setLabel('Override code')
+                            .setCustomId('code')
+                            .setPlaceholder('Override the code (optional)')
+                            .setMinLength(2)
+                            .setMaxLength(24)
+                            .setRequired(false)
+                            .setStyle(TextInputStyle.Short)
+                    ),
+                new ActionRowBuilder<TextInputBuilder>()
+                    .addComponents(
+                        new TextInputBuilder()
                             .setLabel('Max uses')
                             .setCustomId('uses')
                             .setPlaceholder('Enter the amount of uses. Default: 1')
                             .setMinLength(1)
-                            .setMaxLength(3)
+                            .setMaxLength(5)
                             .setRequired(false)
                             .setStyle(TextInputStyle.Short)
                     ),

@@ -94,14 +94,15 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
     },
     params: t.Object({ code: t.String({ description: 'The gift code' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).post('/', async ({ session, body: { name, role, max_uses: maxUses, code_expiration: codeExpiration, gift_duration: giftDuration }, i18n, error }) => { // Create a gift code
+}).post('/', async ({ session, body: { name, code, role, max_uses: maxUses, code_expiration: codeExpiration, gift_duration: giftDuration }, i18n, error }) => { // Create a gift code
     if(!session?.hasPermission(Permission.ManageGiftCodes)) return error(403, { error: i18n('error.notAllowed') });
 
     const codeExpiresAt = codeExpiration ? new Date(codeExpiration) : null;
     const giftExpiresAt = giftDuration || null;
 
-    const code = await createGiftCode({
+    const giftCode = await createGiftCode({
         name: name.trim(),
+        code: code?.trim() || undefined,
         maxUses,
         gift: {
             type: 'role',
@@ -122,7 +123,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
         giftDuration: giftExpiresAt
     });
 
-    return { message: i18n('gift_codes.created'), code };
+    return { message: i18n('gift_codes.created'), code: giftCode };
 }, {
     detail: {
         tags: ['Gift codes'],
@@ -135,7 +136,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ name: t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }), role: t.String({ error: 'error.wrongType;;[["field", "role"], ["type", "string"]]' }), max_uses: t.Number({ error: 'error.wrongType;;[["field", "max_uses"], ["type", "number"]]' }), code_expiration: t.Optional(t.Number({ error: 'error.wrongType;;[["field", "code_expiration"], ["type", "number"]]' })), gift_duration: t.Optional(t.Number({ error: 'error.wrongType;;[["field", "gift_duration"], ["type", "number"]]' })) }, { error: 'error.invalidBody', additionalProperties: true }),
+    body: t.Object({ name: t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }), code: t.Optional(t.String({ error: 'error.wrongType;;[["field", "code"], ["type", "string"]]' })), role: t.String({ error: 'error.wrongType;;[["field", "role"], ["type", "string"]]' }), max_uses: t.Number({ error: 'error.wrongType;;[["field", "max_uses"], ["type", "number"]]' }), code_expiration: t.Optional(t.Number({ error: 'error.wrongType;;[["field", "code_expiration"], ["type", "number"]]' })), gift_duration: t.Optional(t.Number({ error: 'error.wrongType;;[["field", "gift_duration"], ["type", "number"]]' })) }, { error: 'error.invalidBody', additionalProperties: true }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).delete('/:code', async ({ session, params, i18n, error }) => { // Delete gift code
     if(!session?.hasPermission(Permission.ManageGiftCodes)) return error(403, { error: i18n('error.notAllowed') });

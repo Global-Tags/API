@@ -18,6 +18,7 @@ export default class CreateGiftCode extends Modal {
 
     async submit(interaction: ModalSubmitInteraction, message: Message, fields: ModalSubmitFields, member: GuildMember, player: Player) {
         const name = fields.getTextInputValue('name');
+        const code = fields.getTextInputValue('code');
         const role = interaction.customId.split('_')[1];
         const maxUses = parseInt(fields.getTextInputValue('uses') || '1');
         const codeDuration = fields.getTextInputValue('codeDuration');
@@ -31,8 +32,9 @@ export default class CreateGiftCode extends Modal {
         const giftExpiresAt = giftDuration.trim() != '' ? ms(giftDuration as StringValue) || NaN : null;
         if(giftExpiresAt != null && isNaN(giftExpiresAt)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Invalid gift expiration date!')], flags: [MessageFlags.Ephemeral] });
 
-        const code = await createGiftCode({
+        const giftCode = await createGiftCode({
             name,
+            code: code?.trim() || undefined,
             maxUses,
             gift: {
                 type: 'role',
@@ -53,6 +55,6 @@ export default class CreateGiftCode extends Modal {
             giftDuration: giftExpiresAt
         });
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The code was successfully created!\n\n🎁 ||**${code}**||`)], flags: [MessageFlags.Ephemeral] });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The code was successfully created!\n\n🎁 ||**${giftCode}**||`)], flags: [MessageFlags.Ephemeral] });
     }
 }
