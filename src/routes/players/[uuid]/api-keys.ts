@@ -74,7 +74,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     sendModLogMessage({
         logType: ModLogType.CreateApiKey,
         staff: await GameProfile.getProfileByUUID(session.uuid!),
-        user: await GameProfile.getProfileByUUID(uuid),
+        user: await player.getGameProfile(),
         discord: false,
         key: name
     });
@@ -111,7 +111,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     sendModLogMessage({
         logType: ModLogType.RegenerateApiKey,
-        user: await GameProfile.getProfileByUUID(uuid),
+        user: await player.getGameProfile(),
         staff: await GameProfile.getProfileByUUID(session.uuid!),
         discord: false,
         key: key.name
@@ -148,7 +148,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     sendModLogMessage({
         logType: ModLogType.DeleteApiKey,
         staff: await GameProfile.getProfileByUUID(session.uuid!),
-        user: await GameProfile.getProfileByUUID(uuid),
+        user: await player.getGameProfile(),
         discord: false,
         key: key.name
     });

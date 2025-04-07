@@ -27,8 +27,8 @@ export default class ClearTagButton extends Button {
 
         sendModLogMessage({
             logType: ModLogType.ClearTag,
-            user: await GameProfile.getProfileByUUID(target.uuid),
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            user: await target.getGameProfile(),
+            staff: await player.getGameProfile(),
             discord: true
         });
 

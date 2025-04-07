@@ -42,7 +42,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     sendModLogMessage({
         logType: player.watchlist ? ModLogType.Watch : ModLogType.Unwatch,
         staff: await GameProfile.getProfileByUUID(session.uuid!),
-        user: await GameProfile.getProfileByUUID(uuid),
+        user: await player.getGameProfile(),
         discord: false
     });
 

@@ -18,7 +18,7 @@ export default class UnlinkCommand extends Command {
     async execute(interaction: CommandInteraction, options: CommandInteractionOptionResolver, member: GuildMember, player: Player) {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
-        await onDiscordUnlink(await GameProfile.getProfileByUUID(player.uuid), player.connections.discord.id!);
+        await onDiscordUnlink(await player.getGameProfile(), player.connections.discord.id!);
 
         player.connections.discord.id = null;
         player.connections.discord.code = null;

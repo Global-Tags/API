@@ -29,8 +29,8 @@ export default class EditRoleExpirationModal extends Modal {
 
         sendModLogMessage({
             logType: ModLogType.SetRoleExpiration,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
-            user: await GameProfile.getProfileByUUID(target.uuid),
+            staff: await player.getGameProfile(),
+            user: await target.getGameProfile(),
             discord: true,
             role: name,
             expires: expiresAt

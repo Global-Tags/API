@@ -30,7 +30,7 @@ export default class SetSkuMenu extends SelectMenu {
 
         sendModLogMessage({
             logType: ModLogType.SetRoleSku,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await player.getGameProfile(),
             discord: true,
             role: role.name,
             sku: {

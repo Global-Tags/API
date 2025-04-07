@@ -31,7 +31,7 @@ export default class CreateRoleModal extends Modal {
 
         sendModLogMessage({
             logType: ModLogType.CreateRole,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await player.getGameProfile(),
             discord: true,
             role: name
         });

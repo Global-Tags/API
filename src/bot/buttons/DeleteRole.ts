@@ -7,7 +7,7 @@ import { getCachedRoles, updateRoleCache } from "../../database/schemas/roles";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { GameProfile } from "../../libs/game-profiles";
 
-export default class DeleteRoleButton extends Button {
+export default class DeleteRole extends Button {
     constructor() {
         super({
             id: 'deleteRole',
@@ -21,7 +21,7 @@ export default class DeleteRoleButton extends Button {
 
         sendModLogMessage({
             logType: ModLogType.DeleteRole,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await player.getGameProfile(),
             discord: true,
             role: role.name
         });

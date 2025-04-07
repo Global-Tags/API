@@ -25,8 +25,8 @@ export default class DeleteNoteMenu extends SelectMenu {
 
         sendModLogMessage({
             logType: ModLogType.DeleteNote,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
-            user: await GameProfile.getProfileByUUID(target.uuid),
+            staff: await player.getGameProfile(),
+            user: await target.getGameProfile(),
             discord: true,
             note: note.text
         });

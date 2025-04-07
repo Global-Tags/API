@@ -81,7 +81,7 @@ export default class CustomIconCommand extends Command {
             await Bun.write(Bun.file(join('icons', player.uuid, `${player.icon.hash}.png`)), request.data, { createPath: true });
 
             sendCustomIconUploadMessage(
-                await GameProfile.getProfileByUUID(player.uuid),
+                await player.getGameProfile(),
                 player.icon.hash
             );
 

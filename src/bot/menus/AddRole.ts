@@ -18,7 +18,7 @@ export default class AddRoleMenu extends SelectMenu {
         const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
-        const staffProfile = await GameProfile.getProfileByUUID(player.uuid);
+        const staffProfile = await player.getGameProfile();
         const roleName = values[0];
         const reason = `Added by ${staffProfile.getUsernameOrUUID()}`;
         
@@ -29,7 +29,7 @@ export default class AddRoleMenu extends SelectMenu {
         sendModLogMessage({
             logType: ModLogType.AddRole,
             staff: staffProfile,
-            user: await GameProfile.getProfileByUUID(target.uuid),
+            user: await target.getGameProfile(),
             discord: true,
             role: roleName
         });

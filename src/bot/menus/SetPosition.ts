@@ -27,8 +27,8 @@ export default class SetPositionMenu extends SelectMenu {
 
         sendModLogMessage({
             logType: ModLogType.EditPosition,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
-            user: await GameProfile.getProfileByUUID(target.uuid),
+            staff: await player.getGameProfile(),
+            user: await target.getGameProfile(),
             discord: true,
             positions: {
                 old: oldPosition,

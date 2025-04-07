@@ -24,8 +24,8 @@ export default class WatchButton extends Button {
 
         sendModLogMessage({
             logType: ModLogType.Watch,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
-            user: await GameProfile.getProfileByUUID(target.uuid),
+            staff: await player.getGameProfile(),
+            user: await target.getGameProfile(),
             discord: true
         });
 

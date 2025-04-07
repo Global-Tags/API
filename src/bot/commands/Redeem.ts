@@ -35,7 +35,7 @@ export default class RedeemCommand extends Command {
         await player.save();
         await code.save();
 
-        sendGiftCodeRedeemMessage(await GameProfile.getProfileByUUID(player.uuid), code, expiresAt);
+        sendGiftCodeRedeemMessage(await player.getGameProfile(), code, expiresAt);
 
         const header = new EmbedBuilder()
             .setColor(colors.gray)

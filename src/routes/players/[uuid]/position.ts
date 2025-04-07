@@ -37,7 +37,7 @@ export default (app: ElysiaApp) => app.post('/', async ({ session, body: { posit
         sendModLogMessage({
             logType: ModLogType.EditPosition,
             staff: await GameProfile.getProfileByUUID(session.uuid!),
-            user: await GameProfile.getProfileByUUID(uuid),
+            user: await player?.getGameProfile(),
             discord: false,
             positions: {
                 old: oldPosition || '---',

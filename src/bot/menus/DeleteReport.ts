@@ -25,8 +25,8 @@ export default class DeleteReportMenu extends SelectMenu {
 
         sendModLogMessage({
             logType: ModLogType.DeleteReport,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
-            user: await GameProfile.getProfileByUUID(target.uuid),
+            staff: await player.getGameProfile(),
+            user: await target.getGameProfile(),
             discord: true,
             report: report.reason
         });

@@ -25,12 +25,12 @@ export default class EditRoleNoteModal extends Modal {
         if(!target.setRoleNote(name, note)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is not active!')], flags: [MessageFlags.Ephemeral] });
         target.save();
 
-        const profile = await GameProfile.getProfileByUUID(player.uuid);
+        const profile = await player.getGameProfile();
 
         sendModLogMessage({
             logType: ModLogType.EditRoleNote,
             staff: profile,
-            user: await GameProfile.getProfileByUUID(target.uuid),
+            user: await target.getGameProfile(),
             discord: true,
             role: name,
             note

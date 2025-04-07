@@ -24,8 +24,8 @@ export default class UnlinkEmailButton extends Button {
 
         sendModLogMessage({
             logType: ModLogType.UnlinkConnection,
-            user: await GameProfile.getProfileByUUID(target.uuid),
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            user: await target.getGameProfile(),
+            staff: await player.getGameProfile(),
             discord: true,
             type: 'email'
         });

@@ -68,7 +68,7 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
         sendModLogMessage({
             logType: ModLogType.ChangeIconType,
             staff: await GameProfile.getProfileByUUID(session.uuid!),
-            user: await GameProfile.getProfileByUUID(uuid),
+            user: await player?.getGameProfile(),
             discord: false,
             icons: {
                 old: oldIcon?.name || '---',

@@ -37,7 +37,7 @@ export default class ManagePermissionsMenu extends SelectMenu {
 
         sendModLogMessage({
             logType: ModLogType.ChangeRolePermissions,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await player.getGameProfile(),
             discord: true,
             role: role.name,
             permissions: {

@@ -26,8 +26,8 @@ export default class UnbanButton extends Button {
 
         sendModLogMessage({
             logType: ModLogType.Unban,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
-            user: await GameProfile.getProfileByUUID(target.uuid),
+            staff: await player.getGameProfile(),
+            user: await target.getGameProfile(),
             discord: true
         });
 

@@ -46,7 +46,7 @@ export default class CreateGiftCodeModal extends Modal {
 
         sendModLogMessage({
             logType: ModLogType.CreateGiftCode,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await player.getGameProfile(),
             discord: true,
             code: name,
             role,

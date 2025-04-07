@@ -24,7 +24,7 @@ export default class DeleteGiftCodeMenu extends SelectMenu {
 
         sendModLogMessage({
             logType: ModLogType.DeleteGiftCode,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await player.getGameProfile(),
             discord: true,
             code: code.name
         });

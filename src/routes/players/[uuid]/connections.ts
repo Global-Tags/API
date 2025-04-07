@@ -50,7 +50,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     if(!player) return error(404, { error: i18n('error.noTag') });
     if(!player.connections.discord.id && !player.connections.discord.code) return error(409, { error: i18n('connections.discord.notConnected') });
 
-    await onDiscordUnlink(await GameProfile.getProfileByUUID(player.uuid), player.connections.discord.id!);
+    await onDiscordUnlink(await player.getGameProfile(), player.connections.discord.id!);
 
     player.connections.discord.id = null;
     player.connections.discord.code = null;
@@ -130,7 +130,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     await player.save();
 
     sendEmailLinkMessage(
-        await GameProfile.getProfileByUUID(player.uuid),
+        await player.getGameProfile(),
         config.discordBot.notifications.accountConnections.hideEmails ? null : player.connections.email.address!,
         true
     );
@@ -174,7 +174,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     if(!player.connections.email.address && !player.connections.email.code) return error(400, { error: i18n('connections.email.notConnected') });
 
     sendEmailLinkMessage(
-        await GameProfile.getProfileByUUID(player.uuid),
+        await player.getGameProfile(),
         config.discordBot.notifications.accountConnections.hideEmails ? null : player.connections.email.address!,
         false
     );

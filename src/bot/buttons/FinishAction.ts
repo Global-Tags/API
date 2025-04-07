@@ -19,7 +19,7 @@ export default class FinishActionButton extends Button {
         row.components.forEach(component => component.setDisabled(true));
 
         const embed = EmbedBuilder.from(message.embeds[0]);
-        embed.setFooter({ text: `Processed by ${(await GameProfile.getProfileByUUID(player.uuid)).username || member.user.username}`, iconURL: `https://laby.net/texture/profile/head/${stripUUID(player.uuid)}.png?size=1024&overlay` });
+        embed.setFooter({ text: `Processed by ${(await player.getGameProfile()).username || member.user.username}`, iconURL: `https://laby.net/texture/profile/head/${stripUUID(player.uuid)}.png?size=1024&overlay` });
 
         message.edit({ embeds: [embed], components: [row] });
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ Action completed!')], flags: [MessageFlags.Ephemeral] });

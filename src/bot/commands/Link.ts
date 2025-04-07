@@ -38,7 +38,7 @@ export default class LinkCommand extends Command {
         codePlayer.connections.discord.code = null;
         codePlayer.save();
 
-        onDiscordLink(await GameProfile.getProfileByUUID(codePlayer.uuid), member.user.id);
+        onDiscordLink(await codePlayer.getGameProfile(), member.user.id);
 
         interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ Your account was successfully linked!')] });
     }

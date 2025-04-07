@@ -25,7 +25,7 @@ export default class ToggleIconButton extends Button {
 
         sendModLogMessage({
             logType: ModLogType.ToggleRoleIcon,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await player.getGameProfile(),
             discord: true,
             role: role.name,
             roleIcon: role.hasIcon

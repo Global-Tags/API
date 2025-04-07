@@ -27,7 +27,7 @@ export default class RenameRoleModal extends Modal {
 
         sendModLogMessage({
             logType: ModLogType.RenameRole,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await player.getGameProfile(),
             discord: true,
             names: {
                 old: role.name,
