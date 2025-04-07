@@ -6,7 +6,7 @@ import { Permission } from "../../types/Permission";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { formatTimestamp } from "../../libs/discord-notifier";
 
-export default class ModerateAccount extends Button {
+export default class ModerateAccountButton extends Button {
     constructor() {
         super({
             id: 'moderateAccount',

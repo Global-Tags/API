@@ -4,7 +4,7 @@ import { config } from "../../libs/config";
 import { Permission } from "../../types/Permission";
 import { Player } from "../../database/schemas/players";
 
-export default class CreateNote extends Button {
+export default class CreateNoteButton extends Button {
     constructor() {
         super({
             id: 'createNote',

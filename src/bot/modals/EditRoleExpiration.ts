@@ -7,7 +7,7 @@ import { Permission } from "../../types/Permission";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import ms, { StringValue } from "ms";
 
-export default class EditRoleExpiration extends Modal {
+export default class EditRoleExpirationModal extends Modal {
     constructor() {
         super({ 
             id: 'editRoleExpiration',

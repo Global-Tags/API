@@ -6,7 +6,7 @@ import players from "../../database/schemas/players";
 import { config } from "../../libs/config";
 import { fetchSku } from "../bot";
 
-export default class EntitlementUpdate extends Event {
+export default class EntitlementUpdateEvent extends Event {
     constructor() {
         super('entitlementUpdate', false);
     }

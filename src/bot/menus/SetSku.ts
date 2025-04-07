@@ -7,7 +7,7 @@ import roles, { updateRoleCache } from "../../database/schemas/roles";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { GameProfile } from "../../libs/game-profiles";
 
-export default class SetSku extends SelectMenu {
+export default class SetSkuMenu extends SelectMenu {
     constructor() {
         super({
             id: 'setSku',

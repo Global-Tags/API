@@ -7,7 +7,7 @@ import { getCachedRoles, updateRoleCache } from "../../database/schemas/roles";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { GameProfile } from "../../libs/game-profiles";
 
-export default class DeleteRole extends Button {
+export default class DeleteRoleButton extends Button {
     constructor() {
         super({
             id: 'deleteRole',

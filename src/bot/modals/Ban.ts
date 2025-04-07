@@ -9,7 +9,7 @@ import { Permission } from "../../types/Permission";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import ms, { StringValue } from "ms";
 
-export default class Ban extends Modal {
+export default class BanModal extends Modal {
     constructor() {
         super({
             id: 'ban',

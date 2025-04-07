@@ -7,7 +7,7 @@ import { Permission } from "../../types/Permission";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { snakeCase } from "change-case";
 
-export default class CreateApiKey extends Modal {
+export default class CreateApiKeyModal extends Modal {
     constructor() {
         super({
             id: 'createApiKey',

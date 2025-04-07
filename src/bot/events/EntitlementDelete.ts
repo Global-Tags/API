@@ -6,7 +6,7 @@ import entitlements from "../../database/schemas/entitlement";
 import { config } from "../../libs/config";
 import { fetchSku } from "../bot";
 
-export default class EntitlementDelete extends Event {
+export default class EntitlementDeleteEvent extends Event {
     constructor() {
         super('entitlementDelete', false);
     }

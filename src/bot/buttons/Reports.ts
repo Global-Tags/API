@@ -6,7 +6,7 @@ import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 import { formatTimestamp } from "../../libs/discord-notifier";
 
-export default class Reports extends Button {
+export default class ReportsButton extends Button {
     constructor() {
         super({
             id: 'reports',

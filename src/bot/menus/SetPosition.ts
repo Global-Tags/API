@@ -8,7 +8,7 @@ import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
-export default class SetPosition extends SelectMenu {
+export default class SetPositionMenu extends SelectMenu {
     constructor() {
         super({
             id: 'setPosition',

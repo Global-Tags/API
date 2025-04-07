@@ -6,7 +6,7 @@ import { capitalCase, snakeCase } from "change-case";
 import { Permission } from "../../types/Permission";
 import { stripUUID } from "../../libs/game-profiles";
 
-export default class EditRole extends Button {
+export default class EditRoleButton extends Button {
     constructor() {
         super({
             id: 'editRole',

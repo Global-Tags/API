@@ -7,7 +7,7 @@ import { Permission } from "../../types/Permission";
 import codeSchema from "../../database/schemas/gift-codes";
 import { GameProfile } from "../../libs/game-profiles";
 
-export default class DeleteGiftCode extends SelectMenu {
+export default class DeleteGiftCodeMenu extends SelectMenu {
     constructor() {
         super({
             id: 'deleteGiftCode',

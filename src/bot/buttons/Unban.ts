@@ -8,7 +8,7 @@ import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
-export default class Unban extends Button {
+export default class UnbanButton extends Button {
     constructor() {
         super({
             id: 'unban',

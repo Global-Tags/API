@@ -3,7 +3,7 @@ import Event from "../structs/Event";
 import players from "../../database/schemas/players";
 import { config } from "../../libs/config";
 
-export default class GuildMemberAdd extends Event {
+export default class GuildMemberAddEvent extends Event {
     constructor() {
         super('guildMemberAdd', false);
     }

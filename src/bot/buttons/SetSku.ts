@@ -5,7 +5,7 @@ import { getCachedRoles } from "../../database/schemas/roles";
 import players from "../../database/schemas/players";
 import { Permission } from "../../types/Permission";
 
-export default class SetSku extends Button {
+export default class SetSkuButton extends Button {
     constructor() {
         super('setSku');
     }

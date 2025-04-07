@@ -6,7 +6,7 @@ import { Permission } from "../../types/Permission";
 import giftCodes from "../../database/schemas/gift-codes";
 import { formatTimestamp } from "../../libs/discord-notifier";
 
-export default class GiftCodes extends Command {
+export default class GiftCodesCommand extends Command {
     constructor() {
         super({
             name: 'gift-codes',

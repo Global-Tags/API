@@ -7,7 +7,7 @@ import roles, { updateRoleCache } from "../../database/schemas/roles";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { GameProfile } from "../../libs/game-profiles";
 
-export default class ToggleIcon extends Button {
+export default class ToggleIconButton extends Button {
     constructor() {
         super({
             id: 'toggleIcon',

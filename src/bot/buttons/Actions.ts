@@ -10,7 +10,7 @@ import { config } from "../../libs/config";
 type InfoEntry = { name: string, value: string };
 type Info = { category: string, entries: InfoEntry[] };
 
-export default class Actions extends Button {
+export default class ActionsButton extends Button {
     constructor() {
         super({
             id: 'actions',

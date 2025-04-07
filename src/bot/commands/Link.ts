@@ -6,7 +6,7 @@ import { config } from "../../libs/config";
 import { GameProfile } from "../../libs/game-profiles";
 import { onDiscordLink } from "../../libs/events";
 
-export default class Link extends Command {
+export default class LinkCommand extends Command {
     constructor() {
         super({
             name: 'link',

@@ -7,7 +7,7 @@ import { getCachedRoles } from "../../database/schemas/roles";
 import { capitalCase, pascalCase } from "change-case";
 import { config } from "../../libs/config";
 
-export default class ManageRole extends SelectMenu {
+export default class ManageRoleMenu extends SelectMenu {
     constructor() {
         super({
             id: 'manageRole',

@@ -6,7 +6,7 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
-export default class EditRoleNote extends Modal {
+export default class EditRoleNoteModal extends Modal {
     constructor() {
         super({
             id: 'editRoleNote',

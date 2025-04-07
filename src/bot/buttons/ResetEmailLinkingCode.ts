@@ -6,7 +6,7 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
-export default class ResetEmailLinkingCode extends Button {
+export default class ResetEmailLinkingCodeButton extends Button {
     constructor() {
         super({
             id: 'resetEmailLinkingCode',

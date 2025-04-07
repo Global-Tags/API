@@ -6,7 +6,7 @@ import { formatTimestamp } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
 import { stripUUID } from "../../libs/game-profiles";
 
-export default class EditRole extends SelectMenu {
+export default class EditRoleMenu extends SelectMenu {
     constructor() {
         super({
             id: 'editRole',

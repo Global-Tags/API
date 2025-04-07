@@ -5,7 +5,7 @@ import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 import { stripUUID } from "../../libs/game-profiles";
 
-export default class EditRoleExpiration extends Button {
+export default class EditRoleExpirationButton extends Button {
     constructor() {
         super({
             id: 'editRoleExpiration',

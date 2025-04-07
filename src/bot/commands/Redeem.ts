@@ -7,7 +7,7 @@ import { formatTimestamp, sendGiftCodeRedeemMessage } from "../../libs/discord-n
 import { capitalCase } from "change-case";
 import { GameProfile } from "../../libs/game-profiles";
 
-export default class Redeem extends Command {
+export default class RedeemCommand extends Command {
     constructor() {
         super({
             name: 'redeem',

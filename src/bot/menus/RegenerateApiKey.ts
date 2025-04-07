@@ -7,7 +7,7 @@ import { Permission } from "../../types/Permission";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { generateSecureCode } from "../../routes/players/[uuid]/connections";
 
-export default class RegenerateApiKey extends SelectMenu {
+export default class RegenerateApiKeyMenu extends SelectMenu {
     constructor() {
         super({
             id: 'regenerateApiKey',

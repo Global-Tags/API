@@ -6,7 +6,7 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
-export default class DeleteApiKey extends SelectMenu {
+export default class DeleteApiKeyMenu extends SelectMenu {
     constructor() {
         super({
             id: 'deleteApiKey',

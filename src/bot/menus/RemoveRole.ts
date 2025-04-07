@@ -6,7 +6,7 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
-export default class RemoveRole extends SelectMenu {
+export default class RemoveRoleMenu extends SelectMenu {
     constructor() {
         super({
             id: 'removeRole',

@@ -7,7 +7,7 @@ import { Permission } from "../../types/Permission";
 import { GlobalPosition, positions } from "../../types/GlobalPosition";
 import { stripUUID } from "../../libs/game-profiles";
 
-export default class SetPosition extends Button {
+export default class SetPositionButton extends Button {
     constructor() {
         super({
             id: 'setPosition',

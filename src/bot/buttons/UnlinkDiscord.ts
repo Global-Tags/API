@@ -7,7 +7,7 @@ import { Permission } from "../../types/Permission";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { onDiscordUnlink } from "../../libs/events";
 
-export default class UnlinkDiscord extends Button {
+export default class UnlinkDiscordButton extends Button {
     constructor() {
         super({
             id: 'unlinkDiscord',

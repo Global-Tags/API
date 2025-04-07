@@ -12,7 +12,7 @@ import { sendCustomIconUploadMessage } from "../../libs/discord-notifier";
 import { GameProfile } from "../../libs/game-profiles";
 import { snakeCase } from "change-case";
 
-export default class CustomIcon extends Command {
+export default class CustomIconCommand extends Command {
     constructor() {
         super({
             name: 'icon',

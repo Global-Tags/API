@@ -5,7 +5,7 @@ import { colors } from "../bot";
 import { GameProfile } from "../../libs/game-profiles";
 import { onDiscordUnlink } from "../../libs/events";
 
-export default class Unlink extends Command {
+export default class UnlinkCommand extends Command {
     constructor() {
         super({
             name: 'unlink',

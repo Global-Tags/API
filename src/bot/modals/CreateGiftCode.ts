@@ -8,7 +8,7 @@ import { createGiftCode } from "../../database/schemas/gift-codes";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { GameProfile } from "../../libs/game-profiles";
 
-export default class CreateGiftCode extends Modal {
+export default class CreateGiftCodeModal extends Modal {
     constructor() {
         super({
             id: 'createGiftCode_',

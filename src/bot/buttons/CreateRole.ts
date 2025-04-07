@@ -4,7 +4,7 @@ import { config } from "../../libs/config";
 import { Permission } from "../../types/Permission";
 import { Player } from "../../database/schemas/players";
 
-export default class CreateRole extends Button {
+export default class CreateRoleButton extends Button {
     constructor() {
         super({
             id: 'createRole',

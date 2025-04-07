@@ -8,7 +8,7 @@ import { snakeCase } from "change-case";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { GameProfile } from "../../libs/game-profiles";
 
-export default class CreateRole extends Modal {
+export default class CreateRoleModal extends Modal {
     constructor() {
         super({
             id: 'createRole',

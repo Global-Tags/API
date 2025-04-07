@@ -10,7 +10,7 @@ const errorEmbed = new EmbedBuilder()
     .setColor(bot.colors.error)
     .setDescription('❌ An error ocurred! Our team has been notified.');
 
-export default class InteractionCreate extends Event {
+export default class InteractionCreateEvent extends Event {
     constructor() {
         super('interactionCreate', false);
     }
