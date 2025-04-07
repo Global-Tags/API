@@ -1,11 +1,10 @@
 import { ApplicationCommandOptionType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
 import Command from "../structs/Command";
-import players, { Player } from "../../database/schemas/players";
+import { Player } from "../../database/schemas/players";
 import { colors, images } from "../bot";
 import giftCodes from "../../database/schemas/gift-codes";
 import { formatTimestamp, sendGiftCodeRedeemMessage } from "../../libs/discord-notifier";
 import { capitalCase } from "change-case";
-import { GameProfile } from "../../libs/game-profiles";
 
 export default class RedeemCommand extends Command {
     constructor() {

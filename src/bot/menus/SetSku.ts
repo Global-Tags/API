@@ -5,7 +5,6 @@ import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 import roles, { updateRoleCache } from "../../database/schemas/roles";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { GameProfile } from "../../libs/game-profiles";
 
 export default class SetSkuMenu extends SelectMenu {
     constructor() {

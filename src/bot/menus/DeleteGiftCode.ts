@@ -5,7 +5,6 @@ import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
 import codeSchema from "../../database/schemas/gift-codes";
-import { GameProfile } from "../../libs/game-profiles";
 
 export default class DeleteGiftCodeMenu extends SelectMenu {
     constructor() {

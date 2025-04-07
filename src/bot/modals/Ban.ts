@@ -6,7 +6,7 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendBanEmail } from "../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { stripUUID } from "../../libs/game-profiles";
 import ms, { StringValue } from "ms";
 
 export default class BanModal extends Modal {

@@ -6,7 +6,6 @@ import { Permission } from "../../types/Permission";
 import ms, { StringValue } from "ms";
 import { createGiftCode } from "../../database/schemas/gift-codes";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { GameProfile } from "../../libs/game-profiles";
 
 export default class CreateGiftCodeModal extends Modal {
     constructor() {

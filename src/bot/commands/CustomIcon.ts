@@ -9,7 +9,6 @@ import { config } from "../../libs/config";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon } from "../../types/GlobalIcon";
 import { sendCustomIconUploadMessage } from "../../libs/discord-notifier";
-import { GameProfile } from "../../libs/game-profiles";
 import { snakeCase } from "change-case";
 
 export default class CustomIconCommand extends Command {

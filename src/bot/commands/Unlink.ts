@@ -2,7 +2,6 @@ import { CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, Gui
 import Command from "../structs/Command";
 import { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
-import { GameProfile } from "../../libs/game-profiles";
 import { onDiscordUnlink } from "../../libs/events";
 
 export default class UnlinkCommand extends Command {

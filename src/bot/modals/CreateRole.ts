@@ -6,7 +6,6 @@ import { Permission } from "../../types/Permission";
 import roles, { getNextPosition, updateRoleCache } from "../../database/schemas/roles";
 import { snakeCase } from "change-case";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { GameProfile } from "../../libs/game-profiles";
 
 export default class CreateRoleModal extends Modal {
     constructor() {

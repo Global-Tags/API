@@ -4,7 +4,7 @@ import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { stripUUID } from "../../libs/game-profiles";
 import { onDiscordUnlink } from "../../libs/events";
 
 export default class UnlinkDiscordButton extends Button {

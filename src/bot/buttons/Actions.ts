@@ -3,7 +3,7 @@ import Button from "../structs/Button";
 import { colors } from "../bot";
 import players, { Player } from "../../database/schemas/players";
 import { Permission } from "../../types/Permission";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { stripUUID } from "../../libs/game-profiles";
 import { uuidRegex } from "../commands/PlayerInfo";
 import { config } from "../../libs/config";
 import { stripColors } from "../../libs/chat-color";

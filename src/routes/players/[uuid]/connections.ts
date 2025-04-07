@@ -5,7 +5,7 @@ import { sendEmail } from "../../../libs/mailer";
 import { randomBytes } from "crypto";
 import { config } from "../../../libs/config";
 import { sendEmailLinkMessage } from "../../../libs/discord-notifier";
-import { GameProfile, stripUUID } from "../../../libs/game-profiles";
+import { stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 import { onDiscordUnlink } from "../../../libs/events";
 
