@@ -13,7 +13,7 @@ export default class GuildMemberAdd extends Event {
         const player = await players.findOne({ 'connections.discord.id': member.id });
         if(!player) return;
         
-        for(const role of player.getRoles()) {
+        for(const role of player.getActiveRoles()) {
             for(const roleId of role.role.getSyncedRoles()) {
                 member.roles.add(roleId, `Synced role: ${role.reason || 'Unknown reason'}`);
             }

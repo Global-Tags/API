@@ -1,6 +1,6 @@
-import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, MessageFlags } from "discord.js";
+import { ButtonInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
-import players from "../../database/schemas/players";
+import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { capitalCase, snakeCase } from "change-case";
 import { Permission } from "../../types/Permission";
@@ -8,18 +8,17 @@ import { stripUUID } from "../../libs/game-profiles";
 
 export default class EditRole extends Button {
     constructor() {
-        super('editRole');
+        super({
+            id: 'editRole',
+            requiredPermissions: [Permission.ManageRoles]
+        });
     }
 
-    async trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
-        const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
-        if(!staff.hasPermission(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
-        const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
-        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
-
-        const options = player.getRoles().slice(0, 25).map(({ role: { name: role } }) => {
+        const options = target.getActiveRoles().slice(0, 25).map(({ role: { name: role } }) => {
             role = snakeCase(role);
             return {
                 label: capitalCase(role),

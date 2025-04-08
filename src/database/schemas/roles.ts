@@ -129,13 +129,12 @@ export async function synchronizeRoles() {
     for(const player of players) {
         const member = await guild.members.fetch(player.connections.discord.id!).catch(() => null);
         if(!member || !member.id) continue;
-        const playerRoles = player.roles
-            .filter((role) => !role.expires_at || role.expires_at.getTime() > Date.now());
+        const playerRoles = player.getActiveRoles();
 
         for(const role of roles) {
             if(role.getSyncedRoles().length == 0) continue;
 
-            if(playerRoles.some((playerRole) => playerRole.name == role.name)) {
+            if(playerRoles.some((playerRole) => playerRole.role.name == role.name)) {
                 for(const syncedRole of role.getSyncedRoles()) {
                     if(member.roles.cache.has(syncedRole)) continue;
                     member.roles.add(syncedRole)

@@ -1,6 +1,6 @@
-import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder, MessageFlags } from "discord.js";
+import { ButtonInteraction, Message, GuildMember, EmbedBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
-import players from "../../database/schemas/players";
+import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendTagClearEmail } from "../../libs/mailer";
@@ -10,31 +10,30 @@ import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
 export default class ClearTag extends Button {
     constructor() {
-        super('clearTag');
+        super({
+            id: 'clearTag',
+            requiredPermissions: [Permission.ManageTags]
+        });
     }
 
-    async trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
-        const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
-        if(!staff.hasPermission(Permission.ManageTags)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
+        if(!target.tag) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player does not have a tag!')], flags: [MessageFlags.Ephemeral] });
+        const oldTag = target.tag;
 
-        const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
-        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
-        if(!player.tag) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player does not have a tag!')], flags: [MessageFlags.Ephemeral] });
-        const oldTag = player.tag;
-
-        player.clearTag(staff.uuid);
-        await player.save();
+        target.clearTag(player.uuid);
+        await target.save();
 
         sendModLogMessage({
             logType: ModLogType.ClearTag,
-            user: await GameProfile.getProfileByUUID(player.uuid),
-            staff: await GameProfile.getProfileByUUID(staff.uuid),
+            user: await GameProfile.getProfileByUUID(target.uuid),
+            staff: await GameProfile.getProfileByUUID(player.uuid),
             discord: true
         });
 
-        if(player.isEmailVerified()) {
-            sendTagClearEmail(player.connections.email.address!, oldTag, getI18nFunctionByLanguage(player.last_language));
+        if(target.isEmailVerified()) {
+            sendTagClearEmail(target.connections.email.address!, oldTag, getI18nFunctionByLanguage(target.last_language));
         }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The tag was successfully deleted!')], flags: [MessageFlags.Ephemeral] });

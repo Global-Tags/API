@@ -1,23 +1,22 @@
-import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } from "discord.js";
+import { ButtonInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
-import players from "../../database/schemas/players";
+import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 import { stripUUID } from "../../libs/game-profiles";
 
 export default class ManageConnections extends Button {
     constructor() {
-        super('manageConnections');
+        super({
+            id: 'manageConnections',
+            requiredPermissions: [Permission.ManageConnections]
+        });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, user: User) {
-        const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
-        if(!staff.hasPermission(Permission.ManageConnections)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
-        
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         const uuid = message.embeds[0].author!.name;
-        const player = await players.findOne({ uuid: stripUUID(uuid) });
-        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
+        const target = await players.findOne({ uuid: stripUUID(uuid) });
+        if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const embed = EmbedBuilder.from(message.embeds[0])
             .setTitle('Manage connections')
@@ -30,12 +29,12 @@ export default class ManageConnections extends Button {
                     .setLabel('Unlink Discord')
                     .setCustomId('unlinkDiscord')
                     .setStyle(ButtonStyle.Danger)
-                    .setDisabled(!player.connections.discord.id),
+                    .setDisabled(!target.connections.discord.id),
                 new ButtonBuilder()
                     .setLabel('Reset linking code')
                     .setCustomId('resetDiscordLinkingCode')
                     .setStyle(ButtonStyle.Primary)
-                    .setDisabled(!player.connections.discord.code)
+                    .setDisabled(!target.connections.discord.code)
             ),
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
@@ -43,12 +42,12 @@ export default class ManageConnections extends Button {
                     .setLabel('Unlink Email')
                     .setCustomId('unlinkEmail')
                     .setStyle(ButtonStyle.Danger)
-                    .setDisabled(!player.connections.email.address),
+                    .setDisabled(!target.connections.email.address),
                 new ButtonBuilder()
                     .setLabel('Reset linking code')
                     .setCustomId('resetEmailLinkingCode')
                     .setStyle(ButtonStyle.Primary)
-                    .setDisabled(!player.connections.email.code)
+                    .setDisabled(!target.connections.email.code)
             )
         ]
 

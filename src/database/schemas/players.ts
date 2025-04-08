@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { HydratedDocument, Schema, model } from "mongoose";
 import { snakeCase } from "change-case";
 import { generateSecureCode } from "../../routes/players/[uuid]/connections";
 import { Permission } from "../../types/Permission";
@@ -8,8 +8,8 @@ import { GlobalIcon } from "../../types/GlobalIcon";
 export type PlayerRole = {
     role: Role,
     added_at: Date,
-    manually_added: boolean,
-    expires_at?: Date | null,
+    autoRemove: boolean,
+    expiresAt?: Date | null,
     reason?: string | null
 }
 
@@ -37,7 +37,7 @@ export interface IPlayer {
     roles: {
         name: string,
         added_at: Date,
-        manually_added: boolean,
+        auto_remove: boolean,
         expires_at?: Date | null,
         reason?: string | null
     }[],
@@ -64,7 +64,13 @@ export interface IPlayer {
     },
     addReferral(uuid: string): void,
     isEmailVerified(): boolean,
-    getRoles(): PlayerRole[],
+    getAllRoles(): PlayerRole[],
+    getActiveRoles(): PlayerRole[],
+    getRole(role: string): PlayerRole | null,
+    addRole(info: { name: string, reason: string, autoRemove: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null },
+    setRoleExpiration(name: string, expiration: Date | null): boolean,
+    setRoleNote(name: string, note: string | null): boolean,
+    removeRole(role: string): boolean,
     hasPermission(permission: Permission): boolean,
     canManagePlayers(): boolean,
     isBanned(): boolean,
@@ -79,6 +85,8 @@ export interface IPlayer {
     createReport({ by, reported_tag, reason }: { by: string, reported_tag: string, reason: string }): void,
     deleteReport(id: string): void
 }
+
+export type Player = HydratedDocument<IPlayer>;
 
 const schema = new Schema<IPlayer>({
     uuid: {
@@ -185,7 +193,7 @@ const schema = new Schema<IPlayer>({
                 type: Date,
                 required: true
             },
-            manually_added: {
+            auto_remove: {
                 type: Boolean,
                 required: true
             },
@@ -305,7 +313,7 @@ const schema = new Schema<IPlayer>({
             return this.connections.email.address && !this.connections.email.code;
         },
 
-        getRoles(): PlayerRole[] {
+        getAllRoles(): PlayerRole[] {
             return getCachedRoles().filter(({ name: role }) => {
                 role = snakeCase(role);
                 const playerRole = this.roles.find((playerRole) => snakeCase(playerRole.name) == role);
@@ -317,21 +325,84 @@ const schema = new Schema<IPlayer>({
                 return {
                     role,
                     added_at: playerRole.added_at,
-                    manually_added: playerRole.manually_added,
+                    autoRemove: playerRole.auto_remove,
                     expires_at: playerRole.expires_at,
                     reason: playerRole.reason
                 }
             });
         },
 
+        getActiveRoles(): PlayerRole[] {
+            return this.getAllRoles().filter((role) => role.expiresAt == null || role.expiresAt.getTime() > Date.now());
+        },
+
+        getRole(role: string): PlayerRole | null {
+            role = snakeCase(role);
+            return this.getActiveRoles().find((playerRole) => playerRole.role.name == role) || null;
+        },
+
+        addRole({ name, reason, autoRemove, expiresAt, duration }: { name: string, reason: string, autoRemove: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null } {
+            name = snakeCase(name);
+            const role = this.roles.find((playerRole) => playerRole.name == name);
+            if(role) {
+                if(!role.expires_at) return { success: false, expiresAt: null };
+                if(role.expires_at.getTime() > Date.now()) {
+                    role.reason += ` | ${reason}`;
+                    role.auto_remove = autoRemove;
+                    role.expires_at = expiresAt ? expiresAt : duration ? new Date(role.expires_at.getTime() + duration) : null;
+                    return { success: true, expiresAt: role.expires_at };
+                } else {
+                    role.reason = reason;
+                    role.auto_remove = autoRemove;
+                    role.expires_at = expiresAt ? expiresAt : duration ? new Date(Date.now() + duration) : null;
+                    return { success: true, expiresAt: role.expires_at };
+                }
+            } else {
+                const role = {
+                    name,
+                    reason,
+                    added_at: new Date(),
+                    auto_remove: autoRemove,
+                    expires_at: expiresAt ? expiresAt : duration ? new Date(Date.now() + duration) : null
+                };
+                this.roles.push(role);
+                return { success: true, expiresAt: role.expires_at };
+            }
+        },
+
+        setRoleExpiration(name: string, expiration: Date | null): boolean {
+            const role = this.roles.find((role) => role.name == name);
+            if(!role) return false;
+            role.expires_at = expiration;
+            return true;
+        },
+
+        setRoleNote(name: string, note: string): boolean {
+            const role = this.roles.find((role) => role.name == name);
+            if(!role) return false;
+            role.reason = note;
+            return true;
+        },
+
+        removeRole(role: string): boolean {
+            role = snakeCase(role);
+            const playerRole = this.roles.find((playerRole) => playerRole.name == role);
+            if(!playerRole) return false;
+            playerRole.expires_at = new Date();
+            return true;
+        },
+
         hasPermission(permission: Permission): boolean {
-            return this.getRoles().some((role) => role.role.hasPermission(permission));
+            return this.getActiveRoles().some((role) => role.role.hasPermission(permission));
         },
 
         canManagePlayers(): boolean {
             return [
                 Permission.ManageBans,
+                Permission.ManageApiKeys,
+                Permission.ManageConnections,
                 Permission.ManageNotes,
+                Permission.ManageReports,
                 Permission.ManageRoles,
                 Permission.ManageTags,
                 Permission.ManageWatchlist

@@ -10,21 +10,9 @@ export function handleErrors() {
 
 export function initializeSentry(dsn: string) {
     Logger.info('Initializing Sentry...');
-    const client = new Sentry.BunClient({
+    Sentry.init({
         dsn,
-        tracesSampleRate: 1.0,
-        stackParser: Sentry.defaultStackParser,
-        transport: Sentry.makeFetchTransport,
-        integrations: [
-            Sentry.onUnhandledRejectionIntegration({ mode: 'none' }),
-            Sentry.onUncaughtExceptionIntegration(),
-            Sentry.mongooseIntegration(),
-            Sentry.fsIntegration(),
-        ],
         release: version
-    });
-
-    Sentry.setCurrentClient(client);
-    client.init();
+    })
     Logger.info('Initialized Sentry!');
 }

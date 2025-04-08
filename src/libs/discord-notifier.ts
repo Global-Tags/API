@@ -5,6 +5,7 @@ import { getCustomIconUrl } from "../routes/players/[uuid]/icon";
 import { capitalCase, pascalCase, sentenceCase } from "change-case";
 import { config } from "./config";
 import { translateToAnsi } from "./chat-color";
+import { GiftCode } from "../database/schemas/gift-codes";
 
 export enum ModLogType {
     ChangeTag,
@@ -170,7 +171,7 @@ export function sendWatchlistAddMessage({ user, tag, word }: { user: GameProfile
         channel: config.discordBot.notifications.watchlist.channel,
         content: config.discordBot.notifications.watchlist.content,
         embed: new EmbedBuilder()
-        .setColor(0x5865f2)
+        .setColor(bot.colors.blurple)
         .setTitle('New watched player')
         .addFields([
             {
@@ -196,7 +197,7 @@ export function sendWatchlistTagUpdateMessage(user: GameProfile, tag: string) {
         channel: config.discordBot.notifications.watchlist.channel,
         content: config.discordBot.notifications.watchlist.content,
         embed: new EmbedBuilder()
-            .setColor(0x5865f2)
+            .setColor(bot.colors.blurple)
             .setThumbnail(`https://laby.net/texture/profile/head/${user.uuid}.png?size=1024&overlay`)
             .setTitle('New tag change')
             .addFields([
@@ -219,7 +220,7 @@ export function sendBanAppealMessage(user: GameProfile, reason: string) {
         channel: config.discordBot.notifications.banAppeals.channel,
         content: config.discordBot.notifications.banAppeals.content,
         embed: new EmbedBuilder()
-            .setColor(0x5865f2)
+            .setColor(bot.colors.blurple)
             .setThumbnail(`https://laby.net/texture/profile/head/${user.uuid}.png?size=1024&overlay`)
             .setTitle('New ban appeal')
             .addFields([
@@ -242,7 +243,7 @@ export function sendDiscordLinkMessage(user: GameProfile, userId: string, connec
         channel: config.discordBot.notifications.accountConnections.channel,
         content: null,
         embed: new EmbedBuilder()
-            .setColor(0x5865f2)
+            .setColor(bot.colors.blurple)
             .setThumbnail(`https://laby.net/texture/profile/head/${user.uuid}.png?size=1024&overlay`)
             .setTitle(connected ? 'New discord connection' : 'Discord connection removed')
             .addFields([
@@ -266,7 +267,7 @@ export function sendEmailLinkMessage(user: GameProfile, email: string | null, co
         channel: config.discordBot.notifications.accountConnections.channel,
         content: null,
         embed: new EmbedBuilder()
-            .setColor(0x5865f2)
+            .setColor(bot.colors.blurple)
             .setThumbnail(`https://laby.net/texture/profile/head/${user.uuid}.png?size=1024&overlay`)
             .setTitle(connected ? 'New email connection' : 'Email connection removed')
             .addFields([
@@ -288,7 +289,7 @@ export function sendReferralMessage(inviter: GameProfile, invited: GameProfile) 
 
     sendMessage({
         channel: config.discordBot.notifications.referrals.channel,
-        content: `${inviter.getFormattedHyperlink()} has invited ${inviter.getFormattedHyperlink()}.`,
+        content: `${inviter.getFormattedHyperlink()} has invited ${invited.getFormattedHyperlink()}.`,
         embed: null,
         actionButton: false
     });
@@ -298,7 +299,7 @@ export function sendEntitlementMessage(uuid: string, description: string, head: 
     if(!config.discordBot.notifications.entitlements.enabled) return;
 
     const embed = new EmbedBuilder()
-        .setColor(bot.colors.standart)
+        .setColor(bot.colors.gray)
         .setTitle('💵 Entitlement update')
         .setDescription(description);
 
@@ -316,7 +317,7 @@ export function sendCustomIconUploadMessage(user: GameProfile, hash: string) {
     if(!config.discordBot.notifications.customIcons.enabled) return;
 
     const embed = new EmbedBuilder()
-        .setColor(bot.colors.standart)
+        .setColor(bot.colors.gray)
         .setTitle(':frame_photo: New icon upload')
         .setDescription(`Hash: [\`${hash}\`](<${getCustomIconUrl(user.uuid!, hash)}>)`)
         .addFields([
@@ -331,6 +332,53 @@ export function sendCustomIconUploadMessage(user: GameProfile, hash: string) {
         channel: config.discordBot.notifications.customIcons.channel,
         content: null,
         embed
+    });
+}
+
+export function sendGiftCodeRedeemMessage(user: GameProfile, code: GiftCode, expiresAt?: Date | null) {
+    if(!config.discordBot.notifications.giftCodes.enabled) return;
+
+    const embed = new EmbedBuilder()
+        .setColor(bot.colors.gray)
+        .setTitle('🎁 Gift code redeemed')
+        .addFields([
+            {
+                name: 'Player:',
+                value: user.getFormattedHyperlink(),
+                inline: true
+            },
+            {
+                name: 'Gift code:',
+                value: `\`\`\`${code.name}\`\`\``,
+                inline: true
+            },
+            {
+                name: 'Uses:',
+                value: `\`\`\`${code.uses.length}/${code.max_uses}\`\`\``,
+                inline: true
+            },
+            {
+                name: 'Gift type:',
+                value: `\`\`\`${capitalCase(code.gift.type)}\`\`\``,
+                inline: true
+            },
+            {
+                name: 'Gift value:',
+                value: `\`\`\`${code.gift.value}\`\`\``,
+                inline: true
+            },
+            {
+                name: 'Gift expires:',
+                value: `${expiresAt ? `${formatTimestamp(expiresAt)} (${formatTimestamp(expiresAt, 'R')})` : '```-```'}`,
+                inline: true
+            }
+        ]);
+
+    sendMessage({
+        channel: config.discordBot.notifications.giftCodes.channel,
+        content: null,
+        embed,
+        actionButton: false
     });
 }
 

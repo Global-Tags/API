@@ -27,24 +27,8 @@ export default class EntitlementCreate extends Event {
         );
 
         if(player) {
-            const playerRole = player.roles.find((playerRole) => playerRole.name == role.name);
-            if(playerRole) {
-                if(playerRole.expires_at && playerRole.expires_at > new Date()) {
-                    playerRole.added_at = new Date();
-                    playerRole.manually_added = false;
-                    playerRole.expires_at = null;
-                    playerRole.reason = roleReason(entitlement.id);
-                    await player.save();
-                }
-            } else {
-                player.roles.push({
-                    name: role.name,
-                    added_at: new Date(),
-                    manually_added: false,
-                    reason: roleReason(entitlement.id)
-                });
-                await player.save();
-            }
+            const { success } = player.addRole({ name: role.name, autoRemove: true, reason: roleReason(entitlement.id) });
+            if(success) await player.save();
         }
     }
 }

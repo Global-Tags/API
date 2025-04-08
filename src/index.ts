@@ -21,6 +21,8 @@ import { startEntitlementExpiry, startMetrics, startReferralReset, startRoleCach
 import { config } from "./libs/config";
 import { join } from "path";
 import ip from "./middleware/ip";
+import { generateSecureCode } from "./routes/players/[uuid]/connections";
+import { captureException } from "@sentry/bun";
 
 if(config.mongodb.trim().length == 0) {
     Logger.error('Database connection string is empty!');
@@ -116,8 +118,10 @@ const elysia = new Elysia()
             return { error: i18n('error.notFound') };
         } else {
             set.status = 500;
-            Logger.error(error);
-            return { error: i18n('error.unknownError') };
+            captureException(error);
+            const requestId = generateSecureCode(32);
+            Logger.error(`An error ocurred with request ${requestId}: ${error}`);
+            return { error: i18n('error.unknownError'), id: requestId };
         }
     })
     .listen(config.port);

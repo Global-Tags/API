@@ -21,7 +21,8 @@ export const client = new Client({
 });
 
 export const colors = {
-    standart: 0x2b2d31,
+    gray: 0x2b2d31,
+    blurple: 0x5865f2,
     success: 0x00ee00,
     error: 0xff0000
 };

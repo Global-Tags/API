@@ -1,6 +1,6 @@
-import { ButtonInteraction, CacheType, Message, GuildMember, User, EmbedBuilder, MessageFlags } from "discord.js";
+import { ButtonInteraction, Message, GuildMember, EmbedBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
-import players from "../../database/schemas/players";
+import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
@@ -9,28 +9,27 @@ import { onDiscordUnlink } from "../../libs/events";
 
 export default class UnlinkDiscord extends Button {
     constructor() {
-        super('unlinkDiscord');
+        super({
+            id: 'unlinkDiscord',
+            requiredPermissions: [Permission.ManageConnections]
+        });
     }
 
-    async trigger(interaction: ButtonInteraction<CacheType>, message: Message<boolean>, member: GuildMember, user: User) {
-        const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
-        if(!staff.hasPermission(Permission.ManageConnections)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
+        if(!target.connections.discord.id) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player does not have their discord account linked!')], flags: [MessageFlags.Ephemeral] });
 
-        const player = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
-        if(!player) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
-        if(!player.connections.discord.id) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player does not have their discord account linked!')], flags: [MessageFlags.Ephemeral] });
+        const profile = await GameProfile.getProfileByUUID(target.uuid);
+        await onDiscordUnlink(await profile, target.connections.discord.id!);
 
-        const profile = await GameProfile.getProfileByUUID(player.uuid);
-        await onDiscordUnlink(await profile, player.connections.discord.id!);
-
-        player.connections.discord.id = null;
-        await player.save();
+        target.connections.discord.id = null;
+        await target.save();
 
         sendModLogMessage({
             logType: ModLogType.UnlinkConnection,
             user: profile,
-            staff: await GameProfile.getProfileByUUID(staff.uuid),
+            staff: await GameProfile.getProfileByUUID(player.uuid),
             discord: true,
             type: 'discord'
         });

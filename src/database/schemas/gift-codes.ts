@@ -1,7 +1,7 @@
-import { Schema, model as createModel } from "mongoose";
+import { HydratedDocument, Schema, model as createModel } from "mongoose";
 import { generateSecureCode } from "../../routes/players/[uuid]/connections";
 
-interface IGiftCode {
+export interface IGiftCode {
     name: string,
     code: string,
     uses: string[],
@@ -15,6 +15,7 @@ interface IGiftCode {
     expires_at?: Date | null,
     isValid(): boolean
 }
+export type GiftCode = HydratedDocument<IGiftCode>;
 
 const schema = new Schema<IGiftCode>({
     name: {
@@ -67,18 +68,20 @@ const model = createModel<IGiftCode>('gift-codes', schema);
 
 export async function createGiftCode({
     name,
+    code = generateSecureCode(12),
     maxUses,
     gift,
     expiresAt
 } : {
     name: string,
+    code?: string,
     maxUses: number,
     gift: IGiftCode['gift'],
     expiresAt?: Date | null
 }): Promise<string> {
-    const code = await model.insertOne({
+    const giftCode = await model.insertOne({
         name,
-        code: generateSecureCode(12),
+        code,
         uses: [],
         max_uses: maxUses,
         gift: gift,
@@ -86,7 +89,7 @@ export async function createGiftCode({
         expires_at: expiresAt || null
     });
 
-    return code.code;
+    return giftCode.code;
 }
 
 export default model;

@@ -1,7 +1,7 @@
 import { t } from "elysia";
 import { Permission } from "../types/Permission";
 import { ElysiaApp } from "..";
-import { ModLogType, sendModLogMessage } from "../libs/discord-notifier";
+import { ModLogType, sendGiftCodeRedeemMessage, sendModLogMessage } from "../libs/discord-notifier";
 import { formatUUID, GameProfile } from "../libs/game-profiles";
 import giftCodes, { createGiftCode } from "../database/schemas/gift-codes";
 import players from "../database/schemas/players";
@@ -69,37 +69,15 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
     if(!code || !code.isValid()) return error(404, { error: i18n('gift_codes.not_found') });
     if(code.uses.includes(player.uuid)) return error(422, { error: i18n('gift_codes.already_redeemed') });
 
-    let expiration: Date | null = null;
-    const role = player.roles.find(role => role.name == code.gift.value);
-    if(role) {
-        if(!role.expires_at) return error(409, { error: i18n('gift_codes.already_have_role') });
-        if(role.expires_at.getTime() > Date.now()) {
-            expiration = code.gift.duration ? new Date(role.expires_at.getTime() + code.gift.duration) : null;
-            role.reason += ` | Gift code: ${code.code}`;
-            role.expires_at = expiration;
-            await player.save();
-        } else {
-            expiration = code.gift.duration ? new Date(Date.now() + code.gift.duration) : null;
-            role.expires_at = expiration;
-            role.manually_added = false;
-            role.reason = `Gift code: ${code.code}`;
-            await player.save();
-        }
-    } else {
-        expiration = code.gift.duration ? new Date(Date.now() + code.gift.duration) : null;
-        player.roles.push({
-            name: code.gift.value,
-            added_at: new Date(),
-            manually_added: false,
-            reason: `Gift code: ${code.code}`,
-            expires_at: expiration
-        });
-        await player.save();
-    }
+    const { success, expiresAt } = player.addRole({ name: code.gift.value, reason: `Gift code: ${code.code}`, autoRemove: false, duration: code.gift.duration });
+    if(!success) return error(409, { error: i18n('gift_codes.already_have_role') });
     code.uses.push(player.uuid);
+    await player.save();
     await code.save();
+    
+    sendGiftCodeRedeemMessage(await GameProfile.getProfileByUUID(player.uuid), code, expiresAt);
 
-    return { message: i18n(`gift_codes.redeemed_${expiration ? 'temporarily' : 'permanently'}`).replace('<role>', code.gift.value), expires_at: expiration?.getTime() || null };
+    return { message: i18n(`gift_codes.redeemed_${expiresAt ? 'temporarily' : 'permanently'}`).replace('<role>', code.gift.value), expires_at: expiresAt?.getTime() || null };
 }, {
     detail: {
         tags: ['Gift codes'],
@@ -116,14 +94,15 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
     },
     params: t.Object({ code: t.String({ description: 'The gift code' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).post('/', async ({ session, body: { name, role, max_uses: maxUses, code_expiration: codeExpiration, gift_duration: giftDuration }, i18n, error }) => { // Create a gift code
+}).post('/', async ({ session, body: { name, code, role, max_uses: maxUses, code_expiration: codeExpiration, gift_duration: giftDuration }, i18n, error }) => { // Create a gift code
     if(!session?.hasPermission(Permission.ManageGiftCodes)) return error(403, { error: i18n('error.notAllowed') });
 
     const codeExpiresAt = codeExpiration ? new Date(codeExpiration) : null;
     const giftExpiresAt = giftDuration || null;
 
-    const code = await createGiftCode({
+    const giftCode = await createGiftCode({
         name: name.trim(),
+        code: code?.trim() || undefined,
         maxUses,
         gift: {
             type: 'role',
@@ -144,7 +123,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
         giftDuration: giftExpiresAt
     });
 
-    return { message: i18n('gift_codes.created'), code };
+    return { message: i18n('gift_codes.created'), code: giftCode };
 }, {
     detail: {
         tags: ['Gift codes'],
@@ -157,7 +136,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ name: t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }), role: t.String({ error: 'error.wrongType;;[["field", "role"], ["type", "string"]]' }), max_uses: t.Number({ error: 'error.wrongType;;[["field", "max_uses"], ["type", "number"]]' }), code_expiration: t.Optional(t.Number({ error: 'error.wrongType;;[["field", "code_expiration"], ["type", "number"]]' })), gift_duration: t.Optional(t.Number({ error: 'error.wrongType;;[["field", "gift_duration"], ["type", "number"]]' })) }, { error: 'error.invalidBody', additionalProperties: true }),
+    body: t.Object({ name: t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }), code: t.Optional(t.String({ error: 'error.wrongType;;[["field", "code"], ["type", "string"]]' })), role: t.String({ error: 'error.wrongType;;[["field", "role"], ["type", "string"]]' }), max_uses: t.Number({ error: 'error.wrongType;;[["field", "max_uses"], ["type", "number"]]' }), code_expiration: t.Optional(t.Number({ error: 'error.wrongType;;[["field", "code_expiration"], ["type", "number"]]' })), gift_duration: t.Optional(t.Number({ error: 'error.wrongType;;[["field", "gift_duration"], ["type", "number"]]' })) }, { error: 'error.invalidBody', additionalProperties: true }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).delete('/:code', async ({ session, params, i18n, error }) => { // Delete gift code
     if(!session?.hasPermission(Permission.ManageGiftCodes)) return error(403, { error: i18n('error.notAllowed') });
