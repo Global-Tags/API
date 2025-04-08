@@ -3,7 +3,7 @@ import Button from "../structs/Button";
 import { Permission } from "../../types/Permission";
 import { Player } from "../../database/schemas/players";
 
-export default class CreateApiKey extends Button {
+export default class CreateApiKeyButton extends Button {
     constructor() {
         super({
             id: 'createApiKey',

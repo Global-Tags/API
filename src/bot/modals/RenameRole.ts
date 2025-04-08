@@ -6,10 +6,9 @@ import { Permission } from "../../types/Permission";
 import { getCachedRoles } from "../../database/schemas/roles";
 import { snakeCase } from "change-case";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { GameProfile } from "../../libs/game-profiles";
 import roleModel from "../../database/schemas/roles";
 
-export default class RenameRole extends Modal {
+export default class RenameRoleModal extends Modal {
     constructor() {
         super({
             id: 'renameRole',
@@ -27,7 +26,7 @@ export default class RenameRole extends Modal {
 
         sendModLogMessage({
             logType: ModLogType.RenameRole,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await player.getGameProfile(),
             discord: true,
             names: {
                 old: role.name,

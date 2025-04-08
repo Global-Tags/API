@@ -6,7 +6,7 @@ import { Permission } from "../../types/Permission";
 import { getCachedRoles } from "../../database/schemas/roles";
 import { capitalCase } from "change-case";
 
-export default class CreateGiftCode extends Button {
+export default class CreateGiftCodeButton extends Button {
     constructor() {
         super({
             id: 'createGiftCode',

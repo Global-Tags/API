@@ -4,10 +4,10 @@ import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { stripUUID } from "../../libs/game-profiles";
 import ms, { StringValue } from "ms";
 
-export default class EditRoleExpiration extends Modal {
+export default class EditRoleExpirationModal extends Modal {
     constructor() {
         super({ 
             id: 'editRoleExpiration',
@@ -29,8 +29,8 @@ export default class EditRoleExpiration extends Modal {
 
         sendModLogMessage({
             logType: ModLogType.SetRoleExpiration,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
-            user: await GameProfile.getProfileByUUID(target.uuid),
+            staff: await player.getGameProfile(),
+            user: await target.getGameProfile(),
             discord: true,
             role: name,
             expires: expiresAt

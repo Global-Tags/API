@@ -2,10 +2,9 @@ import { CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, Gui
 import Command from "../structs/Command";
 import { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
-import { GameProfile } from "../../libs/game-profiles";
 import { onDiscordUnlink } from "../../libs/events";
 
-export default class Unlink extends Command {
+export default class UnlinkCommand extends Command {
     constructor() {
         super({
             name: 'unlink',
@@ -18,7 +17,7 @@ export default class Unlink extends Command {
     async execute(interaction: CommandInteraction, options: CommandInteractionOptionResolver, member: GuildMember, player: Player) {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
-        await onDiscordUnlink(await GameProfile.getProfileByUUID(player.uuid), player.connections.discord.id!);
+        await onDiscordUnlink(await player.getGameProfile(), player.connections.discord.id!);
 
         player.connections.discord.id = null;
         player.connections.discord.code = null;

@@ -6,7 +6,7 @@ import { config } from "../../libs/config";
 import { Permission } from "../../types/Permission";
 import { Player } from "../../database/schemas/players";
 
-export default class RenameRole extends Button {
+export default class RenameRoleButton extends Button {
     constructor() {
         super({
             id: 'renameRole',

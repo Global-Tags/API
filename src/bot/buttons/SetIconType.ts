@@ -7,7 +7,7 @@ import { Permission } from "../../types/Permission";
 import { GlobalIcon, icons } from "../../types/GlobalIcon";
 import { stripUUID } from "../../libs/game-profiles";
 
-export default class SetIconType extends Button {
+export default class SetIconTypeButton extends Button {
     constructor() {
         super({
             id: 'setIconType',

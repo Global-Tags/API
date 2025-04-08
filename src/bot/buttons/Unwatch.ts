@@ -4,9 +4,9 @@ import { colors } from "../bot";
 import players, { Player } from "../../database/schemas/players";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { stripUUID } from "../../libs/game-profiles";
 
-export default class Unwatch extends Button {
+export default class UnwatchButton extends Button {
     constructor() {
         super({
             id: 'unwatch',
@@ -24,8 +24,8 @@ export default class Unwatch extends Button {
 
         sendModLogMessage({
             logType: ModLogType.Unwatch,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
-            user: await GameProfile.getProfileByUUID(target.uuid),
+            staff: await player.getGameProfile(),
+            user: await target.getGameProfile(),
             discord: true
         });
 

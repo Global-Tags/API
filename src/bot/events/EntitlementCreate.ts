@@ -8,7 +8,7 @@ import { getCachedRoles } from "../../database/schemas/roles";
 
 const roleReason = (entitlement: string) => `Discord entitlement: ${entitlement}`;
 
-export default class EntitlementCreate extends Event {
+export default class EntitlementCreateEvent extends Event {
     constructor() {
         super('entitlementCreate', false);
     }

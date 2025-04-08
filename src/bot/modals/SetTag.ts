@@ -6,9 +6,9 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendTagChangeEmail } from "../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { stripUUID } from "../../libs/game-profiles";
 
-export default class SetTag extends Modal {
+export default class SetTagModal extends Modal {
     constructor() {
         super({
             id: 'setTag',
@@ -25,8 +25,8 @@ export default class SetTag extends Modal {
 
         sendModLogMessage({
             logType: ModLogType.ChangeTag,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
-            user: await GameProfile.getProfileByUUID(target.uuid),
+            staff: await player.getGameProfile(),
+            user: await target.getGameProfile(),
             tags: {
                 old: target.tag || 'None',
                 new: tag

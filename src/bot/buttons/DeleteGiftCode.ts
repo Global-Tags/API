@@ -5,7 +5,7 @@ import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 import codeSchema from "../../database/schemas/gift-codes";
 
-export default class DeleteGiftCode extends Button {
+export default class DeleteGiftCodeButton extends Button {
     constructor() {
         super({
             id: 'deleteGiftCode',

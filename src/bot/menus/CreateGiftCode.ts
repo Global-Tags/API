@@ -3,7 +3,7 @@ import SelectMenu from "../structs/SelectMenu";
 import { Player } from "../../database/schemas/players";
 import { Permission } from "../../types/Permission";
 
-export default class CreateGiftCode extends SelectMenu {
+export default class CreateGiftCodeMenu extends SelectMenu {
     constructor() {
         super({
             id: 'createGiftCode',

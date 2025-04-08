@@ -4,9 +4,9 @@ import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { stripUUID } from "../../libs/game-profiles";
 
-export default class EditRoleNote extends Modal {
+export default class EditRoleNoteModal extends Modal {
     constructor() {
         super({
             id: 'editRoleNote',
@@ -25,12 +25,12 @@ export default class EditRoleNote extends Modal {
         if(!target.setRoleNote(name, note)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The role is not active!')], flags: [MessageFlags.Ephemeral] });
         target.save();
 
-        const profile = await GameProfile.getProfileByUUID(player.uuid);
+        const profile = await player.getGameProfile();
 
         sendModLogMessage({
             logType: ModLogType.EditRoleNote,
             staff: profile,
-            user: await GameProfile.getProfileByUUID(target.uuid),
+            user: await target.getGameProfile(),
             discord: true,
             role: name,
             note

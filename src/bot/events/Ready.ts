@@ -4,7 +4,7 @@ import Event from "../structs/Event";
 import players from "../../database/schemas/players";
 import * as bot from "../bot";
 
-export default class Ready extends Event {
+export default class ReadyEvent extends Event {
     constructor() {
         super('ready', true);
     }

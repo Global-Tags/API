@@ -5,7 +5,7 @@ import players, { Player } from "../../database/schemas/players";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 
-export default class DeleteNote extends Button {
+export default class DeleteNoteButton extends Button {
     constructor() {
         super({
             id: 'deleteNote',

@@ -61,8 +61,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     await player.save();
 
     sendReportMessage({
-        user: await GameProfile.getProfileByUUID(uuid),
-        reporter: await GameProfile.getProfileByUUID(session.uuid),
+        user: await player.getGameProfile(),
+        reporter: await reporter.getGameProfile(),
         tag: player.tag,
         reason
     });

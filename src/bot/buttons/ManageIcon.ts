@@ -9,7 +9,7 @@ import { GlobalIcon } from "../../types/GlobalIcon";
 import { config } from "../../libs/config";
 import { stripUUID } from "../../libs/game-profiles";
 
-export default class ManageIcon extends Button {
+export default class ManageIconButton extends Button {
     constructor() {
         super({
             id: 'manageIcon',

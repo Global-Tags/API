@@ -5,9 +5,8 @@ import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
 import codeSchema from "../../database/schemas/gift-codes";
-import { GameProfile } from "../../libs/game-profiles";
 
-export default class DeleteGiftCode extends SelectMenu {
+export default class DeleteGiftCodeMenu extends SelectMenu {
     constructor() {
         super({
             id: 'deleteGiftCode',
@@ -24,7 +23,7 @@ export default class DeleteGiftCode extends SelectMenu {
 
         sendModLogMessage({
             logType: ModLogType.DeleteGiftCode,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await player.getGameProfile(),
             discord: true,
             code: code.name
         });

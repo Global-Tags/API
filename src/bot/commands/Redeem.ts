@@ -1,13 +1,12 @@
 import { ApplicationCommandOptionType, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
 import Command from "../structs/Command";
-import players, { Player } from "../../database/schemas/players";
+import { Player } from "../../database/schemas/players";
 import { colors, images } from "../bot";
 import giftCodes from "../../database/schemas/gift-codes";
 import { formatTimestamp, sendGiftCodeRedeemMessage } from "../../libs/discord-notifier";
 import { capitalCase } from "change-case";
-import { GameProfile } from "../../libs/game-profiles";
 
-export default class Redeem extends Command {
+export default class RedeemCommand extends Command {
     constructor() {
         super({
             name: 'redeem',
@@ -35,7 +34,7 @@ export default class Redeem extends Command {
         await player.save();
         await code.save();
 
-        sendGiftCodeRedeemMessage(await GameProfile.getProfileByUUID(player.uuid), code, expiresAt);
+        sendGiftCodeRedeemMessage(await player.getGameProfile(), code, expiresAt);
 
         const header = new EmbedBuilder()
             .setColor(colors.gray)

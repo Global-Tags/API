@@ -4,6 +4,7 @@ import { generateSecureCode } from "../../routes/players/[uuid]/connections";
 import { Permission } from "../../types/Permission";
 import { getCachedRoles, Role } from "./roles";
 import { GlobalIcon } from "../../types/GlobalIcon";
+import { GameProfile } from "../../libs/game-profiles";
 
 export type PlayerRole = {
     role: Role,
@@ -62,6 +63,8 @@ export interface IPlayer {
         discord: { id?: string | null, code?: string | null },
         email: { address?: string | null, code?: string | null }
     },
+    getGameProfile(): Promise<GameProfile>,
+    getReferrer(): Promise<Player | null>
     addReferral(uuid: string): void,
     isEmailVerified(): boolean,
     getAllRoles(): PlayerRole[],
@@ -304,6 +307,16 @@ const schema = new Schema<IPlayer>({
     }
 }, {
     methods: {
+        async getGameProfile(): Promise<GameProfile> {
+            return await GameProfile.getProfileByUUID(this.uuid);
+        },
+
+        async getReferrer(): Promise<Player | null> {
+            if(!this.referrals.has_referred) return null;
+            const referrer = await this.model('players').findOne({ 'referrals.total.uuid': this.uuid });
+            return referrer as Player | null;
+        },
+
         addReferral(uuid: string) {
             this.referrals.total.push({ uuid, timestamp: Date.now() });
             this.referrals.current_month++;

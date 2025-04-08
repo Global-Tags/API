@@ -5,7 +5,7 @@ import { colors } from "../bot";
 import { stripUUID } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 
-export default class SetTag extends Button {
+export default class SetTagButton extends Button {
     constructor() {
         super({
             id: 'setTag',

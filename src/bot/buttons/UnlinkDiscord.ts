@@ -4,10 +4,10 @@ import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { stripUUID } from "../../libs/game-profiles";
 import { onDiscordUnlink } from "../../libs/events";
 
-export default class UnlinkDiscord extends Button {
+export default class UnlinkDiscordButton extends Button {
     constructor() {
         super({
             id: 'unlinkDiscord',
@@ -20,7 +20,7 @@ export default class UnlinkDiscord extends Button {
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
         if(!target.connections.discord.id) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player does not have their discord account linked!')], flags: [MessageFlags.Ephemeral] });
 
-        const profile = await GameProfile.getProfileByUUID(target.uuid);
+        const profile = await target.getGameProfile();
         await onDiscordUnlink(await profile, target.connections.discord.id!);
 
         target.connections.discord.id = null;
@@ -29,7 +29,7 @@ export default class UnlinkDiscord extends Button {
         sendModLogMessage({
             logType: ModLogType.UnlinkConnection,
             user: profile,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await player.getGameProfile(),
             discord: true,
             type: 'discord'
         });

@@ -6,9 +6,8 @@ import { Permission } from "../../types/Permission";
 import ms, { StringValue } from "ms";
 import { createGiftCode } from "../../database/schemas/gift-codes";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { GameProfile } from "../../libs/game-profiles";
 
-export default class CreateGiftCode extends Modal {
+export default class CreateGiftCodeModal extends Modal {
     constructor() {
         super({
             id: 'createGiftCode_',
@@ -46,7 +45,7 @@ export default class CreateGiftCode extends Modal {
 
         sendModLogMessage({
             logType: ModLogType.CreateGiftCode,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await player.getGameProfile(),
             discord: true,
             code: name,
             role,

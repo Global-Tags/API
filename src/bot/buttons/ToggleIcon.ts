@@ -5,9 +5,8 @@ import { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import roles, { updateRoleCache } from "../../database/schemas/roles";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { GameProfile } from "../../libs/game-profiles";
 
-export default class ToggleIcon extends Button {
+export default class ToggleIconButton extends Button {
     constructor() {
         super({
             id: 'toggleIcon',
@@ -25,7 +24,7 @@ export default class ToggleIcon extends Button {
 
         sendModLogMessage({
             logType: ModLogType.ToggleRoleIcon,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await player.getGameProfile(),
             discord: true,
             role: role.name,
             roleIcon: role.hasIcon

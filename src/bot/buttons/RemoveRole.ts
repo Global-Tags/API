@@ -6,7 +6,7 @@ import { capitalCase, snakeCase } from "change-case";
 import { Permission } from "../../types/Permission";
 import { stripUUID } from "../../libs/game-profiles";
 
-export default class RemoveRole extends Button {
+export default class RemoveRoleButton extends Button {
     constructor() {
         super({
             id: 'removeRole',

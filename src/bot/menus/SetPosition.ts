@@ -6,9 +6,9 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendPositionChangeEmail } from "../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { stripUUID } from "../../libs/game-profiles";
 
-export default class SetPosition extends SelectMenu {
+export default class SetPositionMenu extends SelectMenu {
     constructor() {
         super({
             id: 'setPosition',
@@ -27,8 +27,8 @@ export default class SetPosition extends SelectMenu {
 
         sendModLogMessage({
             logType: ModLogType.EditPosition,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
-            user: await GameProfile.getProfileByUUID(target.uuid),
+            staff: await player.getGameProfile(),
+            user: await target.getGameProfile(),
             discord: true,
             positions: {
                 old: oldPosition,

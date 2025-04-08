@@ -3,7 +3,7 @@ import Button from "../structs/Button";
 import { Permission } from "../../types/Permission";
 import { Player } from "../../database/schemas/players";
 
-export default class Ban extends Button {
+export default class BanButton extends Button {
     constructor() {
         super({
             id: 'ban',

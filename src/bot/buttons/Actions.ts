@@ -6,11 +6,12 @@ import { Permission } from "../../types/Permission";
 import { stripUUID } from "../../libs/game-profiles";
 import { uuidRegex } from "../commands/PlayerInfo";
 import { config } from "../../libs/config";
+import { stripColors } from "../../libs/chat-color";
 
 type InfoEntry = { name: string, value: string };
 type Info = { category: string, entries: InfoEntry[] };
 
-export default class Actions extends Button {
+export default class ActionsButton extends Button {
     constructor() {
         super({
             id: 'actions',
@@ -31,6 +32,7 @@ export default class Actions extends Button {
         const moderation: InfoEntry[] = [];
         const connections: InfoEntry[] = [];
 
+        general.push({ name: 'Tag', value: `\`${!!target.tag ? stripColors(target.tag) : '-'}\`` });
         if(player.hasPermission(Permission.ManageTags)) {
             general.push({ name: 'Tag history', value: `\`${target.history.length}\`` });
             moderation.push({ name: 'Tag clears', value: `\`${target.clears.filter(({ type }) => type == 'tag').length}\`` });
@@ -38,7 +40,7 @@ export default class Actions extends Button {
         }
         general.push({ name: 'Language', value: `\`${target.last_language}\`` });
         general.push({ name: 'Hidden role icon', value: `\`${target.hide_role_icon ? '✅' : '❌'}\`` });
-        general.push({ name: 'Got referred', value: `\`${target.referrals.has_referred ? '✅' : '❌'}\`` });
+        general.push({ name: 'Referred by', value: `${(await (await target.getReferrer())?.getGameProfile())?.getFormattedHyperlink() || '`-`'}` });
         if(player.hasPermission(Permission.ManageApiKeys)) general.push({ name: 'API Keys', value: `\`${target.api_keys.length}\`` });
 
         if(player.hasPermission(Permission.ManageNotes)) moderation.push({ name: 'Notes', value: `\`${target.notes.length}\`` });

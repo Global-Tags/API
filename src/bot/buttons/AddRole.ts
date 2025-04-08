@@ -7,7 +7,7 @@ import { Permission } from "../../types/Permission";
 import { getCachedRoles } from "../../database/schemas/roles";
 import { stripUUID } from "../../libs/game-profiles";
 
-export default class AddRole extends Button {
+export default class AddRoleButton extends Button {
     constructor() {
         super({
             id: 'addRole',

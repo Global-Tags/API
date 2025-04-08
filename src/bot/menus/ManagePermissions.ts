@@ -5,9 +5,8 @@ import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 import roles, { updateRoleCache } from "../../database/schemas/roles";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { GameProfile } from "../../libs/game-profiles";
 
-export default class ManagePermissions extends SelectMenu {
+export default class ManagePermissionsMenu extends SelectMenu {
     constructor() {
         super({
             id: 'managePermissions',
@@ -37,7 +36,7 @@ export default class ManagePermissions extends SelectMenu {
 
         sendModLogMessage({
             logType: ModLogType.ChangeRolePermissions,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            staff: await player.getGameProfile(),
             discord: true,
             role: role.name,
             permissions: {

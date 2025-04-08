@@ -6,10 +6,10 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendBanEmail } from "../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { stripUUID } from "../../libs/game-profiles";
 import ms, { StringValue } from "ms";
 
-export default class Ban extends Modal {
+export default class BanModal extends Modal {
     constructor() {
         super({
             id: 'ban',
@@ -36,8 +36,8 @@ export default class Ban extends Modal {
 
         sendModLogMessage({
             logType: ModLogType.Ban,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
-            user: await GameProfile.getProfileByUUID(target.uuid),
+            staff: await player.getGameProfile(),
+            user: await target.getGameProfile(),
             discord: true,
             appealable: true,
             reason: reason,

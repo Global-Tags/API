@@ -4,9 +4,9 @@ import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { stripUUID } from "../../libs/game-profiles";
 
-export default class RemoveRole extends SelectMenu {
+export default class RemoveRoleMenu extends SelectMenu {
     constructor() {
         super({
             id: 'removeRole',
@@ -27,8 +27,8 @@ export default class RemoveRole extends SelectMenu {
 
         sendModLogMessage({
             logType: ModLogType.RemoveRole,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
-            user: await GameProfile.getProfileByUUID(target.uuid),
+            staff: await player.getGameProfile(),
+            user: await target.getGameProfile(),
             discord: true,
             role: roleName
         });

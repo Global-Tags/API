@@ -78,7 +78,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     sendModLogMessage({
         logType: ModLogType.CreateNote,
         staff: await GameProfile.getProfileByUUID(session.uuid!),
-        user: await GameProfile.getProfileByUUID(uuid),
+        user: await player.getGameProfile(),
         discord: false,
         note
     });
@@ -116,7 +116,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     sendModLogMessage({
         logType: ModLogType.DeleteNote,
         staff: await GameProfile.getProfileByUUID(session.uuid!),
-        user: await GameProfile.getProfileByUUID(uuid),
+        user: await player.getGameProfile(),
         discord: false,
         note: note.text
     });

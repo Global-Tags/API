@@ -4,9 +4,9 @@ import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { stripUUID } from "../../libs/game-profiles";
 
-export default class Watch extends Button {
+export default class WatchButton extends Button {
     constructor() {
         super({
             id: 'watch',
@@ -24,8 +24,8 @@ export default class Watch extends Button {
 
         sendModLogMessage({
             logType: ModLogType.Watch,
-            staff: await GameProfile.getProfileByUUID(player.uuid),
-            user: await GameProfile.getProfileByUUID(target.uuid),
+            staff: await player.getGameProfile(),
+            user: await target.getGameProfile(),
             discord: true
         });
 

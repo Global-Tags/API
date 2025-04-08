@@ -3,10 +3,9 @@ import Command from "../structs/Command";
 import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { config } from "../../libs/config";
-import { GameProfile } from "../../libs/game-profiles";
 import { onDiscordLink } from "../../libs/events";
 
-export default class Link extends Command {
+export default class LinkCommand extends Command {
     constructor() {
         super({
             name: 'link',
@@ -38,7 +37,7 @@ export default class Link extends Command {
         codePlayer.connections.discord.code = null;
         codePlayer.save();
 
-        onDiscordLink(await GameProfile.getProfileByUUID(codePlayer.uuid), member.user.id);
+        onDiscordLink(await codePlayer.getGameProfile(), member.user.id);
 
         interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ Your account was successfully linked!')] });
     }

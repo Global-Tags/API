@@ -75,7 +75,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
     await player.save();
     await code.save();
     
-    sendGiftCodeRedeemMessage(await GameProfile.getProfileByUUID(player.uuid), code, expiresAt);
+    sendGiftCodeRedeemMessage(await player.getGameProfile(), code, expiresAt);
 
     return { message: i18n(`gift_codes.redeemed_${expiresAt ? 'temporarily' : 'permanently'}`).replace('<role>', code.gift.value), expires_at: expiresAt?.getTime() || null };
 }, {

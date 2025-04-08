@@ -5,7 +5,7 @@ import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 import { stripUUID } from "../../libs/game-profiles";
 
-export default class ManageTag extends Button {
+export default class ManageTagButton extends Button {
     constructor() {
         super({
             id: 'manageTag',

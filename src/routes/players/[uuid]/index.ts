@@ -114,7 +114,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
 
     let isWatched = false;
     let notifyWatch = true;
-    const gameProfile = await GameProfile.getProfileByUUID(uuid);
+    const gameProfile = await player?.getGameProfile();
     if(!session.hasPermission(Permission.BypassValidation)) {
         tag = tag.trim().replace(colorCodesWithSpaces, '').replace(hexColorCodesWithSpaces, '');
         const strippedTag = stripColors(tag);
@@ -125,7 +125,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         isWatched = (player && player.watchlist) || watchlist.some((word) => {
             if(strippedTag.toLowerCase().includes(word)) {
                 Logger.warn(`Now watching ${uuid} for matching "${word}" in "${tag}".`);
-                sendWatchlistAddMessage({ user: gameProfile, tag, word });
+                sendWatchlistAddMessage({ user: gameProfile!, tag, word });
                 notifyWatch = false;
                 return true;
             }
@@ -168,7 +168,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         }
     }
 
-    if(isWatched && notifyWatch) sendWatchlistTagUpdateMessage(await gameProfile, tag);
+    if(isWatched && notifyWatch) sendWatchlistTagUpdateMessage(gameProfile!, tag);
     return { message: i18n(`setTag.success.${session.equal ? 'self' : 'admin'}`) };
 }, {
     detail: {
@@ -199,7 +199,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         sendModLogMessage({
             logType: ModLogType.ClearTag,
             staff: await GameProfile.getProfileByUUID(session.uuid!),
-            user: await GameProfile.getProfileByUUID(uuid),
+            user: await player.getGameProfile(),
             discord: false
         });
         player.clearTag(session.uuid!);

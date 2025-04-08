@@ -9,10 +9,9 @@ import { config } from "../../libs/config";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon } from "../../types/GlobalIcon";
 import { sendCustomIconUploadMessage } from "../../libs/discord-notifier";
-import { GameProfile } from "../../libs/game-profiles";
 import { snakeCase } from "change-case";
 
-export default class CustomIcon extends Command {
+export default class CustomIconCommand extends Command {
     constructor() {
         super({
             name: 'icon',
@@ -81,7 +80,7 @@ export default class CustomIcon extends Command {
             await Bun.write(Bun.file(join('icons', player.uuid, `${player.icon.hash}.png`)), request.data, { createPath: true });
 
             sendCustomIconUploadMessage(
-                await GameProfile.getProfileByUUID(player.uuid),
+                await player.getGameProfile(),
                 player.icon.hash
             );
 

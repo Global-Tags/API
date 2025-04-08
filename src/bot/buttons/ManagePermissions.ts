@@ -6,7 +6,7 @@ import { colors, images } from "../bot";
 import { getCachedRoles } from "../../database/schemas/roles";
 import { capitalCase } from "change-case";
 
-export default class ManagePermissions extends Button {
+export default class ManagePermissionsButton extends Button {
     constructor() {
         super({
             id: 'managePermissions',

@@ -78,7 +78,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     sendModLogMessage({
         logType: ModLogType.Ban,
         staff: await GameProfile.getProfileByUUID(session.uuid!),
-        user: await GameProfile.getProfileByUUID(uuid),
+        user: await player.getGameProfile(),
         discord: false,
         reason: reason,
         appealable: appealable == undefined ? true : appealable,
@@ -122,7 +122,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     sendModLogMessage({
         logType: ModLogType.EditBan,
-        user: await GameProfile.getProfileByUUID(uuid),
+        user: await player.getGameProfile(),
         staff: await GameProfile.getProfileByUUID(session.uuid!),
         discord: false,
         appealable: appealable,
@@ -161,7 +161,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     await player.save();
 
     sendBanAppealMessage(
-        await GameProfile.getProfileByUUID(uuid),
+        await player.getGameProfile(),
         reason
     );
 
@@ -196,7 +196,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     sendModLogMessage({
         logType: ModLogType.Unban,
         staff: await GameProfile.getProfileByUUID(session.uuid!),
-        user: await GameProfile.getProfileByUUID(uuid),
+        user: await player.getGameProfile(),
         discord: false
     });
 

@@ -5,7 +5,7 @@ import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 import { stripUUID } from "../../libs/game-profiles";
 
-export default class ManageApiKeys extends Button {
+export default class ManageApiKeysButton extends Button {
     constructor() {
         super({
             id: 'manageApiKeys',

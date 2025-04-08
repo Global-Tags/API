@@ -4,9 +4,9 @@ import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { stripUUID } from "../../libs/game-profiles";
 
-export default class UnlinkEmail extends Button {
+export default class UnlinkEmailButton extends Button {
     constructor() {
         super({
             id: 'unlinkEmail',
@@ -24,8 +24,8 @@ export default class UnlinkEmail extends Button {
 
         sendModLogMessage({
             logType: ModLogType.UnlinkConnection,
-            user: await GameProfile.getProfileByUUID(target.uuid),
-            staff: await GameProfile.getProfileByUUID(player.uuid),
+            user: await target.getGameProfile(),
+            staff: await player.getGameProfile(),
             discord: true,
             type: 'email'
         });
