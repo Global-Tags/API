@@ -16,6 +16,7 @@ import { ElysiaApp } from "../../..";
 
 const { validation } = config;
 const { min, max, blacklist, watchlist } = validation.tag;
+const multipleSpaces = /\s{2,}/g;
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, language, params, i18n, error }) => { // Get player info
     if(!!session?.uuid && !!language) saveLastLanguage(session.uuid, language);
@@ -116,7 +117,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     let notifyWatch = true;
     const gameProfile = await player?.getGameProfile();
     if(!session.hasPermission(Permission.BypassValidation)) {
-        tag = tag.trim().replace(colorCodesWithSpaces, '').replace(hexColorCodesWithSpaces, '');
+        tag = tag.trim().replace(multipleSpaces, ' ').replace(colorCodesWithSpaces, '').replace(hexColorCodesWithSpaces, '');
         const strippedTag = stripColors(tag);
         if(strippedTag == '') return error(422, { error: i18n('setTag.empty') });
         if(strippedTag.length < min || strippedTag.length > max) return error(422, { error: i18n('setTag.validation').replace('<min>', String(min)).replace('<max>', String(max)) });
