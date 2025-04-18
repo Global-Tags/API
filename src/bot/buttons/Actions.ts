@@ -7,8 +7,8 @@ import { stripUUID, uuidRegex } from "../../libs/game-profiles";
 import { config } from "../../libs/config";
 import { stripColors } from "../../libs/chat-color";
 
-type InfoEntry = { name: string, value: string };
-type Info = { category: string, entries: InfoEntry[] };
+export type InfoEntry = { name: string, value: string };
+export type Info = { category: string, entries: InfoEntry[] };
 
 export default class ActionsButton extends Button {
     constructor() {
@@ -74,17 +74,28 @@ export default class ActionsButton extends Button {
                     .setLabel('Account')
                     .setCustomId('manageAccount')
                     .setStyle(ButtonStyle.Primary)
-                    .setDisabled(!player.hasPermission(Permission.ManageConnections) && !player.hasPermission(Permission.ManageRoles)),
-                new ButtonBuilder()
-                    .setLabel('Tag Settings')
-                    .setCustomId('manageTag')
-                    .setStyle(ButtonStyle.Primary)
-                    .setDisabled(!player.hasPermission(Permission.ManageTags)),
+                    .setDisabled(![
+                        Permission.ManageConnections,
+                        Permission.ManageRoles,
+                        Permission.ManageApiKeys,
+                        Permission.ManageTags
+                    ].some((permission) => player.hasPermission(permission))),
                 new ButtonBuilder()
                     .setLabel('Moderation')
                     .setCustomId('moderateAccount')
                     .setStyle(ButtonStyle.Primary)
-                    .setDisabled(!player.hasPermission(Permission.ManageBans) && !player.hasPermission(Permission.ManageNotes) && !player.hasPermission(Permission.ManageReports) && !player.hasPermission(Permission.ManageWatchlist))
+                    .setDisabled(![
+                        Permission.ManageBans,
+                        Permission.ManageNotes,
+                        Permission.ManageReports,
+                        Permission.ManageWatchlist,
+                        Permission.ManageTags
+                    ].some((permission) => player.hasPermission(permission))),
+                new ButtonBuilder()
+                    .setLabel('Manage Tag')
+                    .setCustomId('manageTag')
+                    .setStyle(ButtonStyle.Primary)
+                    .setDisabled(!player.hasPermission(Permission.ManageTags))
             );
 
         interaction.reply({ embeds: [embed], components: [row], flags: [MessageFlags.Ephemeral] });

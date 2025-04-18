@@ -14,7 +14,12 @@ export default class ManageAccountButton extends Button {
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        if(!player.hasPermission(Permission.ManageConnections) && !player.hasPermission(Permission.ManageRoles) && !player.hasPermission(Permission.ManageApiKeys)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
+        if(![
+            Permission.ManageConnections,
+            Permission.ManageRoles,
+            Permission.ManageApiKeys,
+            Permission.ManageTags
+        ].some((permission) => player.hasPermission(permission))) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
         
         const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
@@ -23,25 +28,39 @@ export default class ManageAccountButton extends Button {
             .setTitle('Manage account')
             .setDescription('Here you can manage the player\'s connections and roles.');
 
-        const row = new ActionRowBuilder<ButtonBuilder>()
-        .addComponents(
-            new ButtonBuilder()
-                .setLabel('Connections')
-                .setCustomId('manageConnections')
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(!player.hasPermission(Permission.ManageConnections)),
-            new ButtonBuilder()
-                .setLabel('Roles')
-                .setCustomId('manageRoles')
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(!player.hasPermission(Permission.ManageRoles)),
-            new ButtonBuilder()
-                .setLabel('API Keys')
-                .setCustomId('manageApiKeys')
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(!player.hasPermission(Permission.ManageApiKeys))
-        );
+        const rows = [
+            new ActionRowBuilder<ButtonBuilder>()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setLabel('Connections')
+                        .setCustomId('manageConnections')
+                        .setStyle(ButtonStyle.Primary)
+                        .setDisabled(!player.hasPermission(Permission.ManageConnections)),
+                    new ButtonBuilder()
+                        .setLabel('Roles')
+                        .setCustomId('manageRoles')
+                        .setStyle(ButtonStyle.Primary)
+                        .setDisabled(!player.hasPermission(Permission.ManageRoles)),
+                    new ButtonBuilder()
+                        .setLabel('API Keys')
+                        .setCustomId('manageApiKeys')
+                        .setStyle(ButtonStyle.Primary)
+                        .setDisabled(!player.hasPermission(Permission.ManageApiKeys))
+                ),
+            new ActionRowBuilder<ButtonBuilder>()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setLabel('Tag History')
+                        .setCustomId('tagHistory')
+                        .setStyle(ButtonStyle.Primary)
+                        .setDisabled(!player.hasPermission(Permission.ManageTags)),
+                    new ButtonBuilder()
+                        .setLabel('Referrals')
+                        .setCustomId('referrals')
+                        .setStyle(ButtonStyle.Primary)
+                )
+        ]
 
-        interaction.reply({ embeds: [embed], components: [row], flags: [MessageFlags.Ephemeral] });
+        interaction.reply({ embeds: [embed], components: rows, flags: [MessageFlags.Ephemeral] });
     }
 }
