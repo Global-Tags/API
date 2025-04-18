@@ -67,17 +67,17 @@ export default class ModerateAccountButton extends Button {
             new ActionRowBuilder<ButtonBuilder>()
                 .addComponents(
                     new ButtonBuilder()
-                        .setLabel(`Reports${target.reports.length > 0 ? ` (${target.reports.length})` : ''}`)
+                        .setLabel(`Reports${player.hasPermission(Permission.ManageReports) && target.reports.length > 0 ? ` (${target.reports.length})` : ''}`)
                         .setCustomId('reports')
                         .setStyle(ButtonStyle.Primary)
                         .setDisabled(!player.hasPermission(Permission.ManageReports)),
                     new ButtonBuilder()
-                        .setLabel(`Notes${target.notes.length > 0 ? ` (${target.notes.length})` : ''}`)
+                        .setLabel(`Notes${player.hasPermission(Permission.ManageNotes) && target.notes.length > 0 ? ` (${target.notes.length})` : ''}`)
                         .setCustomId('notes')
                         .setStyle(ButtonStyle.Primary)
                         .setDisabled(!player.hasPermission(Permission.ManageNotes)),
                     new ButtonBuilder()
-                        .setLabel(`Clears${target.clears.length > 0 ? ` (${target.clears.length})` : ''}`)
+                        .setLabel(`Clears${player.hasPermission(Permission.ManageTags) && target.clears.length > 0 ? ` (${target.clears.length})` : ''}`)
                         .setCustomId('clears')
                         .setStyle(ButtonStyle.Primary)
                         .setDisabled(!player.hasPermission(Permission.ManageTags))
