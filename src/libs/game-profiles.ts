@@ -1,5 +1,7 @@
 import axios from "axios";
 
+export const uuidRegex = /[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}|[a-f0-9]{8}(?:[a-f0-9]{4}){4}[a-f0-9]{8}/;
+
 export class GameProfile {
     uuid: string | null
     username: string | null
