@@ -1,11 +1,11 @@
-import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember } from "discord.js";
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
 import Command from "../structs/Command";
 import players, { Player } from "../../database/schemas/players";
 import * as bot from "../bot";
 import { translateToAnsi } from "../../libs/chat-color";
 import { formatUUID, GameProfile, stripUUID } from "../../libs/game-profiles";
 import { capitalCase } from "change-case";
-export const uuidRegex = /[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}|[a-f0-9]{8}(?:[a-f0-9]{4}){4}[a-f0-9]{8}/;
+import { Permission } from "../../types/Permission";
 
 export default class PlayerInfoCommand extends Command {
     constructor() {
@@ -25,28 +25,30 @@ export default class PlayerInfoCommand extends Command {
     }
 
     async execute(interaction: CommandInteraction, options: CommandInteractionOptionResolver, member: GuildMember, player: Player | null) {
-        await interaction.deferReply();
-        let name, uuid = options.getString('player', true);
-        if(!uuidRegex.test(uuid)) {
-            const profile = await GameProfile.getProfileByUsername(uuid);
-            if(!profile.uuid || profile.error) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(`❌ ${profile.error || 'An error ocurred with the request to mojang'}`)] });
-            
-            name = profile.username;
-            uuid = profile.uuid;
-        }
-        const strippedUUID = stripUUID(uuid);
-        const data = await players.findOne({ uuid: strippedUUID });
-        const roles = data?.getActiveRoles() || [];
+        const resolvable = options.getString('player', true);
 
-        if(!data) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ This player is not in our records!')] });
-        interaction.editReply({
+        const or: any[] = [{ uuid: stripUUID(resolvable) }, { uuid: (await GameProfile.getProfileByUsername(resolvable))?.uuid }];
+        if(player) {
+            if(player.hasPermission(Permission.ManageConnections)) {
+                or.push({ 'connections.discord.id': resolvable });
+                or.push({ 'connections.email.address': resolvable });
+            }
+        }
+        const data = await players.findOne({ $or: or });
+        if(!data) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ This player is not in our records!')] });
+        const profile = await GameProfile.getProfileByUUID(data.uuid);
+        if(!profile) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ This player does not exist!')] });
+
+        const roles = data.getActiveRoles() || [];
+
+        interaction.reply({
             embeds: [
                 new EmbedBuilder()
                     .setColor(bot.colors.gray)
-                    .setThumbnail(`https://laby.net/texture/profile/head/${strippedUUID}.png?size=1024&overlay`)
-                    .setAuthor({ name: formatUUID(uuid) })
-                    .setURL(`https://laby.net/${uuid}`)
-                    .setTitle(`Playerdata${!!name ? ` of ${name}` : ''}`)
+                    .setThumbnail(`https://laby.net/texture/profile/head/${profile.uuid}.png?size=1024&overlay`)
+                    .setAuthor({ name: formatUUID(data.uuid) })
+                    .setURL(`https://laby.net/${profile.uuid}`)
+                    .setTitle(`Playerdata${!!profile.username ? ` of ${profile.username}` : ''}`)
                     .addFields([
                         {
                             name: 'Tag',
@@ -84,7 +86,8 @@ export default class PlayerInfoCommand extends Command {
                             .setCustomId('actions')
                             .setStyle(ButtonStyle.Primary)
                     )
-            ] : []
+            ] : [],
+            flags: [data.connections.discord.id, data.connections.email.address].some((connection) => connection === resolvable) ? [MessageFlags.Ephemeral] : []
         });
     }
 }
