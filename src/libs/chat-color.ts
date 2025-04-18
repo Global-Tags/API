@@ -26,6 +26,6 @@ export function translateToAnsi(text: string): string {
         .replaceAll(/(&|§)b/gi, '[0;36m')
         .replaceAll(/(&|§)f/gi, '[0;37m')
         .replaceAll(/(&|§)r/gi, '[0;37m')
-        .replace(colorCodes, '')
+        .replaceAll(colorCodes, '')
         .replaceAll(hexColorCodes, '');
 }
