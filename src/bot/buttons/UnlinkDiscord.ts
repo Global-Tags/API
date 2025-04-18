@@ -21,7 +21,7 @@ export default class UnlinkDiscordButton extends Button {
         if(!target.connections.discord.id) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player does not have their discord account linked!')], flags: [MessageFlags.Ephemeral] });
 
         const profile = await target.getGameProfile();
-        await onDiscordUnlink(await profile, target.connections.discord.id!);
+        await onDiscordUnlink(profile, target.connections.discord.id!);
 
         target.connections.discord.id = null;
         await target.save();
