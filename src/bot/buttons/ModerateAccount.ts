@@ -3,9 +3,7 @@ import Button from "../structs/Button";
 import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
-import { formatTimestamp } from "../../libs/discord-notifier";
-import { InfoEntry } from "./Actions";
+import { stripUUID } from "../../libs/game-profiles";
 
 export default class ModerateAccountButton extends Button {
     constructor() {
@@ -27,28 +25,9 @@ export default class ModerateAccountButton extends Button {
         const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
-        const info: InfoEntry[] = [];
-
-        if(player.hasPermission(Permission.ManageWatchlist)) {
-            info.push({ name: 'Watchlist', value: `\`${target.watchlist ? '✅' : '❌'}\`` });
-        }
-        if(player.hasPermission(Permission.ManageBans)) {
-            info.push({ name: 'Active ban', value: `\`${target.isBanned() ? '✅' : '❌'}\`` });
-            if(target.isBanned()) {
-                const ban = target.bans[0];
-                info.push({ name: 'Ban ID', value: `\`${ban.id}\`` });
-                info.push({ name: 'Ban reason', value: `\`${ban.reason}\`` });
-                info.push({ name: 'Banned by', value: `[${(await GameProfile.getProfileByUUID(ban.staff)).getUsernameOrUUID()}](https://laby.net/@${player.uuid})` });
-                info.push({ name: 'Banned since', value: `${formatTimestamp(ban.banned_at)}` });
-                info.push({ name: 'Expiration date', value: `${ban.expires_at ? `${formatTimestamp(ban.expires_at)}` : '`-`'}` });
-                info.push({ name: 'Is ban appealable', value: `\`${ban.appealable ? '✅' : '❌'}\`` });
-                info.push({ name: 'Was ban appealed', value: `\`${ban.appealed ? '✅' : '❌'}\`` });
-            }
-        }
-
         const embed = EmbedBuilder.from(message.embeds[0])
             .setTitle('Moderate account')
-            .setDescription(info.length > 0 ? info.map(({ name, value }) => `> ${name}: ${value}`).join('\n') : '*No information available*');
+            .setDescription('Here you can manage the account of the player.');
 
         const rows = [
             new ActionRowBuilder<ButtonBuilder>()
