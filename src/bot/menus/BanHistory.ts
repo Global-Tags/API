@@ -23,6 +23,6 @@ export default class BanHistoryMenu extends SelectMenu {
         const ban = target.bans.find((note) => note.id == values[0]);
         if(!ban) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Ban not found!')], flags: [MessageFlags.Ephemeral] });
 
-        interaction.reply({ embeds: [EmbedBuilder.from(message.embeds[0]).setDescription(`\n> Ban ID: \`${ban.id}\`\n> Ban reason: \`${ban.reason}\`\n> Banned by: [\`${(await GameProfile.getProfileByUUID(ban.staff)).getUsernameOrUUID()}\`](https://laby.net/@${player.uuid})\n> Banned since: ${formatTimestamp(ban.banned_at)}\n> Expiration date: ${ban.expires_at ? `${formatTimestamp(ban.expires_at)}` : '`-`'}\n> Is ban appealable: \`${ban.appealable ? '✅' : '❌'}\`\n> Was ban appealed: \`${ban.appealed ? '✅' : '❌'}\``)], flags: [MessageFlags.Ephemeral] });
+        interaction.reply({ embeds: [EmbedBuilder.from(message.embeds[0]).setDescription(`\n> Ban ID: \`${ban.id}\`\n> Ban reason: \`${ban.reason}\`\n> Banned by: [\`${(await GameProfile.getProfileByUUID(ban.staff)).getUsernameOrUUID()}\`](https://laby.net/@${player.uuid})\n> Banned since: ${formatTimestamp(ban.banned_at)}\n> Expiration date: ${ban.expires_at ? `${formatTimestamp(ban.expires_at)}` : '`-`'}\n> Is ban appealable: \`${ban.appeal.appealable ? '✅' : '❌'}\`\n> Ban appeal: \`${ban.appeal.appealed ? `${ban.appeal.reason || 'Unknown reason'} (${ban.appeal.appealed_at ? formatTimestamp(ban.appeal.appealed_at, 'd') : 'Unknown date'})` : '--'}\``)], flags: [MessageFlags.Ephemeral] });
     }
 }
