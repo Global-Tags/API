@@ -4,6 +4,8 @@ import { join } from "path";
 import Logger from "./Logger";
 import { capitalCase } from "change-case";
 import { I18nFunction } from "./i18n";
+import moment from "moment";
+import { stripColors } from "./chat-color";
 
 const { mailer } = config;
 
@@ -37,18 +39,26 @@ export async function sendEmail({ recipient, subject, template, variables = [] }
     if(!file.exists()) throw new Error('Template does not exist!');
     let message = await file.text();
     for(const variable of variables) {
-        message = message.replaceAll(`[${variable[0]}]`, variable[1]);
+        message = message.replaceAll(`[${variable[0]}]`, variable[1].trim());
     }
 
     return await transporter.sendMail({
         from: `"${mailer.sender.name}" <${mailer.sender.address}>`,
-        to: recipient,
+        to: recipient.trim(),
         subject: subject,
         html: message
     });
 }
 
-export function sendBanEmail(address: string, reason: string, i18n: I18nFunction) {
+export function sendBanEmail({ address, reason, duration, appealable, i18n }: { address: string, reason: string, duration: Date | null, appealable: boolean, i18n: I18nFunction }) {
+    const permanent = !duration;
+    const durationOptions: MailOptions['variables'] = [];
+
+    if(!permanent) {
+        durationOptions.push(['duration', i18n('email.banned.duration')]);
+        durationOptions.push(['duration_value', i18n('email.banned.until').replace('<date>', moment(duration).format('DD.MM.YYYY HH:mm'))]);
+    }
+
     sendEmail({
         recipient: address,
         subject: i18n('email.banned.subject'),
@@ -56,9 +66,12 @@ export function sendBanEmail(address: string, reason: string, i18n: I18nFunction
         variables: [
             ['title', i18n('email.banned.title')],
             ['greeting', i18n('email.greeting')],
-            ['description', i18n('email.banned.description')],
-            ['reason', reason],
-            ['appeal', i18n('email.banned.appeal')],
+            ['description', i18n(`email.banned.description.${permanent ? 'permanent' : 'temporary'}`)],
+            ['reason', i18n('email.banned.reason')],
+            ['reason_value', reason],
+            ['duration_visibility', permanent ? 'none' : 'initial'],
+            ...durationOptions,
+            ['appeal', i18n(`email.banned.${appealable ? 'a' : 'noA'}ppeal`)],
             ['footer', i18n('email.footer')],
         ]
     });
@@ -88,7 +101,7 @@ export function sendTagClearEmail(address: string, tag: string, i18n: I18nFuncti
             ['title', i18n('email.tagCleared.title')],
             ['greeting', i18n('email.greeting')],
             ['description', i18n('email.tagCleared.description')],
-            ['tag', `"${tag}"`],
+            ['tag', `"${stripColors(tag)}"`],
             ['warning', i18n('email.tagCleared.warning')],
             ['footer', i18n('email.footer')],
         ]
@@ -105,9 +118,9 @@ export function sendTagChangeEmail(address: string, oldTag: string, newTag: stri
             ['greeting', i18n('email.greeting')],
             ['description', i18n('email.tagChanged.description')],
             ['previous', i18n('email.tagChanged.previous')],
-            ['old_tag', `"${oldTag}"`],
+            ['old_tag', `"${stripColors(oldTag)}"`],
             ['new', i18n('email.tagChanged.new')],
-            ['new_tag', `"${newTag}"`],
+            ['new_tag', `"${stripColors(newTag)}"`],
             ['warning', i18n('email.tagChanged.warning')],
             ['footer', i18n('email.footer')],
         ]
