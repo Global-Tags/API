@@ -80,7 +80,7 @@ function isInteractionAllowed(interaction: Interaction, player: Player | null): 
         if(!player) return { embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] };
         if(interaction.requiredPermissions.some(perm => !player.hasPermission(perm))) return { embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] };
     }
-    if(player?.isBanned() && !interaction.allowWhenBanned) return { embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ You are banned!')], flags: [MessageFlags.Ephemeral] };
+    if(player?.isBanned() && !interaction.allowWhenBanned && process.env.NODE_ENV == 'prod') return { embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ You are banned!')], flags: [MessageFlags.Ephemeral] };
     return null;
 }
 

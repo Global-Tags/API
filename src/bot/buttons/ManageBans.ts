@@ -20,7 +20,7 @@ export default class ManageBansButton extends Button {
 
         const banInfo = target.isBanned() ? await (async () => {
             const ban = target.bans[0];
-            return `\n> Ban ID: \`${ban.id}\`\n> Ban reason: \`${ban.reason}\`\n> Banned by: [\`${(await GameProfile.getProfileByUUID(ban.staff)).getUsernameOrUUID()}\`](https://laby.net/@${player.uuid})\n> Banned since: ${formatTimestamp(ban.banned_at)}\n> Expiration date: ${ban.expires_at ? `${formatTimestamp(ban.expires_at)}` : '`-`'}\n> Is ban appealable: \`${ban.appealable ? '✅' : '❌'}\`\n> Was ban appealed: \`${ban.appealed ? '✅' : '❌'}\``;
+            return `\n> Ban ID: \`${ban.id}\`\n> Ban reason: \`${ban.reason}\`\n> Banned by: [\`${(await GameProfile.getProfileByUUID(ban.staff)).getUsernameOrUUID()}\`](https://laby.net/@${player.uuid})\n> Banned since: ${formatTimestamp(ban.banned_at)}\n> Expiration date: ${ban.expires_at ? `${formatTimestamp(ban.expires_at)}` : '`-`'}\n> Is ban appealable: \`${ban.appeal.appealable ? '✅' : '❌'}\`\n> Ban appeal: ${ban.appeal.appealed ? `\`${ban.appeal.reason || 'Unknown reason'}\` (${ban.appeal.appealed_at ? formatTimestamp(ban.appeal.appealed_at, 'd') : '`Unknown date`'})` : '`--`'}`;
         })() : '';
 
         const embed = EmbedBuilder.from(message.embeds[0])
