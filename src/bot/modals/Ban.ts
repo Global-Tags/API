@@ -45,7 +45,13 @@ export default class BanModal extends Modal {
         });
 
         if(target.isEmailVerified()) {
-            sendBanEmail(target.connections.email.address!, reason || '---', getI18nFunctionByLanguage(target.last_language));
+            sendBanEmail({
+                address: target.connections.email.address!,
+                reason: reason || '---',
+                appealable: true,
+                duration: expiresAt,
+                i18n: getI18nFunctionByLanguage(target.last_language)
+            });
         }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The player was successfully banned!')], flags: [MessageFlags.Ephemeral] });

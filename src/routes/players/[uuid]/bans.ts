@@ -86,7 +86,13 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     });
 
     if(player.isEmailVerified()) {
-        sendBanEmail(player.connections.email.address!, reason || '---', getI18nFunctionByLanguage(player.last_language));
+        sendBanEmail({
+            address: player.connections.email.address!,
+            reason: reason || '---',
+            appealable: appealable == undefined ? true : appealable,
+            duration: expires,
+            i18n: getI18nFunctionByLanguage(player.last_language)
+        });
     }
 
     return { message: i18n('ban.banned') };

@@ -153,8 +153,15 @@
         "banned": {
             "subject": "Your GlobalTags account was banned",
             "title": "Account Banned",
-            "description": "Your account has been banned from GlobalTags for the following reason:",
-            "appeal": "You can appeal your ban ingame."
+            "description": {
+                "temporary": "Your account has been banned from GlobalTags temporarily.",
+                "permanent": "Your account has been banned from GlobalTags permanently."
+            },
+            "duration": "Duration:",
+            "until": "Until <date>",
+            "reason": "Reason:",
+            "appeal": "You may appeal your ban ingame.",
+            "noAppeal": "It is not possible to appeal your ban."
         },
         "tagChanged": {
             "subject": "Your GlobalTag was changed by staff",
