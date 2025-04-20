@@ -33,7 +33,6 @@
     },
     "email": {
         "banned": {
-            "description": "Tu cuenta ha sido baneada de GlobalTags por la siguiente razón:",
             "subject": "Tu cuenta de GlobalTags ha sido baneada",
             "title": "Cuenta baneada",
             "appeal": "Puedes apelar tu baneo dentro del juego."

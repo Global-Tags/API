@@ -105,7 +105,6 @@
         "banned": {
             "subject": "Din GlobalTags konto ble utstengt",
             "title": "Konto Utstengt",
-            "description": "Kontoen din ble utestengt fra GlobalTags av følgende grunn:",
             "appeal": "Du kan anke forbudet ditt i spillet."
         },
         "tagChanged": {

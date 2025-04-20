@@ -109,7 +109,6 @@
         "banned": {
             "subject": "Dein GlobalTags Account wurde gebannt",
             "title": "Account gebannt",
-            "description": "Dein GlobalTags Account wurde für den folgenden Grund gebannt:",
             "appeal": "Du kannst ingame einen Entbannungsantrag stellen."
         },
         "tagChanged": {
