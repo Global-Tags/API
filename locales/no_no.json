@@ -26,7 +26,9 @@
             "success": {
                 "shown": "Din rolle ikon er nå vist!",
                 "hidden": "Din rolle ikon er nå skjult!"
-            }
+            },
+            "already_hidden": "Rolleikonet ditt er allerede skjult!",
+            "already_shown": "Rolleikonet ditt er allerede vist!"
         }
     },
     "position": {
@@ -79,7 +81,9 @@
         "success": {
             "watch": "Spilleren er nå på overvåkningslisten!",
             "unwatch": "Spilleren er ikke lenger på overvåkningslisten!"
-        }
+        },
+        "already_watched": "Denne spilleren er allerede på overvåkningslisten!",
+        "not_watched": "Denne spilleren er ikke på overvåkningslisten!"
     },
     "connections": {
         "discord": {
@@ -105,7 +109,15 @@
         "banned": {
             "subject": "Din GlobalTags konto ble utstengt",
             "title": "Konto Utstengt",
-            "appeal": "Du kan anke forbudet ditt i spillet."
+            "appeal": "Du kan anke forbudet ditt i spillet.",
+            "description": {
+                "permanent": "Kontoen din ble permanent utestengt fra GlobalTags.",
+                "temporary": "Kontoen din ble midlertidig utestengt fra GlobalTags."
+            },
+            "duration": "Varighet:",
+            "until": "Frem til <date>",
+            "reason": "Grunn:",
+            "noAppeal": "Det er ikke mulig å anke utestengelsen din."
         },
         "tagChanged": {
             "subject": "Din GlobalTag ble endret av lag-medlem",
@@ -181,5 +193,29 @@
             "success": "Rollen ble slettet!"
         },
         "not_found": "Rollen ble ikke funnet!"
+    },
+    "api_keys": {
+        "not_found": "API-nøkkelen ble ikke funnet!",
+        "already_exists": "En API-nøkkel med dette navn finnes allerede!",
+        "created": "API-nøkkelen ble opprettet!",
+        "regenerated": "API-nøkkelen ble gjenskapt!",
+        "deleted": "API-nøkkelen ble slettet!"
+    },
+    "gift_codes": {
+        "not_found": "Gavekode ikke funnet!",
+        "already_redeemed": "Du har allerede løst inn denne gavekoden!",
+        "already_have_role": "Du har allerede rollen!",
+        "created": "Gavekoden ble opprettet!",
+        "deleted": "Gavekoden ble slettet!",
+        "redeemed_temporarily": "Du fikk\"<role>\"-rollen midlertidig!",
+        "redeemed_permanently": "Du fikk\"<role>\"-rollen permanent!"
+    },
+    "ban": {
+        "no_reason": "Ingen grunn oppgitt",
+        "banned": "Spilleren ble utestengt!",
+        "unbanned": "Spillerens utestengelse ble opphevet!",
+        "not_found": "Utestengelse ikke funnet!",
+        "already_banned": "Denne spilleren er allerede utestengt!",
+        "not_banned": "Denne spilleren er ikke utestengt!"
     }
 }

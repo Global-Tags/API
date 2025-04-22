@@ -109,7 +109,15 @@
         "banned": {
             "subject": "Dein GlobalTags Account wurde gebannt",
             "title": "Account gebannt",
-            "appeal": "Du kannst ingame einen Entbannungsantrag stellen."
+            "appeal": "Du hast die Möglichkeit, Ingame einen Entbannungsantrag zu stellen.",
+            "description": {
+                "permanent": "Du wurdest permanent von GlobalTags gebannt.",
+                "temporary": "Du wurdest temporär von GlobalTags gebannt."
+            },
+            "duration": "Dauer:",
+            "until": "Bis <date>",
+            "reason": "Grund:",
+            "noAppeal": "Es ist nicht möglich, einen Entbannungsantrag für diesen Ban zu erstellen."
         },
         "tagChanged": {
             "subject": "Dein GlobalTag wurde vom Team geändert",
@@ -200,5 +208,14 @@
         "already_exists": "Es existiert bereits ein API Key mit diesem Namen!",
         "regenerated": "Der API Key wurde erfolgreich neu generiert!",
         "deleted": "Der API Key wurde erfolgreich gelöscht!"
+    },
+    "gift_codes": {
+        "not_found": "Der Geschenkcode wurde nicht gefunden!",
+        "already_redeemed": "Du hast diesen Geschenkcode bereits eingelöst!",
+        "already_have_role": "Du hast diese Rolle bereits!",
+        "created": "Der Geschenkcode wurde erfolgreich erstellt!",
+        "deleted": "Der Geschenkcode wurde erfolgreich gelöscht!",
+        "redeemed_temporarily": "Du hast die \"<role>\"-Rolle temporär erhalten!",
+        "redeemed_permanently": "Du hast die \"<role>\"-Rolle permanent erhalten!"
     }
 }
