@@ -56,10 +56,10 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
             current_month_referrals: player.referrals.current_month
         },
         ban: showBan && player.isBanned() ? (() => {
-            const { appealable, appealed, banned_at, expires_at, id, reason, staff } = player.bans.at(0)!;
+            const { appeal, banned_at, expires_at, id, reason, staff } = player.bans.at(0)!;
             return {
-                appealable,
-                appealed,
+                appealable: appeal.appealable,
+                appealed: appeal.appealed,
                 banned_at: banned_at.getTime(),
                 expires_at: expires_at?.getTime() || null,
                 id,
@@ -115,7 +115,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
 
     let isWatched = false;
     let notifyWatch = true;
-    const gameProfile = await player?.getGameProfile();
+    const gameProfile = player ? await player.getGameProfile() : await GameProfile.getProfileByUUID(uuid);
     if(!session.hasPermission(Permission.BypassValidation)) {
         tag = tag.trim().replace(multipleSpaces, ' ').replace(colorCodesWithSpaces, '').replace(hexColorCodesWithSpaces, '');
         const strippedTag = stripColors(tag);
@@ -126,7 +126,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         isWatched = (player && player.watchlist) || watchlist.some((word) => {
             if(strippedTag.toLowerCase().includes(word)) {
                 Logger.warn(`Now watching ${uuid} for matching "${word}" in "${tag}".`);
-                sendWatchlistAddMessage({ user: gameProfile!, tag, word });
+                sendWatchlistAddMessage({ user: gameProfile, tag, word });
                 notifyWatch = false;
                 return true;
             }
@@ -169,7 +169,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         }
     }
 
-    if(isWatched && notifyWatch) sendWatchlistTagUpdateMessage(gameProfile!, tag);
+    if(isWatched && notifyWatch) sendWatchlistTagUpdateMessage(gameProfile, tag);
     return { message: i18n(`setTag.success.${session.equal ? 'self' : 'admin'}`) };
 }, {
     detail: {
