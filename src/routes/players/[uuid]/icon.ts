@@ -107,24 +107,24 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return error(404, { error: i18n('error.noTag') });
     if(player.isBanned()) return error(403, { error: i18n('error.banned') });
-    if(!player.hasPermission(Permission.CustomIcon)) return error(403, { error: i18n('You\'re not allowed to have a custom icon!') });
+    if(!player.hasPermission(Permission.CustomIcon)) return error(403, { error: i18n('icon.upload.notAllowed') });
 
     const metadata = await sharp(await image.arrayBuffer()).metadata().catch((err: Error) => {
         Logger.error('Failed to read image metadata:', err.message);
         return null;
     });
 
-    if(!metadata) return error(422, { error: i18n('The upload failed. Please contact support!') });
-    if(metadata.format != 'png') return error(422, { error: i18n('The file you uploaded is not a PNG image!')});
-    if(!metadata.height || metadata.height != metadata.width) return error(422, { error: i18n('The file you uploaded is not a square image!')});
-    if(metadata.height > config.validation.icon.maxResolution) return error(422, { error: i18n(`The file you uploaded exceeds the max resolution of ${config.validation.icon.maxResolution}x${config.validation.icon.maxResolution}!`) });
+    if(!metadata) return error(422, { error: i18n('icon.upload.invalidMetadata') });
+    if(metadata.format != 'png') return error(422, { error: i18n('icon.upload.wrongFormat')});
+    if(!metadata.height || metadata.height != metadata.width) return error(422, { error: i18n('icon.upload.wrongSize')});
+    if(metadata.height > config.validation.icon.maxResolution) return error(422, { error: i18n('icon.upload.exceedsMaxResolution').replaceAll('<max>', config.validation.icon.maxResolution.toString()) });
 
     player.icon.name = snakeCase(GlobalIcon[GlobalIcon.Custom]);
     player.icon.hash = generateSecureCode(32);
     await player.save();
     await Bun.write(Bun.file(join('icons', player.uuid, `${player.icon.hash}.png`)), await image.arrayBuffer(), { createPath: true });
 
-    return { message: i18n(`icon.success.${session.equal ? 'self' : 'admin'}`), hash: player.icon.hash };
+    return { message: i18n('icon.upload.success'), hash: player.icon.hash };
 }, {
     detail: {
         tags: ['Settings'],
