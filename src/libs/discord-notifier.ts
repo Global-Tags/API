@@ -36,6 +36,7 @@ export enum ModLogType {
     ChangeRolePermissions,
     SetRoleSku,
     DeleteRole,
+    OverwriteConnection,
     UnlinkConnection,
     ResetLinkingCode
 }
@@ -120,9 +121,15 @@ type ModLogData = {
     role: string,
     sku: { old: string | null, new: string | null }
 } | {
+    logType: ModLogType.OverwriteConnection,
+    type: 'discord' | 'email',
+    value: { old: string | null, new: string }
+} | {
     logType: ModLogType.UnlinkConnection | ModLogType.ResetLinkingCode,
     type: 'discord' | 'email' 
 });
+
+export const hiddenConnectionLabel = '**`HIDDEN`**';
 
 export function formatTimestamp(date: Date, style: 't' | 'T' | 'd' | 'D' | 'f' | 'F' | 'R' = 'f') {
     return `<t:${Math.floor(date.getTime() / 1000 | 0)}:${style}>`;
@@ -277,7 +284,7 @@ export function sendEmailLinkMessage(user: GameProfile, email: string | null, co
                 },
                 {
                     name: connected ? 'Email' : 'Previous Email',
-                    value: `${email ? `||${email}||` : '**`HIDDEN`**'}`
+                    value: `${email ? `||${email}||` : hiddenConnectionLabel}`
                 }
             ]),
         actionButton: false
@@ -416,6 +423,10 @@ function modlogDescription(data: ModLogData): string | null {
     else if(type == ModLogType.ChangeRolePermissions) return `\`${data.role}\`\n\`\`\`diff\n${data.permissions.added.map((permission) => `+ ${pascalCase(permission)}`).join('\n')}${data.permissions.added.length > 0 && data.permissions.removed.length > 0 ? '\n' : ''}${data.permissions.removed.map((permission) => `- ${pascalCase(permission)}`).join('\n')}\`\`\``;
     else if(type == ModLogType.SetRoleSku) return `**Role**: \`${data.role}\`. **SKU**: \`${data.sku.old || '-'}\` → \`${data.sku.new || '-'}\``;
     else if(type == ModLogType.DeleteRole) return `\`${data.role}\``;
+    else if(type == ModLogType.OverwriteConnection) {
+        const redactValue = data.type == 'email' && config.discordBot.notifications.accountConnections.hideEmails;
+        return `**Type**: \`${capitalCase(data.type)}\`. ${redactValue ? hiddenConnectionLabel : data.value.old ? `||${data.value.old}||` : '`-`'} → ${redactValue ? hiddenConnectionLabel : data.value.new ? `||${data.value.new}||` : '`-`'}`;
+    }
     else if(type == ModLogType.UnlinkConnection || type == ModLogType.ResetLinkingCode) return `**Type**: \`${capitalCase(data.type)}\``;
     return null;
 }

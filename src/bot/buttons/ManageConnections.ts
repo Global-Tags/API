@@ -26,28 +26,36 @@ export default class ManageConnectionsButton extends Button {
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
-                    .setLabel('Unlink Discord')
-                    .setCustomId('unlinkDiscord')
-                    .setStyle(ButtonStyle.Danger)
-                    .setDisabled(!target.connections.discord.id),
+                    .setLabel('Overwrite value')
+                    .setCustomId('overwriteDiscord')
+                    .setStyle(ButtonStyle.Primary),
                 new ButtonBuilder()
                     .setLabel('Reset linking code')
                     .setCustomId('resetDiscordLinkingCode')
-                    .setStyle(ButtonStyle.Primary)
-                    .setDisabled(!target.connections.discord.code)
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(!target.connections.discord.code),
+                new ButtonBuilder()
+                    .setLabel('Unlink Discord')
+                    .setCustomId('unlinkDiscord')
+                    .setStyle(ButtonStyle.Danger)
+                    .setDisabled(!target.connections.discord.id)
             ),
             new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
-                    .setLabel('Unlink Email')
-                    .setCustomId('unlinkEmail')
-                    .setStyle(ButtonStyle.Danger)
-                    .setDisabled(!target.connections.email.address),
+                    .setLabel('Overwrite value')
+                    .setCustomId('overwriteEmail')
+                    .setStyle(ButtonStyle.Primary),
                 new ButtonBuilder()
                     .setLabel('Reset linking code')
                     .setCustomId('resetEmailLinkingCode')
-                    .setStyle(ButtonStyle.Primary)
-                    .setDisabled(!target.connections.email.code)
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(!target.connections.email.code),
+                new ButtonBuilder()
+                    .setLabel('Unlink Email')
+                    .setCustomId('unlinkEmail')
+                    .setStyle(ButtonStyle.Danger)
+                    .setDisabled(!target.connections.email.address)
             )
         ]
 

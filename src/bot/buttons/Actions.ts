@@ -6,6 +6,7 @@ import { Permission } from "../../types/Permission";
 import { stripUUID, uuidRegex } from "../../libs/game-profiles";
 import { config } from "../../libs/config";
 import { stripColors } from "../../libs/chat-color";
+import { hiddenConnectionLabel } from "../../libs/discord-notifier";
 
 export type InfoEntry = { name: string, value: string };
 export type Info = { category: string, entries: InfoEntry[] };
@@ -52,7 +53,7 @@ export default class ActionsButton extends Button {
 
         if(player.hasPermission(Permission.ManageConnections)) {
             connections.push({ name: 'Discord', value: target.connections.discord.id ? `[\`${target.connections.discord.id}\`](discord://-/users/${target.connections.discord.id})` : '`❌`' });
-            connections.push({ name: 'Email', value: target.connections.email.address ? config.discordBot.notifications.accountConnections.hideEmails ? '**`HIDDEN`**' : `\`${target.connections.email.address}\`` : '`❌`' });
+            connections.push({ name: 'Email', value: target.connections.email.address ? config.discordBot.notifications.accountConnections.hideEmails ? hiddenConnectionLabel : `\`${target.connections.email.address}\`` : '`❌`' });
         }
 
         info.push({ category: 'General', entries: general });
