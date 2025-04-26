@@ -29,6 +29,14 @@
             },
             "already_shown": "Dein Rollenicon wird bereits angezeigt!",
             "already_hidden": "Dein Rollenicon ist bereits versteckt!"
+        },
+        "upload": {
+            "notAllowed": "Du benötigst GlobalTags Premium, um eigene Icons hochzuladen!",
+            "invalidMetadata": "Der Upload ist fehlgeschlagen. Bitte kontaktiere den Support!",
+            "wrongFormat": "Die Datei, die du hochgeladen hast, ist keine gültige PNG-Datei!",
+            "wrongResolution": "Die Datei, die du hochgeladen hast, ist kein viereckiges Bild!",
+            "success": "Das Icon wurde erfolgreich hochgeladen!",
+            "exceedsMaxResolution": "Die Datei, die du hochgeladen hast, überschreitet die maximale Größe von <max>x<max>!"
         }
     },
     "position": {
