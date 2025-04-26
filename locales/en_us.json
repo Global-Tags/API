@@ -50,6 +50,14 @@
                 "shown": "Your role icon is now shown!"
             }
         },
+        "upload": {
+            "notAllowed": "You need GlobalTags Premium to upload a custom icon!",
+            "invalidMetadata": "The upload failed. Please contact support!",
+            "wrongFormat": "The file you uploaded is not a PNG image!",
+            "wrongResolution": "The file you uploaded is not a square image!",
+            "exceedsMaxResolution": "The file you uploaded exceeds the max resolution of <max>x<max>!",
+            "success": "The custom icon was successfully uploaded!"
+        },
         "success": {
             "self": "Your icon was successfully set!",
             "admin": "The player's icon was successfully set!"
