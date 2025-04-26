@@ -19,7 +19,7 @@ export default class DeleteGiftCodeButton extends Button {
             .setDescription('Here you can select a gift code to be deleted.');
 
         const codes = await codeSchema.find();
-        const codeMap = codes.filter((code) => code.isValid()).map((code) => ({
+        const codeMap = codes.filter((code) => code.isValid()).slice(0, 25).map((code) => ({
             value: code.code,
             label: code.name,
             description: `Uses: ${code.uses.length}/${code.max_uses}. Expires at: ${code.expires_at ? code.expires_at.toDateString() : 'Never'}`,

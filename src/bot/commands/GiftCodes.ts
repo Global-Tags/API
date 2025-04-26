@@ -17,9 +17,9 @@ export default class GiftCodesCommand extends Command {
 
     async execute(interaction: CommandInteraction, options: CommandInteractionOptionResolver, member: GuildMember, player: Player) {
         const codes = await giftCodes.find();
-        const codeMap = codes.filter((code) => code.isValid()).map((code) => 
+        const codeMap = codes.filter((code) => code.isValid()).slice(0, 40).map((code) => 
             `↝ \`${code.name}\` [||**${code.code}**||] - \`${code.uses.length}/${code.max_uses}\` Uses${code.expires_at ? ` (Expires ${formatTimestamp(code.expires_at, 'R')})` : ''}`
-        ).join('\n');
+        );
 
         const header = new EmbedBuilder()
             .setColor(colors.gray)
@@ -28,7 +28,7 @@ export default class GiftCodesCommand extends Command {
         const embed = new EmbedBuilder()
             .setColor(colors.gray)
             .setTitle('🎁 Gift codes')
-            .setDescription(`**Active gift codes**\n${codeMap.length == 0 ? '*No active gift codes.*' : codeMap}`)
+            .setDescription(`**Active gift codes**\n${codeMap.length == 0 ? '*No active gift codes.*' : codeMap.join('\n')}${codes.length > 40 ? `\n\n*and ${codes.length - 40} more...*` : ''}`)
             .setImage(images.placeholder);
 
         const row = new ActionRowBuilder<ButtonBuilder>()
