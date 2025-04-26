@@ -4,7 +4,7 @@ import { GameProfile } from "./game-profiles";
 import { getCustomIconUrl } from "../routes/players/[uuid]/icon";
 import { capitalCase, pascalCase, sentenceCase } from "change-case";
 import { config } from "./config";
-import { translateToAnsi } from "./chat-color";
+import { stripColors, translateToAnsi } from "./chat-color";
 import { GiftCode } from "../database/schemas/gift-codes";
 
 export enum ModLogType {
@@ -403,7 +403,7 @@ export function sendModLogMessage(data: ModLogData) {
 
 function modlogDescription(data: ModLogData): string | null {
     const { logType: type } = data;
-    if(type == ModLogType.ChangeTag) return `\`${data.tags.old}\` → \`${data.tags.new}\``;
+    if(type == ModLogType.ChangeTag) return `\`${stripColors(data.tags.old)}\` → \`${stripColors(data.tags.new)}\``;
     else if(type == ModLogType.Ban) return `**Reason**: \`${data.reason || 'No reason'}\`. **Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Expires**: ${data.expires ? `${formatTimestamp(data.expires)} (${formatTimestamp(data.expires, 'R')})` : '`-`'}`;
     else if(type == ModLogType.EditBan) return `**Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Reason**: \`${data.reason || '-- No reason --'}\``;
     else if(type == ModLogType.AddRole || type == ModLogType.RemoveRole) return `\`${data.role}\``;
