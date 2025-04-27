@@ -411,7 +411,7 @@ function modlogDescription(data: ModLogData): string | null {
     else if(type == ModLogType.SetRoleExpiration) return `**Role**: \`${data.role}\`. **Expires**: ${data.expires ? `${formatTimestamp(data.expires)} (${formatTimestamp(data.expires, 'R')})` : '`-`'}`;
     else if(type == ModLogType.EditPosition) return `\`${capitalCase(data.positions.old)}\` → \`${capitalCase(data.positions.new)}\``;
     else if(type == ModLogType.ChangeIconType) return `\`${capitalCase(data.icons.old)}\` → \`${capitalCase(data.icons.new)}\``;
-    else if(type == ModLogType.ClearIconTexture) return `[${data.hash}](${getCustomIconUrl(data.user!.uuid!, data.hash)})`;
+    else if(type == ModLogType.ClearIconTexture) return `[\`${data.hash}\`](<${getCustomIconUrl(data.user!.uuid!, data.hash)}>)`;
     else if(type == ModLogType.CreateApiKey || type == ModLogType.RegenerateApiKey || type == ModLogType.DeleteApiKey) return `**Key name**: \`${data.key}\``;
     else if(type == ModLogType.CreateGiftCode) return `**Name**: \`${data.code}\`. **Role**: \`${data.role}\`. **Max uses**: \`${data.maxUses}\`. **Code expires**: ${data.codeExpiration ? formatTimestamp(data.codeExpiration, 'R') : '`Never`'}. **Gift duration**: \`${data.giftDuration ? data.giftDuration.toString() : 'Permanent'}\``;
     else if(type == ModLogType.DeleteGiftCode) return `\`${data.code}\``;
