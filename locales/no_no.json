@@ -29,6 +29,12 @@
             },
             "already_hidden": "Rolleikonet ditt er allerede skjult!",
             "already_shown": "Rolleikonet ditt er allerede vist!"
+        },
+        "upload": {
+            "notAllowed": "Du trenger GlobalTags Premium for å laste opp et egendefinertikon!",
+            "invalidMetadata": "Opplastingen mislyktes. Vennligst kontakt kundestøtte!",
+            "wrongFormat": "Filen du lastet opp er ikke et PNG-bilde!",
+            "wrongResolution": "Filen du lastet opp er ikke et firkantet bilde!"
         }
     },
     "position": {
