@@ -3,7 +3,7 @@ import Command from "../structs/Command";
 import players, { Player } from "../../database/schemas/players";
 import * as bot from "../bot";
 import { translateToAnsi } from "../../libs/chat-color";
-import { formatUUID, GameProfile, stripUUID } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { capitalCase } from "change-case";
 import { Permission } from "../../types/Permission";
 
