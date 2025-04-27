@@ -1,5 +1,5 @@
-import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
-import Command from "../structs/Command";
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, CommandInteraction, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
+import Command, { CommandOptions } from "../structs/Command";
 import players, { Player } from "../../database/schemas/players";
 import * as bot from "../bot";
 import { translateToAnsi } from "../../libs/chat-color";
@@ -24,7 +24,7 @@ export default class PlayerInfoCommand extends Command {
         });
     }
 
-    async execute(interaction: CommandInteraction, options: CommandInteractionOptionResolver, member: GuildMember, player: Player | null) {
+    async execute(interaction: CommandInteraction, options: CommandOptions, member: GuildMember, player: Player | null) {
         const resolvable = options.getString('player', true);
 
         const or: any[] = [{ uuid: stripUUID(resolvable) }, { uuid: (await GameProfile.getProfileByUsername(resolvable))?.uuid }];
