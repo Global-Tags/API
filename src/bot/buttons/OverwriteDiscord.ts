@@ -6,7 +6,7 @@ import { Permission } from "../../types/Permission";
 export default class OverwriteDiscordButton extends Button {
     constructor() {
         super({
-            id: 'overwriteDiscord',
+            id: 'overwriteDiscord_',
             requiredPermissions: [Permission.ManageConnections]
         });
     }
@@ -14,7 +14,7 @@ export default class OverwriteDiscordButton extends Button {
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         const modal = new ModalBuilder()
             .setTitle('Overwrite Discord ID')
-            .setCustomId('overwriteDiscord')
+            .setCustomId(`overwriteDiscord_${interaction.customId.split('_')[1]}`)
             .addComponents([
                 new ActionRowBuilder<TextInputBuilder>()
                     .addComponents(

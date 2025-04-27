@@ -37,17 +37,17 @@ export default class ManageRoleMenu extends SelectMenu {
                 .addComponents(
                     new ButtonBuilder()
                         .setLabel('Rename')
-                        .setCustomId('renameRole')
+                        .setCustomId(`renameRole_${role.name}`)
                         .setStyle(ButtonStyle.Primary)
                         .setEmoji('🏷️'),
                     new ButtonBuilder()
                         .setLabel('Toggle Icon')
-                        .setCustomId('toggleIcon')
+                        .setCustomId(`toggleIcon_${role.name}`)
                         .setStyle(ButtonStyle.Primary)
                         .setEmoji('🖼️'),
                     new ButtonBuilder()
                         .setLabel('Manage permissions')
-                        .setCustomId('managePermissions')
+                        .setCustomId(`managePermissions_${role.name}`)
                         .setStyle(ButtonStyle.Primary)
                         .setEmoji('🔒')
                 ),
@@ -55,12 +55,12 @@ export default class ManageRoleMenu extends SelectMenu {
                 .addComponents(
                     new ButtonBuilder()
                         .setLabel('Set SKU')
-                        .setCustomId('setSku')
+                        .setCustomId(`setSku_${role.name}`)
                         .setStyle(ButtonStyle.Primary)
                         .setEmoji('💳'),
                     new ButtonBuilder()
                         .setLabel('Delete role')
-                        .setCustomId('deleteRole')
+                        .setCustomId(`deleteRole_${role.name}`)
                         .setStyle(ButtonStyle.Danger)
                         .setEmoji('🗑️')
                 )

@@ -7,18 +7,17 @@ import { getCustomIconUrl } from "../../routes/players/[uuid]/icon";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon } from "../../types/GlobalIcon";
 import { config } from "../../libs/config";
-import { stripUUID } from "../../libs/game-profiles";
 
 export default class ManageIconButton extends Button {
     constructor() {
         super({
-            id: 'manageIcon',
+            id: 'manageIcon_',
             requiredPermissions: [Permission.ManageTags]
         });
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const embed = EmbedBuilder.from(message.embeds[0])
@@ -41,11 +40,11 @@ export default class ManageIconButton extends Button {
                 .addComponents(
                     new ButtonBuilder()
                         .setLabel('Change type')
-                        .setCustomId('setIconType')
+                        .setCustomId(`setIconType_${target.uuid}`)
                         .setStyle(ButtonStyle.Primary),
                     new ButtonBuilder()
                         .setLabel('Clear texture')
-                        .setCustomId('clearIconTexture')
+                        .setCustomId(`clearIconTexture_${target.uuid}`)
                         .setStyle(ButtonStyle.Danger)
                 )
         ];

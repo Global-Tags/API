@@ -46,7 +46,6 @@ export default class PlayerInfoCommand extends Command {
                 new EmbedBuilder()
                     .setColor(bot.colors.gray)
                     .setThumbnail(`https://laby.net/texture/profile/head/${profile.uuid}.png?size=1024&overlay`)
-                    .setAuthor({ name: formatUUID(data.uuid) })
                     .setURL(`https://laby.net/${profile.uuid}`)
                     .setTitle(`Playerdata${!!profile.username ? ` of ${profile.username}` : ''}`)
                     .addFields([
@@ -83,7 +82,7 @@ export default class PlayerInfoCommand extends Command {
                     .addComponents(
                         new ButtonBuilder()
                             .setLabel('Actions')
-                            .setCustomId('actions')
+                            .setCustomId(`actions_${data.uuid}`)
                             .setStyle(ButtonStyle.Primary)
                     )
             ] : [],

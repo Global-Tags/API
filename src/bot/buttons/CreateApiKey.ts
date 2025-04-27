@@ -6,7 +6,7 @@ import { Player } from "../../database/schemas/players";
 export default class CreateApiKeyButton extends Button {
     constructor() {
         super({
-            id: 'createApiKey',
+            id: 'createApiKey_',
             requiredPermissions: [Permission.ManageApiKeys]
         });
     }
@@ -14,7 +14,7 @@ export default class CreateApiKeyButton extends Button {
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         const modal = new ModalBuilder()
             .setTitle('Create API key')
-            .setCustomId('createApiKey')
+            .setCustomId(`createApiKey_${interaction.customId.split('_')[1]}`)
             .addComponents(
                 new ActionRowBuilder<TextInputBuilder>()
                     .addComponents(

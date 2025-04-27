@@ -33,7 +33,7 @@ export default class InteractionCreateEvent extends Event {
             }
         } else if(interaction.isButton()) {
             const { member, customId, message } = interaction;
-            const button = bot.buttons.get(customId);
+            const button = bot.buttons.find((button) => customId.startsWith(button.id));
 
             if(!button) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ Unknown button!')], flags: [MessageFlags.Ephemeral] });
             const error = isInteractionAllowed(button, player);
@@ -46,7 +46,7 @@ export default class InteractionCreateEvent extends Event {
             }
         } else if(interaction.isStringSelectMenu()) {
             const { member, customId, values, message } = interaction;
-            const menu = bot.menus.get(customId);
+            const menu = bot.menus.find((menu) => customId.startsWith(menu.id));
 
             if(!menu) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ Unknown menu!')], flags: [MessageFlags.Ephemeral] });
             const error = isInteractionAllowed(menu, player);

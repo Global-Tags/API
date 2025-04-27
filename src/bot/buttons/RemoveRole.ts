@@ -4,18 +4,17 @@ import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { capitalCase, snakeCase } from "change-case";
 import { Permission } from "../../types/Permission";
-import { stripUUID } from "../../libs/game-profiles";
 
 export default class RemoveRoleButton extends Button {
     constructor() {
         super({
-            id: 'removeRole',
+            id: 'removeRole_',
             requiredPermissions: [Permission.ManageRoles]
         });
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const options = target.getActiveRoles().slice(0, 25).map(({ role: { name: role } }) => {
@@ -31,7 +30,7 @@ export default class RemoveRoleButton extends Button {
         const row = new ActionRowBuilder<StringSelectMenuBuilder>()
             .addComponents([
                 new StringSelectMenuBuilder()
-                    .setCustomId('removeRole')
+                    .setCustomId(`removeRole_${target.uuid}`)
                     .setMinValues(1)
                     .setMaxValues(1)
                     .setPlaceholder('Select a role to remove...')

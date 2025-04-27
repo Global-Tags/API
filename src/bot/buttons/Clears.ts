@@ -2,7 +2,7 @@ import { ButtonInteraction, Message, GuildMember, EmbedBuilder, MessageFlags } f
 import Button from "../structs/Button";
 import { colors } from "../bot";
 import players, { Player } from "../../database/schemas/players";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { GameProfile } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 import { formatTimestamp } from "../../libs/discord-notifier";
 import { stripColors } from "../../libs/chat-color";
@@ -11,14 +11,14 @@ import { getCustomIconUrl } from "../../routes/players/[uuid]/icon";
 export default class ClearsButton extends Button {
     constructor() {
         super({
-            id: 'clears',
+            id: 'clears_',
             requiredPermissions: [Permission.ManageTags]
         });
     }
     
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')] });
 
         const clears = [];

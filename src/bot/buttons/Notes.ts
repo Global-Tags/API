@@ -2,21 +2,21 @@ import { ButtonInteraction, Message, GuildMember, ButtonBuilder, ActionRowBuilde
 import Button from "../structs/Button";
 import { colors } from "../bot";
 import players, { Player } from "../../database/schemas/players";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { GameProfile } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 import { formatTimestamp } from "../../libs/discord-notifier";
 
 export default class NotesButton extends Button {
     constructor() {
         super({
-            id: 'notes',
+            id: 'notes_',
             requiredPermissions: [Permission.ManageNotes]
         });
     }
     
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')] });
 
         const notes = [];
@@ -33,11 +33,11 @@ export default class NotesButton extends Button {
             .addComponents(
                 new ButtonBuilder()
                     .setLabel('Create note')
-                    .setCustomId('createNote')
+                    .setCustomId(`createNote_${target.uuid}`)
                     .setStyle(ButtonStyle.Success),
                 new ButtonBuilder()
                     .setLabel('Delete note')
-                    .setCustomId('deleteNote')
+                    .setCustomId(`deleteNote_${target.uuid}`)
                     .setStyle(ButtonStyle.Danger)
             );
 
