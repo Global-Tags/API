@@ -9,7 +9,7 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 export default class ManagePermissionsMenu extends SelectMenu {
     constructor() {
         super({
-            id: 'managePermissions',
+            id: 'managePermissions_',
             requiredPermissions: [Permission.ManageRoles]
         });
     }
@@ -17,7 +17,7 @@ export default class ManagePermissionsMenu extends SelectMenu {
     async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: Player) {
         if(values.length == 0) return interaction.deferUpdate();
 
-        const role = await roles.findOne({ name: message.embeds[1].footer!.text });
+        const role = await roles.findOne({ name: interaction.customId.split('_')[1] });
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
 
         const permissions = [...role.permissions];

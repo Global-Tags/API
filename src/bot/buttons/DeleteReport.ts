@@ -2,20 +2,20 @@ import { ButtonInteraction, Message, GuildMember, ActionRowBuilder, EmbedBuilder
 import Button from "../structs/Button";
 import { colors } from "../bot";
 import players, { Player } from "../../database/schemas/players";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { GameProfile } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 
 export default class DeleteReportButton extends Button {
     constructor() {
         super({
-            id: 'deleteReport',
+            id: 'deleteReport_',
             requiredPermissions: [Permission.ManageReports]
         });
     }
     
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')] });
         if(target.reports.length < 1) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player was never reported!')] });
 
@@ -37,7 +37,7 @@ export default class DeleteReportButton extends Button {
         const row = new ActionRowBuilder<StringSelectMenuBuilder>()
             .addComponents(
                 new StringSelectMenuBuilder()
-                    .setCustomId('deleteReport')
+                    .setCustomId(`deleteReport_${target.uuid}`)
                     .setPlaceholder('Select a report...')
                     .setMinValues(1)
                     .setMaxValues(1)

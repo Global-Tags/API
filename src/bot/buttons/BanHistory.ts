@@ -2,20 +2,20 @@ import { ButtonInteraction, Message, GuildMember, EmbedBuilder, MessageFlags, Ac
 import Button from "../structs/Button";
 import { colors } from "../bot";
 import players, { Player } from "../../database/schemas/players";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { GameProfile } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 
 export default class BanHistoryButton extends Button {
     constructor() {
         super({
-            id: 'banHistory',
+            id: 'banHistory_',
             requiredPermissions: [Permission.ManageBans]
         });
     }
     
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')] });
 
         const bans = [];
@@ -36,7 +36,7 @@ export default class BanHistoryButton extends Button {
         const row = new ActionRowBuilder<StringSelectMenuBuilder>()
             .addComponents(
                 new StringSelectMenuBuilder()
-                    .setCustomId('banHistory')
+                    .setCustomId(`banHistory_${target.uuid}`)
                     .setPlaceholder('Please select a ban to see')
                     .setMinValues(0)
                     .setMaxValues(1)

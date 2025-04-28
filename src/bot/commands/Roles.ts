@@ -1,5 +1,5 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, GuildMember, MessageFlags, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from "discord.js";
-import Command from "../structs/Command";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, EmbedBuilder, GuildMember, MessageFlags, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from "discord.js";
+import Command, { CommandOptions } from "../structs/Command";
 import { config } from "../../libs/config";
 import { colors, images } from "../bot";
 import { Player } from "../../database/schemas/players";
@@ -16,7 +16,7 @@ export default class RolesCommand extends Command {
         });
     }    
 
-    async execute(interaction: CommandInteraction, options: CommandInteractionOptionResolver, member: GuildMember, player: Player) {
+    async execute(interaction: CommandInteraction, options: CommandOptions, member: GuildMember, player: Player) {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
         const roles = getCachedRoles();
 

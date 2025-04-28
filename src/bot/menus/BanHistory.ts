@@ -4,12 +4,12 @@ import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { formatTimestamp } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { GameProfile } from "../../libs/game-profiles";
 
 export default class BanHistoryMenu extends SelectMenu {
     constructor() {
         super({
-            id: 'banHistory',
+            id: 'banHistory_',
             requiredPermissions: [Permission.ManageBans]
         });
     }
@@ -17,7 +17,7 @@ export default class BanHistoryMenu extends SelectMenu {
     async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: Player) {
         if(values.length == 0) return interaction.deferUpdate();
 
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const ban = target.bans.find((note) => note.id == values[0]);

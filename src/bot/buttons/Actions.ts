@@ -14,14 +14,14 @@ export type Info = { category: string, entries: InfoEntry[] };
 export default class ActionsButton extends Button {
     constructor() {
         super({
-            id: 'actions',
+            id: 'actions_',
             requireDiscordLink: true
         });
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         if(!player.canManagePlayers()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
-        const uuid = message.embeds[0].author?.name || message.embeds[0].fields[0].value.match(uuidRegex)?.[0];
+        const uuid = interaction.customId.split('_')[1] || message.embeds[0].author?.name || message.embeds[0].fields[0].value.match(uuidRegex)?.[0];
         if(!uuid) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
         const strippedUUID = stripUUID(uuid);
         const target = await players.findOne({ uuid: strippedUUID });
@@ -62,8 +62,7 @@ export default class ActionsButton extends Button {
 
         const embed = new EmbedBuilder()
             .setColor(colors.blurple)
-            .setAuthor({ name: uuid })
-            .setThumbnail(`https://laby.net/texture/profile/head/${strippedUUID}.png?size=1024&overlay`)
+            .setThumbnail(`https://laby.net/texture/profile/head/${target.uuid}.png?size=1024&overlay`)
             .setTitle('Action menu')
             .setDescription(info.filter(({ entries }) => entries.length > 0).map(({ category, entries }) =>
                 `__${category}__\n${entries.map(({ name, value }) => `> ${name}: ${value}`).join('\n')}`
@@ -73,7 +72,7 @@ export default class ActionsButton extends Button {
             .addComponents(
                 new ButtonBuilder()
                     .setLabel('Account')
-                    .setCustomId('manageAccount')
+                    .setCustomId(`manageAccount_${target.uuid}`)
                     .setStyle(ButtonStyle.Primary)
                     .setDisabled(![
                         Permission.ManageConnections,
@@ -83,7 +82,7 @@ export default class ActionsButton extends Button {
                     ].some((permission) => player.hasPermission(permission))),
                 new ButtonBuilder()
                     .setLabel('Moderation')
-                    .setCustomId('moderateAccount')
+                    .setCustomId(`moderateAccount_${target.uuid}`)
                     .setStyle(ButtonStyle.Primary)
                     .setDisabled(![
                         Permission.ManageBans,
@@ -94,7 +93,7 @@ export default class ActionsButton extends Button {
                     ].some((permission) => player.hasPermission(permission))),
                 new ButtonBuilder()
                     .setLabel('Manage Tag')
-                    .setCustomId('manageTag')
+                    .setCustomId(`manageTag_${target.uuid}`)
                     .setStyle(ButtonStyle.Primary)
                     .setDisabled(!player.hasPermission(Permission.ManageTags))
             );

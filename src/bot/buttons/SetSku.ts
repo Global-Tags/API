@@ -2,20 +2,19 @@ import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowB
 import Button from "../structs/Button";
 import { client, colors, images } from "../bot";
 import { getCachedRoles } from "../../database/schemas/roles";
-import players from "../../database/schemas/players";
+import { Player } from "../../database/schemas/players";
 import { Permission } from "../../types/Permission";
 
 export default class SetSkuButton extends Button {
     constructor() {
-        super('setSku');
+        super({
+            id: 'setSku_',
+            requiredPermissions: [Permission.ManageRoles]
+        });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, user: User) {
-        const staff = await players.findOne({ 'connections.discord.id': user.id });
-        if(!staff) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You need to link your Minecraft account with `/link`!')], flags: [MessageFlags.Ephemeral] });
-        if(!staff.hasPermission(Permission.ManageRoles)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
-
-        const role = getCachedRoles().find((role) => role.name == message.embeds[1].footer!.text);
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+        const role = getCachedRoles().find((role) => role.name == interaction.customId.split('_')[1]);
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
 
         const skus = (await client.application!.fetchSKUs()).map((sku) => ({ id: sku.id, name: sku.name }));
@@ -30,7 +29,7 @@ export default class SetSkuButton extends Button {
         const row = new ActionRowBuilder<StringSelectMenuBuilder>()
             .addComponents(
                 new StringSelectMenuBuilder()
-                    .setCustomId('setSku')
+                    .setCustomId(`setSku_${role.name}`)
                     .setPlaceholder('Please select an SKU...')
                     .setMinValues(0)
                     .setMaxValues(1)

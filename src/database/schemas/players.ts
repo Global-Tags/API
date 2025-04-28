@@ -84,7 +84,7 @@ export interface IPlayer {
     banPlayer({ reason, staff, appealable, expiresAt }: { reason: string, staff: string, appealable?: boolean, expiresAt?: Date | null }): void,
     unban(): void,
     clearTag(staff: string): void,
-    clearIcon(staff: string): void,
+    clearIconTexture(staff: string): void,
     createApiKey(name: string): string,
     createNote({ text, author }: { text: string, author: string }): void,
     existsNote(id: string): boolean,

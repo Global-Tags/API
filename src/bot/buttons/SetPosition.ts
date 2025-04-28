@@ -5,18 +5,17 @@ import { colors } from "../bot";
 import { capitalCase, snakeCase } from "change-case";
 import { Permission } from "../../types/Permission";
 import { GlobalPosition, positions } from "../../types/GlobalPosition";
-import { stripUUID } from "../../libs/game-profiles";
 
 export default class SetPositionButton extends Button {
     constructor() {
         super({
-            id: 'setPosition',
+            id: 'setPosition_',
             requiredPermissions: [Permission.ManageTags]
         });
     }
     
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const embed = EmbedBuilder.from(message.embeds[0])
@@ -26,7 +25,7 @@ export default class SetPositionButton extends Button {
         const playerPosition = snakeCase(target.position);
 
         const menu = new StringSelectMenuBuilder()
-            .setCustomId('setPosition')
+            .setCustomId(`setPosition_${target.uuid}`)
             .setPlaceholder('Please select a position.')
             .setMinValues(1)
             .setMaxValues(1)

@@ -6,18 +6,17 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendIconTypeChangeEmail } from "../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
-import { stripUUID } from "../../libs/game-profiles";
 
 export default class SetIconTypeMenu extends SelectMenu {
     constructor() {
         super({
-            id: 'setIconType',
+            id: 'setIconType_',
             requiredPermissions: [Permission.ManageTags],
         });
     }
 
     async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: Player) {
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
         if(target.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player is already banned!')], flags: [MessageFlags.Ephemeral] });
 

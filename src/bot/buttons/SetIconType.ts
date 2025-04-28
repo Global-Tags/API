@@ -5,18 +5,17 @@ import { colors } from "../bot";
 import { capitalCase, snakeCase } from "change-case";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon, icons } from "../../types/GlobalIcon";
-import { stripUUID } from "../../libs/game-profiles";
 
 export default class SetIconTypeButton extends Button {
     constructor() {
         super({
-            id: 'setIconType',
+            id: 'setIconType_',
             requiredPermissions: [Permission.ManageTags]
         })
     }
     
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const embed = EmbedBuilder.from(message.embeds[0])
@@ -26,7 +25,7 @@ export default class SetIconTypeButton extends Button {
         const playerIcon = snakeCase(target.icon.name);
 
         const menu = new StringSelectMenuBuilder()
-            .setCustomId('setIconType')
+            .setCustomId(`setIconType_${target.uuid}`)
             .setPlaceholder('Please select an icon.')
             .setMinValues(1)
             .setMaxValues(1)

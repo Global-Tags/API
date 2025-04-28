@@ -3,18 +3,17 @@ import Button from "../structs/Button";
 import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
-import { stripUUID } from "../../libs/game-profiles";
 
 export default class EditRoleNoteButton extends Button {
     constructor() {
         super({
-            id: 'editRoleNote',
+            id: 'editRoleNote_',
             requiredPermissions: [Permission.ManageRoles]
         });
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const role = target.getActiveRoles().find((role) => role.role.name == message.embeds[0].footer!.text);
@@ -33,7 +32,7 @@ export default class EditRoleNoteButton extends Button {
         interaction.showModal(
             new ModalBuilder()
                 .setTitle('Edit role note')
-                .setCustomId('editRoleNote')
+                .setCustomId(`editRoleNote_${target.uuid}`)
                 .addComponents(
                     new ActionRowBuilder<TextInputBuilder>()
                         .addComponents(input)

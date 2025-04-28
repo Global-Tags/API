@@ -1,6 +1,6 @@
 import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, MessageFlags, StringSelectMenuBuilder } from "discord.js";
 import Button from "../structs/Button";
-import players, { Player } from "../../database/schemas/players";
+import { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 import { getCachedRoles } from "../../database/schemas/roles";
@@ -15,7 +15,8 @@ export default class CreateGiftCodeButton extends Button {
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const embed = EmbedBuilder.from(message.embeds[1])
+        const embed = new EmbedBuilder()
+            .setColor(colors.gray)
             .setTitle('Create gift code')
             .setDescription('Here you can select a role to be given to the player when they redeem the gift code.');
 
@@ -36,6 +37,6 @@ export default class CreateGiftCodeButton extends Button {
                 .setOptions(roles)
             );
 
-        interaction.reply({ embeds: [EmbedBuilder.from(message.embeds[0]), embed], components: [row], flags: [MessageFlags.Ephemeral] });
+        interaction.reply({ embeds: [embed], components: [row], flags: [MessageFlags.Ephemeral] });
     }
 }

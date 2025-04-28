@@ -9,18 +9,18 @@ import { Player } from "../../database/schemas/players";
 export default class RenameRoleButton extends Button {
     constructor() {
         super({
-            id: 'renameRole',
+            id: 'renameRole_',
             requiredPermissions: [Permission.ManageRoles]
         });
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const role = getCachedRoles().find((role) => role.name == message.embeds[1].footer!.text);
+        const role = getCachedRoles().find((role) => role.name == interaction.customId.split('_')[1]);
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
 
         const modal = new ModalBuilder()
         .setTitle('Rename role')
-        .setCustomId('renameRole')
+        .setCustomId(`renameRole_${role.name}`)
         .addComponents(
             new ActionRowBuilder<TextInputBuilder>()
             .addComponents(

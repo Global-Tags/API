@@ -3,33 +3,32 @@ import Button from "../structs/Button";
 import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
-import { stripUUID } from "../../libs/game-profiles";
 
 export default class ManageRolesButton extends Button {
     constructor() {
         super({
-            id: 'manageRoles',
+            id: 'manageRoles_',
             requiredPermissions: [Permission.ManageRoles]
         });
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const row = new ActionRowBuilder<ButtonBuilder>()
             .addComponents([
                 new ButtonBuilder()
                     .setLabel('Add role')
-                    .setCustomId('addRole')
+                    .setCustomId(`addRole_${target.uuid}`)
                     .setStyle(ButtonStyle.Success),
                 new ButtonBuilder()
                     .setLabel('Edit role')
-                    .setCustomId('editRole')
+                    .setCustomId(`editRole_${target.uuid}`)
                     .setStyle(ButtonStyle.Primary),
                 new ButtonBuilder()
                     .setLabel('Remove role')
-                    .setCustomId('removeRole')
+                    .setCustomId(`removeRole_${target.uuid}`)
                     .setStyle(ButtonStyle.Danger)
             ]);
 

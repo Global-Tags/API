@@ -4,19 +4,18 @@ import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { formatTimestamp } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { stripUUID } from "../../libs/game-profiles";
 
 export default class EditRoleMenu extends SelectMenu {
     constructor() {
         super({
-            id: 'editRole',
+            id: 'editRole_',
             requiredPermissions: [Permission.ManageRoles]
         });
     }
 
     async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: Player) {
         if(values.length == 0) return interaction.deferUpdate();
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const role = target.getActiveRoles().find(role => role.role.name == values[0]);
@@ -30,11 +29,11 @@ export default class EditRoleMenu extends SelectMenu {
         const row = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
-                    .setCustomId('editRoleNote')
+                    .setCustomId(`editRoleNote_${target.uuid}`)
                     .setLabel('Edit note')
                     .setStyle(ButtonStyle.Primary),
                 new ButtonBuilder()
-                    .setCustomId('editRoleExpiration')
+                    .setCustomId(`editRoleExpiration_${target.uuid}`)
                     .setLabel('Edit expiration')
                     .setStyle(ButtonStyle.Primary)
             );

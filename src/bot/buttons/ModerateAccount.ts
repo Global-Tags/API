@@ -3,12 +3,11 @@ import Button from "../structs/Button";
 import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
-import { stripUUID } from "../../libs/game-profiles";
 
 export default class ModerateAccountButton extends Button {
     constructor() {
         super({
-            id: 'moderateAccount',
+            id: 'moderateAccount_',
             requireDiscordLink: true
         });
     }
@@ -22,7 +21,7 @@ export default class ModerateAccountButton extends Button {
             Permission.ManageTags
         ].some((permission) => player.hasPermission(permission))) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
 
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const embed = EmbedBuilder.from(message.embeds[0])
@@ -34,12 +33,12 @@ export default class ModerateAccountButton extends Button {
                 .addComponents(
                     new ButtonBuilder()
                         .setLabel('Manage Watchlist')
-                        .setCustomId('manageWatchlist')
+                        .setCustomId(`manageWatchlist_${target.uuid}`)
                         .setStyle(ButtonStyle.Primary)
                         .setDisabled(!player.hasPermission(Permission.ManageWatchlist)),
                     new ButtonBuilder()
                         .setLabel('Manage Bans')
-                        .setCustomId('manageBans')
+                        .setCustomId(`manageBans_${target.uuid}`)
                         .setStyle(ButtonStyle.Primary)
                         .setDisabled(!player.hasPermission(Permission.ManageBans))
                 ),
@@ -47,17 +46,17 @@ export default class ModerateAccountButton extends Button {
                 .addComponents(
                     new ButtonBuilder()
                         .setLabel(`Reports${player.hasPermission(Permission.ManageReports) && target.reports.length > 0 ? ` (${target.reports.length})` : ''}`)
-                        .setCustomId('reports')
+                        .setCustomId(`reports_${target.uuid}`)
                         .setStyle(ButtonStyle.Primary)
                         .setDisabled(!player.hasPermission(Permission.ManageReports)),
                     new ButtonBuilder()
                         .setLabel(`Notes${player.hasPermission(Permission.ManageNotes) && target.notes.length > 0 ? ` (${target.notes.length})` : ''}`)
-                        .setCustomId('notes')
+                        .setCustomId(`notes_${target.uuid}`)
                         .setStyle(ButtonStyle.Primary)
                         .setDisabled(!player.hasPermission(Permission.ManageNotes)),
                     new ButtonBuilder()
                         .setLabel(`Clears${player.hasPermission(Permission.ManageTags) && target.clears.length > 0 ? ` (${target.clears.length})` : ''}`)
-                        .setCustomId('clears')
+                        .setCustomId(`clears_${target.uuid}`)
                         .setStyle(ButtonStyle.Primary)
                         .setDisabled(!player.hasPermission(Permission.ManageTags))
                 )

@@ -3,12 +3,11 @@ import Button from "../structs/Button";
 import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
-import { stripUUID } from "../../libs/game-profiles";
 
 export default class ManageAccountButton extends Button {
     constructor() {
         super({
-            id: 'manageAccount',
+            id: 'manageAccount_',
             requireDiscordLink: true
         });
     }
@@ -21,7 +20,7 @@ export default class ManageAccountButton extends Button {
             Permission.ManageTags
         ].some((permission) => player.hasPermission(permission))) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
         
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const embed = EmbedBuilder.from(message.embeds[0])
@@ -33,17 +32,17 @@ export default class ManageAccountButton extends Button {
                 .addComponents(
                     new ButtonBuilder()
                         .setLabel('Connections')
-                        .setCustomId('manageConnections')
+                        .setCustomId(`manageConnections_${target.uuid}`)
                         .setStyle(ButtonStyle.Primary)
                         .setDisabled(!player.hasPermission(Permission.ManageConnections)),
                     new ButtonBuilder()
                         .setLabel('Roles')
-                        .setCustomId('manageRoles')
+                        .setCustomId(`manageRoles_${target.uuid}`)
                         .setStyle(ButtonStyle.Primary)
                         .setDisabled(!player.hasPermission(Permission.ManageRoles)),
                     new ButtonBuilder()
                         .setLabel('API Keys')
-                        .setCustomId('manageApiKeys')
+                        .setCustomId(`manageApiKeys_${target.uuid}`)
                         .setStyle(ButtonStyle.Primary)
                         .setDisabled(!player.hasPermission(Permission.ManageApiKeys))
                 ),
@@ -51,12 +50,12 @@ export default class ManageAccountButton extends Button {
                 .addComponents(
                     new ButtonBuilder()
                         .setLabel('Tag History')
-                        .setCustomId('tagHistory')
+                        .setCustomId(`tagHistory_${target.uuid}`)
                         .setStyle(ButtonStyle.Primary)
                         .setDisabled(!player.hasPermission(Permission.ManageTags)),
                     new ButtonBuilder()
                         .setLabel('Referrals')
-                        .setCustomId('referrals')
+                        .setCustomId(`referrals_${target.uuid}`)
                         .setStyle(ButtonStyle.Primary)
                 )
         ]

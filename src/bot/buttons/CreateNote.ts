@@ -7,7 +7,7 @@ import { Player } from "../../database/schemas/players";
 export default class CreateNoteButton extends Button {
     constructor() {
         super({
-            id: 'createNote',
+            id: 'createNote_',
             requiredPermissions: [Permission.ManageNotes]
         });
     }
@@ -15,7 +15,7 @@ export default class CreateNoteButton extends Button {
     public trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         const modal = new ModalBuilder()
         .setTitle('Create note')
-        .setCustomId('createNote')
+        .setCustomId(`createNote_${interaction.customId.split('_')[1]}`)
         .addComponents(
             new ActionRowBuilder<TextInputBuilder>()
             .addComponents(

@@ -3,18 +3,17 @@ import Button from "../structs/Button";
 import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
-import { stripUUID } from "../../libs/game-profiles";
 
 export default class DeleteApiKeyButton extends Button {
     constructor() {
         super({
-            id: 'deleteApiKey',
+            id: 'deleteApiKey_',
             requiredPermissions: [Permission.ManageApiKeys]
         });
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const options = target.api_keys.map((key) =>
@@ -34,7 +33,7 @@ export default class DeleteApiKeyButton extends Button {
         const row = new ActionRowBuilder<StringSelectMenuBuilder>()
             .addComponents(
                 new StringSelectMenuBuilder()
-                .setCustomId('deleteApiKey')
+                .setCustomId(`deleteApiKey_${target.uuid}`)
                 .setPlaceholder('Select an API key to delete...')
                 .setMinValues(0)
                 .setMaxValues(1)

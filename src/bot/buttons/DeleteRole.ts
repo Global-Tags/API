@@ -3,8 +3,9 @@ import Button from "../structs/Button";
 import { Permission } from "../../types/Permission";
 import { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
-import { getCachedRoles, updateRoleCache } from "../../database/schemas/roles";
+import { updateRoleCache } from "../../database/schemas/roles";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
+import roles from "../../database/schemas/roles";
 
 export default class DeleteRole extends Button {
     constructor() {
@@ -15,7 +16,7 @@ export default class DeleteRole extends Button {
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const role = getCachedRoles().find((role) => role.name == message.embeds[1].footer!.text);
+        const role = await roles.findOne({ name: interaction.customId.split('_')[1] });
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
 
         sendModLogMessage({
