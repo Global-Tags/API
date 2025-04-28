@@ -376,7 +376,7 @@ export function sendGiftCodeRedeemMessage(user: GameProfile, code: GiftCode, exp
             },
             {
                 name: 'Gift expires:',
-                value: `${expiresAt ? `${formatTimestamp(expiresAt)} (${formatTimestamp(expiresAt, 'R')})` : '```-```'}`,
+                value: `${expiresAt ? `${formatTimestamp(expiresAt, 'd')}\n(${formatTimestamp(expiresAt, 'R')})` : '```-```'}`,
                 inline: true
             }
         ]);
