@@ -1,9 +1,9 @@
 import { t } from "elysia";
-import players from "../../../database/schemas/players";
+import { getOrCreatePlayer } from "../../../database/schemas/players";
 import { Permission } from "../../../types/Permission";
 import { GlobalPosition } from "../../../types/GlobalPosition";
 import { capitalCase, snakeCase } from "change-case";
-import { GameProfile, stripUUID } from "../../../libs/game-profiles";
+import { GameProfile } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
 import { sendTagChangeEmail } from "../../../libs/mailer";
@@ -11,33 +11,23 @@ import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 
 export default (app: ElysiaApp) => app.post('/', async ({ session, body: { position }, params, i18n, error }) => { // Change tag position
     if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
+
+    position = position.toLowerCase();
     if(!(capitalCase(position) in GlobalPosition)) return error(422, { error: i18n('position.invalid') });
 
-    position = snakeCase(position);
-    const uuid = stripUUID(params.uuid);
-    const player = await players.findOne({ uuid });
-    if(session.equal && player?.isBanned()) return error(403, { error: i18n('error.banned') });
+    const player = await getOrCreatePlayer(params.uuid);
+    if(session.equal && player.isBanned()) return error(403, { error: i18n('error.banned') });
+    if(snakeCase(player.position) == position) return error(400, { error: i18n('position.samePosition') });
 
-    const oldPosition = player?.position;
-
-    if(player) {
-        if(player.isBanned()) return error(403, { error: i18n('error.banned') });
-        if(snakeCase(player.position) == position) return error(400, { error: i18n('position.samePosition') });
-
-        player.position = position;
-        await player.save();
-    } else {
-        await players.insertMany({
-            uuid,
-            position
-        });
-    }
+    const oldPosition = player.position;
+    player.position = position;
+    await player.save();
 
     if(!session.equal) {
         sendModLogMessage({
             logType: ModLogType.EditPosition,
             staff: await GameProfile.getProfileByUUID(session.uuid!),
-            user: await player?.getGameProfile(),
+            user: await player.getGameProfile(),
             discord: false,
             positions: {
                 old: oldPosition || '---',
@@ -45,7 +35,7 @@ export default (app: ElysiaApp) => app.post('/', async ({ session, body: { posit
             }
         });
 
-        if(player?.isEmailVerified()) {
+        if(player.isEmailVerified()) {
             sendTagChangeEmail(player.connections.email.address!, oldPosition || '---', position, getI18nFunctionByLanguage(player.last_language));
         }
     }
