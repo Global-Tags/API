@@ -4,18 +4,17 @@ import { colors } from "../bot";
 import players, { Player } from "../../database/schemas/players";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { stripUUID } from "../../libs/game-profiles";
 
 export default class UnwatchButton extends Button {
     constructor() {
         super({
-            id: 'unwatch',
+            id: 'unwatch_',
             requiredPermissions: [Permission.ManageWatchlist]
         });
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
         if(!target.watchlist) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player is not on the watchlist!')], flags: [MessageFlags.Ephemeral] });
 

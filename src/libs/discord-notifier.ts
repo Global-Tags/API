@@ -4,7 +4,7 @@ import { GameProfile } from "./game-profiles";
 import { getCustomIconUrl } from "../routes/players/[uuid]/icon";
 import { capitalCase, pascalCase, sentenceCase } from "change-case";
 import { config } from "./config";
-import { translateToAnsi } from "./chat-color";
+import { stripColors, translateToAnsi } from "./chat-color";
 import { GiftCode } from "../database/schemas/gift-codes";
 
 export enum ModLogType {
@@ -36,6 +36,7 @@ export enum ModLogType {
     ChangeRolePermissions,
     SetRoleSku,
     DeleteRole,
+    OverwriteConnection,
     UnlinkConnection,
     ResetLinkingCode
 }
@@ -120,9 +121,15 @@ type ModLogData = {
     role: string,
     sku: { old: string | null, new: string | null }
 } | {
+    logType: ModLogType.OverwriteConnection,
+    type: 'discord' | 'email',
+    value: { old: string | null, new: string }
+} | {
     logType: ModLogType.UnlinkConnection | ModLogType.ResetLinkingCode,
     type: 'discord' | 'email' 
 });
+
+export const hiddenConnectionLabel = '**`HIDDEN`**';
 
 export function formatTimestamp(date: Date, style: 't' | 'T' | 'd' | 'D' | 'f' | 'F' | 'R' = 'f') {
     return `<t:${Math.floor(date.getTime() / 1000 | 0)}:${style}>`;
@@ -277,7 +284,7 @@ export function sendEmailLinkMessage(user: GameProfile, email: string | null, co
                 },
                 {
                     name: connected ? 'Email' : 'Previous Email',
-                    value: `${email ? `||${email}||` : '**`HIDDEN`**'}`
+                    value: `${email ? `||${email}||` : hiddenConnectionLabel}`
                 }
             ]),
         actionButton: false
@@ -369,7 +376,7 @@ export function sendGiftCodeRedeemMessage(user: GameProfile, code: GiftCode, exp
             },
             {
                 name: 'Gift expires:',
-                value: `${expiresAt ? `${formatTimestamp(expiresAt)} (${formatTimestamp(expiresAt, 'R')})` : '```-```'}`,
+                value: `${expiresAt ? `${formatTimestamp(expiresAt, 'd')}\n(${formatTimestamp(expiresAt, 'R')})` : '```-```'}`,
                 inline: true
             }
         ]);
@@ -396,7 +403,7 @@ export function sendModLogMessage(data: ModLogData) {
 
 function modlogDescription(data: ModLogData): string | null {
     const { logType: type } = data;
-    if(type == ModLogType.ChangeTag) return `\`${data.tags.old}\` → \`${data.tags.new}\``;
+    if(type == ModLogType.ChangeTag) return `\`${stripColors(data.tags.old)}\` → \`${stripColors(data.tags.new)}\``;
     else if(type == ModLogType.Ban) return `**Reason**: \`${data.reason || 'No reason'}\`. **Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Expires**: ${data.expires ? `${formatTimestamp(data.expires)} (${formatTimestamp(data.expires, 'R')})` : '`-`'}`;
     else if(type == ModLogType.EditBan) return `**Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Reason**: \`${data.reason || '-- No reason --'}\``;
     else if(type == ModLogType.AddRole || type == ModLogType.RemoveRole) return `\`${data.role}\``;
@@ -404,7 +411,7 @@ function modlogDescription(data: ModLogData): string | null {
     else if(type == ModLogType.SetRoleExpiration) return `**Role**: \`${data.role}\`. **Expires**: ${data.expires ? `${formatTimestamp(data.expires)} (${formatTimestamp(data.expires, 'R')})` : '`-`'}`;
     else if(type == ModLogType.EditPosition) return `\`${capitalCase(data.positions.old)}\` → \`${capitalCase(data.positions.new)}\``;
     else if(type == ModLogType.ChangeIconType) return `\`${capitalCase(data.icons.old)}\` → \`${capitalCase(data.icons.new)}\``;
-    else if(type == ModLogType.ClearIconTexture) return `[${data.hash}](${getCustomIconUrl(data.user!.uuid!, data.hash)})`;
+    else if(type == ModLogType.ClearIconTexture) return `[\`${data.hash}\`](<${getCustomIconUrl(data.user!.uuid!, data.hash)}>)`;
     else if(type == ModLogType.CreateApiKey || type == ModLogType.RegenerateApiKey || type == ModLogType.DeleteApiKey) return `**Key name**: \`${data.key}\``;
     else if(type == ModLogType.CreateGiftCode) return `**Name**: \`${data.code}\`. **Role**: \`${data.role}\`. **Max uses**: \`${data.maxUses}\`. **Code expires**: ${data.codeExpiration ? formatTimestamp(data.codeExpiration, 'R') : '`Never`'}. **Gift duration**: \`${data.giftDuration ? data.giftDuration.toString() : 'Permanent'}\``;
     else if(type == ModLogType.DeleteGiftCode) return `\`${data.code}\``;
@@ -416,6 +423,10 @@ function modlogDescription(data: ModLogData): string | null {
     else if(type == ModLogType.ChangeRolePermissions) return `\`${data.role}\`\n\`\`\`diff\n${data.permissions.added.map((permission) => `+ ${pascalCase(permission)}`).join('\n')}${data.permissions.added.length > 0 && data.permissions.removed.length > 0 ? '\n' : ''}${data.permissions.removed.map((permission) => `- ${pascalCase(permission)}`).join('\n')}\`\`\``;
     else if(type == ModLogType.SetRoleSku) return `**Role**: \`${data.role}\`. **SKU**: \`${data.sku.old || '-'}\` → \`${data.sku.new || '-'}\``;
     else if(type == ModLogType.DeleteRole) return `\`${data.role}\``;
+    else if(type == ModLogType.OverwriteConnection) {
+        const redactValue = data.type == 'email' && config.discordBot.notifications.accountConnections.hideEmails;
+        return `**Type**: \`${capitalCase(data.type)}\`. ${redactValue ? hiddenConnectionLabel : data.value.old ? `||${data.value.old}||` : '`-`'} → ${redactValue ? hiddenConnectionLabel : data.value.new ? `||${data.value.new}||` : '`-`'}`;
+    }
     else if(type == ModLogType.UnlinkConnection || type == ModLogType.ResetLinkingCode) return `**Type**: \`${capitalCase(data.type)}\``;
     return null;
 }

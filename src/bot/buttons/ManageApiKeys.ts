@@ -3,18 +3,17 @@ import Button from "../structs/Button";
 import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
-import { stripUUID } from "../../libs/game-profiles";
 
 export default class ManageApiKeysButton extends Button {
     constructor() {
         super({
-            id: 'manageApiKeys',
+            id: 'manageApiKeys_',
             requiredPermissions: [Permission.ManageApiKeys]
         });
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const embed = EmbedBuilder.from(message.embeds[0])
@@ -25,15 +24,15 @@ export default class ManageApiKeysButton extends Button {
         .addComponents(
             new ButtonBuilder()
                 .setLabel('Create Key')
-                .setCustomId('createApiKey')
+                .setCustomId(`createApiKey_${target.uuid}`)
                 .setStyle(ButtonStyle.Success),
             new ButtonBuilder()
                 .setLabel('Regenerate Key')
-                .setCustomId('regenerateApiKey')
+                .setCustomId(`regenerateApiKey_${target.uuid}`)
                 .setStyle(ButtonStyle.Primary),
             new ButtonBuilder()
                 .setLabel('Delete Key')
-                .setCustomId('deleteApiKey')
+                .setCustomId(`deleteApiKey_${target.uuid}`)
                 .setStyle(ButtonStyle.Danger)
         );
 

@@ -4,18 +4,17 @@ import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { stripUUID } from "../../libs/game-profiles";
 
 export default class RemoveRoleMenu extends SelectMenu {
     constructor() {
         super({
-            id: 'removeRole',
+            id: 'removeRole_',
             requiredPermissions: [Permission.ManageRoles]
         });
     }
 
     async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: Player) {
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const roleName = values[0];

@@ -5,18 +5,17 @@ import { colors } from "../bot";
 import { capitalCase, snakeCase } from "change-case";
 import { Permission } from "../../types/Permission";
 import { getCachedRoles } from "../../database/schemas/roles";
-import { stripUUID } from "../../libs/game-profiles";
 
 export default class AddRoleButton extends Button {
     constructor() {
         super({
-            id: 'addRole',
+            id: 'addRole_',
             requiredPermissions: [Permission.ManageRoles]
         });
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const options = getCachedRoles().filter((role) => !target.getActiveRoles().some((r) => r.role.name == role.name)).slice(0, 25).map(({ name: role }) => {
@@ -32,7 +31,7 @@ export default class AddRoleButton extends Button {
         const row = new ActionRowBuilder<StringSelectMenuBuilder>()
             .addComponents([
                 new StringSelectMenuBuilder()
-                    .setCustomId('addRole')
+                    .setCustomId(`addRole_${target.uuid}`)
                     .setMinValues(1)
                     .setMaxValues(1)
                     .setPlaceholder('Select a role to add...')

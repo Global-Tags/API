@@ -50,8 +50,12 @@ export interface IPlayer {
     }[],
     notes: { id: string, text: string, author: string, createdAt: Date }[],
     bans: {
-        appealable: boolean,
-        appealed: boolean,
+        appeal: {
+            appealable: boolean,
+            appealed: boolean,
+            reason?: string | null,
+            appealed_at?: Date | null
+        },
         banned_at: Date,
         expires_at: Date | null,
         id: string,
@@ -80,7 +84,7 @@ export interface IPlayer {
     banPlayer({ reason, staff, appealable, expiresAt }: { reason: string, staff: string, appealable?: boolean, expiresAt?: Date | null }): void,
     unban(): void,
     clearTag(staff: string): void,
-    clearIcon(staff: string): void,
+    clearIconTexture(staff: string): void,
     createApiKey(name: string): string,
     createNote({ text, author }: { text: string, author: string }): void,
     existsNote(id: string): boolean,
@@ -244,15 +248,25 @@ const schema = new Schema<IPlayer>({
         }
     }],
     bans: [{
-        appealable: {
-            type: Boolean,
-            required: true,
-            default: true
-        },
-        appealed: {
-            type: Boolean,
-            required: true,
-            default: false
+        appeal: {
+            appealable: {
+                type: Boolean,
+                required: true,
+                default: true
+            },
+            appealed: {
+                type: Boolean,
+                required: true,
+                default: false
+            },
+            reason: {
+                type: String,
+                required: false
+            },
+            appealed_at: {
+                type: Date,
+                required: false
+            }
         },
         banned_at: {
             type: Date,
@@ -429,8 +443,12 @@ const schema = new Schema<IPlayer>({
 
         banPlayer({ reason, staff, appealable = true, expiresAt }: { reason: string, staff: string, appealable?: boolean, expiresAt?: Date | null }) {
             this.bans.unshift({
-                appealable,
-                appealed: false,
+                appeal: {
+                    appealable,
+                    appealed: false,
+                    reason: null,
+                    appealed_at: null
+                },
                 banned_at: new Date(),
                 expires_at: expiresAt || null,
                 id: generateSecureCode(),

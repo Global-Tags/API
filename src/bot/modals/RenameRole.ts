@@ -11,7 +11,7 @@ import roleModel from "../../database/schemas/roles";
 export default class RenameRoleModal extends Modal {
     constructor() {
         super({
-            id: 'renameRole',
+            id: 'renameRole_',
             requiredPermissions: [Permission.ManageRoles]
         });
     }
@@ -19,7 +19,7 @@ export default class RenameRoleModal extends Modal {
     async submit(interaction: ModalSubmitInteraction, message: Message, fields: ModalSubmitFields, member: GuildMember, player: Player) {
         const name = snakeCase(fields.getTextInputValue('name').trim());
         const roles = getCachedRoles();
-        const role = await roleModel.findOne({ name: message.embeds[1].footer!.text });
+        const role = await roleModel.findOne({ name: interaction.customId.split('_')[1] });
 
         if(!role) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')] });
         if(roles.some((role) => role.name == name)) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ The role \`${name}\` already exists!`)] });

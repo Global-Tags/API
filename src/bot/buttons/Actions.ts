@@ -3,25 +3,25 @@ import Button from "../structs/Button";
 import { colors } from "../bot";
 import players, { Player } from "../../database/schemas/players";
 import { Permission } from "../../types/Permission";
-import { stripUUID } from "../../libs/game-profiles";
-import { uuidRegex } from "../commands/PlayerInfo";
+import { stripUUID, uuidRegex } from "../../libs/game-profiles";
 import { config } from "../../libs/config";
 import { stripColors } from "../../libs/chat-color";
+import { hiddenConnectionLabel } from "../../libs/discord-notifier";
 
-type InfoEntry = { name: string, value: string };
-type Info = { category: string, entries: InfoEntry[] };
+export type InfoEntry = { name: string, value: string };
+export type Info = { category: string, entries: InfoEntry[] };
 
 export default class ActionsButton extends Button {
     constructor() {
         super({
-            id: 'actions',
+            id: 'actions_',
             requireDiscordLink: true
         });
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         if(!player.canManagePlayers()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
-        const uuid = message.embeds[0].author?.name || message.embeds[0].fields[0].value.match(uuidRegex)?.[0];
+        const uuid = interaction.customId.split('_')[1] || message.embeds[0].author?.name || message.embeds[0].fields[0].value.match(uuidRegex)?.[0];
         if(!uuid) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
         const strippedUUID = stripUUID(uuid);
         const target = await players.findOne({ uuid: strippedUUID });
@@ -53,7 +53,7 @@ export default class ActionsButton extends Button {
 
         if(player.hasPermission(Permission.ManageConnections)) {
             connections.push({ name: 'Discord', value: target.connections.discord.id ? `[\`${target.connections.discord.id}\`](discord://-/users/${target.connections.discord.id})` : '`❌`' });
-            connections.push({ name: 'Email', value: target.connections.email.address ? config.discordBot.notifications.accountConnections.hideEmails ? '**`HIDDEN`**' : `\`${target.connections.email.address}\`` : '`❌`' });
+            connections.push({ name: 'Email', value: target.connections.email.address ? config.discordBot.notifications.accountConnections.hideEmails ? hiddenConnectionLabel : `\`${target.connections.email.address}\`` : '`❌`' });
         }
 
         info.push({ category: 'General', entries: general });
@@ -62,8 +62,7 @@ export default class ActionsButton extends Button {
 
         const embed = new EmbedBuilder()
             .setColor(colors.blurple)
-            .setAuthor({ name: uuid })
-            .setThumbnail(`https://laby.net/texture/profile/head/${strippedUUID}.png?size=1024&overlay`)
+            .setThumbnail(`https://laby.net/texture/profile/head/${target.uuid}.png?size=1024&overlay`)
             .setTitle('Action menu')
             .setDescription(info.filter(({ entries }) => entries.length > 0).map(({ category, entries }) =>
                 `__${category}__\n${entries.map(({ name, value }) => `> ${name}: ${value}`).join('\n')}`
@@ -73,19 +72,30 @@ export default class ActionsButton extends Button {
             .addComponents(
                 new ButtonBuilder()
                     .setLabel('Account')
-                    .setCustomId('manageAccount')
+                    .setCustomId(`manageAccount_${target.uuid}`)
                     .setStyle(ButtonStyle.Primary)
-                    .setDisabled(!player.hasPermission(Permission.ManageConnections) && !player.hasPermission(Permission.ManageRoles)),
-                new ButtonBuilder()
-                    .setLabel('Tag Settings')
-                    .setCustomId('manageTag')
-                    .setStyle(ButtonStyle.Primary)
-                    .setDisabled(!player.hasPermission(Permission.ManageTags)),
+                    .setDisabled(![
+                        Permission.ManageConnections,
+                        Permission.ManageRoles,
+                        Permission.ManageApiKeys,
+                        Permission.ManageTags
+                    ].some((permission) => player.hasPermission(permission))),
                 new ButtonBuilder()
                     .setLabel('Moderation')
-                    .setCustomId('moderateAccount')
+                    .setCustomId(`moderateAccount_${target.uuid}`)
                     .setStyle(ButtonStyle.Primary)
-                    .setDisabled(!player.hasPermission(Permission.ManageBans) && !player.hasPermission(Permission.ManageNotes) && !player.hasPermission(Permission.ManageReports) && !player.hasPermission(Permission.ManageWatchlist))
+                    .setDisabled(![
+                        Permission.ManageBans,
+                        Permission.ManageNotes,
+                        Permission.ManageReports,
+                        Permission.ManageWatchlist,
+                        Permission.ManageTags
+                    ].some((permission) => player.hasPermission(permission))),
+                new ButtonBuilder()
+                    .setLabel('Manage Tag')
+                    .setCustomId(`manageTag_${target.uuid}`)
+                    .setStyle(ButtonStyle.Primary)
+                    .setDisabled(!player.hasPermission(Permission.ManageTags))
             );
 
         interaction.reply({ embeds: [embed], components: [row], flags: [MessageFlags.Ephemeral] });

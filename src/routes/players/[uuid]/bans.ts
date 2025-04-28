@@ -14,8 +14,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     if(!player) return error(404, { error: i18n('error.playerNotFound') });
 
     return player.bans.map((ban) => ({
-        appealable: ban.appealable,
-        appealed: ban.appealed,
+        appealable: ban.appeal.appealable,
+        appealed: ban.appeal.appealed,
         banned_at: ban.banned_at.getTime(),
         expires_at: ban.expires_at?.getTime() || null,
         id: ban.id,
@@ -45,9 +45,9 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     
     const ban = player.bans.find(({ id }) => id === params.id);
     if(!ban) return error(404, { error: i18n('ban.not_found') });
-    const { appealable, appealed, banned_at, expires_at, id, reason, staff } = ban;
+    const { appeal, banned_at, expires_at, id, reason, staff } = ban;
 
-    return { appealable, appealed, banned_at: banned_at.getTime(), expires_at: expires_at?.getTime() || null, id, reason, staff: formatUUID(staff) };
+    return { appealable: appeal.appealable, appealed: appeal.appealable, banned_at: banned_at.getTime(), expires_at: expires_at?.getTime() || null, id, reason, staff: formatUUID(staff) };
 }, {
     detail: {
         tags: ['Admin'],
@@ -86,7 +86,13 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     });
 
     if(player.isEmailVerified()) {
-        sendBanEmail(player.connections.email.address!, reason || '---', getI18nFunctionByLanguage(player.last_language));
+        sendBanEmail({
+            address: player.connections.email.address!,
+            reason: reason || '---',
+            appealable: appealable == undefined ? true : appealable,
+            duration: expires,
+            i18n: getI18nFunctionByLanguage(player.last_language)
+        });
     }
 
     return { message: i18n('ban.banned') };
@@ -117,7 +123,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     const ban = player.bans.at(0)!;
     ban.reason = reason;
-    ban.appealable = appealable;
+    ban.appeal.appealable = appealable;
     await player.save();
 
     sendModLogMessage({
@@ -154,10 +160,12 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     const player = await players.findOne({ uuid });
     if(!player || !player.isBanned()) return error(404, { error: i18n('appeal.notBanned') });
     const ban = player.bans.at(0)!;
-    if(!ban.appealable) return error(403, { error: i18n('appeal.notAppealable') });
-    if(ban.appealed) return error(403, { error: i18n('appeal.alreadyAppealed') });
+    if(!ban.appeal.appealable) return error(403, { error: i18n('appeal.notAppealable') });
+    if(ban.appeal.appealed) return error(403, { error: i18n('appeal.alreadyAppealed') });
 
-    ban.appealed = true;
+    ban.appeal.appealed = true;
+    ban.appeal.reason = reason;
+    ban.appeal.appealed_at = new Date();
     await player.save();
 
     sendBanAppealMessage(

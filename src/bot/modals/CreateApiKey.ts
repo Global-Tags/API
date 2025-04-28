@@ -4,19 +4,18 @@ import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { stripUUID } from "../../libs/game-profiles";
 import { snakeCase } from "change-case";
 
 export default class CreateApiKeyModal extends Modal {
     constructor() {
         super({
-            id: 'createApiKey',
+            id: 'createApiKey_',
             requiredPermissions: [Permission.ManageApiKeys]
         });
     }
 
     async submit(interaction: ModalSubmitInteraction, message: Message, fields: ModalSubmitFields, member: GuildMember, player: Player) {
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
         const name = snakeCase(fields.getTextInputValue('name').trim());
 

@@ -162,3 +162,7 @@ Environment variables configure essential application settings. Below is a detai
     - **Entitlements (SKUs)**:
         - **`GT_DISCORD_BOT_ENTITLEMENTS_ENABLED`**: Enables SKU subscription logging.
         - **`GT_DISCORD_BOT_ENTITLEMENTS_CHANNEL`**: ID of the channel for entitlement logs.
+
+    - **Gift code logs**:
+        - **`GT_DISCORD_BOT_GIFT_CODES_ENABLED`**: Enables notifications for gift code uses
+        - **`GT_DISCORD_BOT_GIFT_CODES_CHANNEL`**: ID of the channel for gift code logs.

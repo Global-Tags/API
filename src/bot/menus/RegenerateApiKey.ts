@@ -4,13 +4,12 @@ import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { stripUUID } from "../../libs/game-profiles";
 import { generateSecureCode } from "../../routes/players/[uuid]/connections";
 
 export default class RegenerateApiKeyMenu extends SelectMenu {
     constructor() {
         super({
-            id: 'regenerateApiKey',
+            id: 'regenerateApiKey_',
             requiredPermissions: [Permission.ManageApiKeys]
         });
     }
@@ -18,7 +17,7 @@ export default class RegenerateApiKeyMenu extends SelectMenu {
     async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: Player) {
         if(values.length == 0) return interaction.deferUpdate();
 
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const key = target.api_keys.find((key) => key.name == values[0]);

@@ -23,7 +23,6 @@
         "banned": {
             "subject": "당신의 GlobalTags 계정은 밴되었습니다",
             "title": "계정 밴",
-            "description": "당신의 GlobalTags 계정은 다음 이유로 인해 밴되었습니다:",
             "appeal": "게임 내에서 밴을 항의할 수 있습니다."
         },
         "tagChanged": {

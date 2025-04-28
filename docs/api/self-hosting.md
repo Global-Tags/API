@@ -1,7 +1,5 @@
 # Self-hosting the GlobalTagsAPI
 
-## Run with bun (that rhymes)
-
 ### 1. Clone the Repository
 
 Start by cloning the repository to your local machine:
@@ -39,10 +37,10 @@ bun start
     bun i -g pm2 pm2-logrotate
 
     # Start the daemon
-    pm2 start "bun start" --name GlobalTagsAPI
+    pm2 start src/index.ts --name GlobalTagsAPI --interpreter ~/.bun/bin/bun # Or wherever your bun executable is
     ```
 
-## Run with docker
+# Self-hosting the documentation
 
 ### 1. Clone the Repository
 
@@ -53,16 +51,22 @@ git clone https://github.com/Global-Tags/API gtapi
 cd gtapi
 ```
 
-You can now edit your `.env` file and the configs in `./config`.
+### 2. Get into the virtualenv
+To get into the virtualenv you need python and pip installed.
 
-### 2. Launching the API
-Then you can run the API:
 ```bash
-# Using docker
-docker run --name gtapi -itd -p 5500:5500 -v ./config:/app/config -v ./icons:/app/icons rappytv/globaltagsapi:latest
+python -m venv .venv
 
-# OR
+# Windows
+. ./.venv/bin/activate.bat
 
-# Using docker compose
-docker compose up -d
+# Linux / macOS
+. ./.venv/bin/activate
+```
+
+### 3. Install the dependencies and run mkdocs
+```bash
+pip install -r requirements.txt
+
+mkdocs serve
 ```

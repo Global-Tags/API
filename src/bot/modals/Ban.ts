@@ -6,19 +6,18 @@ import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendBanEmail } from "../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
 import { Permission } from "../../types/Permission";
-import { stripUUID } from "../../libs/game-profiles";
 import ms, { StringValue } from "ms";
 
 export default class BanModal extends Modal {
     constructor() {
         super({
-            id: 'ban',
+            id: 'ban_',
             requiredPermissions: [Permission.ManageBans],
         });
     }
 
     async submit(interaction: ModalSubmitInteraction, message: Message, fields: ModalSubmitFields, member: GuildMember, player: Player) {
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
         if(target.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player is already banned!')], flags: [MessageFlags.Ephemeral] });
         const reason = fields.getTextInputValue('reason');
@@ -45,7 +44,13 @@ export default class BanModal extends Modal {
         });
 
         if(target.isEmailVerified()) {
-            sendBanEmail(target.connections.email.address!, reason || '---', getI18nFunctionByLanguage(target.last_language));
+            sendBanEmail({
+                address: target.connections.email.address!,
+                reason: reason || '---',
+                appealable: true,
+                duration: expiresAt,
+                i18n: getI18nFunctionByLanguage(target.last_language)
+            });
         }
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The player was successfully banned!')], flags: [MessageFlags.Ephemeral] });

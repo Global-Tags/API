@@ -14,12 +14,13 @@ export default class DeleteGiftCodeButton extends Button {
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const embed = EmbedBuilder.from(message.embeds[1])
+        const embed = new EmbedBuilder()
+            .setColor(colors.gray)
             .setTitle('Delete gift code')
             .setDescription('Here you can select a gift code to be deleted.');
 
         const codes = await codeSchema.find();
-        const codeMap = codes.filter((code) => code.isValid()).map((code) => ({
+        const codeMap = codes.filter((code) => code.isValid()).slice(0, 25).map((code) => ({
             value: code.code,
             label: code.name,
             description: `Uses: ${code.uses.length}/${code.max_uses}. Expires at: ${code.expires_at ? code.expires_at.toDateString() : 'Never'}`,
@@ -38,6 +39,6 @@ export default class DeleteGiftCodeButton extends Button {
                 .setOptions(codeMap)
             );
 
-        interaction.reply({ embeds: [EmbedBuilder.from(message.embeds[0]), embed], components: [row], flags: [MessageFlags.Ephemeral] });
+        interaction.reply({ embeds: [embed], components: [row], flags: [MessageFlags.Ephemeral] });
     }
 }

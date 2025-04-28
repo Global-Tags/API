@@ -6,7 +6,7 @@ import { Player } from "../../database/schemas/players";
 export default class BanButton extends Button {
     constructor() {
         super({
-            id: 'ban',
+            id: 'ban_',
             requiredPermissions: [Permission.ManageBans]
         });
     }
@@ -14,7 +14,7 @@ export default class BanButton extends Button {
     public trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         const modal = new ModalBuilder()
             .setTitle('Ban player')
-            .setCustomId('ban')
+            .setCustomId(`ban_${interaction.customId.split('_')[1]}`)
             .addComponents(
                 new ActionRowBuilder<TextInputBuilder>()
                     .addComponents(

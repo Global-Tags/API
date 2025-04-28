@@ -2,19 +2,18 @@ import { ButtonInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder
 import Button from "../structs/Button";
 import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
-import { stripUUID } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 
 export default class SetTagButton extends Button {
     constructor() {
         super({
-            id: 'setTag',
+            id: 'setTag_',
             requiredPermissions: [Permission.ManageTags]
         });
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const target = await players.findOne({ uuid: stripUUID(message.embeds[0].author!.name) });
+        const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
         const input = new TextInputBuilder()
@@ -28,7 +27,7 @@ export default class SetTagButton extends Button {
 
         const modal = new ModalBuilder()
             .setTitle('Set new tag')
-            .setCustomId('setTag')
+            .setCustomId(`setTag_${target.uuid}`)
             .addComponents(new ActionRowBuilder<TextInputBuilder>().addComponents(input));
 
         interaction.showModal(modal);

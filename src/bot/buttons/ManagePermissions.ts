@@ -9,13 +9,13 @@ import { capitalCase } from "change-case";
 export default class ManagePermissionsButton extends Button {
     constructor() {
         super({
-            id: 'managePermissions',
+            id: 'managePermissions_',
             requiredPermissions: [Permission.ManageRoles]
         });
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const role = getCachedRoles().find((role) => role.name == message.embeds[1].footer!.text);
+        const role = getCachedRoles().find((role) => role.name == interaction.customId.split('_')[1]);
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
 
         const embed = new EmbedBuilder()
@@ -27,7 +27,7 @@ export default class ManagePermissionsButton extends Button {
         const row = new ActionRowBuilder<StringSelectMenuBuilder>()
             .addComponents([
                 new StringSelectMenuBuilder()
-                    .setCustomId('managePermissions')
+                    .setCustomId(`managePermissions_${role.name}`)
                     .setMinValues(0)
                     .setMaxValues(Math.min(25, permissions.length))
                     .setPlaceholder('Select the permissions...')
