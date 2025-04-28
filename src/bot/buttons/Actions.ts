@@ -14,7 +14,7 @@ export type Info = { category: string, entries: InfoEntry[] };
 export default class ActionsButton extends Button {
     constructor() {
         super({
-            id: 'actions_',
+            id: 'actions',
             requireDiscordLink: true
         });
     }
