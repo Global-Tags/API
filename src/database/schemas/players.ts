@@ -4,7 +4,7 @@ import { generateSecureCode } from "../../routes/players/[uuid]/connections";
 import { Permission } from "../../types/Permission";
 import { getCachedRoles, Role } from "./roles";
 import { GlobalIcon } from "../../types/GlobalIcon";
-import { GameProfile } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
 
 export type PlayerRole = {
     role: Role,
@@ -529,4 +529,13 @@ const schema = new Schema<IPlayer>({
     }
 });
 
-export default model<IPlayer>('players', schema);
+const players = model<IPlayer>('players', schema);
+
+export async function getOrCreatePlayer(uuid: string): Promise<Player> {
+    uuid = stripUUID(uuid);
+    const player = await players.findOne({ uuid });
+    if(player) return player;
+    return await players.create({ uuid });
+}
+
+export default players;
