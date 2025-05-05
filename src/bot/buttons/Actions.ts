@@ -21,7 +21,7 @@ export default class ActionsButton extends Button {
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
         if(!player.canManagePlayers()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
-        const uuid = interaction.customId.split('_')[1] || message.embeds[0].author?.name || message.embeds[0].fields[0].value.match(uuidRegex)?.[0];
+        const uuid = interaction.customId.split('_')[1] || message.embeds[0]?.author?.name || message.embeds[0]?.fields[0]?.value.match(uuidRegex)?.[0];
         if(!uuid) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
         const strippedUUID = stripUUID(uuid);
         const target = await players.findOne({ uuid: strippedUUID });
