@@ -7,7 +7,7 @@ import { Permission } from "../../../types/Permission";
 import { GlobalIcon } from "../../../types/GlobalIcon";
 import { GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
-import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
+import { ModLogType, sendCustomIconUploadMessage, sendModLogMessage } from "../../../libs/discord-notifier";
 import { sendTagChangeEmail } from "../../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 import { generateSecureCode } from "./connections";
@@ -114,6 +114,11 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     player.icon.hash = generateSecureCode(32);
     await player.save();
     await Bun.write(Bun.file(join('icons', player.uuid, `${player.icon.hash}.png`)), await image.arrayBuffer(), { createPath: true });
+
+    if(!player.hasPermission(Permission.BypassValidation)) sendCustomIconUploadMessage(
+        await player.getGameProfile(),
+        player.icon.hash
+    );
 
     return { message: i18n('icon.upload.success'), hash: player.icon.hash };
 }, {
