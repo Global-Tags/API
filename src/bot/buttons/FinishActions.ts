@@ -4,7 +4,7 @@ import { colors } from "../bot";
 import { Player } from "../../database/schemas/players";
 import { stripUUID } from "../../libs/game-profiles";
 
-export default class FinishActionButton extends Button {
+export default class FinishActionsButton extends Button {
     constructor() {
         super({
             id: 'finishAction',
