@@ -125,7 +125,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         isWatched = (player && player.watchlist) || watchlist.some((word) => {
             if(strippedTag.toLowerCase().includes(word)) {
                 Logger.warn(`Now watching ${player.uuid} for matching "${word}" in "${tag}".`);
-                sendWatchlistAddMessage({ user: gameProfile, tag, word });
+                sendWatchlistAddMessage({ player: gameProfile, tag, word });
                 isWatchedInitially = true;
                 return true;
             }
