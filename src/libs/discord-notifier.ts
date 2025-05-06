@@ -179,6 +179,7 @@ export function sendWatchlistAddMessage({ player, tag, word }: { player: GamePro
         content: config.discordBot.notifications.watchlist.content,
         embed: new EmbedBuilder()
             .setColor(bot.colors.blurple)
+            .setThumbnail(`https://laby.net/texture/profile/head/${player.uuid}.png?size=1024&overlay`)
             .setTitle('New watched player')
             .addFields([
                 {
