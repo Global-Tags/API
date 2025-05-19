@@ -1,7 +1,7 @@
 import { t } from "elysia";
-import players from "../../../database/schemas/players";
+import players, { getOrCreatePlayer } from "../../../database/schemas/players";
 import { Permission } from "../../../types/Permission";
-import { sendReportMessage } from "../../../libs/discord-notifier";
+import { ModLogType, sendModLogMessage, sendReportMessage } from "../../../libs/discord-notifier";
 import { formatUUID, GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
@@ -44,11 +44,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     if(player.hasPermission(Permission.ReportImmunity)) return error(403, { error: i18n('report.immune') });
     if(!player.tag) return error(404, { error: i18n('report.noTag') });
 
-    const reporter = await players.findOneAndUpdate({ uuid: session.uuid }, {
-        $set: {
-            uuid: session.uuid
-        }
-    }, { upsert: true, new: true });
+    const reporter = await getOrCreatePlayer(session.uuid);
     if(reporter.isBanned()) return error(403, { error: i18n('error.banned') });
     if(player.reports.some((report) => report.by == reporter.uuid && report.reported_tag == player.tag)) return error(409, { error: i18n('report.alreadyReported') });
     if(reason.trim() == '') return error(422, { error: i18n('report.invalidReason') });
@@ -61,7 +57,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     await player.save();
 
     sendReportMessage({
-        user: await player.getGameProfile(),
+        player: await player.getGameProfile(),
         reporter: await reporter.getGameProfile(),
         tag: player.tag,
         reason
@@ -84,4 +80,40 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     body: t.Object({ reason: t.String({ minLength: 2, maxLength: 200, error: 'report.validation;;[["min", "2"], ["max", "200"]]', description: 'The report reason' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to report' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-});
+}).delete(`/:id`, async ({ session, params: { uuid, id }, i18n, error }) => { // Delete report
+    if(!session?.hasPermission(Permission.ManageReports)) return error(403, { error: i18n('error.notAllowed') });
+
+    const player = await players.findOne({ uuid: stripUUID(uuid) });
+    if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
+
+    const report = player.reports.find((report) => report.id == id.trim());
+    if(!report) return error(404, { error: i18n(`report.delete.not_found`) });
+
+    player.deleteReport(report.id);
+    await player.save();
+
+    sendModLogMessage({
+        logType: ModLogType.DeleteReport,
+        staff: await GameProfile.getProfileByUUID(session.uuid!),
+        user: await player.getGameProfile(),
+        discord: false,
+        report: `\`${report.reason}\` (\`#${report.id}\`)`
+    });
+
+    return { message: i18n(`report.delete.success`) };
+}, {
+    detail: {
+        tags: ['Admin'],
+        description: 'Deletes a specific player report'
+    },
+    response: {
+        200: t.Object({ message: t.String() }, { description: 'The report was deleted' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage reports' }),
+        404: t.Object({ error: t.String() }, { description: 'The player or the report was not found' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+    },
+    params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }), id: t.String({ description: 'The report ID' }) }),
+    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+});;

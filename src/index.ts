@@ -109,6 +109,7 @@ const elysia = new Elysia()
                     for(const argument of args)
                         errorMessage = errorMessage.replaceAll(`<${argument[0]}>`, argument[1]);
                 } catch(error) {
+                    captureException(error);
                     Logger.error(`Failed to apply arguments "${errorParts[1]}": ${error}`);
                 }
             }
@@ -124,6 +125,6 @@ const elysia = new Elysia()
             return { error: i18n('error.unknownError'), id: requestId };
         }
     })
-    .listen(config.port);
+    .listen({ port: config.port, idleTimeout: 20_000 });
 
 export type ElysiaApp = typeof elysia;

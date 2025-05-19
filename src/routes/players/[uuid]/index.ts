@@ -1,5 +1,5 @@
 import { t } from "elysia";
-import players from "../../../database/schemas/players";
+import players, { getOrCreatePlayer } from "../../../database/schemas/players";
 import Logger from "../../../libs/Logger";
 import { ModLogType, sendModLogMessage, sendWatchlistAddMessage, sendWatchlistTagUpdateMessage } from "../../../libs/discord-notifier";
 import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
@@ -14,13 +14,13 @@ import { GlobalPosition } from "../../../types/GlobalPosition";
 import { formatUUID, GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
-const { validation } = config;
+const { validation, strictAuth } = config;
 const { min, max, blacklist, watchlist } = validation.tag;
 const multipleSpaces = /\s{2,}/g;
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, language, params, i18n, error }) => { // Get player info
     if(!!session?.uuid && !!language) saveLastLanguage(session.uuid, language);
-    if(config.strictAuth) {
+    if(strictAuth) {
         if(!session?.uuid) return error(403, { error: i18n('error.notAllowed') });
     }
     const showBan = session?.equal || session?.hasPermission(Permission.ManageBans) || false;
@@ -81,7 +81,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ uuid: t.String({ description: 'The uuid of the player you want to fetch the info of' }) }),
-    headers: t.Object({ authorization: config.strictAuth ? t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) : t.Optional(t.String({ description: 'Your authentication token' })) }, { error: 'error.notAllowed' }),
+    headers: t.Object({ authorization: strictAuth ? t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) : t.Optional(t.String({ description: 'Your authentication token' })) }, { error: 'error.notAllowed' }),
 }).get('/history', async ({ session, params, i18n, error }) => { // Get player's tag history
     if(!session || session?.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
 
@@ -107,15 +107,14 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     params: t.Object({ uuid: t.String({ description: 'The uuid of the player you want to fetch the info of' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' }),
 }).post('/', async ({ session, body: { tag }, params, i18n, error }) => { // Change tag
-    const uuid = stripUUID(params.uuid);
     if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
-    if(session.equal && player?.isBanned()) return error(403, { error: i18n('error.banned') });
+    const player = await getOrCreatePlayer(params.uuid);
+    if(session.equal && player.isBanned()) return error(403, { error: i18n('error.banned') });
 
     let isWatched = false;
-    let notifyWatch = true;
-    const gameProfile = player ? await player.getGameProfile() : await GameProfile.getProfileByUUID(uuid);
+    let isWatchedInitially = false;
+    const gameProfile = await player.getGameProfile();
     if(!session.hasPermission(Permission.BypassValidation)) {
         tag = tag.trim().replace(multipleSpaces, ' ').replace(colorCodesWithSpaces, '').replace(hexColorCodesWithSpaces, '');
         const strippedTag = stripColors(tag);
@@ -125,32 +124,22 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         if(blacklistedWord) return error(422, { error: i18n('setTag.blacklisted').replaceAll('<word>', blacklistedWord) });
         isWatched = (player && player.watchlist) || watchlist.some((word) => {
             if(strippedTag.toLowerCase().includes(word)) {
-                Logger.warn(`Now watching ${uuid} for matching "${word}" in "${tag}".`);
-                sendWatchlistAddMessage({ user: gameProfile, tag, word });
-                notifyWatch = false;
+                Logger.warn(`Now watching ${player.uuid} for matching "${word}" in "${tag}".`);
+                sendWatchlistAddMessage({ player: gameProfile, tag, word });
+                isWatchedInitially = true;
                 return true;
             }
             return false;
         });
     }
 
-    const oldTag = player?.tag;
+    if(player.tag == tag) return error(409, { error: i18n('setTag.sameTag') });
 
-    if(!player) {
-        await players.insertMany({
-            uuid,
-            tag,
-            watchlist: isWatched,
-            history: [tag]
-        });
-    } else {
-        if(player.tag == tag) return error(409, { error: i18n('setTag.sameTag') });
-
-        player.tag = tag;
-        if(isWatched) player.watchlist = true;
-        if(player.history[player.history.length - 1] != tag) player.history.push(tag);
-        await player.save();
-    }
+    const oldTag = player.tag;
+    player.tag = tag;
+    if(isWatched) player.watchlist = true;
+    if(player.history.at(-1) != tag) player.history.push(tag);
+    await player.save();
     
     if(!session.equal) {
         sendModLogMessage({
@@ -164,12 +153,12 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
             }
         });
 
-        if(player?.isEmailVerified()) {
+        if(player.isEmailVerified()) {
             sendTagChangeEmail(player.connections.email.address!, oldTag || '---', tag, getI18nFunctionByLanguage(player.last_language));
         }
     }
 
-    if(isWatched && notifyWatch) sendWatchlistTagUpdateMessage(gameProfile, tag);
+    if(isWatched && !isWatchedInitially) sendWatchlistTagUpdateMessage(gameProfile, tag);
     return { message: i18n(`setTag.success.${session.equal ? 'self' : 'admin'}`) };
 }, {
     detail: {
@@ -205,8 +194,9 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         });
         player.clearTag(session.uuid!);
         sendTagClearEmail(player.connections.email.address!, player.tag, getI18nFunctionByLanguage(player.last_language));
+    } else {
+        player.tag = null;
     }
-    player.tag = null;
     await player.save();
 
     return { message: i18n(`resetTag.success.${session.equal ? 'self' : 'admin'}`) };

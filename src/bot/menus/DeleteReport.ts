@@ -27,7 +27,7 @@ export default class DeleteReportMenu extends SelectMenu {
             staff: await player.getGameProfile(),
             user: await target.getGameProfile(),
             discord: true,
-            report: report.reason
+            report: `\`${report.reason}\` (\`#${report.id}\`)`
         });
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The report was successfully deleted!')], flags: [MessageFlags.Ephemeral] });

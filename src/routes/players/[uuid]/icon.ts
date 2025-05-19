@@ -1,5 +1,5 @@
 import { t } from "elysia";
-import players from "../../../database/schemas/players";
+import players, { getOrCreatePlayer } from "../../../database/schemas/players";
 import { join } from "path";
 import { capitalCase, snakeCase } from "change-case";
 import { config } from "../../../libs/config";
@@ -7,7 +7,7 @@ import { Permission } from "../../../types/Permission";
 import { GlobalIcon } from "../../../types/GlobalIcon";
 import { GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
-import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
+import { ModLogType, sendCustomIconUploadMessage, sendModLogMessage } from "../../../libs/discord-notifier";
 import { sendTagChangeEmail } from "../../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 import { generateSecureCode } from "./connections";
@@ -44,34 +44,25 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
 }).post('/', async ({ session, body: { icon }, params, i18n, error }) => { // Change icon
     if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
 
-    icon = snakeCase(icon);
-    const uuid = stripUUID(params.uuid);
-    const player = await players.findOne({ uuid });
-    if(session.equal && player?.isBanned()) return error(403, { error: i18n('error.banned') });
+    icon = icon.toLowerCase();
+    const player = await getOrCreatePlayer(params.uuid);
+    if(session.equal && player.isBanned()) return error(403, { error: i18n('error.banned') });
 
     const isCustomIconDisallowed = session.equal && snakeCase(GlobalIcon[GlobalIcon.Custom]) == icon && !session.hasPermission(Permission.CustomIcon);
     if(!session.hasPermission(Permission.BypassValidation) && (isCustomIconDisallowed || !(capitalCase(icon) in GlobalIcon) || config.validation.icon.blacklist.includes(capitalCase(icon)))) return error(403, { error: i18n('icon.notAllowed') });
 
-    const oldIcon = player?.icon;
+    if(player.isBanned()) return error(403, { error: i18n('error.banned') });
+    if(snakeCase(player.icon.name) == icon) return error(400, { error: i18n('icon.sameIcon') });
 
-    if(player) {
-        if(player.isBanned()) return error(403, { error: i18n('error.banned') });
-        if(snakeCase(player.icon.name) == icon) return error(400, { error: i18n('icon.sameIcon') });
-
-        player.icon.name = icon;
-        await player.save();
-    } else {
-        await players.insertMany({
-            uuid,
-            icon
-        });
-    }
+    const oldIcon = player.icon;
+    player.icon.name = icon;
+    await player.save();
     
     if(!session.equal) {
         sendModLogMessage({
             logType: ModLogType.ChangeIconType,
             staff: await GameProfile.getProfileByUUID(session.uuid!),
-            user: await player?.getGameProfile(),
+            user: await player.getGameProfile(),
             discord: false,
             icons: {
                 old: oldIcon?.name || '---',
@@ -79,7 +70,7 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
             }
         });
 
-        if(player?.isEmailVerified()) {
+        if(player.isEmailVerified()) {
             sendTagChangeEmail(player.connections.email.address!, oldIcon?.name || '---', icon, getI18nFunctionByLanguage(player.last_language));
         }
     }
@@ -123,6 +114,11 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     player.icon.hash = generateSecureCode(32);
     await player.save();
     await Bun.write(Bun.file(join('icons', player.uuid, `${player.icon.hash}.png`)), await image.arrayBuffer(), { createPath: true });
+
+    if(!player.hasPermission(Permission.BypassValidation)) sendCustomIconUploadMessage(
+        await player.getGameProfile(),
+        player.icon.hash
+    );
 
     return { message: i18n('icon.upload.success'), hash: player.icon.hash };
 }, {

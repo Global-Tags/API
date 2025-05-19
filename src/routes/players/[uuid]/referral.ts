@@ -1,5 +1,5 @@
 import { t } from "elysia";
-import players from "../../../database/schemas/players";
+import players, { getOrCreatePlayer } from "../../../database/schemas/players";
 import { sendReferralMessage } from "../../../libs/discord-notifier";
 import { GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
@@ -11,11 +11,7 @@ export default (app: ElysiaApp) => app.post('/', async ({ session, params, i18n,
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return error(404, { error: i18n('error.playerNotFound') });
 
-    const executor = await players.findOneAndUpdate({ uuid: session.uuid }, {
-        $set: {
-            uuid: session.uuid
-        }
-    }, { upsert: true, new: true });
+    const executor = await getOrCreatePlayer(session.uuid);
     if(executor.referrals.has_referred) return error(409, { error: i18n('referral.alreadyReferred') });
     
     player.addReferral(session.uuid);

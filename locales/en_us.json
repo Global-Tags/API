@@ -86,7 +86,11 @@
         "invalidReason": "You have to provide a valid reason!",
         "validation": "Keep the \"reason\" field between <min> and <max> characters.",
         "success": "The player was successfully reported!",
-        "immune": "This player cannot be reported!"
+        "immune": "This player cannot be reported!",
+        "delete": {
+            "not_found": "The report was not found!",
+            "success": "The report was successfully deleted!"
+        }
     },
     "setTag": {
         "empty": "The tag must not be empty!",

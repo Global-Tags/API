@@ -1,11 +1,12 @@
 import * as bot from "../bot/bot";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, TextChannel } from "discord.js";
+import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonBuilder, ButtonStyle, ContainerBuilder, EmbedBuilder, JSONEncodable, MessageCreateOptions, MessageFlags, SectionBuilder, TextDisplayBuilder, ThumbnailBuilder, TopLevelComponentData } from "discord.js";
 import { GameProfile } from "./game-profiles";
 import { getCustomIconUrl } from "../routes/players/[uuid]/icon";
 import { capitalCase, pascalCase, sentenceCase } from "change-case";
 import { config } from "./config";
 import { stripColors, translateToAnsi } from "./chat-color";
 import { GiftCode } from "../database/schemas/gift-codes";
+import Logger from "./Logger";
 
 export enum ModLogType {
     ChangeTag,
@@ -135,174 +136,166 @@ export function formatTimestamp(date: Date, style: 't' | 'T' | 'd' | 'D' | 'f' |
     return `<t:${Math.floor(date.getTime() / 1000 | 0)}:${style}>`;
 }
 
-export function sendReportMessage({ user, reporter, tag, reason } : {
-    user: GameProfile,
+export function sendReportMessage({ player, reporter, tag, reason } : {
+    player: GameProfile,
     reporter: GameProfile,
     tag: string,
     reason: string
 }) {
     if(!config.discordBot.notifications.reports.enabled) return;
 
-    sendMessage({
-        channel: config.discordBot.notifications.reports.channel,
+    sendEmbed(config.discordBot.notifications.reports.channel, {
         content: config.discordBot.notifications.reports.content,
         embed: new EmbedBuilder()
-        .setColor(0xff0000)
-        .setThumbnail(`https://laby.net/texture/profile/head/${user.uuid}.png?size=1024&overlay`)
-        .setTitle('New report!')
-        .addFields([
-            {
-                name: 'Reported player',
-                value: user.getFormattedHyperlink()
-            },
-            {
-                name: 'Reported Tag',
-                value: `\`\`\`ansi\n${translateToAnsi(tag)}\`\`\``
-            },
-            {
-                name: 'Reporter',
-                value: reporter.getFormattedHyperlink()
-            },
-            {
-                name: 'Reason',
-                value: `\`\`\`${reason}\`\`\``
-            }
-        ])
-    });
-}
-
-export function sendWatchlistAddMessage({ user, tag, word }: { user: GameProfile, tag: string, word: string }) {
-    if(!config.discordBot.notifications.watchlist.enabled) return;
-
-    sendMessage({
-        channel: config.discordBot.notifications.watchlist.channel,
-        content: config.discordBot.notifications.watchlist.content,
-        embed: new EmbedBuilder()
-        .setColor(bot.colors.blurple)
-        .setTitle('New watched player')
-        .addFields([
-            {
-                name: 'Watched player',
-                value: user.getFormattedHyperlink()
-            },
-            {
-                name: 'New tag',
-                value: `\`\`\`ansi\n${translateToAnsi(tag)}\`\`\``
-            },
-            {
-                name: 'Matched word',
-                value: `\`\`\`${word}\`\`\``
-            }
-        ])
-    });
-}
-
-export function sendWatchlistTagUpdateMessage(user: GameProfile, tag: string) {
-    if(!config.discordBot.notifications.watchlist.enabled) return;
-
-    sendMessage({
-        channel: config.discordBot.notifications.watchlist.channel,
-        content: config.discordBot.notifications.watchlist.content,
-        embed: new EmbedBuilder()
-            .setColor(bot.colors.blurple)
-            .setThumbnail(`https://laby.net/texture/profile/head/${user.uuid}.png?size=1024&overlay`)
-            .setTitle('New tag change')
+            .setColor(bot.colors.error)
+            .setThumbnail(`https://laby.net/texture/profile/head/${player.uuid}.png?size=1024&overlay`)
+            .setTitle('New report!')
             .addFields([
                 {
-                    name: 'Watched player',
-                    value: user.getFormattedHyperlink()
+                    name: 'Reported player',
+                    value: player.getFormattedHyperlink()
                 },
                 {
-                    name: 'New tag',
+                    name: 'Reported Tag',
                     value: `\`\`\`ansi\n${translateToAnsi(tag)}\`\`\``
-                }
-            ])
-    });
-}
-
-export function sendBanAppealMessage(user: GameProfile, reason: string) {
-    if(!config.discordBot.notifications.banAppeals.enabled) return;
-
-    sendMessage({
-        channel: config.discordBot.notifications.banAppeals.channel,
-        content: config.discordBot.notifications.banAppeals.content,
-        embed: new EmbedBuilder()
-            .setColor(bot.colors.blurple)
-            .setThumbnail(`https://laby.net/texture/profile/head/${user.uuid}.png?size=1024&overlay`)
-            .setTitle('New ban appeal')
-            .addFields([
+                },
                 {
-                    name: 'Player',
-                    value: user.getFormattedHyperlink()
+                    name: 'Reporter',
+                    value: reporter.getFormattedHyperlink()
                 },
                 {
                     name: 'Reason',
                     value: `\`\`\`${reason}\`\`\``
                 }
-            ])
+            ]),
+        targetUUID: player.uuid!!
     });
 }
 
-export function sendDiscordLinkMessage(user: GameProfile, userId: string, connected: boolean) {
-    if(!config.discordBot.notifications.accountConnections.enabled) return;
+export function sendWatchlistAddMessage({ player, tag, word }: { player: GameProfile, tag: string, word: string }) {
+    if(!config.discordBot.notifications.watchlist.enabled) return;
 
-    sendMessage({
-        channel: config.discordBot.notifications.accountConnections.channel,
-        content: null,
+    sendEmbed(config.discordBot.notifications.watchlist.channel, {
+        content: config.discordBot.notifications.watchlist.content,
         embed: new EmbedBuilder()
             .setColor(bot.colors.blurple)
-            .setThumbnail(`https://laby.net/texture/profile/head/${user.uuid}.png?size=1024&overlay`)
+            .setThumbnail(`https://laby.net/texture/profile/head/${player.uuid}.png?size=1024&overlay`)
+            .setTitle('New watched player')
+            .addFields([
+                {
+                    name: 'Watched player',
+                    value: player.getFormattedHyperlink()
+                },
+                {
+                    name: 'New tag',
+                    value: `\`\`\`ansi\n${translateToAnsi(tag)}\`\`\``
+                },
+                {
+                    name: 'Matched word',
+                    value: `\`\`\`${word}\`\`\``
+                }
+            ]),
+        targetUUID: player.uuid!
+    });
+}
+
+export function sendWatchlistTagUpdateMessage(player: GameProfile, tag: string) {
+    if(!config.discordBot.notifications.watchlist.enabled) return;
+
+    sendEmbed(config.discordBot.notifications.watchlist.channel, {
+        content: config.discordBot.notifications.watchlist.content,
+        embed: new EmbedBuilder()
+            .setColor(bot.colors.blurple)
+            .setThumbnail(`https://laby.net/texture/profile/head/${player.uuid}.png?size=1024&overlay`)
+            .setTitle('New tag change')
+            .addFields([
+                {
+                    name: 'Watched player',
+                    value: player.getFormattedHyperlink()
+                },
+                {
+                    name: 'New tag',
+                    value: `\`\`\`ansi\n${translateToAnsi(tag)}\`\`\``
+                }
+            ]),
+        targetUUID: player.uuid!
+    });
+}
+
+export function sendBanAppealMessage(player: GameProfile, reason: string) {
+    if(!config.discordBot.notifications.banAppeals.enabled) return;
+
+    sendEmbed(config.discordBot.notifications.banAppeals.channel, {
+        content: config.discordBot.notifications.banAppeals.content,
+        embed: new EmbedBuilder()
+            .setColor(bot.colors.blurple)
+            .setThumbnail(`https://laby.net/texture/profile/head/${player.uuid}.png?size=1024&overlay`)
+            .setTitle('New ban appeal')
+            .addFields([
+                {
+                    name: 'Player',
+                    value: player.getFormattedHyperlink()
+                },
+                {
+                    name: 'Reason',
+                    value: `\`\`\`${reason}\`\`\``
+                }
+            ]),
+        targetUUID: player.uuid!
+    });
+}
+
+export function sendDiscordLinkMessage(player: GameProfile, userId: string, connected: boolean) {
+    if(!config.discordBot.notifications.accountConnections.enabled) return;
+
+    sendEmbed(config.discordBot.notifications.accountConnections.channel, {
+        embed: new EmbedBuilder()
+            .setColor(bot.colors.blurple)
+            .setThumbnail(`https://laby.net/texture/profile/head/${player.uuid}.png?size=1024&overlay`)
             .setTitle(connected ? 'New discord connection' : 'Discord connection removed')
             .addFields([
                 {
                     name: 'Player',
-                    value: user.getFormattedHyperlink()
+                    value: player.getFormattedHyperlink()
                 },
                 {
                     name: connected ? 'User ID' : 'Previous User ID',
                     value: `[\`${userId}\`](discord://-/users/${userId})`
                 }
-            ]),
-        actionButton: false
+            ])
     });
 }
 
-export function sendEmailLinkMessage(user: GameProfile, email: string | null, connected: boolean) {
+export function sendEmailLinkMessage(player: GameProfile, email: string | null, connected: boolean) {
     if(!config.discordBot.notifications.accountConnections.enabled) return;
 
-    sendMessage({
-        channel: config.discordBot.notifications.accountConnections.channel,
-        content: null,
+    sendEmbed(config.discordBot.notifications.accountConnections.channel, {
         embed: new EmbedBuilder()
             .setColor(bot.colors.blurple)
-            .setThumbnail(`https://laby.net/texture/profile/head/${user.uuid}.png?size=1024&overlay`)
+            .setThumbnail(`https://laby.net/texture/profile/head/${player.uuid}.png?size=1024&overlay`)
             .setTitle(connected ? 'New email connection' : 'Email connection removed')
             .addFields([
                 {
                     name: 'Player',
-                    value: `[\`${user.username}\`](https://laby.net/@${user.uuid})`
+                    value: `[\`${player.username}\`](https://laby.net/@${player.uuid})`
                 },
                 {
                     name: connected ? 'Email' : 'Previous Email',
                     value: `${email ? `||${email}||` : hiddenConnectionLabel}`
                 }
-            ]),
-        actionButton: false
+            ])
     });
 }
 
 export function sendReferralMessage(inviter: GameProfile, invited: GameProfile) {
     if(!config.discordBot.notifications.referrals.enabled) return;
 
-    sendMessage({
-        channel: config.discordBot.notifications.referrals.channel,
-        content: `${inviter.getFormattedHyperlink()} has invited ${invited.getFormattedHyperlink()}.`,
-        embed: null,
-        actionButton: false
+    sendComponents(config.discordBot.notifications.referrals.channel, {
+        components: [new TextDisplayBuilder().setContent(`${inviter.getFormattedHyperlink()} has invited ${invited.getFormattedHyperlink()}.`)]
     });
 }
 
-export function sendEntitlementMessage(uuid: string, description: string, head: boolean) {
+export function sendEntitlementMessage(description: string, uuid?: string) {
     if(!config.discordBot.notifications.entitlements.enabled) return;
 
     const embed = new EmbedBuilder()
@@ -310,39 +303,28 @@ export function sendEntitlementMessage(uuid: string, description: string, head: 
         .setTitle('💵 Entitlement update')
         .setDescription(description);
 
-    if(head) embed.setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`);
+    if(uuid) embed.setThumbnail(`https://laby.net/texture/profile/head/${uuid}.png?size=1024&overlay`);
 
-    sendMessage({
-        channel: config.discordBot.notifications.entitlements.channel,
-        content: null,
-        embed,
-        actionButton: false
-    });
+    sendEmbed(config.discordBot.notifications.entitlements.channel, { embed });
 }
 
-export function sendCustomIconUploadMessage(user: GameProfile, hash: string) {
+export function sendCustomIconUploadMessage(player: GameProfile, hash: string) {
     if(!config.discordBot.notifications.customIcons.enabled) return;
 
-    const embed = new EmbedBuilder()
-        .setColor(bot.colors.gray)
-        .setTitle(':frame_photo: New icon upload')
-        .setDescription(`Hash: [\`${hash}\`](<${getCustomIconUrl(user.uuid!, hash)}>)`)
-        .addFields([
-            {
-                name: 'Player:',
-                value: user.getFormattedHyperlink()
-            }
-        ])
-        .setThumbnail(getCustomIconUrl(user.uuid!, hash));
-
-    sendMessage({
-        channel: config.discordBot.notifications.customIcons.channel,
-        content: null,
-        embed
-    });
+    sendComponents(config.discordBot.notifications.customIcons.channel, {
+        components: [
+            new ContainerBuilder().addSectionComponents(
+                new SectionBuilder().addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent('# :frame_photo: New icon upload'),
+                    new TextDisplayBuilder().setContent(`>>> Player: ${player.getFormattedHyperlink()}\nHash: [\`${hash}\`](<${getCustomIconUrl(player.uuid!, hash)}>)`),
+                ).setThumbnailAccessory(new ThumbnailBuilder().setURL(getCustomIconUrl(player.uuid!, hash)))
+            )
+        ],
+        targetUUID: player.uuid!
+    })
 }
 
-export function sendGiftCodeRedeemMessage(user: GameProfile, code: GiftCode, expiresAt?: Date | null) {
+export function sendGiftCodeRedeemMessage(player: GameProfile, code: GiftCode, expiresAt?: Date | null) {
     if(!config.discordBot.notifications.giftCodes.enabled) return;
 
     const embed = new EmbedBuilder()
@@ -351,7 +333,7 @@ export function sendGiftCodeRedeemMessage(user: GameProfile, code: GiftCode, exp
         .addFields([
             {
                 name: 'Player:',
-                value: user.getFormattedHyperlink(),
+                value: player.getFormattedHyperlink(),
                 inline: true
             },
             {
@@ -381,23 +363,15 @@ export function sendGiftCodeRedeemMessage(user: GameProfile, code: GiftCode, exp
             }
         ]);
 
-    sendMessage({
-        channel: config.discordBot.notifications.giftCodes.channel,
-        content: null,
-        embed,
-        actionButton: false
-    });
+    sendEmbed(config.discordBot.notifications.giftCodes.channel, { embed });
 }
 
 export function sendModLogMessage(data: ModLogData) {
     if(!config.discordBot.notifications.mogLog.enabled) return;
 
     const description = modlogDescription(data);
-    sendMessage({
-        channel: config.discordBot.notifications.mogLog.channel,
-        content: `[**${sentenceCase(ModLogType[data.logType])}**] ${data.staff.getFormattedHyperlink()}${data.discord ? ' [**D**]' : ''}${data.user ? ` → ${data.user.getFormattedHyperlink()}` : ''}${description ? `: ${description}` : ''}`,
-        embed: null,
-        actionButton: false
+    sendComponents(config.discordBot.notifications.mogLog.channel, {
+        components: [new TextDisplayBuilder().setContent(`[**${sentenceCase(ModLogType[data.logType])}**] ${data.staff.getFormattedHyperlink()}${data.discord ? ' [**D**]' : ''}${data.user ? ` → ${data.user.getFormattedHyperlink()}` : ''}${description ? `: ${description}` : ''}`)]
     });
 }
 
@@ -431,28 +405,52 @@ function modlogDescription(data: ModLogData): string | null {
     return null;
 }
 
-async function sendMessage({ channel, content, embed, actionButton = true } : {
-    channel: string,
-    content: string | null,
-    embed: EmbedBuilder | null,
-    actionButton?: boolean
+const actionButtonRow = (uuid: string) => new ActionRowBuilder<ButtonBuilder>()
+    .addComponents(
+        new ButtonBuilder()
+        .setLabel('Actions')
+        .setCustomId(`actions_${uuid}`)
+        .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+        .setLabel('Finish actions')
+        .setCustomId('finishActions')
+        .setStyle(ButtonStyle.Success),
+    );
+
+async function sendEmbed(channelId: string, { content, embed, targetUUID } : {
+    content?: string,
+    embed?: EmbedBuilder,
+    targetUUID?: string
 }) {
+    sendMessage(
+        channelId,
+        {
+            content: content,
+            embeds: !embed ? [] : [embed],
+            components: targetUUID ? [actionButtonRow(targetUUID)] : []
+        }
+    );
+}
+
+async function sendComponents(channelId: string, { components, targetUUID } : {
+    components: (APIMessageTopLevelComponent | JSONEncodable<APIMessageTopLevelComponent> | TopLevelComponentData)[],
+    targetUUID?: string,
+}) {
+    sendMessage(
+        channelId,
+        {
+            components: [
+                ...components,
+                ...targetUUID ? [actionButtonRow(targetUUID)] : []
+            ],
+            flags: [MessageFlags.IsComponentsV2]
+        }
+    );
+}
+
+async function sendMessage(channelId: string, options: MessageCreateOptions) {
     if(!config.discordBot.enabled) return;
-    (await bot.client.channels.fetch(channel) as TextChannel)?.send({
-        content: content != null ? content : undefined,
-        embeds: embed == null ? [] : [embed],
-        components: actionButton ? [
-            new ActionRowBuilder<ButtonBuilder>()
-            .addComponents(
-                new ButtonBuilder()
-                .setLabel('Actions')
-                .setCustomId('actions')
-                .setStyle(ButtonStyle.Primary),
-                new ButtonBuilder()
-                .setLabel('Finish actions')
-                .setCustomId('finishAction')
-                .setStyle(ButtonStyle.Success),
-            )
-        ] : []
-    });
+    const channel = await bot.client.channels.fetch(channelId);
+    if(!channel || !channel.isSendable()) return;
+    channel.send(options).catch((err) => Logger.error('Failed to send message to discord channel', err));
 }

@@ -19,9 +19,8 @@ export default class EntitlementUpdateEvent extends Event {
         if(!sku) return;
 
         sendEntitlementMessage(
-            player?.uuid || '',
             `<@!${newEntitlement.userId}> has cancelled their **${sku?.name || 'Unknown SKU'}** subscription!`,
-            !!player,
+            player?.uuid
         );
 
         await entitlement.insertMany({

@@ -4,7 +4,8 @@ import { generateSecureCode } from "../../routes/players/[uuid]/connections";
 import { Permission } from "../../types/Permission";
 import { getCachedRoles, Role } from "./roles";
 import { GlobalIcon } from "../../types/GlobalIcon";
-import { GameProfile } from "../../libs/game-profiles";
+import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { isConnected } from "../mongo";
 
 export type PlayerRole = {
     role: Role,
@@ -529,4 +530,23 @@ const schema = new Schema<IPlayer>({
     }
 });
 
-export default model<IPlayer>('players', schema);
+const players = model<IPlayer>('players', schema);
+
+export async function getOrCreatePlayer(uuid: string): Promise<Player> {
+    uuid = stripUUID(uuid);
+    const player = await players.findOne({ uuid });
+    if(player) return player;
+    return await players.create({ uuid });
+}
+
+export async function resetMonthlyReferrals() {
+    if(!isConnected()) return;
+    const data = await players.find({ 'referrals.current_month': { $gt: 0 } });
+
+    for(const player of data) {
+        player.referrals.current_month = 0;
+        player.save();
+    }
+}
+
+export default players;

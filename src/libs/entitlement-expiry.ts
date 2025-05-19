@@ -17,9 +17,8 @@ export async function checkExpiredEntitlements() {
         entitlement.save();
         if(!entitlement.test) {
             sendEntitlementMessage(
-                player?.uuid || '',
                 `<@!${entitlement.user_id}>'s **${sku.name || 'Unknown SKU'}** subscription just expired!`,
-                !!player
+                player?.uuid
             );
         }
 

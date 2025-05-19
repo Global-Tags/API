@@ -18,9 +18,8 @@ export default class EntitlementDeleteEvent extends Event {
         if(!sku) return;
 
         sendEntitlementMessage(
-            player?.uuid || '',
             `[**S**] <@!${entitlement.userId}> has deleted their **${sku?.name || 'Unknown SKU'}** subscription!`,
-            !!player,
+            player?.uuid
         );
 
         await entitlements.insertMany({

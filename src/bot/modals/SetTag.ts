@@ -34,6 +34,7 @@ export default class SetTagModal extends Modal {
         });
 
         target.tag = tag;
+        target.history.push(tag);
         target.save();
 
         if(target.isEmailVerified()) {

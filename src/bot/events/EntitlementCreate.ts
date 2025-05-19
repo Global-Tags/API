@@ -21,9 +21,8 @@ export default class EntitlementCreateEvent extends Event {
         const player = await players.findOne({ 'connections.discord.id': entitlement.userId });
 
         sendEntitlementMessage(
-            player?.uuid || '',
             `${entitlement.isTest() ? '[**S**] ' : ''}<@!${entitlement.userId}> just subscribed to **${sku?.name || 'Unknown SKU'}**!`,
-            !!player,
+            player?.uuid
         );
 
         if(player) {
