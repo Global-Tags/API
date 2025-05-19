@@ -5,6 +5,7 @@ import { Permission } from "../../types/Permission";
 import { getCachedRoles, Role } from "./roles";
 import { GlobalIcon } from "../../types/GlobalIcon";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { isConnected } from "../mongo";
 
 export type PlayerRole = {
     role: Role,
@@ -536,6 +537,16 @@ export async function getOrCreatePlayer(uuid: string): Promise<Player> {
     const player = await players.findOne({ uuid });
     if(player) return player;
     return await players.create({ uuid });
+}
+
+export async function resetMonthlyReferrals() {
+    if(!isConnected()) return;
+    const data = await players.find({ 'referrals.current_month': { $gt: 0 } });
+
+    for(const player of data) {
+        player.referrals.current_month = 0;
+        player.save();
+    }
 }
 
 export default players;

@@ -125,6 +125,6 @@ const elysia = new Elysia()
             return { error: i18n('error.unknownError'), id: requestId };
         }
     })
-    .listen(config.port);
+    .listen({ port: config.port, idleTimeout: 20_000 });
 
 export type ElysiaApp = typeof elysia;
