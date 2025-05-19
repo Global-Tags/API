@@ -109,6 +109,7 @@ const elysia = new Elysia()
                     for(const argument of args)
                         errorMessage = errorMessage.replaceAll(`<${argument[0]}>`, argument[1]);
                 } catch(error) {
+                    captureException(error);
                     Logger.error(`Failed to apply arguments "${errorParts[1]}": ${error}`);
                 }
             }

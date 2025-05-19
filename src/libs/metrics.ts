@@ -9,6 +9,7 @@ import { getCachedRoles } from "../database/schemas/roles";
 import { GlobalIcon, icons as iconList } from "../types/GlobalIcon";
 import { snakeCase } from "change-case";
 import { GlobalPosition, positions as positionList } from "../types/GlobalPosition";
+import { captureException } from "@sentry/bun";
 
 let requests: number;
 
@@ -91,9 +92,10 @@ export async function saveMetrics() {
         dailyRequests: getRequests(),
         positions,
         icons
-    }).catch((error) =>
+    }).catch((error) => {
+        captureException(error);
         Logger.error(`Error while trying to save metrics: ${error}. Request count: ${requests}`)
-    ).then(() =>
+    }).then(() =>
         Logger.debug('New metrics saved!')
     );
 

@@ -3,6 +3,7 @@ import Logger from "../../libs/Logger";
 import Event from "../structs/Event";
 import players from "../../database/schemas/players";
 import * as bot from "../bot";
+import { captureException } from "@sentry/bun";
 
 export default class ReadyEvent extends Event {
     constructor() {
@@ -42,6 +43,7 @@ async function registerCommands() {
             await rest.put(Routes.applicationCommands(bot.client.user!.id), { body: commands });
             Logger.debug(`Registered ${commands.length} commands!`);
         } catch (error) {
+            captureException(error);
             Logger.error(error);
         }
     })();
