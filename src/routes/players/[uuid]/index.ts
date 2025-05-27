@@ -192,8 +192,10 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
             user: await player.getGameProfile(),
             discord: false
         });
+        if(player.isEmailVerified()) {
+            sendTagClearEmail(player.connections.email.address!, player.tag, getI18nFunctionByLanguage(player.last_language));
+        }
         player.clearTag(session.uuid!);
-        sendTagClearEmail(player.connections.email.address!, player.tag, getI18nFunctionByLanguage(player.last_language));
     } else {
         player.tag = null;
     }
