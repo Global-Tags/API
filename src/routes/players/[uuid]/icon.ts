@@ -18,13 +18,13 @@ export function getCustomIconUrl(uuid: string, hash: string) {
     return `${config.baseUrl}/players/${uuid}/icon/${hash}`;
 }
 
-export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, hash }, i18n, error }) => { // Get custom icon
+export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, hash }, i18n, status }) => { // Get custom icon
     const player = await players.findOne({ uuid: stripUUID(uuid) });
-    if(!player) return error(404, { error: i18n('error.noTag') });
-    if(player.isBanned()) return error(403, { error: i18n('error.playerBanned') });
+    if(!player) return status(404, { error: i18n('error.noTag') });
+    if(player.isBanned()) return status(403, { error: i18n('error.playerBanned') });
 
     const file = Bun.file(join('data', 'icons', player.uuid, `${hash.trim()}.png`));
-    if(!(await file.exists())) return error(404, { error: i18n('error.noIcon') });
+    if(!(await file.exists())) return status(404, { error: i18n('error.noIcon') });
 
     return file;
 }, {
@@ -41,18 +41,18 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ uuid: t.String({ description: 'The uuid of the image owner' }), hash: t.String({ description: 'The image hash' }) })
-}).post('/', async ({ session, body: { icon }, params, i18n, error }) => { // Change icon
-    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
+}).post('/', async ({ session, body: { icon }, params, i18n, status }) => { // Change icon
+    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
 
     icon = icon.toLowerCase();
     const player = await getOrCreatePlayer(params.uuid);
-    if(session.equal && player.isBanned()) return error(403, { error: i18n('error.banned') });
+    if(session.equal && player.isBanned()) return status(403, { error: i18n('error.banned') });
 
     const isCustomIconDisallowed = session.equal && snakeCase(GlobalIcon[GlobalIcon.Custom]) == icon && !session.hasPermission(Permission.CustomIcon);
-    if(!session.hasPermission(Permission.BypassValidation) && (isCustomIconDisallowed || !(capitalCase(icon) in GlobalIcon) || config.validation.icon.blacklist.includes(capitalCase(icon)))) return error(403, { error: i18n('icon.notAllowed') });
+    if(!session.hasPermission(Permission.BypassValidation) && (isCustomIconDisallowed || !(capitalCase(icon) in GlobalIcon) || config.validation.icon.blacklist.includes(capitalCase(icon)))) return status(403, { error: i18n('icon.notAllowed') });
 
-    if(player.isBanned()) return error(403, { error: i18n('error.banned') });
-    if(snakeCase(player.icon.name) == icon) return error(400, { error: i18n('icon.sameIcon') });
+    if(player.isBanned()) return status(403, { error: i18n('error.banned') });
+    if(snakeCase(player.icon.name) == icon) return status(400, { error: i18n('icon.sameIcon') });
 
     const oldIcon = player.icon;
     player.icon.name = icon;
@@ -92,23 +92,23 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     body: t.Object({ icon: t.String({ error: 'error.wrongType;;[["field", "icon"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).post('/upload', async ({ session, body: { image }, params, i18n, error }) => { // Upload custom icon
-    if(!session || !session.equal) return error(403, { error: i18n('error.notAllowed') });
+}).post('/upload', async ({ session, body: { image }, params, i18n, status }) => { // Upload custom icon
+    if(!session || !session.equal) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return error(404, { error: i18n('error.noTag') });
-    if(player.isBanned()) return error(403, { error: i18n('error.banned') });
-    if(!player.hasPermission(Permission.CustomIcon)) return error(403, { error: i18n('icon.upload.notAllowed') });
+    if(!player) return status(404, { error: i18n('error.noTag') });
+    if(player.isBanned()) return status(403, { error: i18n('error.banned') });
+    if(!player.hasPermission(Permission.CustomIcon)) return status(403, { error: i18n('icon.upload.notAllowed') });
 
     const metadata = await sharp(await image.arrayBuffer()).metadata().catch((err: Error) => {
         Logger.error('Failed to read image metadata:', err.message);
         return null;
     });
 
-    if(!metadata) return error(422, { error: i18n('icon.upload.invalidMetadata') });
-    if(metadata.format != 'png') return error(422, { error: i18n('icon.upload.wrongFormat')});
-    if(!metadata.height || metadata.height != metadata.width) return error(422, { error: i18n('icon.upload.wrongSize')});
-    if(metadata.height > config.validation.icon.maxResolution) return error(422, { error: i18n('icon.upload.exceedsMaxResolution').replaceAll('<max>', config.validation.icon.maxResolution.toString()) });
+    if(!metadata) return status(422, { error: i18n('icon.upload.invalidMetadata') });
+    if(metadata.format != 'png') return status(422, { error: i18n('icon.upload.wrongFormat')});
+    if(!metadata.height || metadata.height != metadata.width) return status(422, { error: i18n('icon.upload.wrongSize')});
+    if(metadata.height > config.validation.icon.maxResolution) return status(422, { error: i18n('icon.upload.exceedsMaxResolution').replaceAll('<max>', config.validation.icon.maxResolution.toString()) });
 
     player.icon.name = snakeCase(GlobalIcon[GlobalIcon.Custom]);
     player.icon.hash = generateSecureCode(32);
@@ -137,13 +137,13 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     body: t.Object({ image: t.File({ type: 'image/png', error: 'error.wrongType;;[["field", "image"], ["type", "png file"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).patch('/role-visibility', async ({ session, body: { visible }, params, i18n, error }) => { // Toggle role icon
-    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
+}).patch('/role-visibility', async ({ session, body: { visible }, params, i18n, status }) => { // Toggle role icon
+    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return error(404, { error: i18n('error.noTag') });
-    if(session.equal && player.isBanned()) return error(403, { error: i18n('error.banned') });
-    if(player.hide_role_icon == !visible) return error(409, { error: i18n(`icon.role_icon.already_${player.hide_role_icon ? 'hidden' : 'shown'}`) });
+    if(!player) return status(404, { error: i18n('error.noTag') });
+    if(session.equal && player.isBanned()) return status(403, { error: i18n('error.banned') });
+    if(player.hide_role_icon == !visible) return status(409, { error: i18n(`icon.role_icon.already_${player.hide_role_icon ? 'hidden' : 'shown'}`) });
 
     player.hide_role_icon = !visible;
     await player.save();

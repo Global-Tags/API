@@ -5,12 +5,12 @@ import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
 import { GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { Permission } from "../../../types/Permission";
 
-export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, error }) => { // Watch player
-    if(!session?.hasPermission(Permission.ManageWatchlist)) return error(403, { error: i18n('error.notAllowed') });
+export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Watch player
+    if(!session?.hasPermission(Permission.ManageWatchlist)) return status(403, { error: i18n('error.notAllowed') });
     const uuid = stripUUID(params.uuid);
     
     const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n('error.playerNotFound') });
+    if(!player) return status(404, { error: i18n('error.playerNotFound') });
 
     return { watched: player.watchlist };
 }, {
@@ -28,13 +28,13 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     },
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).patch('/', async ({ session, body: { watched }, params, i18n, error }) => { // Watch player
-    if(!session?.hasPermission(Permission.ManageWatchlist)) return error(403, { error: i18n('error.notAllowed') });
+}).patch('/', async ({ session, body: { watched }, params, i18n, status }) => { // Watch player
+    if(!session?.hasPermission(Permission.ManageWatchlist)) return status(403, { error: i18n('error.notAllowed') });
     const uuid = stripUUID(params.uuid);
     
     const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n('error.playerNotFound') });
-    if(player.watchlist == watched) return error(409, { error: i18n(`watchlist.${player.watchlist ? 'already' : 'not'}_watched`) });
+    if(!player) return status(404, { error: i18n('error.playerNotFound') });
+    if(player.watchlist == watched) return status(409, { error: i18n(`watchlist.${player.watchlist ? 'already' : 'not'}_watched`) });
 
     player.watchlist = watched;
     await player.save();

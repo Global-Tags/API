@@ -6,8 +6,8 @@ import { snakeCase } from "change-case";
 import { ElysiaApp } from "..";
 import { GameProfile } from "../libs/game-profiles";
 
-export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error }) => { // Get roles
-    if(!session?.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
+export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }) => { // Get roles
+    if(!session?.hasPermission(Permission.ManageRoles)) return status(403, { error: i18n('error.notAllowed') });
 
     return getCachedRoles().map((role) => ({
         name: role.name,
@@ -28,12 +28,12 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).get('/:name', async ({ session, params, i18n, error }) => { // Get specific role
-    if(!session?.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
+}).get('/:name', async ({ session, params, i18n, status }) => { // Get specific role
+    if(!session?.hasPermission(Permission.ManageRoles)) return status(403, { error: i18n('error.notAllowed') });
     const name = snakeCase(decodeURIComponent(params.name).trim());
 
     const role = getCachedRoles().find((role) => role.name == name);
-    if(!role) return error(404, { error: i18n('roles.not_found') });
+    if(!role) return status(404, { error: i18n('roles.not_found') });
 
     return {
         name: role.name,
@@ -56,11 +56,11 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
     },
     params: t.Object({ name: t.String({ description: 'The role name' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).post('/', async ({ session, body, i18n, error }) => { // Create role
-    if(!session?.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
+}).post('/', async ({ session, body, i18n, status }) => { // Create role
+    if(!session?.hasPermission(Permission.ManageRoles)) return status(403, { error: i18n('error.notAllowed') });
 
     const name = snakeCase(body.name.trim());
-    if(getCachedRoles().find((role) => role.name == name)) return error(409, { error: i18n('roles.create.already_exists').replaceAll('<role>', name) });
+    if(getCachedRoles().find((role) => role.name == name)) return status(409, { error: i18n('roles.create.already_exists').replaceAll('<role>', name) });
 
     await roles.insertMany([{
         name,
@@ -93,13 +93,13 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error })
     },
     body: t.Object({ name: t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).delete('/:name', async ({ session, params, i18n, error }) => { // Delete role
-    if(!session?.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
+}).delete('/:name', async ({ session, params, i18n, status }) => { // Delete role
+    if(!session?.hasPermission(Permission.ManageRoles)) return status(403, { error: i18n('error.notAllowed') });
 
     const name = snakeCase(decodeURIComponent(params.name).trim());
 
     const role = getCachedRoles().find((role) => role.name == name);
-    if(!role) return error(404, { error: i18n('roles.not_found') });
+    if(!role) return status(404, { error: i18n('roles.not_found') });
 
     sendModLogMessage({
         logType: ModLogType.DeleteRole,

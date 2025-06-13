@@ -4,15 +4,15 @@ import { sendReferralMessage } from "../../../libs/discord-notifier";
 import { GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
-export default (app: ElysiaApp) => app.post('/', async ({ session, params, i18n, error }) => { // Mark player as referrer
-    if(!session?.uuid) return error(403, { error: i18n('error.notAllowed') });
-    if(session.equal) return error(403, { error: i18n('referral.self') });
+export default (app: ElysiaApp) => app.post('/', async ({ session, params, i18n, status }) => { // Mark player as referrer
+    if(!session?.uuid) return status(403, { error: i18n('error.notAllowed') });
+    if(session.equal) return status(403, { error: i18n('referral.self') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return error(404, { error: i18n('error.playerNotFound') });
+    if(!player) return status(404, { error: i18n('error.playerNotFound') });
 
     const executor = await getOrCreatePlayer(session.uuid);
-    if(executor.referrals.has_referred) return error(409, { error: i18n('referral.alreadyReferred') });
+    if(executor.referrals.has_referred) return status(409, { error: i18n('referral.alreadyReferred') });
     
     player.addReferral(session.uuid);
     await player.save();
