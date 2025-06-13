@@ -23,7 +23,7 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     if(!player) return error(404, { error: i18n('error.noTag') });
     if(player.isBanned()) return error(403, { error: i18n('error.playerBanned') });
 
-    const file = Bun.file(join('icons', player.uuid, `${hash.trim()}.png`));
+    const file = Bun.file(join('data', 'icons', player.uuid, `${hash.trim()}.png`));
     if(!(await file.exists())) return error(404, { error: i18n('error.noIcon') });
 
     return file;
@@ -113,7 +113,7 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     player.icon.name = snakeCase(GlobalIcon[GlobalIcon.Custom]);
     player.icon.hash = generateSecureCode(32);
     await player.save();
-    await Bun.write(Bun.file(join('icons', player.uuid, `${player.icon.hash}.png`)), await image.arrayBuffer(), { createPath: true });
+    await Bun.write(Bun.file(join('data', 'icons', player.uuid, `${player.icon.hash}.png`)), await image.arrayBuffer(), { createPath: true });
 
     if(!player.hasPermission(Permission.BypassValidation)) sendCustomIconUploadMessage(
         await player.getGameProfile(),
