@@ -36,7 +36,7 @@ export default class PlayerInfoCommand extends Command {
         }
         const data = await players.findOne({ $or: or });
         if(!data) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ This player is not in our records!')] });
-        const profile = await GameProfile.getProfileByUUID(data.uuid);
+        const profile = await data.getGameProfile();
         if(!profile) return interaction.reply({ embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription('❌ This player does not exist!')] });
 
         const roles = data.getActiveRoles() || [];
@@ -47,7 +47,7 @@ export default class PlayerInfoCommand extends Command {
                     .setColor(bot.colors.gray)
                     .setThumbnail(`https://laby.net/texture/profile/head/${profile.uuid}.png?size=1024&overlay`)
                     .setURL(`https://laby.net/${profile.uuid}`)
-                    .setTitle(`Playerdata${!!profile.username ? ` of ${profile.username}` : ''}`)
+                    .setTitle(`Playerdata of ${profile.getUsernameOrUUID()}`)
                     .addFields([
                         {
                             name: 'Tag',

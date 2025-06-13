@@ -29,7 +29,7 @@ export class GameProfile {
         try {
             const res = await axios({
                 method: 'get',
-                url: `https://api.mojang.com/users/profiles/minecraft/${username}`,
+                url: `https://api.minecraftservices.com/minecraft/profile/lookup/name/${username}`,
                 headers: {
                     'Accept-Encoding': 'gzip'
                 }
@@ -45,7 +45,7 @@ export class GameProfile {
         try {
             const res = await axios({
                 method: 'get',
-                url: `https://api.mojang.com/user/profile/${uuid}`,
+                url: `https://api.minecraftservices.com/minecraft/profile/lookup/${uuid}`,
                 headers: {
                     'Accept-Encoding': 'gzip'
                 }

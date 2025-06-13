@@ -277,7 +277,7 @@ export function sendEmailLinkMessage(player: GameProfile, email: string | null, 
             .addFields([
                 {
                     name: 'Player',
-                    value: `[\`${player.username}\`](https://laby.net/@${player.uuid})`
+                    value: `[\`${player.getUsernameOrUUID()}\`](https://laby.net/@${player.getUuidOrUsername()})`
                 },
                 {
                     name: connected ? 'Email' : 'Previous Email',
