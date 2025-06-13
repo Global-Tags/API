@@ -40,20 +40,17 @@ export default class CreateGiftCodeModal extends Modal {
                 value: role,
                 duration: giftExpiresAt
             },
-            expiresAt: codeExpiresAt
+            expiresAt: codeExpiresAt,
+            createdBy: player.uuid
         });
 
         sendModLogMessage({
             logType: ModLogType.CreateGiftCode,
             staff: await player.getGameProfile(),
             discord: true,
-            code: name,
-            role,
-            maxUses,
-            codeExpiration: codeExpiresAt,
-            giftDuration: giftExpiresAt
+            code: giftCode
         });
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The code was successfully created!\n\n🎁 ||**${giftCode}**||`)], flags: [MessageFlags.Ephemeral] });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The code was successfully created!\n\n🎁 ||**${giftCode.code}**||`)], flags: [MessageFlags.Ephemeral] });
     }
 }

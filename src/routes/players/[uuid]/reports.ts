@@ -5,11 +5,11 @@ import { ModLogType, sendModLogMessage, sendReportMessage } from "../../../libs/
 import { formatUUID, GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
-export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, error }) => { // Get reports
-    if(!session?.hasPermission(Permission.ManageReports)) return error(403, { error: i18n('error.notAllowed') });
+export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get reports
+    if(!session?.hasPermission(Permission.ManageReports)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return error(404, { error: i18n('error.playerNotFound') });
+    if(!player) return status(404, { error: i18n('error.playerNotFound') });
 
     return player.reports.map((report) => ({
         id: report.id,
@@ -33,21 +33,21 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     },
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to get the reports of' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).post('/', async ({ session, body: { reason }, params, i18n, error }) => { // Report player
+}).post('/', async ({ session, body: { reason }, params, i18n, status }) => { // Report player
     const uuid = stripUUID(params.uuid);
-    if(!session?.uuid) return error(403, { error: i18n('error.notAllowed') });
+    if(!session?.uuid) return status(403, { error: i18n('error.notAllowed') });
 
-    if(session.equal) return error(403, { error: i18n('report.self') });
+    if(session.equal) return status(403, { error: i18n('report.self') });
     const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n('error.playerNoTag') });
-    if(player.isBanned()) return error(403, { error: i18n('ban.already_banned') });
-    if(player.hasPermission(Permission.ReportImmunity)) return error(403, { error: i18n('report.immune') });
-    if(!player.tag) return error(404, { error: i18n('report.noTag') });
+    if(!player) return status(404, { error: i18n('error.playerNoTag') });
+    if(player.isBanned()) return status(403, { error: i18n('ban.already_banned') });
+    if(player.hasPermission(Permission.ReportImmunity)) return status(403, { error: i18n('report.immune') });
+    if(!player.tag) return status(404, { error: i18n('report.noTag') });
 
     const reporter = await getOrCreatePlayer(session.uuid);
-    if(reporter.isBanned()) return error(403, { error: i18n('error.banned') });
-    if(player.reports.some((report) => report.by == reporter.uuid && report.reported_tag == player.tag)) return error(409, { error: i18n('report.alreadyReported') });
-    if(reason.trim() == '') return error(422, { error: i18n('report.invalidReason') });
+    if(reporter.isBanned()) return status(403, { error: i18n('error.banned') });
+    if(player.reports.some((report) => report.by == reporter.uuid && report.reported_tag == player.tag)) return status(409, { error: i18n('report.alreadyReported') });
+    if(reason.trim() == '') return status(422, { error: i18n('report.invalidReason') });
 
     player.createReport({
         by: reporter.uuid,
@@ -80,14 +80,14 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     body: t.Object({ reason: t.String({ minLength: 2, maxLength: 200, error: 'report.validation;;[["min", "2"], ["max", "200"]]', description: 'The report reason' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to report' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).delete(`/:id`, async ({ session, params: { uuid, id }, i18n, error }) => { // Delete report
-    if(!session?.hasPermission(Permission.ManageReports)) return error(403, { error: i18n('error.notAllowed') });
+}).delete(`/:id`, async ({ session, params: { uuid, id }, i18n, status }) => { // Delete report
+    if(!session?.hasPermission(Permission.ManageReports)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(uuid) });
-    if(!player) return error(404, { error: i18n(`error.playerNotFound`) });
+    if(!player) return status(404, { error: i18n(`error.playerNotFound`) });
 
     const report = player.reports.find((report) => report.id == id.trim());
-    if(!report) return error(404, { error: i18n(`report.delete.not_found`) });
+    if(!report) return status(404, { error: i18n(`report.delete.not_found`) });
 
     player.deleteReport(report.id);
     await player.save();

@@ -9,15 +9,15 @@ import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
 import { sendTagChangeEmail } from "../../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 
-export default (app: ElysiaApp) => app.post('/', async ({ session, body: { position }, params, i18n, error }) => { // Change tag position
-    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
+export default (app: ElysiaApp) => app.post('/', async ({ session, body: { position }, params, i18n, status }) => { // Change tag position
+    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
 
     position = position.toLowerCase();
-    if(!(capitalCase(position) in GlobalPosition)) return error(422, { error: i18n('position.invalid') });
+    if(!(capitalCase(position) in GlobalPosition)) return status(422, { error: i18n('position.invalid') });
 
     const player = await getOrCreatePlayer(params.uuid);
-    if(session.equal && player.isBanned()) return error(403, { error: i18n('error.banned') });
-    if(snakeCase(player.position) == position) return error(400, { error: i18n('position.samePosition') });
+    if(session.equal && player.isBanned()) return status(403, { error: i18n('error.banned') });
+    if(snakeCase(player.position) == position) return status(400, { error: i18n('position.samePosition') });
 
     const oldPosition = player.position;
     player.position = position;

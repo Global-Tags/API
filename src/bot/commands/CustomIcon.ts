@@ -77,7 +77,7 @@ export default class CustomIconCommand extends Command {
             player.icon.name = snakeCase(GlobalIcon[GlobalIcon.Custom]);
             player.icon.hash = generateSecureCode(32);
             await player.save();
-            await Bun.write(Bun.file(join('icons', player.uuid, `${player.icon.hash}.png`)), request.data, { createPath: true });
+            await Bun.write(Bun.file(join('data', 'icons', player.uuid, `${player.icon.hash}.png`)), request.data, { createPath: true });
 
             if(!player.hasPermission(Permission.BypassValidation)) sendCustomIconUploadMessage(
                 await player.getGameProfile(),

@@ -18,16 +18,16 @@ const { validation, strictAuth } = config;
 const { min, max, blacklist, watchlist } = validation.tag;
 const multipleSpaces = /\s{2,}/g;
 
-export default (app: ElysiaApp) => app.get('/', async ({ session, language, params, i18n, error }) => { // Get player info
+export default (app: ElysiaApp) => app.get('/', async ({ session, language, params, i18n, status }) => { // Get player info
     if(!!session?.uuid && !!language) saveLastLanguage(session.uuid, language);
     if(strictAuth) {
-        if(!session?.uuid) return error(403, { error: i18n('error.notAllowed') });
+        if(!session?.uuid) return status(403, { error: i18n('error.notAllowed') });
     }
     const showBan = session?.equal || session?.hasPermission(Permission.ManageBans) || false;
     const showRoleIconVisibility = session?.equal || session?.hasPermission(Permission.ManageRoles) || false;
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return error(404, { error: i18n('error.playerNoTag') });
+    if(!player) return status(404, { error: i18n('error.playerNoTag') });
 
     const playerIcon = snakeCase(player.icon.name);
 
@@ -82,11 +82,11 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     },
     params: t.Object({ uuid: t.String({ description: 'The uuid of the player you want to fetch the info of' }) }),
     headers: t.Object({ authorization: strictAuth ? t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) : t.Optional(t.String({ description: 'Your authentication token' })) }, { error: 'error.notAllowed' }),
-}).get('/history', async ({ session, params, i18n, error }) => { // Get player's tag history
-    if(!session || session?.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
+}).get('/history', async ({ session, params, i18n, status }) => { // Get player's tag history
+    if(!session || session?.equal && !session.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return error(404, { error: i18n('error.playerNoTag') });
+    if(!player) return status(404, { error: i18n('error.playerNoTag') });
 
     return player.history.map((tag) => ({
         tag,
@@ -106,11 +106,11 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     },
     params: t.Object({ uuid: t.String({ description: 'The uuid of the player you want to fetch the info of' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' }),
-}).post('/', async ({ session, body: { tag }, params, i18n, error }) => { // Change tag
-    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
+}).post('/', async ({ session, body: { tag }, params, i18n, status }) => { // Change tag
+    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await getOrCreatePlayer(params.uuid);
-    if(session.equal && player.isBanned()) return error(403, { error: i18n('error.banned') });
+    if(session.equal && player.isBanned()) return status(403, { error: i18n('error.banned') });
 
     let isWatched = false;
     let isWatchedInitially = false;
@@ -118,10 +118,10 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     if(!session.hasPermission(Permission.BypassValidation)) {
         tag = tag.trim().replace(multipleSpaces, ' ').replace(colorCodesWithSpaces, '').replace(hexColorCodesWithSpaces, '');
         const strippedTag = stripColors(tag);
-        if(strippedTag == '') return error(422, { error: i18n('setTag.empty') });
-        if(strippedTag.length < min || strippedTag.length > max) return error(422, { error: i18n('setTag.validation').replace('<min>', String(min)).replace('<max>', String(max)) });
+        if(strippedTag == '') return status(422, { error: i18n('setTag.empty') });
+        if(strippedTag.length < min || strippedTag.length > max) return status(422, { error: i18n('setTag.validation').replace('<min>', String(min)).replace('<max>', String(max)) });
         const blacklistedWord = blacklist.find((word) => strippedTag.toLowerCase().includes(word));
-        if(blacklistedWord) return error(422, { error: i18n('setTag.blacklisted').replaceAll('<word>', blacklistedWord) });
+        if(blacklistedWord) return status(422, { error: i18n('setTag.blacklisted').replaceAll('<word>', blacklistedWord) });
         isWatched = (player && player.watchlist) || watchlist.some((word) => {
             if(strippedTag.toLowerCase().includes(word)) {
                 Logger.warn(`Now watching ${player.uuid} for matching "${word}" in "${tag}".`);
@@ -133,7 +133,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         });
     }
 
-    if(player.tag == tag) return error(409, { error: i18n('setTag.sameTag') });
+    if(player.tag == tag) return status(409, { error: i18n('setTag.sameTag') });
 
     const oldTag = player.tag;
     player.tag = tag;
@@ -176,14 +176,14 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
     body: t.Object({ tag: t.String({ error: 'error.wrongType;;[["field", "tag"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).delete('/', async ({ session, params, i18n, error }) => { // Delete tag
-    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
+}).delete('/', async ({ session, params, i18n, status }) => { // Delete tag
+    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
     const uuid = stripUUID(params.uuid);
 
     const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n('error.noTag') });
-    if(session.equal && player.isBanned()) return error(403, { error: i18n('error.banned') });
-    if(!player.tag) return error(404, { error: i18n('error.noTag') });
+    if(!player) return status(404, { error: i18n('error.noTag') });
+    if(session.equal && player.isBanned()) return status(403, { error: i18n('error.banned') });
+    if(!player.tag) return status(404, { error: i18n('error.noTag') });
 
     if(!session.equal) {
         sendModLogMessage({

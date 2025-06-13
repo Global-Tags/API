@@ -95,7 +95,7 @@ export default (app: ElysiaApp) => app.get('/', () => ({
         503: t.Object({ error: t.String() }, { description: 'Database is not reachable' })
     }
 })
-.get('/ping', ({ error }: Context) => { return error(204, '') }, {
+.get('/ping', ({ status }: Context) => { return status(204, '') }, {
     detail: {
         tags: ['API'],
         description: 'Used by uptime checkers. This route is not being logged'
