@@ -1,14 +1,13 @@
 import { existsSync, readdirSync } from "fs";
 import { join } from "path";
 import Logger from "../libs/Logger";
-import players from "../database/schemas/players";
-import { Permission } from "../types/Permission";
+import players, { Player } from "../database/schemas/players";
 import { stripUUID } from "../libs/game-profiles";
 
 export type SessionData = {
     uuid: string | null,
-    equal: boolean,
-    hasPermission: (permission: Permission) => boolean
+    player: Player | null,
+    self: boolean
 }
 
 export default abstract class AuthProvider {
@@ -20,15 +19,15 @@ export default abstract class AuthProvider {
     }
 
     public async getSession(token: string, uuid?: string | null): Promise<SessionData> {
-        const tokenUuid = await this.getUUID(token);
+        const tokenUUID = await this.getUUID(token);
         if(uuid) uuid = stripUUID(uuid);
-        if(!tokenUuid) return { uuid: tokenUuid, equal: tokenUuid == uuid, hasPermission: (permission: Permission) => false };
-        const data = await players.findOne({ uuid: tokenUuid });
-        if(!data) return { uuid: tokenUuid, equal: tokenUuid == uuid, hasPermission: (permission: Permission) => false };
+        if(!tokenUUID) return { uuid: null, player: null, self: false };
+        const data = await players.findOne({ uuid: tokenUUID });
+        if(!data) return { uuid: tokenUUID, player: null, self: tokenUUID == uuid };
         return {
-            uuid: tokenUuid,
-            equal: uuid == tokenUuid,
-            hasPermission: (permission: Permission) => data.hasPermission(permission)
+            uuid: tokenUUID,
+            player: data,
+            self: uuid == tokenUUID
         }
     }
     public abstract getUUID(token: string): Promise<string | null>;
