@@ -5,12 +5,14 @@ import { sendEmailLinkMessage } from "../../../libs/discord-notifier";
 import { ElysiaApp } from "../../..";
 import { onDiscordUnlink } from "../../../libs/events";
 import { generateSecureCode } from "../../../libs/crypto";
+import { Permission } from "../../../types/Permission";
 
 export default (app: ElysiaApp) => app.post('/discord', async ({ session, i18n, status }) => { // Get a discord linking code
     if(!config.discordBot.notifications.accountConnections.enabled) return status(409, { error: i18n('connections.discord.disabled') });
-    if(!session?.self) return status(403, { error: i18n('error.notAllowed') });
+    if(!session) return status(403, { error: i18n('error.notAllowed') });
+    const { self, player } = session;
+    if(!self && !player?.hasPermission(Permission.ViewConnections)) return status(403, { error: i18n('error.notAllowed') });
 
-    const { player } = session;
     if(!player) return status(404, { error: i18n('error.noTag') });
     if(player.connections.discord.id) return status(409, { error: i18n('connections.discord.alreadyConnected') });
     if(player.connections.discord.code) return { code: player.connections.discord.code };
@@ -37,9 +39,10 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, i18n, 
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).delete('/discord', async ({ session, i18n, status }) => { // Unlink discord account
     if(!config.discordBot.notifications.accountConnections.enabled) return status(409, { error: i18n('connections.discord.disabled') });
-    if(!session?.self) return status(403, { error: i18n('error.notAllowed') });
+    if(!session) return status(403, { error: i18n('error.notAllowed') });
+    const { self, player } = session;
+    if(!self && !player?.hasPermission(Permission.RemoveConnections)) return status(403, { error: i18n('error.notAllowed') });
 
-    const { player } = session;
     if(!player) return status(404, { error: i18n('error.noTag') });
     if(!player.connections.discord.id && !player.connections.discord.code) return status(409, { error: i18n('connections.discord.notConnected') });
 
@@ -67,9 +70,10 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, i18n, 
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).post('/email', async ({ session, body: { email }, i18n, status }) => { // Send verification email
-    if(!session?.self) return status(403, { error: i18n('error.notAllowed') });
+    if(!session) return status(403, { error: i18n('error.notAllowed') });
+    const { self, player } = session;
+    if(!self && !player?.hasPermission(Permission.ViewConnections)) return status(403, { error: i18n('error.notAllowed') });
 
-    const { player } = session;
     if(!player) return status(404, { error: i18n('error.noTag') });
     if(player.connections.email.address) return status(409, { error: i18n('connections.email.alreadyConnected') });
 
@@ -158,9 +162,10 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, i18n, 
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }), code: t.String({ description: 'Your verification code' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).delete('/email', async ({ session, i18n, status }) => { // Unlink email
-    if(!session?.self) return status(403, { error: i18n('error.notAllowed') });
+    if(!session) return status(403, { error: i18n('error.notAllowed') });
+    const { self, player } = session;
+    if(!self && !player?.hasPermission(Permission.RemoveConnections)) return status(403, { error: i18n('error.notAllowed') });
 
-    const { player } = session;
     if(!player) return status(404, { error: i18n('error.noTag') });
     if(!player.connections.email.address && !player.connections.email.code) return status(400, { error: i18n('connections.email.notConnected') });
 

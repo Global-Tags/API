@@ -23,8 +23,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     if(strictAuth) {
         if(!session?.uuid) return status(403, { error: i18n('error.notAllowed') });
     }
-    const showBan = session?.self || session?.player?.hasPermission(Permission.ManageBans) || false;
-    const showRoleIconVisibility = session?.self || session?.player?.hasPermission(Permission.ManageRoles) || false;
+    const showBan = session?.self || session?.player?.hasPermission(Permission.ViewBans) || false;
+    const showRoleIconVisibility = session?.self || session?.player?.hasPermission(Permission.ManageTags) || false;
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNoTag') });

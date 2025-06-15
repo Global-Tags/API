@@ -34,7 +34,7 @@ export default (app: ElysiaApp) => app.post('/', async ({ session, params, i18n,
         409: t.Object({ error: t.String() }, { description: 'You have already marked someone as your referrer' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'Database is not reachable' })
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to refer to' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })

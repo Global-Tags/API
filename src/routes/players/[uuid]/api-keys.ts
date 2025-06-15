@@ -8,7 +8,7 @@ import { snakeCase } from "change-case";
 import { generateSecureCode } from "../../../libs/crypto";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get api key list
-    if(!session?.player?.hasPermission(Permission.ManageApiKeys)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ViewApiKeys)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNotFound') });
@@ -34,7 +34,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).get('/:name', async ({ session, params, i18n, status }) => { // Get info of specific api key
-    if(!session?.player?.hasPermission(Permission.ManageApiKeys)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ViewApiKeys)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNotFound') });
@@ -60,7 +60,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }), name: t.String({ description: 'The API key name' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).post('/', async ({ session, body: { name }, params, i18n, status }) => { // Create an API key
-    if(!session?.player?.hasPermission(Permission.ManageApiKeys)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.CreateApiKeys)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNotFound') });
@@ -97,7 +97,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).patch('/:name', async ({ session, params, i18n, status }) => { // Regenerate API key
-    if(!session?.player?.hasPermission(Permission.ManageApiKeys)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.EditApiKeys)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNotFound') });
@@ -132,7 +132,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }), name: t.String({ description: 'The API key name' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).delete('/:name', async ({ session, params, i18n, status }) => { // Delete api key
-    if(!session?.player?.hasPermission(Permission.ManageApiKeys)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.DeleteApiKeys)) return status(403, { error: i18n('error.notAllowed') });
     const uuid = stripUUID(params.uuid);
 
     const player = await players.findOne({ uuid });

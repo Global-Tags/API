@@ -6,7 +6,7 @@ import { snakeCase } from "change-case";
 import { ElysiaApp } from "..";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }) => { // Get roles
-    if(!session?.player?.hasPermission(Permission.ManageRoles)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ViewRoles)) return status(403, { error: i18n('error.notAllowed') });
 
     return getCachedRoles().map((role) => ({
         name: role.name,
@@ -28,7 +28,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     },
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).get('/:name', async ({ session, params, i18n, status }) => { // Get specific role
-    if(!session?.player?.hasPermission(Permission.ManageRoles)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ViewRoles)) return status(403, { error: i18n('error.notAllowed') });
     const name = snakeCase(decodeURIComponent(params.name).trim());
 
     const role = getCachedRoles().find((role) => role.name == name);
@@ -56,7 +56,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     params: t.Object({ name: t.String({ description: 'The role name' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).post('/', async ({ session, body, i18n, status }) => { // Create role
-    if(!session?.player?.hasPermission(Permission.ManageRoles)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.CreateRoles)) return status(403, { error: i18n('error.notAllowed') });
 
     const name = snakeCase(body.name.trim());
     if(getCachedRoles().find((role) => role.name == name)) return status(409, { error: i18n('roles.create.already_exists').replaceAll('<role>', name) });
@@ -93,7 +93,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     body: t.Object({ name: t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).delete('/:name', async ({ session, params, i18n, status }) => { // Delete role
-    if(!session?.player?.hasPermission(Permission.ManageRoles)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.DeleteRoles)) return status(403, { error: i18n('error.notAllowed') });
 
     const name = snakeCase(decodeURIComponent(params.name).trim());
 
