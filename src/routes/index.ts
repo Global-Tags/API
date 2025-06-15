@@ -23,8 +23,7 @@ export default (app: ElysiaApp) => app.get('/', () => ({
         200: t.Object({ version: t.String(), requests: t.Number(), commit: t.Object({ branch: t.String(), sha: t.Union([t.String(), t.Null()]), tree: t.Union([t.String(), t.Null()]) }) }, { description: 'Some basic API info' }),
         503: t.Object({ error: t.String() }, { description: 'Database is not reachable' })
     }
-})
-.get('/metrics', async ({ query: { latest } }) => {
+}).get('/metrics', async ({ query: { latest } }) => {
     const metrics = await Metrics.find();
 
     return metrics.filter((doc) => {
@@ -94,8 +93,7 @@ export default (app: ElysiaApp) => app.get('/', () => ({
         }, { description: 'The referral leaderboards' }),
         503: t.Object({ error: t.String() }, { description: 'Database is not reachable' })
     }
-})
-.get('/ping', ({ status }: Context) => { return status(204, '') }, {
+}).get('/ping', ({ status }: Context) => { return status(204, '') }, {
     detail: {
         tags: ['API'],
         description: 'Used by uptime checkers. This route is not being logged'

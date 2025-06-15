@@ -23,7 +23,7 @@ import { join } from "path";
 import ip from "./middleware/ip";
 import { generateSecureCode } from "./routes/players/[uuid]/connections";
 import { captureException } from "@sentry/bun";
-import { validateKeypair } from "./libs/jwt";
+import { validateKeypair } from "./libs/crypto";
 
 if(config.mongodb.trim().length == 0) {
     Logger.error('Database connection string is empty!');
