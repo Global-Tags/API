@@ -4,8 +4,8 @@ import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
 import { Permission } from "../../../types/Permission";
 import { GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
-import { generateSecureCode } from "./connections";
 import { snakeCase } from "change-case";
+import { generateSecureCode } from "../../../libs/crypto";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get api key list
     if(!session?.hasPermission(Permission.ManageApiKeys)) return status(403, { error: i18n('error.notAllowed') });

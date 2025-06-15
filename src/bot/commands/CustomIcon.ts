@@ -4,12 +4,12 @@ import { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { join } from 'path';
 import axios from "axios";
-import { generateSecureCode } from "../../routes/players/[uuid]/connections";
 import { config } from "../../libs/config";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon } from "../../types/GlobalIcon";
 import { sendCustomIconUploadMessage } from "../../libs/discord-notifier";
 import { snakeCase } from "change-case";
+import { generateSecureCode } from "../../libs/crypto";
 
 export default class CustomIconCommand extends Command {
     constructor() {

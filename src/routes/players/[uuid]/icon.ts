@@ -10,9 +10,9 @@ import { ElysiaApp } from "../../..";
 import { ModLogType, sendCustomIconUploadMessage, sendModLogMessage } from "../../../libs/discord-notifier";
 import { sendTagChangeEmail } from "../../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
-import { generateSecureCode } from "./connections";
 import sharp from "sharp";
 import Logger from "../../../libs/Logger";
+import { generateSecureCode } from "../../../libs/crypto";
 
 export function getCustomIconUrl(uuid: string, hash: string) {
     return `${config.baseUrl}/players/${uuid}/icon/${hash}`;

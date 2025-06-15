@@ -1,6 +1,6 @@
 import { HydratedDocument, Schema, model as createModel } from "mongoose";
-import { generateSecureCode } from "../../routes/players/[uuid]/connections";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
+import { generateSecureCode } from "../../libs/crypto";
 
 export interface IGiftCode {
     id: string;
@@ -104,7 +104,7 @@ export async function createGiftCode({
     createdBy: string
 }): Promise<GiftCode> {
     return await model.insertOne({
-        id: generateSecureCode(12),
+        id: generateSecureCode(),
         name,
         code,
         uses: [],

@@ -1,5 +1,4 @@
-import crypto from "crypto";
-import { generateSecureCode } from "../routes/players/[uuid]/connections";
+import crypto, { randomBytes } from "crypto";
 import Logger from "./Logger";
 
 const publicKeyFile = Bun.file('./data/certificate/pubkey.pem');
@@ -28,4 +27,8 @@ async function generateKeypair() {
 
     Bun.write(publicKeyFile, publicKey);
     Bun.write(privateKeyFile, privateKey);
+}
+
+export function generateSecureCode(length: number = 10) {
+    return randomBytes(length).toString('hex').slice(0, length);
 }

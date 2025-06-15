@@ -1,17 +1,12 @@
 import { t } from "elysia";
 import players from "../../../database/schemas/players";
-import getAuthProvider from "../../../middleware/get-auth-provider";
 import { sendEmail } from "../../../libs/mailer";
-import { randomBytes } from "crypto";
 import { config } from "../../../libs/config";
 import { sendEmailLinkMessage } from "../../../libs/discord-notifier";
 import { stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 import { onDiscordUnlink } from "../../../libs/events";
-
-export function generateSecureCode(length: number = 10) {
-    return randomBytes(length).toString('hex').slice(0, length);
-}
+import { generateSecureCode } from "../../../libs/crypto";
 
 export default (app: ElysiaApp) => app.post('/discord', async ({ session, params, i18n, status }) => { // Get a discord linking code
     if(!config.discordBot.notifications.accountConnections.enabled) return status(409, { error: i18n('connections.discord.disabled') });

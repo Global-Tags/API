@@ -1,11 +1,11 @@
 import { HydratedDocument, Schema, model } from "mongoose";
 import { snakeCase } from "change-case";
-import { generateSecureCode } from "../../routes/players/[uuid]/connections";
 import { Permission } from "../../types/Permission";
 import { getCachedRoles, Role } from "./roles";
 import { GlobalIcon } from "../../types/GlobalIcon";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { isConnected } from "../mongo";
+import { generateSecureCode } from "../../libs/crypto";
 
 export type PlayerRole = {
     role: Role,
