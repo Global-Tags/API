@@ -29,6 +29,11 @@ async function generateKeypair() {
     Bun.write(privateKeyFile, privateKey);
 }
 
+/**
+ * Generates a secure random code of the specified length.
+ * @param length The length of the secure code. 10 characters by default (for document IDs)
+ * @returns A random hexadecimal string of the specified length.
+ */
 export function generateSecureCode(length: number = 10) {
     return randomBytes(length).toString('hex').slice(0, length);
 }
