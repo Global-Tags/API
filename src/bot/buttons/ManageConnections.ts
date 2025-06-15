@@ -8,7 +8,7 @@ export default class ManageConnectionsButton extends Button {
     constructor() {
         super({
             id: 'manageConnections_',
-            requiredPermissions: [Permission.ManageConnections]
+            requiredPermissions: [Permission.ViewConnections]
         });
     }
 

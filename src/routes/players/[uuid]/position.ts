@@ -10,7 +10,7 @@ import { sendTagChangeEmail } from "../../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 
 export default (app: ElysiaApp) => app.post('/', async ({ session, body: { position }, params, i18n, status }) => { // Change tag position
-    if(!session || !session.self && !session.player?.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session || !session.self && !session.player?.hasPermission(Permission.ManagePlayerPositions)) return status(403, { error: i18n('error.notAllowed') });
 
     position = position.toLowerCase();
     if(!(capitalCase(position) in GlobalPosition)) return status(422, { error: i18n('position.invalid') });

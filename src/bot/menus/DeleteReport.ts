@@ -9,7 +9,7 @@ export default class DeleteReportMenu extends SelectMenu {
     constructor() {
         super({
             id: 'deleteReport_',
-            requiredPermissions: [Permission.ManageReports]
+            requiredPermissions: [Permission.DeleteReports]
         });
     }
 

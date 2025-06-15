@@ -12,7 +12,7 @@ export default class ClearsButton extends Button {
     constructor() {
         super({
             id: 'clears_',
-            requiredPermissions: [Permission.ManageTags]
+            requiredPermissions: [Permission.ViewClears]
         });
     }
     

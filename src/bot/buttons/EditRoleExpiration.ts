@@ -8,7 +8,7 @@ export default class EditRoleExpirationButton extends Button {
     constructor() {
         super({
             id: 'editRoleExpiration_',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.EditRoles]
         });
     }
 

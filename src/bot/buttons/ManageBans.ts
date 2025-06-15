@@ -10,7 +10,7 @@ export default class ManageBansButton extends Button {
     constructor() {
         super({
             id: 'manageBans_',
-            requiredPermissions: [Permission.ManageBans]
+            requiredPermissions: [Permission.ViewBans]
         });
     }
 

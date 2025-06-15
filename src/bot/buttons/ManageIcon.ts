@@ -12,7 +12,7 @@ export default class ManageIconButton extends Button {
     constructor() {
         super({
             id: 'manageIcon_',
-            requiredPermissions: [Permission.ManageTags]
+            requiredPermissions: [Permission.ManagePlayerIcons]
         });
     }
 

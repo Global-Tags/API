@@ -24,7 +24,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         if(!session?.uuid) return status(403, { error: i18n('error.notAllowed') });
     }
     const showBan = session?.self || session?.player?.hasPermission(Permission.ViewBans) || false;
-    const showRoleIconVisibility = session?.self || session?.player?.hasPermission(Permission.ManageTags) || false;
+    const showRoleIconVisibility = session?.self || session?.player?.hasPermission(Permission.ManagePlayerIcons) || false;
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNoTag') });
@@ -49,7 +49,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         roleIcon: !player.hide_role_icon ? player.getActiveRoles().find((role) => role.role.hasIcon)?.role.name || null : null,
         hideRoleIcon: showRoleIconVisibility ? player.hide_role_icon : false,
         roles: player.getActiveRoles().map((role) => role.role.name),
-        permissions: permissions.filter((permission) => player.hasPermission(permission)).map((permission) => snakeCase(Permission[permission])),
+        permissions: player.getActiveRoles().reduce((acc, role) => acc | role.role.permissions, 0),
         referrals: {
             has_referred: player.referrals.has_referred,
             total_referrals: player.referrals.total.length,
@@ -74,7 +74,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
         description: 'Returns a players\' tag info'
     },
     response: {
-        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referrals: t.Object({ has_referred: t.Boolean(), total_referrals: t.Integer(), current_month_referrals: t.Integer() }), roleIcon: t.Union([t.String(), t.Null()]), hideRoleIcon: t.Boolean(), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ appealable: t.Boolean(), appealed: t.Boolean(), banned_at: t.Number(), expires_at: t.Union([t.Number(), t.Null()]), id: t.String(), reason: t.Union([t.String(), t.Null()]), staff: t.String() }), t.Null()]) }, { description: 'The tag data' }),
+        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referrals: t.Object({ has_referred: t.Boolean(), total_referrals: t.Integer(), current_month_referrals: t.Integer() }), roleIcon: t.Union([t.String(), t.Null()]), hideRoleIcon: t.Boolean(), roles: t.Array(t.String()), permissions: t.Integer(), ban: t.Union([t.Object({ appealable: t.Boolean(), appealed: t.Boolean(), banned_at: t.Number(), expires_at: t.Union([t.Number(), t.Null()]), id: t.String(), reason: t.Union([t.String(), t.Null()]), staff: t.String() }), t.Null()]) }, { description: 'The tag data' }),
         403: t.Object({ error: t.String() }, { description: 'The player is banned' }),
         404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
@@ -83,7 +83,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     params: t.Object({ uuid: t.String({ description: 'The uuid of the player you want to fetch the info of' }) }),
     headers: t.Object({ authorization: strictAuth ? t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) : t.Optional(t.String({ description: 'Your authentication token' })) }, { error: 'error.notAllowed' }),
 }).get('/history', async ({ session, params, i18n, status }) => { // Get player's tag history
-    if(!session || session?.self && !session.player?.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session || session?.self && !session.player?.hasPermission(Permission.ViewTagHistory)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNoTag') });
@@ -107,7 +107,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     params: t.Object({ uuid: t.String({ description: 'The uuid of the player you want to fetch the info of' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' }),
 }).post('/', async ({ session, body: { tag }, params, i18n, status }) => { // Change tag
-    if(!session || !session.self && !session.player?.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session || !session.self && !session.player?.hasPermission(Permission.ManagePlayerTags)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await getOrCreatePlayer(params.uuid);
     if(session.self && player.isBanned()) return status(403, { error: i18n('error.banned') });
@@ -177,7 +177,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     body: t.Object({ tag: t.String({ error: 'error.wrongType;;[["field", "tag"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).delete('/', async ({ session, params, i18n, status }) => { // Delete tag
-    if(!session || !session.self && !session.player?.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session || !session.self && !session.player?.hasPermission(Permission.ManagePlayerTags)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.noTag') });

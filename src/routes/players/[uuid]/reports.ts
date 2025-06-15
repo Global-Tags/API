@@ -6,7 +6,7 @@ import { formatUUID, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get reports
-    if(!session?.player?.hasPermission(Permission.ManageReports)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ViewReports)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNotFound') });
@@ -80,7 +80,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to report' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).delete('/:id', async ({ session, params: { uuid, id }, i18n, status }) => { // Delete report
-    if(!session?.player?.hasPermission(Permission.ManageReports)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.DeleteReports)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(uuid) });
     if(!player) return status(404, { error: i18n(`error.playerNotFound`) });

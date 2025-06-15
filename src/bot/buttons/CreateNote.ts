@@ -8,7 +8,7 @@ export default class CreateNoteButton extends Button {
     constructor() {
         super({
             id: 'createNote_',
-            requiredPermissions: [Permission.ManageNotes]
+            requiredPermissions: [Permission.CreateNotes]
         });
     }
 

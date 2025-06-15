@@ -9,7 +9,7 @@ export default class DeleteReportButton extends Button {
     constructor() {
         super({
             id: 'deleteReport_',
-            requiredPermissions: [Permission.ManageReports]
+            requiredPermissions: [Permission.DeleteReports]
         });
     }
     

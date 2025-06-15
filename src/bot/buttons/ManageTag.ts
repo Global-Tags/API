@@ -8,7 +8,7 @@ export default class ManageTagButton extends Button {
     constructor() {
         super({
             id: 'manageTag_',
-            requiredPermissions: [Permission.ManageTags]
+            requiredPermissions: [Permission.ManagePlayerTags]
         });
     }
 

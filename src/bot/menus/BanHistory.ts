@@ -10,7 +10,7 @@ export default class BanHistoryMenu extends SelectMenu {
     constructor() {
         super({
             id: 'banHistory_',
-            requiredPermissions: [Permission.ManageBans]
+            requiredPermissions: [Permission.ViewBans]
         });
     }
 

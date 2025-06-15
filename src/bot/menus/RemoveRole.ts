@@ -9,7 +9,7 @@ export default class RemoveRoleMenu extends SelectMenu {
     constructor() {
         super({
             id: 'removeRole_',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.ManagePlayerRoles]
         });
     }
 

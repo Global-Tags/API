@@ -11,7 +11,7 @@ export default class ClearIconTextureButton extends Button {
     constructor() {
         super({
             id: 'clearIconTexture_',
-            requiredPermissions: [Permission.ManageTags]
+            requiredPermissions: [Permission.ManagePlayerIcons]
         });
     }
     

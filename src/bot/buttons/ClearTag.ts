@@ -11,7 +11,7 @@ export default class ClearTagButton extends Button {
     constructor() {
         super({
             id: 'clearTag_',
-            requiredPermissions: [Permission.ManageTags]
+            requiredPermissions: [Permission.ManagePlayerTags]
         });
     }
 

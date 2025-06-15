@@ -7,7 +7,7 @@ export default class CreateGiftCodeMenu extends SelectMenu {
     constructor() {
         super({
             id: 'createGiftCode',
-            requiredPermissions: [Permission.ManageApiKeys]
+            requiredPermissions: [Permission.CreateGiftCodes]
         });
     }
 

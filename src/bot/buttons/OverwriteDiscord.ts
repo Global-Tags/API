@@ -7,7 +7,7 @@ export default class OverwriteDiscordButton extends Button {
     constructor() {
         super({
             id: 'overwriteDiscord_',
-            requiredPermissions: [Permission.ManageConnections]
+            requiredPermissions: [Permission.ViewConnections]
         });
     }
 

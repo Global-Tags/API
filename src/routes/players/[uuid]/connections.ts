@@ -11,7 +11,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, i18n, 
     if(!config.discordBot.notifications.accountConnections.enabled) return status(409, { error: i18n('connections.discord.disabled') });
     if(!session) return status(403, { error: i18n('error.notAllowed') });
     const { self, player } = session;
-    if(!self && !player?.hasPermission(Permission.ViewConnections)) return status(403, { error: i18n('error.notAllowed') });
+    if(!self) return status(403, { error: i18n('error.notAllowed') });
 
     if(!player) return status(404, { error: i18n('error.noTag') });
     if(player.connections.discord.id) return status(409, { error: i18n('connections.discord.alreadyConnected') });
@@ -72,7 +72,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, i18n, 
 }).post('/email', async ({ session, body: { email }, i18n, status }) => { // Send verification email
     if(!session) return status(403, { error: i18n('error.notAllowed') });
     const { self, player } = session;
-    if(!self && !player?.hasPermission(Permission.ViewConnections)) return status(403, { error: i18n('error.notAllowed') });
+    if(!self) return status(403, { error: i18n('error.notAllowed') });
 
     if(!player) return status(404, { error: i18n('error.noTag') });
     if(player.connections.email.address) return status(409, { error: i18n('connections.email.alreadyConnected') });

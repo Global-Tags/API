@@ -8,7 +8,7 @@ export default class DeleteApiKeyButton extends Button {
     constructor() {
         super({
             id: 'deleteApiKey_',
-            requiredPermissions: [Permission.ManageApiKeys]
+            requiredPermissions: [Permission.DeleteApiKeys]
         });
     }
 

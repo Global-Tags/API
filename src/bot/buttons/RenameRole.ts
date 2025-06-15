@@ -10,7 +10,7 @@ export default class RenameRoleButton extends Button {
     constructor() {
         super({
             id: 'renameRole_',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.EditRoles]
         });
     }
 

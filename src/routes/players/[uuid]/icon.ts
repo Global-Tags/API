@@ -42,7 +42,7 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     },
     params: t.Object({ uuid: t.String({ description: 'The uuid of the image owner' }), hash: t.String({ description: 'The image hash' }) })
 }).post('/', async ({ session, body: { icon }, params, i18n, status }) => { // Change icon
-    if(!session || !session.self && !session.player?.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session || !session.self && !session.player?.hasPermission(Permission.ManagePlayerIcons)) return status(403, { error: i18n('error.notAllowed') });
 
     icon = icon.toLowerCase();
     const player = await getOrCreatePlayer(params.uuid);
@@ -138,7 +138,7 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).patch('/role-visibility', async ({ session, body: { visible }, params, i18n, status }) => { // Toggle role icon
-    if(!session || !session.self && !session.player?.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session || !session.self && !session.player?.hasPermission(Permission.ManagePlayerIcons)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.noTag') });

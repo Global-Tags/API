@@ -8,7 +8,7 @@ export default class RegenerateApiKeyButton extends Button {
     constructor() {
         super({
             id: 'regenerateApiKey_',
-            requiredPermissions: [Permission.ManageApiKeys]
+            requiredPermissions: [Permission.EditApiKeys]
         });
     }
 

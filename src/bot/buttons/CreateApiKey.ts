@@ -7,7 +7,7 @@ export default class CreateApiKeyButton extends Button {
     constructor() {
         super({
             id: 'createApiKey_',
-            requiredPermissions: [Permission.ManageApiKeys]
+            requiredPermissions: [Permission.CreateApiKeys]
         });
     }
 

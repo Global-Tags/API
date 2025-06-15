@@ -14,9 +14,9 @@ export enum Permission { // TODO: Replace real bitfield values
     EditStaffCategories = 1 << 0,
     DeleteStaffCategories = 1 << 0,
     ViewStaffMembers = 1 << 0,
-    CreateStaffMembers,
-    EditStaffMembers,
-    DeleteStaffMembers,
+    CreateStaffMembers = 1 << 0,
+    EditStaffMembers = 1 << 0,
+    DeleteStaffMembers = 1 << 0,
 
     //* Bans
 
@@ -35,7 +35,6 @@ export enum Permission { // TODO: Replace real bitfield values
     //* Connections
 
     ViewConnections = 1 << 0,
-    EditConnections = 1 << 0,
     RemoveConnections = 1 << 0,
 
     //* Gift codes
@@ -58,12 +57,31 @@ export enum Permission { // TODO: Replace real bitfield values
     CreateRoles = 1 << 0,
     EditRoles = 1 << 0,
     DeleteRoles = 1 << 0,
+    ManagePlayerRoles = 1 << 0,
 
-    //! TODO
+    //* Player management
+    
+    ViewTagHistory = 1 << 0,
+    ManagePlayerTags = 1 << 0,
+    ManagePlayerIcons = 1 << 0,
+    ManagePlayerPositions = 1 << 0,
+    ViewClears = 1 << 0,
 
-    ManageTags, //* Player management
-    ManageReports, //* Reports
-    ManageWatchlist //* Watchlist
+    //* Referrals
+
+    ViewReferrals = 1 << 0,
+    RemoveReferrer = 1 << 0,
+
+    //* Reports
+
+    ViewReports = 1 << 0,
+    ReviewReports = 1 << 0,
+    DeleteReports = 1 << 0,
+
+    //* Watchlist
+
+    ViewWatchlist = 1 << 0,
+    ManageWatchlistEntries = 1 << 0
 }
 
 export const permissions = Object.keys(Permission).filter(key => isNaN(Number(key))).map((permission) => Permission[permission as keyof typeof Permission]);

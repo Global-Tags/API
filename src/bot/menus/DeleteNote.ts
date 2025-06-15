@@ -9,7 +9,7 @@ export default class DeleteNoteMenu extends SelectMenu {
     constructor() {
         super({
             id: 'deleteNote_',
-            requiredPermissions: [Permission.ManageNotes]
+            requiredPermissions: [Permission.DeleteNotes]
         });
     }
 
