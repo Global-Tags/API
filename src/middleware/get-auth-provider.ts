@@ -7,6 +7,6 @@ export default function getAuthProvider(app: Elysia) {
         if(!header) return { provider: null };
         const provider = AuthProvider.getProvider(header);
         const uuid = params?.['uuid'];
-        return { provider, session: provider ? await provider.getSession(header, uuid) : null };
+        return { provider, session: await provider?.getSession(header, uuid) || null };
     });
 }

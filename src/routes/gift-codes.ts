@@ -2,12 +2,11 @@ import { t } from "elysia";
 import { Permission } from "../types/Permission";
 import { ElysiaApp } from "..";
 import { ModLogType, sendGiftCodeRedeemMessage, sendModLogMessage } from "../libs/discord-notifier";
-import { formatUUID, GameProfile } from "../libs/game-profiles";
+import { formatUUID } from "../libs/game-profiles";
 import giftCodes, { createGiftCode } from "../database/schemas/gift-codes";
-import players from "../database/schemas/players";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }) => { // Get gift code list
-    if(!session?.hasPermission(Permission.ManageGiftCodes)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ManageGiftCodes)) return status(403, { error: i18n('error.notAllowed') });
 
     const codes = await giftCodes.find();
 
@@ -40,7 +39,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     },
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).get('/:code', async ({ session, params, i18n, status }) => { // Get info of a specific code
-    if(!session?.hasPermission(Permission.ManageGiftCodes)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ManageGiftCodes)) return status(403, { error: i18n('error.notAllowed') });
 
     const code = await giftCodes.findOne({ $or: [{ id: params.code }, { code: params.code }] });
     if(!code) return status(404, { error: i18n('gift_codes.not_found') });
@@ -63,8 +62,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     params: t.Object({ code: t.String({ description: 'The gift code' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).post('/:code/redeem', async ({ session, params, i18n, status }) => { // Get info of a specific code
-    if(!session || !session.uuid) return status(403, { error: i18n('error.notAllowed') });
-    const player = await players.findOne({ uuid: session.uuid });
+    if(!session?.player) return status(403, { error: i18n('error.notAllowed') });
+    const { player } = session;
     if(!player) return status(403, { error: i18n('error.notAllowed') });
 
     const code = await giftCodes.findOne({ code: params.code });
@@ -97,7 +96,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     params: t.Object({ code: t.String({ description: 'The gift code' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).post('/', async ({ session, body: { name, code, role, max_uses: maxUses, code_expiration: codeExpiration, gift_duration: giftDuration }, i18n, status }) => { // Create a gift code
-    if(!session?.hasPermission(Permission.ManageGiftCodes)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ManageGiftCodes)) return status(403, { error: i18n('error.notAllowed') });
 
     const codeExpiresAt = codeExpiration ? new Date(codeExpiration) : null;
     const giftExpiresAt = giftDuration || null;
@@ -112,12 +111,12 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
             duration: giftExpiresAt
         },
         expiresAt: codeExpiresAt,
-        createdBy: session.uuid!
+        createdBy: session.player.uuid
     });
 
     sendModLogMessage({
         logType: ModLogType.CreateGiftCode,
-        staff: await GameProfile.getProfileByUUID(session.uuid!),
+        staff: await session.player.getGameProfile(),
         discord: false,
         code: giftCode
     });
@@ -138,7 +137,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     body: t.Object({ name: t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }), code: t.Optional(t.String({ error: 'error.wrongType;;[["field", "code"], ["type", "string"]]' })), role: t.String({ error: 'error.wrongType;;[["field", "role"], ["type", "string"]]' }), max_uses: t.Number({ error: 'error.wrongType;;[["field", "max_uses"], ["type", "number"]]' }), code_expiration: t.Optional(t.Number({ error: 'error.wrongType;;[["field", "code_expiration"], ["type", "number"]]' })), gift_duration: t.Optional(t.Number({ error: 'error.wrongType;;[["field", "gift_duration"], ["type", "number"]]' })) }, { error: 'error.invalidBody', additionalProperties: true }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).delete('/:code', async ({ session, params, i18n, status }) => { // Delete gift code
-    if(!session?.hasPermission(Permission.ManageGiftCodes)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ManageGiftCodes)) return status(403, { error: i18n('error.notAllowed') });
 
     const code = await giftCodes.findOne({ id: params.code });
     if(!code) return status(404, { error: i18n('gift_codes.not_found') });
@@ -146,7 +145,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
 
     sendModLogMessage({
         logType: ModLogType.DeleteGiftCode,
-        staff: await GameProfile.getProfileByUUID(session.uuid!),
+        staff: await session.player.getGameProfile(),
         discord: false,
         code
     });

@@ -11,7 +11,7 @@ import { config } from "../../../libs/config";
 import { Permission, permissions } from "../../../types/Permission";
 import { GlobalIcon } from "../../../types/GlobalIcon";
 import { GlobalPosition } from "../../../types/GlobalPosition";
-import { formatUUID, GameProfile, stripUUID } from "../../../libs/game-profiles";
+import { formatUUID, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
 const { validation, strictAuth } = config;
@@ -23,8 +23,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     if(strictAuth) {
         if(!session?.uuid) return status(403, { error: i18n('error.notAllowed') });
     }
-    const showBan = session?.equal || session?.hasPermission(Permission.ManageBans) || false;
-    const showRoleIconVisibility = session?.equal || session?.hasPermission(Permission.ManageRoles) || false;
+    const showBan = session?.self || session?.player?.hasPermission(Permission.ManageBans) || false;
+    const showRoleIconVisibility = session?.self || session?.player?.hasPermission(Permission.ManageRoles) || false;
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNoTag') });
@@ -83,7 +83,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     params: t.Object({ uuid: t.String({ description: 'The uuid of the player you want to fetch the info of' }) }),
     headers: t.Object({ authorization: strictAuth ? t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) : t.Optional(t.String({ description: 'Your authentication token' })) }, { error: 'error.notAllowed' }),
 }).get('/history', async ({ session, params, i18n, status }) => { // Get player's tag history
-    if(!session || session?.equal && !session.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session || session?.self && !session.player?.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNoTag') });
@@ -107,15 +107,15 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     params: t.Object({ uuid: t.String({ description: 'The uuid of the player you want to fetch the info of' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' }),
 }).post('/', async ({ session, body: { tag }, params, i18n, status }) => { // Change tag
-    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session || !session.self && !session.player?.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await getOrCreatePlayer(params.uuid);
-    if(session.equal && player.isBanned()) return status(403, { error: i18n('error.banned') });
+    if(session.self && player.isBanned()) return status(403, { error: i18n('error.banned') });
 
     let isWatched = false;
     let isWatchedInitially = false;
     const gameProfile = await player.getGameProfile();
-    if(!session.hasPermission(Permission.BypassValidation)) {
+    if(!session.player?.hasPermission(Permission.BypassValidation)) {
         tag = tag.trim().replace(multipleSpaces, ' ').replace(colorCodesWithSpaces, '').replace(hexColorCodesWithSpaces, '');
         const strippedTag = stripColors(tag);
         if(strippedTag == '') return status(422, { error: i18n('setTag.empty') });
@@ -141,10 +141,10 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     if(player.history.at(-1) != tag) player.history.push(tag);
     await player.save();
     
-    if(!session.equal) {
+    if(!session.self && session.player) {
         sendModLogMessage({
             logType: ModLogType.ChangeTag,
-            staff: await GameProfile.getProfileByUUID(session.uuid!),
+            staff: await session.player.getGameProfile(),
             user: gameProfile,
             discord: false,
             tags: {
@@ -159,7 +159,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     }
 
     if(isWatched && !isWatchedInitially) sendWatchlistTagUpdateMessage(gameProfile, tag);
-    return { message: i18n(`setTag.success.${session.equal ? 'self' : 'admin'}`) };
+    return { message: i18n(`setTag.success.${session.self ? 'self' : 'admin'}`) };
 }, {
     detail: {
         tags: ['Settings'],
@@ -177,18 +177,17 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     body: t.Object({ tag: t.String({ error: 'error.wrongType;;[["field", "tag"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).delete('/', async ({ session, params, i18n, status }) => { // Delete tag
-    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
-    const uuid = stripUUID(params.uuid);
+    if(!session || !session.self && !session.player?.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
+    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.noTag') });
-    if(session.equal && player.isBanned()) return status(403, { error: i18n('error.banned') });
+    if(session.self && player.isBanned()) return status(403, { error: i18n('error.banned') });
     if(!player.tag) return status(404, { error: i18n('error.noTag') });
 
-    if(!session.equal) {
+    if(!session.self && session.player) {
         sendModLogMessage({
             logType: ModLogType.ClearTag,
-            staff: await GameProfile.getProfileByUUID(session.uuid!),
+            staff: await session.player.getGameProfile(),
             user: await player.getGameProfile(),
             discord: false
         });
@@ -201,7 +200,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     }
     await player.save();
 
-    return { message: i18n(`resetTag.success.${session.equal ? 'self' : 'admin'}`) };
+    return { message: i18n(`resetTag.success.${session.self ? 'self' : 'admin'}`) };
 }, {
     detail: {
         tags: ['Settings'],

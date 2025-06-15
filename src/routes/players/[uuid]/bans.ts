@@ -4,11 +4,11 @@ import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 import { ModLogType, sendBanAppealMessage, sendModLogMessage } from "../../../libs/discord-notifier";
 import { sendBanEmail, sendUnbanEmail } from "../../../libs/mailer";
 import { Permission } from "../../../types/Permission";
-import { formatUUID, GameProfile, stripUUID } from "../../../libs/game-profiles";
+import { formatUUID, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get ban list
-    if(!session?.hasPermission(Permission.ManageBans)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ManageBans)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNotFound') });
@@ -38,7 +38,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).get('/:id', async ({ session, params, i18n, status }) => { // Get ban info of specific ban
-    if(!session?.hasPermission(Permission.ManageBans)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ManageBans)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNotFound') });
@@ -64,10 +64,9 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }), id: t.String({ description: 'The ban ID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).post('/', async ({ session, body: { reason, appealable, duration }, params, i18n, status }) => { // Ban player
-    if(!session?.hasPermission(Permission.ManageBans)) return status(403, { error: i18n('error.notAllowed') });
-    const uuid = stripUUID(params.uuid);
+    if(!session?.player?.hasPermission(Permission.ManageBans)) return status(403, { error: i18n('error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
+    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNotFound') });
     if(player.isBanned()) return status(409, { error: i18n('ban.already_banned') });
 
@@ -77,7 +76,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     sendModLogMessage({
         logType: ModLogType.Ban,
-        staff: await GameProfile.getProfileByUUID(session.uuid!),
+        staff: await session.player.getGameProfile(),
         user: await player.getGameProfile(),
         discord: false,
         reason: reason,
@@ -114,10 +113,9 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).patch('/', async ({ session, body: { appealable, reason }, params, i18n, status }) => { // Update ban info
-    if(!session?.hasPermission(Permission.ManageBans)) return status(403, { error: i18n('error.notAllowed') });
-    const uuid = stripUUID(params.uuid);
+    if(!session?.player?.hasPermission(Permission.ManageBans)) return status(403, { error: i18n('error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
+    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNotFound') });
     if(!player.isBanned()) return status(409, { error: i18n('ban.not_banned') });
 
@@ -128,8 +126,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     sendModLogMessage({
         logType: ModLogType.EditBan,
+        staff: await session.player.getGameProfile(),
         user: await player.getGameProfile(),
-        staff: await GameProfile.getProfileByUUID(session.uuid!),
         discord: false,
         appealable: appealable,
         reason
@@ -153,11 +151,10 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     body: t.Object({ appealable: t.Boolean({ error: 'error.wrongType;;[["field", "appealable"], ["type", "boolean"]]' }), reason: t.String({ error: 'error.wrongType;;[["field", "reason"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).post('/appeal', async ({ session, body: { reason }, params, i18n, status }) => { // Appeal ban
-    if(!session?.equal) return status(403, { error: i18n('error.notAllowed') });
-    const uuid = stripUUID(params.uuid);
+}).post('/appeal', async ({ session, body: { reason }, i18n, status }) => { // Appeal ban
+    if(!session?.self) return status(403, { error: i18n('error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
+    const { player } = session;
     if(!player || !player.isBanned()) return status(404, { error: i18n('appeal.notBanned') });
     const ban = player.bans.at(0)!;
     if(!ban.appeal.appealable) return status(403, { error: i18n('appeal.notAppealable') });
@@ -191,10 +188,9 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).delete('/', async ({ session, params, i18n, status }) => { // Unban player
-    if(!session?.hasPermission(Permission.ManageBans)) return status(403, { error: i18n('error.notAllowed') });
-    const uuid = stripUUID(params.uuid);
+    if(!session?.player?.hasPermission(Permission.ManageBans)) return status(403, { error: i18n('error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
+    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNotFound') });
     if(!player.isBanned()) return status(409, { error: i18n('ban.not_banned') });
 
@@ -203,7 +199,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     sendModLogMessage({
         logType: ModLogType.Unban,
-        staff: await GameProfile.getProfileByUUID(session.uuid!),
+        staff: await session.player.getGameProfile(),
         user: await player.getGameProfile(),
         discord: false
     });
