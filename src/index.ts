@@ -21,8 +21,8 @@ import { startEntitlementExpiry, startMetrics, startReferralReset, startRoleCach
 import { config } from "./libs/config";
 import { join } from "path";
 import ip from "./middleware/ip";
-import { generateSecureCode } from "./routes/players/[uuid]/connections";
 import { captureException } from "@sentry/bun";
+import { generateSecureCode, validateKeypair } from "./libs/crypto";
 
 if(config.mongodb.trim().length == 0) {
     Logger.error('Database connection string is empty!');
@@ -88,6 +88,7 @@ const elysia = new Elysia()
         }
         await connectDatabase(config.mongodb);
         
+        validateKeypair();
         startRoleCacheJob();
         startEntitlementExpiry();
         startRoleSynchronization();

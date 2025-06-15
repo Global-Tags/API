@@ -4,12 +4,12 @@ import { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { join } from 'path';
 import axios from "axios";
-import { generateSecureCode } from "../../routes/players/[uuid]/connections";
 import { config } from "../../libs/config";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon } from "../../types/GlobalIcon";
 import { sendCustomIconUploadMessage } from "../../libs/discord-notifier";
 import { snakeCase } from "change-case";
+import { generateSecureCode } from "../../libs/crypto";
 
 export default class CustomIconCommand extends Command {
     constructor() {
@@ -77,7 +77,7 @@ export default class CustomIconCommand extends Command {
             player.icon.name = snakeCase(GlobalIcon[GlobalIcon.Custom]);
             player.icon.hash = generateSecureCode(32);
             await player.save();
-            await Bun.write(Bun.file(join('icons', player.uuid, `${player.icon.hash}.png`)), request.data, { createPath: true });
+            await Bun.write(Bun.file(join('data', 'icons', player.uuid, `${player.icon.hash}.png`)), request.data, { createPath: true });
 
             if(!player.hasPermission(Permission.BypassValidation)) sendCustomIconUploadMessage(
                 await player.getGameProfile(),

@@ -92,14 +92,10 @@ type ModLogData = {
     key: string
 } | {
     logType: ModLogType.CreateGiftCode,
-    code: string,
-    role: string,
-    maxUses: number,
-    codeExpiration: Date | null,
-    giftDuration: number | null
+    code: GiftCode
 } | {
     logType: ModLogType.DeleteGiftCode,
-    code: string
+    code: GiftCode
 } | {
     logType: ModLogType.CreateNote | ModLogType.DeleteNote,
     note: string
@@ -387,8 +383,8 @@ function modlogDescription(data: ModLogData): string | null {
     else if(type == ModLogType.ChangeIconType) return `\`${capitalCase(data.icons.old)}\` → \`${capitalCase(data.icons.new)}\``;
     else if(type == ModLogType.ClearIconTexture) return `[\`${data.hash}\`](<${getCustomIconUrl(data.user!.uuid!, data.hash)}>)`;
     else if(type == ModLogType.CreateApiKey || type == ModLogType.RegenerateApiKey || type == ModLogType.DeleteApiKey) return `**Key name**: \`${data.key}\``;
-    else if(type == ModLogType.CreateGiftCode) return `**Name**: \`${data.code}\`. **Role**: \`${data.role}\`. **Max uses**: \`${data.maxUses}\`. **Code expires**: ${data.codeExpiration ? formatTimestamp(data.codeExpiration, 'R') : '`Never`'}. **Gift duration**: \`${data.giftDuration ? data.giftDuration.toString() : 'Permanent'}\``;
-    else if(type == ModLogType.DeleteGiftCode) return `\`${data.code}\``;
+    else if(type == ModLogType.CreateGiftCode) return `\n>>> **ID**: \`${data.code.id}\`\n**Name**: \`${data.code.name}\`\n**Type**: \`${sentenceCase(data.code.gift.type)}\`\n**Value**: \`${data.code.gift.value}\`\n**Max uses**: \`${data.code.max_uses}\`\n**Code expires**: ${data.code.expires_at ? formatTimestamp(data.code.expires_at, 'R') : '`Never`'}\n**Gift duration**: \`${data.code.gift.duration ? data.code.gift.duration.toString() : 'Permanent'}\``;
+    else if(type == ModLogType.DeleteGiftCode) return `\`${data.code.name}\` (\`#${data.code.id}\`)`;
     else if(type == ModLogType.CreateNote || type == ModLogType.DeleteNote) return `\`${data.note}\``;
     else if(type == ModLogType.DeleteReport) return `\`${data.report}\``;
     else if(type == ModLogType.CreateRole) return `\`${data.role}\``;
