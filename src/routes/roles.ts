@@ -114,7 +114,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         updated = true;
     }
     if(permissions !== undefined && permissions !== role.permissions) {
-        if(permissions < 0 || permissions > 2147483647) return status(422, { error: i18n('errors.invalid_bitfield') });
+        if(permissions < 0 || permissions > 2147483647) return status(422, { error: i18n('error.invalid_bitfield') });
         role.permissions = permissions;
         updated = true;
     }
