@@ -107,7 +107,7 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
 
     if(!metadata) return status(422, { error: i18n('icon.upload.invalidMetadata') });
     if(metadata.format != 'png') return status(422, { error: i18n('icon.upload.wrongFormat')});
-    if(!metadata.height || metadata.height != metadata.width) return status(422, { error: i18n('icon.upload.wrongSize')});
+    if(!metadata.height || metadata.height != metadata.width) return status(422, { error: i18n('icon.upload.wrongResolution')});
     if(metadata.height > config.validation.icon.maxResolution) return status(422, { error: i18n('icon.upload.exceedsMaxResolution').replaceAll('<max>', config.validation.icon.maxResolution.toString()) });
 
     player.icon.name = snakeCase(GlobalIcon[GlobalIcon.Custom]);

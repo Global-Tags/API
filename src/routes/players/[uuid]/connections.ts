@@ -90,7 +90,6 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, i18n, 
             ['greeting', i18n('email.greeting')],
             ['description', i18n('email.verification.description')],
             ['code', player.connections.email.code],
-            ['button', i18n('email.verification.button')],
             ['note', i18n('email.verification.note')],
             ['footer', i18n('email.footer')],
         ]

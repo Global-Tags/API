@@ -31,7 +31,6 @@
         "not_found": "Ban not found!",
         "already_banned": "This player is already banned!",
         "not_banned": "This player is not banned!",
-        "no_reason": "No reason provided",
         "banned": "The player was successfully banned!",
         "unbanned": "The player was successfully unbanned!"
     },
@@ -98,6 +97,22 @@
             "admin": "The player's tag was successfully updated!"
         }
     },
+    "staff": {
+        "categories": {
+            "not_found": "The category was not found!",
+            "delete": {
+                "success": "The category was successfully deleted!"
+            }
+        },
+        "members": {
+            "not_found": "Unknown staff member!",
+            "invalid_uuid": "The UUID is not valid!",
+            "already_exists": "This UUID is already assigned to a staff member!",
+            "delete": {
+                "success": "The staff member was successfully deleted!"
+            }
+        }
+    },
     "referral": {
         "self": "You can't refer yourself!",
         "alreadyReferred": "You have already marked a player as your referrer!",
@@ -147,10 +162,6 @@
     },
     "roles": {
         "not_found": "The role was not found!",
-        "create": {
-            "already_exists": "The role '<role>' already exists!",
-            "success": "The role was successfully created!"
-        },
         "delete": {
             "success": "The role was successfully deleted!"
         }
