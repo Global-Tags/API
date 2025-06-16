@@ -8,8 +8,10 @@ import { fetchGuild } from "../../bot/bot";
 import players from "./players";
 
 interface IRole {
+    id: string,
     name: string,
     position: number,
+    color?: string | null,
     hasIcon: boolean,
     sku?: string | null,
     permissions: number,
@@ -23,6 +25,11 @@ export type Role = HydratedDocument<IRole>;
 const cachedRoles: Role[] = [];
 
 const schema = new Schema<IRole>({
+    id: {
+        type: String,
+        required: true,
+        unique: true
+    },
     name: {
         type: String,
         required: true
@@ -30,6 +37,11 @@ const schema = new Schema<IRole>({
     position: {
         type: Number,
         required: true
+    },
+    color: {
+        type: String,
+        required: false,
+        default: null
     },
     hasIcon: {
         type: Boolean,
@@ -67,7 +79,7 @@ const schema = new Schema<IRole>({
     }
 });
 
-const roleModel = model<IRole>('roles', schema);
+const Roles = model<IRole>('roles', schema);
 
 export function getCachedRoles(): Role[] {
     return cachedRoles;
@@ -78,6 +90,7 @@ const defaultRoles = [
         name: 'admin',
         position: 0,
         hasIcon: false,
+        color: 'FF0000',
         sku: null,
         permissions: Permission.Administrator
     }
@@ -86,9 +99,9 @@ const defaultRoles = [
 export async function updateRoleCache(): Promise<void> {
     if(!isConnected()) return;
     cachedRoles.length = 0;
-    let roles = await roleModel.find();
+    let roles = await Roles.find();
     if(roles.length == 0) {
-        cachedRoles.push(...await roleModel.insertMany(defaultRoles));
+        cachedRoles.push(...await Roles.insertMany(defaultRoles));
     }
 
     for(const role of roles) {
@@ -100,7 +113,7 @@ export async function updateRoleCache(): Promise<void> {
 
 export async function getNextPosition(): Promise<number> {
     if(!isConnected()) return -1;
-    const roles = await roleModel.find();
+    const roles = await Roles.find();
     roles.sort((a, b) => a.position - b.position);
     return roles[roles.length - 1].position + 1;
 }
@@ -138,4 +151,4 @@ export async function synchronizeRoles() {
     }
 }
 
-export default roleModel;
+export default Roles;
