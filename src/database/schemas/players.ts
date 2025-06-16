@@ -15,7 +15,15 @@ export type PlayerRole = {
     reason?: string | null
 }
 
-export interface IPlayer {
+export type ApiKey = {
+    id: string,
+    name: string,
+    key: string,
+    created_at: Date,
+    last_used?: Date | null
+}
+
+interface IPlayer {
     uuid: string,
     tag?: string | null,
     position: string,
@@ -43,12 +51,7 @@ export interface IPlayer {
         expires_at?: Date | null,
         reason?: string | null
     }[],
-    api_keys: {
-        name: string,
-        key: string,
-        created_at: Date,
-        last_used?: Date | null
-    }[],
+    api_keys: ApiKey[],
     notes: { id: string, text: string, author: string, createdAt: Date }[],
     bans: {
         appeal: {
@@ -68,6 +71,30 @@ export interface IPlayer {
         discord: { id?: string | null, code?: string | null },
         email: { address?: string | null, code?: string | null }
     },
+
+    //* API Keys
+
+    /**
+     * 
+     * @param name The name of the API key to create
+     * @returns The created API key object
+     */
+    createApiKey(name: string): ApiKey;
+
+    /**
+     * 
+     * @param id The ID of the API key to retrieve
+     * @returns The API key object if found, otherwise null
+     */
+    getApiKey(id: string): ApiKey | null;
+
+    /**
+     * 
+     * @param id The ID of the API key to delete
+     * @return True if the API key was deleted, otherwise false
+     */
+    deleteApiKey(id: string): boolean;
+
     getGameProfile(): Promise<GameProfile>,
     getReferrer(): Promise<Player | null>
     addReferral(uuid: string): void,
@@ -86,7 +113,6 @@ export interface IPlayer {
     unban(): void,
     clearTag(staff: string): void,
     clearIconTexture(staff: string): void,
-    createApiKey(name: string): string,
     createNote({ text, author }: { text: string, author: string }): void,
     existsNote(id: string): boolean,
     deleteNote(id: string): void,
@@ -213,6 +239,10 @@ const schema = new Schema<IPlayer>({
     },
     api_keys: {
         type: [{
+            id: {
+                type: String,
+                required: true
+            },
             name: {
                 type: String,
                 required: true
@@ -322,6 +352,31 @@ const schema = new Schema<IPlayer>({
     }
 }, {
     methods: {
+        createApiKey(name: string): ApiKey {
+            const key = {
+                id: generateSecureCode(),
+                name,
+                key: `sk_${generateSecureCode(32)}`,
+                created_at: new Date(),
+                last_used: null
+            }
+            this.api_keys.push(key);
+            return key;
+        },
+
+        getApiKey(id: string): ApiKey | null {
+            const key = this.api_keys.find((key) => key.id == id);
+            if(!key) return null;
+            return key;
+        },
+
+        deleteApiKey(id: string): boolean {
+            const index = this.api_keys.findIndex((key) => key.id == id);
+            if(index === -1) return false;
+            this.api_keys.splice(index, 1);
+            return true;
+        },
+
         async getGameProfile(): Promise<GameProfile> {
             return await GameProfile.getProfileByUUID(this.uuid);
         },
@@ -482,19 +537,6 @@ const schema = new Schema<IPlayer>({
             })
             this.icon.name = snakeCase(GlobalIcon[GlobalIcon.None]);
             this.icon.hash = null;
-        },
-
-        createApiKey(name: string): string {
-            const key = `sk_${generateSecureCode(32)}`;
-            
-            this.api_keys.push({
-                name,
-                key: key,
-                created_at: new Date(),
-                last_used: null
-            });
-
-            return key;
         },
 
         createNote({ text, author }: { text: string, author: string }) {

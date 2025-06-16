@@ -17,7 +17,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
                 uuid: member.uuid,
                 username: (await GameProfile.getProfileByUUID(member.uuid)).username || 'Failed to load',
                 description: member.description || null,
-                avatar_url: 'https://example.com/avatar.png',
+                avatar_url: 'https://example.com/avatar.png', // TODO: Replace with actual avatar URL logic
                 joined_at: member.joined_at.getTime()
             })));
 
@@ -109,7 +109,42 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         },
         body: t.Object({ name: t.String({ minLength: 1, error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }) }, { additionalProperties: true, error: 'error.invalidBody' }),
         headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-    }).delete('/:category', async ({ session, params: { category: id }, i18n, status }) => {
+    }).patch('/:id', async ({ session, body: { name }, params: { id }, i18n, status }) => { // Edit category
+        if(!session?.player?.hasPermission(Permission.EditStaffMembers)) return status(403, { error: i18n('error.notAllowed') });
+
+        const category = await staffCategories.findOne({ id });
+        if(!category) return status(404, { error: i18n('staff.categories.not_found') });
+
+        if(name && category.name !== name.trim()) {
+            category.name = name.trim();
+            await category.save();
+
+            // TODO: Add mod log
+        }
+
+        return status(200, {
+            id: category.id,
+            name: category.name,
+            position: category.position
+        });
+    }, {
+        detail: {
+            tags: ['API'],
+            description: 'Edits an existing staff category'
+        },
+        response: {
+            200: t.Object({ id: t.String(), name: t.String(), position: t.Integer() }, { description: 'The edited team category' }),
+            403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage staff categories' }),
+            404: t.Object({ error: t.String() }, { description: 'Category not found' }),
+            503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        },
+        body: t.Object({
+            name: t.Optional(t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }))
+        }, { additionalProperties: true, error: 'error.invalidBody' }),
+        params: t.Object({ id: t.String({ description: 'The category ID' }) }),
+        headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    }) // TODO: Implement route to patch all categories at once
+    .delete('/:category', async ({ session, params: { category: id }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.DeleteStaffCategories)) return status(403, { error: i18n('error.notAllowed') });
 
         const category = await staffCategories.findOne({ id });
@@ -215,9 +250,9 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         },
         response: {
             201: t.Object({ uuid: t.String(), username: t.String(), category: t.String(), description: t.Union([t.String(), t.Null()]), joined_at: t.Integer() }, { description: 'The created team member' }),
+            400: t.Object({ error: t.String() }, { description: 'An invalid UUID was passed' }),
             403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage staff members' }),
             404: t.Object({ error: t.String() }, { description: 'Category not found' }),
-            400: t.Object({ error: t.String() }, { description: 'An invalid UUID was passed' }),
             409: t.Object({ error: t.String() }, { description: 'Member already exists' }),
             503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
         },
@@ -243,7 +278,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
             member.description = description?.trim() || null;
             updated = true;
         }
-        if(updated) member.save();
+        if(updated) member.save(); // TODO: Add mod log
 
         return status(200, {
             uuid: formatUUID(member.uuid),
@@ -260,9 +295,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         response: {
             200: t.Object({ uuid: t.String(), username: t.String(), category: t.String(), description: t.Union([t.String(), t.Null()]), joined_at: t.Integer() }, { description: 'The edited team member' }),
             403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage staff members' }),
-            404: t.Object({ error: t.String() }, { description: 'Category not found' }),
-            400: t.Object({ error: t.String() }, { description: 'An invalid UUID was passed' }),
-            409: t.Object({ error: t.String() }, { description: 'Member already exists' }),
+            404: t.Object({ error: t.String() }, { description: 'Mmeber or category not found' }),
             503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
         },
         body: t.Object({
