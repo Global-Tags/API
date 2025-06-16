@@ -79,7 +79,7 @@ const defaultRoles = [
         position: 0,
         hasIcon: false,
         sku: null,
-        permissions: 0
+        permissions: Permission.Administrator
     }
 ]
 
