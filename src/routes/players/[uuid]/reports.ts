@@ -2,11 +2,11 @@ import { t } from "elysia";
 import players, { getOrCreatePlayer } from "../../../database/schemas/players";
 import { Permission } from "../../../types/Permission";
 import { ModLogType, sendModLogMessage, sendReportMessage } from "../../../libs/discord-notifier";
-import { formatUUID, GameProfile, stripUUID } from "../../../libs/game-profiles";
+import { formatUUID, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get reports
-    if(!session?.hasPermission(Permission.ManageReports)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ViewReports)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNotFound') });
@@ -34,17 +34,16 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to get the reports of' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
 }).post('/', async ({ session, body: { reason }, params, i18n, status }) => { // Report player
-    const uuid = stripUUID(params.uuid);
-    if(!session?.uuid) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player) return status(403, { error: i18n('error.notAllowed') });
 
-    if(session.equal) return status(403, { error: i18n('report.self') });
-    const player = await players.findOne({ uuid });
+    if(session.self) return status(403, { error: i18n('report.self') });
+    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('error.playerNoTag') });
     if(player.isBanned()) return status(403, { error: i18n('ban.already_banned') });
     if(player.hasPermission(Permission.ReportImmunity)) return status(403, { error: i18n('report.immune') });
     if(!player.tag) return status(404, { error: i18n('report.noTag') });
 
-    const reporter = await getOrCreatePlayer(session.uuid);
+    const reporter = await getOrCreatePlayer(session.uuid!);
     if(reporter.isBanned()) return status(403, { error: i18n('error.banned') });
     if(player.reports.some((report) => report.by == reporter.uuid && report.reported_tag == player.tag)) return status(409, { error: i18n('report.alreadyReported') });
     if(reason.trim() == '') return status(422, { error: i18n('report.invalidReason') });
@@ -80,8 +79,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     body: t.Object({ reason: t.String({ minLength: 2, maxLength: 200, error: 'report.validation;;[["min", "2"], ["max", "200"]]', description: 'The report reason' }) }, { error: 'error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to report' }) }),
     headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).delete(`/:id`, async ({ session, params: { uuid, id }, i18n, status }) => { // Delete report
-    if(!session?.hasPermission(Permission.ManageReports)) return status(403, { error: i18n('error.notAllowed') });
+}).delete('/:id', async ({ session, params: { uuid, id }, i18n, status }) => { // Delete report
+    if(!session?.player?.hasPermission(Permission.DeleteReports)) return status(403, { error: i18n('error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(uuid) });
     if(!player) return status(404, { error: i18n(`error.playerNotFound`) });
@@ -94,7 +93,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     sendModLogMessage({
         logType: ModLogType.DeleteReport,
-        staff: await GameProfile.getProfileByUUID(session.uuid!),
+        staff: await session.player.getGameProfile(),
         user: await player.getGameProfile(),
         discord: false,
         report: `\`${report.reason}\` (\`#${report.id}\`)`

@@ -10,7 +10,7 @@ export default class SetSkuMenu extends SelectMenu {
     constructor() {
         super({
             id: 'setSku_',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.EditRoles]
         });
     }
 

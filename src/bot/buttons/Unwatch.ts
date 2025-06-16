@@ -9,7 +9,7 @@ export default class UnwatchButton extends Button {
     constructor() {
         super({
             id: 'unwatch_',
-            requiredPermissions: [Permission.ManageWatchlist]
+            requiredPermissions: [Permission.ManageWatchlistEntries]
         });
     }
 

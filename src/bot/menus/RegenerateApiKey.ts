@@ -10,7 +10,7 @@ export default class RegenerateApiKeyMenu extends SelectMenu {
     constructor() {
         super({
             id: 'regenerateApiKey_',
-            requiredPermissions: [Permission.ManageApiKeys]
+            requiredPermissions: [Permission.EditApiKeys]
         });
     }
 

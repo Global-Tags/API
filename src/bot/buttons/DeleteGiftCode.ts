@@ -9,7 +9,7 @@ export default class DeleteGiftCodeButton extends Button {
     constructor() {
         super({
             id: 'deleteGiftCode',
-            requiredPermissions: [Permission.ManageGiftCodes]
+            requiredPermissions: [Permission.DeleteGiftCodes]
         });
     }
 

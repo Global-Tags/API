@@ -10,7 +10,7 @@ export default class TagHistoryButton extends Button {
     constructor() {
         super({
             id: 'tagHistory_',
-            requiredPermissions: [Permission.ManageTags]
+            requiredPermissions: [Permission.ViewTagHistory]
         });
     }
     

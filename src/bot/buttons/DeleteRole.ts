@@ -11,7 +11,7 @@ export default class DeleteRole extends Button {
     constructor() {
         super({
             id: 'deleteRole',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.DeleteRoles]
         });
     }
 

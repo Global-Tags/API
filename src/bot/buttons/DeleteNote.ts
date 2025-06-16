@@ -9,7 +9,7 @@ export default class DeleteNoteButton extends Button {
     constructor() {
         super({
             id: 'deleteNote_',
-            requiredPermissions: [Permission.ManageNotes]
+            requiredPermissions: [Permission.DeleteNotes]
         });
     }
     

@@ -10,23 +10,23 @@ import { sendTagChangeEmail } from "../../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 
 export default (app: ElysiaApp) => app.post('/', async ({ session, body: { position }, params, i18n, status }) => { // Change tag position
-    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session || !session.self && !session.player?.hasPermission(Permission.ManagePlayerPositions)) return status(403, { error: i18n('error.notAllowed') });
 
     position = position.toLowerCase();
     if(!(capitalCase(position) in GlobalPosition)) return status(422, { error: i18n('position.invalid') });
 
     const player = await getOrCreatePlayer(params.uuid);
-    if(session.equal && player.isBanned()) return status(403, { error: i18n('error.banned') });
+    if(session.self && player.isBanned()) return status(403, { error: i18n('error.banned') });
     if(snakeCase(player.position) == position) return status(400, { error: i18n('position.samePosition') });
 
     const oldPosition = player.position;
     player.position = position;
     await player.save();
 
-    if(!session.equal) {
+    if(!session.self && session.player) {
         sendModLogMessage({
             logType: ModLogType.EditPosition,
-            staff: await GameProfile.getProfileByUUID(session.uuid!),
+            staff: await session.player.getGameProfile(),
             user: await player.getGameProfile(),
             discord: false,
             positions: {
@@ -40,7 +40,7 @@ export default (app: ElysiaApp) => app.post('/', async ({ session, body: { posit
         }
     }
 
-    return { message: i18n(`position.success.${session.equal ? 'self' : 'admin'}`) };
+    return { message: i18n(`position.success.${session.self ? 'self' : 'admin'}`) };
 }, {
     detail: {
         tags: ['Settings'],

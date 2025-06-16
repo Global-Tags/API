@@ -9,7 +9,7 @@ export default class BanHistoryButton extends Button {
     constructor() {
         super({
             id: 'banHistory_',
-            requiredPermissions: [Permission.ManageBans]
+            requiredPermissions: [Permission.ViewBans]
         });
     }
     

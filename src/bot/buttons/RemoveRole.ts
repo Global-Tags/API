@@ -9,7 +9,7 @@ export default class RemoveRoleButton extends Button {
     constructor() {
         super({
             id: 'removeRole_',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.ManagePlayerRoles]
         });
     }
 

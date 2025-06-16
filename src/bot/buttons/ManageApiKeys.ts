@@ -8,7 +8,7 @@ export default class ManageApiKeysButton extends Button {
     constructor() {
         super({
             id: 'manageApiKeys_',
-            requiredPermissions: [Permission.ManageApiKeys]
+            requiredPermissions: [Permission.ViewApiKeys]
         });
     }
 

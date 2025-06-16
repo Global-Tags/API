@@ -12,7 +12,7 @@ export default class RolesCommand extends Command {
         super({
             name: 'roles',
             description: 'Manage roles',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.ViewRoles]
         });
     }    
 

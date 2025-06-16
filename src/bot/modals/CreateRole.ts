@@ -11,7 +11,7 @@ export default class CreateRoleModal extends Modal {
     constructor() {
         super({
             id: 'createRole',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.CreateRoles]
         });
     }
 

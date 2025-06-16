@@ -9,7 +9,7 @@ export default class EditRoleNoteModal extends Modal {
     constructor() {
         super({
             id: 'editRoleNote_',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.EditRoles]
         });
     }
 

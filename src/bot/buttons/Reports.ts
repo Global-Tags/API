@@ -10,7 +10,7 @@ export default class ReportsButton extends Button {
     constructor() {
         super({
             id: 'reports_',
-            requiredPermissions: [Permission.ManageReports]
+            requiredPermissions: [Permission.ViewReports]
         });
     }
     

@@ -29,7 +29,7 @@ export default class PlayerInfoCommand extends Command {
 
         const or: any[] = [{ uuid: stripUUID(resolvable) }, { uuid: (await GameProfile.getProfileByUsername(resolvable))?.uuid }];
         if(player) {
-            if(player.hasPermission(Permission.ManageConnections)) {
+            if(player.hasPermission(Permission.ViewConnections)) {
                 or.push({ 'connections.discord.id': resolvable });
                 or.push({ 'connections.email.address': resolvable });
             }

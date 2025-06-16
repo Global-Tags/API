@@ -10,7 +10,7 @@ export default class SetIconTypeButton extends Button {
     constructor() {
         super({
             id: 'setIconType_',
-            requiredPermissions: [Permission.ManageTags]
+            requiredPermissions: [Permission.ManagePlayerIcons]
         })
     }
     

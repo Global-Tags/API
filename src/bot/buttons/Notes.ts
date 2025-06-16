@@ -10,7 +10,7 @@ export default class NotesButton extends Button {
     constructor() {
         super({
             id: 'notes_',
-            requiredPermissions: [Permission.ManageNotes]
+            requiredPermissions: [Permission.ViewNotes]
         });
     }
     

@@ -10,7 +10,7 @@ export default class EditRoleExpirationModal extends Modal {
     constructor() {
         super({ 
             id: 'editRoleExpiration_',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.EditRoles]
         });
     }
 

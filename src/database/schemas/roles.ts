@@ -1,7 +1,6 @@
 import { HydratedDocument, model, Schema } from "mongoose"
 import { config } from "../../libs/config";
-import { pascalCase } from "change-case";
-import { Permission } from "../../types/Permission";
+import { Permission, permissions } from "../../types/Permission";
 import { isConnected } from "../mongo";
 import Logger from "../../libs/Logger";
 import playerSchema from "./players";
@@ -13,9 +12,9 @@ interface IRole {
     position: number,
     hasIcon: boolean,
     sku?: string | null,
-    permissions: string[],
+    permissions: number,
     getPermissions(): Permission[],
-    hasPermission(permission: Permission): boolean,
+    hasPermission(permission: Permission, ignoreAdmin?: boolean): boolean,
     getSyncedRoles(): string[],
     rename(name: string): Promise<void>
 }
@@ -41,19 +40,17 @@ const schema = new Schema<IRole>({
         required: false
     },
     permissions: {
-        type: [String],
+        type: Number,
         required: true
     }
 }, {
     methods: {
         getPermissions(): Permission[] {
-            return this.permissions
-                .filter((permission) => pascalCase(permission) in Permission)
-                .map((permission) => Permission[pascalCase(permission) as keyof typeof Permission]);
+            return permissions.filter((permission) => this.hasPermission(permission));
         },
 
-        hasPermission(permission: Permission): boolean {
-            return this.getPermissions().includes(permission);
+        hasPermission(permission: Permission, ignoreAdmin: boolean = false): boolean {
+            return (this.permissions & permission) === permission || (!ignoreAdmin && this.hasPermission(Permission.Administrator, true));
         },
 
         getSyncedRoles(): string[] {
@@ -82,19 +79,7 @@ const defaultRoles = [
         position: 0,
         hasIcon: false,
         sku: null,
-        permissions: [
-            'bypass_validation',
-            'custom_icon',
-            'manage_api_keys',
-            'manage_bans',
-            'manage_connections',
-            'manage_notes',
-            'manage_reports',
-            'manage_roles',
-            'manage_tags',
-            'manage_watchlist',
-            'report_immunity'
-        ]
+        permissions: Permission.Administrator
     }
 ]
 

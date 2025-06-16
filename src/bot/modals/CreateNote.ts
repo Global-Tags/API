@@ -9,7 +9,7 @@ export default class CreateNoteModal extends Modal {
     constructor() {
         super({
             id: 'createNote_',
-            requiredPermissions: [Permission.ManageNotes]
+            requiredPermissions: [Permission.CreateNotes]
         });
     }
 

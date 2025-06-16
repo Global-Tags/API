@@ -10,7 +10,7 @@ export default class CreateGiftCodeButton extends Button {
     constructor() {
         super({
             id: 'createGiftCode',
-            requiredPermissions: [Permission.ManageGiftCodes]
+            requiredPermissions: [Permission.CreateGiftCodes]
         });
     }
 

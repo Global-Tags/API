@@ -11,7 +11,7 @@ export default class GiftCodesCommand extends Command {
         super({
             name: 'gift-codes',
             description: 'Manage gift codes.',
-            requiredPermissions: [Permission.ManageGiftCodes]
+            requiredPermissions: [Permission.ViewGiftCodes]
         });
     }
 

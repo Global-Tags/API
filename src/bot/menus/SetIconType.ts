@@ -11,7 +11,7 @@ export default class SetIconTypeMenu extends SelectMenu {
     constructor() {
         super({
             id: 'setIconType_',
-            requiredPermissions: [Permission.ManageTags],
+            requiredPermissions: [Permission.ManagePlayerIcons],
         });
     }
 

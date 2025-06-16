@@ -11,7 +11,7 @@ export default class ManageRoleMenu extends SelectMenu {
     constructor() {
         super({
             id: 'manageRole',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.EditRoles]
         });
     }
 

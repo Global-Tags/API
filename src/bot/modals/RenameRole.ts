@@ -12,7 +12,7 @@ export default class RenameRoleModal extends Modal {
     constructor() {
         super({
             id: 'renameRole_',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.EditRoles]
         });
     }
 

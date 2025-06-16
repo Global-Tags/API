@@ -8,7 +8,7 @@ export default class ManageWatchlistButton extends Button {
     constructor() {
         super({
             id: 'manageWatchlist_',
-            requiredPermissions: [Permission.ManageWatchlist]
+            requiredPermissions: [Permission.ManageWatchlistEntries]
         });
     }
 

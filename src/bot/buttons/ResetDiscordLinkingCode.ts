@@ -9,7 +9,7 @@ export default class ResetDiscordLinkingCodeButton extends Button {
     constructor() {
         super({
             id: 'resetDiscordLinkingCode_',
-            requiredPermissions: [Permission.ManageConnections]
+            requiredPermissions: [Permission.RemoveConnections]
         });
     }
 

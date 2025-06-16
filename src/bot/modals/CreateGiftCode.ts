@@ -11,7 +11,7 @@ export default class CreateGiftCodeModal extends Modal {
     constructor() {
         super({
             id: 'createGiftCode_',
-            requiredPermissions: [Permission.ManageGiftCodes]
+            requiredPermissions: [Permission.CreateGiftCodes]
         });
     }
 

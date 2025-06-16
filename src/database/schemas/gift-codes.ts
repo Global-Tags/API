@@ -113,7 +113,7 @@ export async function createGiftCode({
         created_by: stripUUID(createdBy),
         created_at: new Date(),
         expires_at: expiresAt || null
-    });;
+    });
 }
 
 export default model;
