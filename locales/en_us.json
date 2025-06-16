@@ -19,7 +19,6 @@
         "not_found": "Gift code not found!",
         "already_redeemed": "You have already redeemed this gift code!",
         "already_have_role": "You already have the role!",
-        "created": "The gift code was successfully created!",
         "deleted": "The gift code was successfully deleted!",
         "redeemed_temporarily": "You have received the \"<role>\" role temporarily!",
         "redeemed_permanently": "You have received the \"<role>\" role permanently!"

@@ -23,7 +23,7 @@ export type ApiKey = {
     last_used?: Date | null
 }
 
-export interface IPlayer {
+interface IPlayer {
     uuid: string,
     tag?: string | null,
     position: string,

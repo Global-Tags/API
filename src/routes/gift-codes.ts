@@ -121,14 +121,28 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         code: giftCode
     });
 
-    return { message: i18n('gift_codes.created'), code: giftCode.code };
+    return {
+        id: giftCode.id,
+        name: giftCode.name,
+        code: giftCode.code,
+        uses: giftCode.uses.map((uuid) => formatUUID(uuid)),
+        max_uses: giftCode.max_uses,
+        gift: {
+            type: giftCode.gift.type,
+            value: giftCode.gift.value,
+            duration: giftCode.gift.duration || null
+        },
+        created_by: formatUUID(giftCode.created_by),
+        created_at: giftCode.created_at.getTime(),
+        expires_at: giftCode.expires_at?.getTime() || null
+    };
 }, {
     detail: {
         tags: ['Gift codes'],
         description: 'Creates a new gift code'
     },
     response: {
-        200: t.Object({ message: t.String(), code: t.String() }, { description: 'The gift code was created' }),
+        200: t.Object({ id: t.String(), name: t.String(), code: t.String(), uses: t.Array(t.String()), max_uses: t.Number(), gift: t.Object({ type: t.String(), value: t.String(), duration: t.Union([t.Number(), t.Null()]) }), created_at: t.Number(), expires_at: t.Union([t.Number(), t.Null()]) }, { description: 'The gift code was created' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage gift codes' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
