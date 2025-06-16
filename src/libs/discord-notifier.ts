@@ -7,6 +7,7 @@ import { config } from "./config";
 import { stripColors, translateToAnsi } from "./chat-color";
 import { GiftCode } from "../database/schemas/gift-codes";
 import Logger from "./Logger";
+import { ApiKey } from "../database/schemas/players";
 
 export enum ModLogType {
     ChangeTag,
@@ -46,6 +47,9 @@ type ModLogData = {
     logType: ModLogType,
     staff: GameProfile,
     user?: GameProfile,
+    /**
+     * @deprecated Discord actions will be removed in the future
+     */
     discord: boolean
 } & ({
     logType: ModLogType.ChangeTag,
@@ -89,7 +93,7 @@ type ModLogData = {
     logType: ModLogType.Unwatch
 } | {
     logType: ModLogType.CreateApiKey | ModLogType.RegenerateApiKey | ModLogType.DeleteApiKey,
-    key: string
+    key: ApiKey
 } | {
     logType: ModLogType.CreateGiftCode,
     code: GiftCode

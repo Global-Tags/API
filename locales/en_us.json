@@ -26,9 +26,6 @@
     },
     "api_keys": {
         "not_found": "The API key was not found!",
-        "already_exists": "An API key with this name already exists!",
-        "created": "The API key was successfully created!",
-        "regenerated": "The API key was successfully regenerated!",
         "deleted": "The API key was successfully deleted!"
     },
     "ban": {
