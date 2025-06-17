@@ -62,7 +62,7 @@ export default (app: ElysiaApp) => app.get('/', () => ({
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     query: t.Object({
-        latest: t.Optional(t.String({ error: 'error.wrongType;;[["field", "element"], ["type", "string"]]' }))
+        latest: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "element"], ["type", "string"]]' }))
     }, { additionalProperties: true })
 }).get('/referrals', async () => {
     const data = await players.find();
