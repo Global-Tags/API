@@ -6,10 +6,10 @@ import { formatUUID, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get reports
-    if(!session?.player?.hasPermission(Permission.ViewReports)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ViewReports)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return status(404, { error: i18n('error.playerNotFound') });
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     return player.reports.map((report) => ({
         id: report.id,
@@ -32,21 +32,21 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to get the reports of' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 }).post('/', async ({ session, body: { reason }, params, i18n, status }) => { // Report player
-    if(!session?.player) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player) return status(403, { error: i18n('$.error.notAllowed') });
 
-    if(session.self) return status(403, { error: i18n('report.self') });
+    if(session.self) return status(403, { error: i18n('$.report.self') });
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return status(404, { error: i18n('error.playerNoTag') });
-    if(player.isBanned()) return status(403, { error: i18n('ban.already_banned') });
-    if(player.hasPermission(Permission.ReportImmunity)) return status(403, { error: i18n('report.immune') });
-    if(!player.tag) return status(404, { error: i18n('error.playerNoTag') });
+    if(!player) return status(404, { error: i18n('$.error.playerNoTag') });
+    if(player.isBanned()) return status(403, { error: i18n('$.ban.already_banned') });
+    if(player.hasPermission(Permission.ReportImmunity)) return status(403, { error: i18n('$.report.immune') });
+    if(!player.tag) return status(404, { error: i18n('$.error.playerNoTag') });
 
     const reporter = await getOrCreatePlayer(session.uuid!);
-    if(reporter.isBanned()) return status(403, { error: i18n('error.banned') });
-    if(player.reports.some((report) => report.by == reporter.uuid && report.reported_tag == player.tag)) return status(409, { error: i18n('report.alreadyReported') });
-    if(reason.trim() == '') return status(422, { error: i18n('report.invalidReason') });
+    if(reporter.isBanned()) return status(403, { error: i18n('$.error.banned') });
+    if(player.reports.some((report) => report.by == reporter.uuid && report.reported_tag == player.tag)) return status(409, { error: i18n('$.report.alreadyReported') });
+    if(reason.trim() == '') return status(422, { error: i18n('$.report.invalidReason') });
 
     player.createReport({
         by: reporter.uuid,
@@ -61,7 +61,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         tag: player.tag,
         reason
     });
-    return { message: i18n('report.success') };
+    return { message: i18n('$.report.success') };
 }, {
     detail: {
         tags: ['Interactions'],
@@ -76,17 +76,17 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ reason: t.String({ minLength: 2, maxLength: 200, error: 'report.validation;;[["min", "2"], ["max", "200"]]', description: 'The report reason' }) }, { error: 'error.invalidBody', additionalProperties: true }),
+    body: t.Object({ reason: t.String({ minLength: 2, maxLength: 200, error: '$.report.validation;;[["min", "2"], ["max", "200"]]', description: 'The report reason' }) }, { error: '$.error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The UUID of the player you want to report' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 }).delete('/:id', async ({ session, params: { uuid, id }, i18n, status }) => { // Delete report
-    if(!session?.player?.hasPermission(Permission.DeleteReports)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.DeleteReports)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(uuid) });
-    if(!player) return status(404, { error: i18n(`error.playerNotFound`) });
+    if(!player) return status(404, { error: i18n(`$.error.playerNotFound`) });
 
     const report = player.reports.find((report) => report.id == id.trim());
-    if(!report) return status(404, { error: i18n(`report.delete.not_found`) });
+    if(!report) return status(404, { error: i18n(`$.report.delete.not_found`) });
 
     player.deleteReport(report.id);
     await player.save();
@@ -99,7 +99,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         report: `\`${report.reason}\` (\`#${report.id}\`)`
     });
 
-    return { message: i18n(`report.delete.success`) };
+    return { message: i18n(`$.report.delete.success`) };
 }, {
     detail: {
         tags: ['Admin'],
@@ -114,5 +114,5 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }), id: t.String({ description: 'The report ID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 });;

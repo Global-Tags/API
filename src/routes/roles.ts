@@ -5,7 +5,7 @@ import roles, { getCachedRoles, getNextPosition, updateRoleCache } from "../data
 import { ElysiaApp } from "..";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }) => { // Get roles
-    if(!session?.player?.hasPermission(Permission.ViewRoles)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ViewRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
     return getCachedRoles().map((role) => ({
         id: role.id,
@@ -27,12 +27,12 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 }).get('/:id', async ({ session, params: { id }, i18n, status }) => { // Get specific role
-    if(!session?.player?.hasPermission(Permission.ViewRoles)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ViewRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const role = getCachedRoles().find((role) => role.id == id);
-    if(!role) return status(404, { error: i18n('roles.not_found') });
+    if(!role) return status(404, { error: i18n('$.roles.not_found') });
 
     return {
         id: role.id,
@@ -56,9 +56,9 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ id: t.String({ description: 'The role ID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 }).post('/', async ({ session, body, i18n, status }) => { // Create role
-    if(!session?.player?.hasPermission(Permission.CreateRoles)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.CreateRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const role = await roles.insertOne({
         name: body.name.trim(),
@@ -96,13 +96,13 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ name: t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }), color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6, error: 'error.wrongType;;[["field", "color"], ["type", "string"]]' }))), permissions: t.Optional(t.Integer({ error: 'error.wrongType;;[["field", "permissions"], ["type", "integer"]]' })) }, { error: 'error.invalidBody', additionalProperties: true }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    body: t.Object({ name: t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' }), color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6, error: '$.error.wrongType;;[["field", "color"], ["type", "string"]]' }))), permissions: t.Optional(t.Integer({ error: '$.error.wrongType;;[["field", "permissions"], ["type", "integer"]]' })) }, { error: '$.error.invalidBody', additionalProperties: true }),
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 }).patch('/:id', async ({ session, params, body: { name, color, permissions }, i18n, status }) => { // Edit role
-    if(!session?.player?.hasPermission(Permission.DeleteRoles)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.DeleteRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const role = await roles.findOne({ id: params.id });
-    if(!role) return status(404, { error: i18n('roles.not_found') });
+    if(!role) return status(404, { error: i18n('$.roles.not_found') });
 
     let updated = false;
     if(name && name.trim() !== role.name) {
@@ -114,7 +114,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         updated = true;
     }
     if(permissions !== undefined && permissions !== role.permissions) {
-        if(permissions < 0 || permissions > 2147483647) return status(422, { error: i18n('error.invalid_bitfield') });
+        if(permissions < 0 || permissions > 2147483647) return status(422, { error: i18n('$.error.invalid_bitfield') });
         role.permissions = permissions;
         updated = true;
     }
@@ -152,15 +152,15 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ name: t.Optional(t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' })), color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6, error: 'error.wrongType;;[["field", "color"], ["type", "string"]]' }))), permissions: t.Optional(t.Integer({ error: 'error.wrongType;;[["field", "permissions"], ["type", "integer"]]' })) }, { error: 'error.invalidBody', additionalProperties: true }),
+    body: t.Object({ name: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' })), color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6, error: '$.error.wrongType;;[["field", "color"], ["type", "string"]]' }))), permissions: t.Optional(t.Integer({ error: '$.error.wrongType;;[["field", "permissions"], ["type", "integer"]]' })) }, { error: '$.error.invalidBody', additionalProperties: true }),
     params: t.Object({ id: t.String({ description: 'The role ID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 }) // TODO: Implement route to patch all roles at once
 .delete('/:id', async ({ session, params, i18n, status }) => { // Delete role
-    if(!session?.player?.hasPermission(Permission.DeleteRoles)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.DeleteRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const role = await roles.findOne({ id: params.id });
-    if(!role) return status(404, { error: i18n('roles.not_found') });
+    if(!role) return status(404, { error: i18n('$.roles.not_found') });
 
     sendModLogMessage({
         logType: ModLogType.DeleteRole,
@@ -172,7 +172,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     await role.deleteOne();
     updateRoleCache();
 
-    return { message: i18n('roles.delete.success') };
+    return { message: i18n('$.roles.delete.success') };
 }, {
     detail: {
         tags: ['Roles'],
@@ -187,5 +187,5 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ id: t.String({ description: 'The role ID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 });

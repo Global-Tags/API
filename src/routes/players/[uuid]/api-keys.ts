@@ -7,10 +7,10 @@ import { ElysiaApp } from "../../..";
 import { generateSecureCode } from "../../../libs/crypto";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get api key list
-    if(!session?.player?.hasPermission(Permission.ViewApiKeys)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ViewApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return status(404, { error: i18n('error.playerNotFound') });
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     return player.api_keys.map((key) => ({
         id: key.id,
@@ -32,15 +32,15 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 }).get('/:id', async ({ session, params, i18n, status }) => { // Get info of specific api key
-    if(!session?.player?.hasPermission(Permission.ViewApiKeys)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ViewApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return status(404, { error: i18n('error.playerNotFound') });
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
     
     const key = player.getApiKey(params.id);
-    if(!key) return status(404, { error: i18n('api_keys.not_found') });
+    if(!key) return status(404, { error: i18n('$.api_keys.not_found') });
     const { name, id, created_at, last_used } = key;
 
     return { id, name, created_at: created_at.getTime(), last_used: last_used?.getTime() || null };
@@ -58,12 +58,12 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }), id: t.String({ description: 'The API key ID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 }).post('/', async ({ session, body: { name }, params, i18n, status }) => { // Create an API key
-    if(!session?.player?.hasPermission(Permission.CreateApiKeys)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.CreateApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return status(404, { error: i18n('error.playerNotFound') });
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     const key = player.createApiKey(name.trim());
     await player.save();
@@ -96,16 +96,16 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ name: t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
+    body: t.Object({ name: t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' }) }, { error: '$.error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 }).post('/:id/regenerate', async ({ session, params, i18n, status }) => { // Regenerate API key
-    if(!session?.player?.hasPermission(Permission.EditApiKeys)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.EditApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return status(404, { error: i18n('error.playerNotFound') });
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
     const key = player.getApiKey(params.id);
-    if(!key) return status(404, { error: i18n('api_keys.not_found') });
+    if(!key) return status(404, { error: i18n('$.api_keys.not_found') });
 
     key.key = `sk_${generateSecureCode(32)}`;
     await player.save();
@@ -137,17 +137,17 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ name: t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
+    body: t.Object({ name: t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' }) }, { error: '$.error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }), id: t.String({ description: 'The API key ID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 }).patch('/:id', async ({ session, params, body: { name }, i18n, status }) => { // Edit API key
-    if(!session?.player?.hasPermission(Permission.EditApiKeys)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.EditApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return status(404, { error: i18n('error.playerNotFound') });
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     const key = player.getApiKey(params.id);
-    if(!key) return status(404, { error: i18n('api_keys.not_found') });
+    if(!key) return status(404, { error: i18n('$.api_keys.not_found') });
 
     key.name = name.trim();
     await player.save();
@@ -179,16 +179,16 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ name: t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
+    body: t.Object({ name: t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' }) }, { error: '$.error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }), id: t.String({ description: 'The API key ID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 }).delete('/:id', async ({ session, params, i18n, status }) => { // Delete api key
-    if(!session?.player?.hasPermission(Permission.DeleteApiKeys)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.DeleteApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return status(404, { error: i18n('error.playerNotFound') });
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
     const key = player.getApiKey(params.id);
-    if(!key || !player.deleteApiKey(key.id)) return status(404, { error: i18n('api_keys.not_found') });
+    if(!key || !player.deleteApiKey(key.id)) return status(404, { error: i18n('$.api_keys.not_found') });
 
     await player.save();
 
@@ -200,7 +200,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         key: key
     });
 
-    return { message: i18n('api_keys.deleted') };
+    return { message: i18n('$.api_keys.deleted') };
 }, {
     detail: {
         tags: ['Admin'],
@@ -215,5 +215,5 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }), id: t.String({ description: 'The API key ID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 });

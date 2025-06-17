@@ -6,10 +6,10 @@ import { stripUUID } from "../../../libs/game-profiles";
 import { Permission } from "../../../types/Permission";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Watch player
-    if(!session?.player?.hasPermission(Permission.ManageWatchlistEntries)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ManageWatchlistEntries)) return status(403, { error: i18n('$.error.notAllowed') });
     
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return status(404, { error: i18n('error.playerNotFound') });
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     return { watched: player.watchlist };
 }, {
@@ -26,13 +26,13 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 }).patch('/', async ({ session, body: { watched }, params, i18n, status }) => { // Watch player
-    if(!session?.player?.hasPermission(Permission.ManageWatchlistEntries)) return status(403, { error: i18n('error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.ManageWatchlistEntries)) return status(403, { error: i18n('$.error.notAllowed') });
     
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return status(404, { error: i18n('error.playerNotFound') });
-    if(player.watchlist == watched) return status(409, { error: i18n(`watchlist.${player.watchlist ? 'already' : 'not'}_watched`) });
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
+    if(player.watchlist == watched) return status(409, { error: i18n(player.watchlist ? '$.watchlist.already_watched' : '$.watchlist.not_watched') });
 
     player.watchlist = watched;
     await player.save();
@@ -44,7 +44,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         discord: false
     });
 
-    return { message: i18n(`watchlist.success.${player.watchlist ? 'watch' : 'unwatch'}`) };
+    return { message: i18n(player.watchlist ? `$.watchlist.success.watch` : '$.watchlist.success.unwatch') };
 }, {
     detail: {
         tags: ['Admin'],
@@ -59,7 +59,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ watched: t.Boolean({ error: 'error.wrongType;;[["field", "watched"], ["type", "boolean"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
+    body: t.Object({ watched: t.Boolean({ error: '$.error.wrongType;;[["field", "watched"], ["type", "boolean"]]' }) }, { error: '$.error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 });

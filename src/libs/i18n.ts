@@ -2,6 +2,7 @@ import { existsSync, readdirSync } from "fs";
 import { join } from "path";
 import Logger from "./Logger";
 import players from "../database/schemas/players";
+import { captureException } from "@sentry/bun";
 
 export type Language = Map<string, string>;
 export type I18nFunction = (path: string) => string;
@@ -44,6 +45,13 @@ export function isValidLanguage(language: string): boolean {
 }
 
 export function translate(path: string, language: Language): string {
+    if(!path.startsWith('\$\.')) {
+        const error = new Error(`Translation path "${path}" was not prefixed with "$."!`);
+        Logger.warn(error.message);
+        captureException(error);
+    } else {
+        path = path.slice(2);
+    }
     if(language.has(path)) return language.get(path)!;
     return getLanguage().get(path) || path;
 }

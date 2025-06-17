@@ -12,7 +12,6 @@
         "noTag": "Please set a tag first!",
         "playerNoTag": "This player does not have a tag!",
         "playerBanned": "This player is banned!",
-        "malformedAuthHeader": "You've entered a malformed authorization header!",
         "noIcon": "The icon was not found!",
         "invalid_bitfield": "You provided an invalid bitfield!"
     },
