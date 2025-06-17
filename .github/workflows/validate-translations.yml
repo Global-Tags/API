@@ -1,0 +1,29 @@
+name: Validate Localization Keys
+
+on:
+  push:
+    paths:
+      - 'src/**/*.ts'
+      - 'locales/en_us.json'
+      - '.github/scripts/validate-translations.js'
+      - '.github/workflows/validate-translations.yml'
+  pull_request:
+
+jobs:
+  validate-translations:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install fast-glob
+
+      - name: Run localization key check
+        run: node .github/scripts/validate-translations.js
