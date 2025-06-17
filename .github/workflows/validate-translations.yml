@@ -5,7 +5,7 @@ on:
     paths:
       - 'src/**/*.ts'
       - 'locales/en_us.json'
-      - '.github/scripts/validate-translations.js'
+      - '.github/scripts/validate-translations.ts'
       - '.github/workflows/validate-translations.yml'
   pull_request:
 
@@ -17,13 +17,13 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set up bun
+        uses: oven-sh/setup-bun@v4
         with:
-          node-version: 22
+          bun-version: latest
 
       - name: Install dependencies
-        run: npm install fast-glob
+        run: bun i fast-glob
 
       - name: Run localization key check
-        run: node .github/scripts/validate-translations.js
+        run: bun .github/scripts/validate-translations.ts
