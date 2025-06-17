@@ -9,6 +9,7 @@ import { GiftCode } from "../database/schemas/gift-codes";
 import Logger from "./Logger";
 import { ApiKey } from "../database/schemas/players";
 import { Role } from "../database/schemas/roles";
+import { ReportDocument } from "../database/schemas/Report";
 
 export enum ModLogType {
     ChangeTag,
@@ -137,11 +138,10 @@ export function formatTimestamp(date: Date, style: 't' | 'T' | 'd' | 'D' | 'f' |
     return `<t:${Math.floor(date.getTime() / 1000 | 0)}:${style}>`;
 }
 
-export function sendReportMessage({ player, reporter, tag, reason } : {
+export function sendReportMessage({ player, reporter, report } : {
     player: GameProfile,
     reporter: GameProfile,
-    tag: string,
-    reason: string
+    report: ReportDocument
 }) {
     if(!config.discordBot.notifications.reports.enabled) return;
 
@@ -157,19 +157,19 @@ export function sendReportMessage({ player, reporter, tag, reason } : {
                     value: player.getFormattedHyperlink()
                 },
                 {
-                    name: 'Reported Tag',
-                    value: `\`\`\`ansi\n${translateToAnsi(tag)}\`\`\``
-                },
-                {
                     name: 'Reporter',
                     value: reporter.getFormattedHyperlink()
                 },
                 {
+                    name: 'Tag',
+                    value: `\`\`\`ansi\n${translateToAnsi(report.context.tag)}\`\`\``
+                },
+                {
                     name: 'Reason',
-                    value: `\`\`\`${reason}\`\`\``
+                    value: `\`\`\`${report.reason}\`\`\``
                 }
             ]),
-        targetUUID: player.uuid!!
+        targetUUID: player.uuid!
     });
 }
 

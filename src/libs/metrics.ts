@@ -65,13 +65,11 @@ export async function saveMetrics() {
     }).length;
     const bans = users.filter((user) => user.isBanned()).length;
     const positions = positionList.reduce((object: any, position) => {
-        const name = snakeCase(GlobalPosition[position]);
-        object[name] = users.filter((user) => name == snakeCase(user.position)).length;
+        object[position] = users.filter((user) => position == snakeCase(user.position)).length;
         return object;
     }, {});
     const icons = iconList.reduce((object: any, icon) => {
-        const name = snakeCase(GlobalIcon[icon]);
-        object[name] = users.filter((user) => name == snakeCase(user.icon.name)).length;
+        object[icon] = users.filter((user) => icon == snakeCase(user.icon.name)).length;
         return object;
     }, {});
     const addon = await fetchAddon('globaltags');

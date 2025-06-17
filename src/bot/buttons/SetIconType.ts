@@ -22,8 +22,6 @@ export default class SetIconTypeButton extends Button {
             .setTitle('Set icon type')
             .setDescription(`The player's current icon type is \`${capitalCase(target.icon.name)}\`.`);
 
-        const playerIcon = snakeCase(target.icon.name);
-
         const menu = new StringSelectMenuBuilder()
             .setCustomId(`setIconType_${target.uuid}`)
             .setPlaceholder('Please select an icon.')
@@ -31,9 +29,9 @@ export default class SetIconTypeButton extends Button {
             .setMaxValues(1)
             .setOptions(icons.map((icon) =>
                 new StringSelectMenuOptionBuilder()
-                    .setLabel(capitalCase(GlobalIcon[icon]))
-                    .setDefault(snakeCase(GlobalIcon[icon]) == playerIcon)
-                    .setValue(GlobalIcon[icon])
+                    .setLabel(icon)
+                    .setDefault(icon == target.icon.name)
+                    .setValue(icon)
             ).slice(0, 25));
 
         interaction.reply({ embeds: [embed], components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu)], flags: [MessageFlags.Ephemeral] });

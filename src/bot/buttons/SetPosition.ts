@@ -22,8 +22,6 @@ export default class SetPositionButton extends Button {
             .setTitle('Set position')
             .setDescription(`The player's current position is \`${capitalCase(target.position)}\`.`);
 
-        const playerPosition = snakeCase(target.position);
-
         const menu = new StringSelectMenuBuilder()
             .setCustomId(`setPosition_${target.uuid}`)
             .setPlaceholder('Please select a position.')
@@ -31,9 +29,9 @@ export default class SetPositionButton extends Button {
             .setMaxValues(1)
             .setOptions(positions.map((position) =>
                 new StringSelectMenuOptionBuilder()
-                    .setLabel(capitalCase(GlobalPosition[position]))
-                    .setDefault(snakeCase(GlobalPosition[position]) == playerPosition)
-                    .setValue(GlobalPosition[position])
+                    .setLabel(capitalCase(position))
+                    .setDefault(position == target.position)
+                    .setValue(position)
             ));
 
         interaction.reply({ embeds: [embed], components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu)], flags: [MessageFlags.Ephemeral] });
