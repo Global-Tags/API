@@ -6,6 +6,7 @@ import { GlobalIcon } from "../../types/GlobalIcon";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { isConnected } from "../mongo";
 import { generateSecureCode } from "../../libs/crypto";
+import { Report, ReportDocument } from "./Report";
 
 export type PlayerRole = {
     role: Role,
@@ -42,7 +43,6 @@ interface IPlayer {
         }[],
         current_month: number
     },
-    reports: { id: string, by: string, reported_tag: string, reason: string, created_at: Date }[],
     hide_role_icon: boolean,
     roles: {
         name: string,
@@ -95,6 +95,14 @@ interface IPlayer {
      */
     deleteApiKey(id: string): boolean;
 
+    /**
+     * 
+     * @param reporter The UUID of the player who is reporting
+     * @param reason The reason for the report
+     * @returns A ReportDocument object representing the created report
+     */
+    createReport(reporter: string, reason: string): Promise<ReportDocument>;
+
     getGameProfile(): Promise<GameProfile>,
     getReferrer(): Promise<Player | null>
     addReferral(uuid: string): void,
@@ -116,7 +124,6 @@ interface IPlayer {
     createNote({ text, author }: { text: string, author: string }): void,
     existsNote(id: string): boolean,
     deleteNote(id: string): void,
-    createReport({ by, reported_tag, reason }: { by: string, reported_tag: string, reason: string }): void,
     deleteReport(id: string): void
 }
 
@@ -185,32 +192,6 @@ const schema = new Schema<IPlayer>({
             required: true,
             default: 0
         }
-    },
-    reports: {
-        type: [{
-            id: {
-                type: String,
-                required: true
-            },
-            by: {
-                type: String,
-                required: true
-            },
-            reported_tag: {
-                type: String,
-                required: true
-            },
-            reason: {
-                type: String,
-                required: true
-            },
-            created_at: {
-                type: Date,
-                required: true
-            }
-        }],
-        required: true,
-        default: []
     },
     hide_role_icon: {
         type: Boolean,
@@ -377,6 +358,26 @@ const schema = new Schema<IPlayer>({
             return true;
         },
 
+        createReport(reporter: string, reason: string): Promise<ReportDocument> {
+            return Report.insertOne({
+                id: generateSecureCode(),
+                reported_uuid: this.uuid,
+                reporter_uuid: reporter,
+                reason,
+                actions: [],
+                context: {
+                    tag: this.tag!,
+                    position: this.position,
+                    icon: {
+                        type: this.icon.name,
+                        hash: this.icon.hash || null
+                    }
+                },
+                created_at: new Date(),
+                last_updated: new Date()
+            });
+        },
+
         async getGameProfile(): Promise<GameProfile> {
             return await GameProfile.getProfileByUUID(this.uuid);
         },
@@ -535,7 +536,7 @@ const schema = new Schema<IPlayer>({
                 staff,
                 timestamp: new Date().getTime()
             })
-            this.icon.name = snakeCase(GlobalIcon[GlobalIcon.None]);
+            this.icon.name = GlobalIcon.None;
             this.icon.hash = null;
         },
 
@@ -554,20 +555,6 @@ const schema = new Schema<IPlayer>({
 
         deleteNote(id: string) {
             this.notes = this.notes.filter((note) => note.id != id);
-        },
-
-        createReport({ by, reported_tag, reason }: { by: string, reported_tag: string, reason: string }) {
-            this.reports.push({
-                id: generateSecureCode(),
-                by,
-                reported_tag,
-                reason,
-                created_at: new Date()
-            })
-        },
-
-        deleteReport(id: string) {
-            this.reports = this.reports.filter((report) => report.id != id);
         }
     }
 });
