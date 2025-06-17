@@ -1,28 +1,23 @@
 import { t } from "elysia";
-import players from "../../../database/schemas/players";
-import getAuthProvider from "../../../middleware/get-auth-provider";
-import { sendEmail } from "../../../libs/mailer";
-import { randomBytes } from "crypto";
+import { enabled as isMailerEnabled, sendEmail } from "../../../libs/mailer";
 import { config } from "../../../libs/config";
 import { sendEmailLinkMessage } from "../../../libs/discord-notifier";
-import { stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 import { onDiscordUnlink } from "../../../libs/events";
+import { generateSecureCode } from "../../../libs/crypto";
+import { Permission } from "../../../types/Permission";
 
-export function generateSecureCode(length: number = 10) {
-    return randomBytes(length).toString('hex').slice(0, length);
-}
+export default (app: ElysiaApp) => app.post('/discord', async ({ session, i18n, status }) => { // Get a discord linking code
+    if(!config.discordBot.notifications.accountConnections.enabled) return status(409, { error: i18n('$.connections.discord.disabled') });
+    if(!session) return status(403, { error: i18n('$.error.notAllowed') });
+    const { self, player } = session;
+    if(!self) return status(403, { error: i18n('$.error.notAllowed') });
 
-export default (app: ElysiaApp) => app.post('/discord', async ({ session, params, i18n, error }) => { // Get a discord linking code
-    if(!config.discordBot.notifications.accountConnections.enabled) return error(409, { error: i18n('connections.discord.disabled') });
-    if(!session?.equal) return error(403, { error: i18n('error.notAllowed') });
-
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return error(404, { error: i18n('error.noTag') });
-    if(player.connections.discord.id) return error(409, { error: i18n('connections.discord.alreadyConnected') });
+    if(!player) return status(404, { error: i18n('$.error.noTag') });
+    if(player.connections.discord.id) return status(409, { error: i18n('$.connections.discord.alreadyConnected') });
     if(player.connections.discord.code) return { code: player.connections.discord.code };
 
-    player.connections.discord.code = generateSecureCode();
+    player.connections.discord.code = generateSecureCode(12);
     await player.save();
 
     return { code: player.connections.discord.code };
@@ -41,14 +36,15 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).delete('/discord', async ({ session, params, i18n, error }) => { // Unlink discord account
-    if(!config.discordBot.notifications.accountConnections.enabled) return error(409, { error: i18n('connections.discord.disabled') });
-    if(!session?.equal) return error(403, { error: i18n('error.notAllowed') });
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+}).delete('/discord', async ({ session, i18n, status }) => { // Unlink discord account
+    if(!config.discordBot.notifications.accountConnections.enabled) return status(409, { error: i18n('$.connections.discord.disabled') });
+    if(!session) return status(403, { error: i18n('$.error.notAllowed') });
+    const { self, player } = session;
+    if(!self && !player?.hasPermission(Permission.RemoveConnections)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return error(404, { error: i18n('error.noTag') });
-    if(!player.connections.discord.id && !player.connections.discord.code) return error(409, { error: i18n('connections.discord.notConnected') });
+    if(!player) return status(404, { error: i18n('$.error.noTag') });
+    if(!player.connections.discord.id && !player.connections.discord.code) return status(409, { error: i18n('$.connections.discord.notConnected') });
 
     await onDiscordUnlink(await player.getGameProfile(), player.connections.discord.id!);
 
@@ -56,7 +52,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     player.connections.discord.code = null;
     await player.save();
 
-    return { message: i18n('connections.discord.unlinked') };
+    return { message: i18n('$.connections.discord.unlinked') };
 }, {
     detail: {
         tags: ['Connections'],
@@ -72,35 +68,35 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).use(getAuthProvider).post('/email', async ({ session, body: { email }, params, i18n, error }) => { // Send verification email
-    if(!session?.equal) return error(403, { error: i18n('error.notAllowed') });
-    email = email.trim();
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+}).post('/email', async ({ session, body: { email }, i18n, status }) => { // Send verification email
+    if(!isMailerEnabled) return status(409, { error: i18n('$.connections.email.disabled') });
+    if(!session) return status(403, { error: i18n('$.error.notAllowed') });
+    const { self, player } = session;
+    if(!self) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return error(404, { error: i18n('error.noTag') });
-    if(player.connections.email.address) return error(409, { error: i18n('connections.email.alreadyConnected') });
+    if(!player) return status(404, { error: i18n('$.error.noTag') });
+    if(player.connections.email.address) return status(409, { error: i18n('$.connections.email.alreadyConnected') });
 
     player.connections.email.address = email;
-    player.connections.email.code = generateSecureCode();
+    player.connections.email.code = generateSecureCode(12);
     await player.save();
 
     sendEmail({
         recipient: email,
-        subject: i18n('email.verification.subject'),
+        subject: i18n('$.email.verification.subject'),
         template: 'verification',
         variables: [
-            ['title', i18n('email.verification.title')],
-            ['greeting', i18n('email.greeting')],
-            ['description', i18n('email.verification.description')],
+            ['title', i18n('$.email.verification.title')],
+            ['greeting', i18n('$.email.greeting')],
+            ['description', i18n('$.email.verification.description')],
             ['code', player.connections.email.code],
-            ['button', i18n('email.verification.button')],
-            ['note', i18n('email.verification.note')],
-            ['footer', i18n('email.footer')],
+            ['note', i18n('$.email.verification.note')],
+            ['footer', i18n('$.email.footer')],
         ]
     });
 
-    return { message: i18n('connections.email.verificationSent') };
+    return { message: i18n('$.connections.email.verificationSent') };
 }, {
     detail: {
         tags: ['Connections'],
@@ -115,16 +111,17 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ email: t.String({ error: 'connections.email.invalidEmail', format: 'email' }) }, { error: 'error.invalidBody', additionalProperties: true }),
+    body: t.Object({ email: t.String({ error: '$.connections.email.invalidEmail', format: 'email' }) }, { error: '$.error.invalidBody', additionalProperties: true }),
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).use(getAuthProvider).post('/email/:code', async ({ session, params, i18n, error }) => { // Verify email
-    if(!session?.equal) return error(403, { error: i18n('error.notAllowed') });
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+}).post('/email/:code', async ({ session, params, i18n, status }) => { // Verify email
+    if(!isMailerEnabled) return status(409, { error: i18n('$.connections.email.disabled') });
+    if(!session?.self) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return error(404, { error: i18n('error.noTag') });
-    if(player.isEmailVerified()) return error(409, { error: i18n('connections.email.alreadyConnected') });
-    if(player.connections.email.code != params.code) return error(403, { error: i18n('connections.email.invalidCode') });
+    const { player } = session;
+    if(!player) return status(404, { error: i18n('$.error.noTag') });
+    if(player.isEmailVerified()) return status(409, { error: i18n('$.connections.email.alreadyConnected') });
+    if(player.connections.email.code != params.code) return status(403, { error: i18n('$.connections.email.invalidCode') });
 
     player.connections.email.code = null;
     await player.save();
@@ -137,18 +134,18 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
 
     sendEmail({
         recipient: player.connections.email.address!,
-        subject: i18n('email.verified.subject'),
+        subject: i18n('$.email.verified.subject'),
         template: 'verified',
         variables: [
-            ['title', i18n('email.verified.title')],
-            ['success', i18n('email.verified.success')],
-            ['questions', i18n('email.verified.questions')],
+            ['title', i18n('$.email.verified.title')],
+            ['success', i18n('$.email.verified.success')],
+            ['questions', i18n('$.email.verified.questions')],
             ['link', 'https://globaltags.xyz/discord'],
-            ['footer', i18n('email.footer')],
+            ['footer', i18n('$.email.footer')],
         ]
     });
 
-    return { message: i18n('connections.email.verified') };
+    return { message: i18n('$.connections.email.verified') };
 }, {
     detail: {
         tags: ['Connections'],
@@ -164,14 +161,15 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }), code: t.String({ description: 'Your verification code' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).delete('/email', async ({ session, params, i18n, error }) => { // Unlink email
-    if(!session?.equal) return error(403, { error: i18n('error.notAllowed') });
-    const uuid = stripUUID(params.uuid);
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+}).delete('/email', async ({ session, i18n, status }) => { // Unlink email
+    if(!isMailerEnabled) return status(409, { error: i18n('$.connections.email.disabled') });
+    if(!session) return status(403, { error: i18n('$.error.notAllowed') });
+    const { self, player } = session;
+    if(!self && !player?.hasPermission(Permission.RemoveConnections)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n('error.noTag') });
-    if(!player.connections.email.address && !player.connections.email.code) return error(400, { error: i18n('connections.email.notConnected') });
+    if(!player) return status(404, { error: i18n('$.error.noTag') });
+    if(!player.connections.email.address && !player.connections.email.code) return status(400, { error: i18n('$.connections.email.notConnected') });
 
     sendEmailLinkMessage(
         await player.getGameProfile(),
@@ -183,7 +181,7 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
     player.connections.email.code = null;
     await player.save();
 
-    return { message: i18n('connections.email.unlinked') };
+    return { message: i18n('$.connections.email.unlinked') };
 }, {
     detail: {
         tags: ['Connections'],
@@ -194,10 +192,11 @@ export default (app: ElysiaApp) => app.post('/discord', async ({ session, params
         400: t.Object({ error: t.String() }, { description: 'You don\'t have an email address connected' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage connections for this player' }),
         404: t.Object({ error: t.String() }, { description: 'You don\'t have an account' }),
+        409: t.Object({ error: t.String() }, { description: 'Email linking is deactivated' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 });

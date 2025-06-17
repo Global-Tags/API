@@ -9,7 +9,7 @@ export default class ResetEmailLinkingCodeButton extends Button {
     constructor() {
         super({
             id: 'resetEmailLinkingCode_',
-            requiredPermissions: [Permission.ManageConnections]
+            requiredPermissions: [Permission.RemoveConnections]
         });
     }
 

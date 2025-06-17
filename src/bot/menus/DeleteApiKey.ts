@@ -9,7 +9,7 @@ export default class DeleteApiKeyMenu extends SelectMenu {
     constructor() {
         super({
             id: 'deleteApiKey_',
-            requiredPermissions: [Permission.ManageApiKeys]
+            requiredPermissions: [Permission.DeleteApiKeys]
         });
     }
 

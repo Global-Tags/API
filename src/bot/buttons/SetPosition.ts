@@ -10,7 +10,7 @@ export default class SetPositionButton extends Button {
     constructor() {
         super({
             id: 'setPosition_',
-            requiredPermissions: [Permission.ManageTags]
+            requiredPermissions: [Permission.ManagePlayerPositions]
         });
     }
     

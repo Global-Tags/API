@@ -10,7 +10,7 @@ export default class ToggleIconButton extends Button {
     constructor() {
         super({
             id: 'toggleIcon_',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.ManagePlayerRoles]
         });
     }
 

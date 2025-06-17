@@ -10,7 +10,7 @@ export default class DeleteGiftCodeMenu extends SelectMenu {
     constructor() {
         super({
             id: 'deleteGiftCode',
-            requiredPermissions: [Permission.ManageGiftCodes]
+            requiredPermissions: [Permission.DeleteGiftCodes]
         });
     }
 
@@ -25,7 +25,7 @@ export default class DeleteGiftCodeMenu extends SelectMenu {
             logType: ModLogType.DeleteGiftCode,
             staff: await player.getGameProfile(),
             discord: true,
-            code: code.name
+            code: code
         });
 
         interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ The code was successfully deleted!')], flags: [MessageFlags.Ephemeral] });

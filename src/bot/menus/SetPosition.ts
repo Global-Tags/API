@@ -11,7 +11,7 @@ export default class SetPositionMenu extends SelectMenu {
     constructor() {
         super({
             id: 'setPosition_',
-            requiredPermissions: [Permission.ManageTags]
+            requiredPermissions: [Permission.ManagePlayerPositions]
         });
     }
 

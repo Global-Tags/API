@@ -12,7 +12,7 @@ export default class BanModal extends Modal {
     constructor() {
         super({
             id: 'ban_',
-            requiredPermissions: [Permission.ManageBans],
+            requiredPermissions: [Permission.CreateBans],
         });
     }
 

@@ -10,7 +10,7 @@ export default class CreateApiKeyModal extends Modal {
     constructor() {
         super({
             id: 'createApiKey_',
-            requiredPermissions: [Permission.ManageApiKeys]
+            requiredPermissions: [Permission.CreateApiKeys]
         });
     }
 

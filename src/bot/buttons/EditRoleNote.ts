@@ -8,7 +8,7 @@ export default class EditRoleNoteButton extends Button {
     constructor() {
         super({
             id: 'editRoleNote_',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.EditRoles]
         });
     }
 

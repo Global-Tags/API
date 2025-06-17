@@ -50,7 +50,7 @@ export default class Ratelimiter {
         set.headers['X-RateLimit-Limit'] = String(this.maxRequests);
         set.headers['X-RateLimit-Remaining'] = String(ratelimitData.remaining);
         set.headers['X-RateLimit-Reset'] = String(ratelimitData.reset / 1000);
-        if(ratelimitData.limited) return error(429, { error: i18n('error.ratelimit').replaceAll('<seconds>', String(Math.ceil(ratelimitData.reset / 1000))) });
+        if(ratelimitData.limited) return error(429, { error: i18n('$.error.ratelimit').replaceAll('<seconds>', String(Math.ceil(ratelimitData.reset / 1000))) });
     }
 
     public getRatelimitData(ip: string): RatelimitData {

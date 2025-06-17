@@ -11,7 +11,7 @@ export default class UnbanButton extends Button {
     constructor() {
         super({
             id: 'unban_',
-            requiredPermissions: [Permission.ManageBans]
+            requiredPermissions: [Permission.DeleteBans]
         });
     }
 

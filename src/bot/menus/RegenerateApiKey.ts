@@ -4,13 +4,13 @@ import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { generateSecureCode } from "../../routes/players/[uuid]/connections";
+import { generateSecureCode } from "../../libs/crypto";
 
 export default class RegenerateApiKeyMenu extends SelectMenu {
     constructor() {
         super({
             id: 'regenerateApiKey_',
-            requiredPermissions: [Permission.ManageApiKeys]
+            requiredPermissions: [Permission.EditApiKeys]
         });
     }
 

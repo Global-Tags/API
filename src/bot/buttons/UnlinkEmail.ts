@@ -9,7 +9,7 @@ export default class UnlinkEmailButton extends Button {
     constructor() {
         super({
             id: 'unlinkEmail_',
-            requiredPermissions: [Permission.ManageConnections]
+            requiredPermissions: [Permission.RemoveConnections]
         });
     }
 

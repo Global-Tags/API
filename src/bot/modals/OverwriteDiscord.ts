@@ -9,7 +9,7 @@ export default class OverwriteDiscordModal extends Modal {
     constructor() {
         super({
             id: 'overwriteDiscord_',
-            requiredPermissions: [Permission.ManageConnections]
+            requiredPermissions: [Permission.RemoveConnections]
         });
     }
 

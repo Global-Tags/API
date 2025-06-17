@@ -9,7 +9,7 @@ export default class SetSkuButton extends Button {
     constructor() {
         super({
             id: 'setSku_',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.EditRoles]
         });
     }
 

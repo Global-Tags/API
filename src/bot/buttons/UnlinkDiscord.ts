@@ -10,7 +10,7 @@ export default class UnlinkDiscordButton extends Button {
     constructor() {
         super({
             id: 'unlinkDiscord_',
-            requiredPermissions: [Permission.ManageConnections]
+            requiredPermissions: [Permission.RemoveConnections]
         });
     }
 

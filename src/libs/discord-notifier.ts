@@ -7,6 +7,8 @@ import { config } from "./config";
 import { stripColors, translateToAnsi } from "./chat-color";
 import { GiftCode } from "../database/schemas/gift-codes";
 import Logger from "./Logger";
+import { ApiKey } from "../database/schemas/players";
+import { Role } from "../database/schemas/roles";
 
 export enum ModLogType {
     ChangeTag,
@@ -46,6 +48,9 @@ type ModLogData = {
     logType: ModLogType,
     staff: GameProfile,
     user?: GameProfile,
+    /**
+     * @deprecated Discord actions will be removed in the future
+     */
     discord: boolean
 } & ({
     logType: ModLogType.ChangeTag,
@@ -65,7 +70,7 @@ type ModLogData = {
     appealable: boolean
 } | {
     logType: ModLogType.AddRole | ModLogType.RemoveRole | ModLogType.CreateRole | ModLogType.DeleteRole,
-    role: string
+    role: Role
 } | {
     logType: ModLogType.EditRoleNote,
     role: string,
@@ -89,17 +94,13 @@ type ModLogData = {
     logType: ModLogType.Unwatch
 } | {
     logType: ModLogType.CreateApiKey | ModLogType.RegenerateApiKey | ModLogType.DeleteApiKey,
-    key: string
+    key: ApiKey
 } | {
     logType: ModLogType.CreateGiftCode,
-    code: string,
-    role: string,
-    maxUses: number,
-    codeExpiration: Date | null,
-    giftDuration: number | null
+    code: GiftCode
 } | {
     logType: ModLogType.DeleteGiftCode,
-    code: string
+    code: GiftCode
 } | {
     logType: ModLogType.CreateNote | ModLogType.DeleteNote,
     note: string
@@ -380,23 +381,23 @@ function modlogDescription(data: ModLogData): string | null {
     if(type == ModLogType.ChangeTag) return `\`${stripColors(data.tags.old)}\` → \`${stripColors(data.tags.new)}\``;
     else if(type == ModLogType.Ban) return `**Reason**: \`${data.reason || 'No reason'}\`. **Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Expires**: ${data.expires ? `${formatTimestamp(data.expires)} (${formatTimestamp(data.expires, 'R')})` : '`-`'}`;
     else if(type == ModLogType.EditBan) return `**Appealable**: \`${data.appealable ? `✅` : `❌`}\`. **Reason**: \`${data.reason || '-- No reason --'}\``;
-    else if(type == ModLogType.AddRole || type == ModLogType.RemoveRole) return `\`${data.role}\``;
+    else if(type == ModLogType.AddRole || type == ModLogType.RemoveRole) return `\`${data.role.name}\``;
     else if(type == ModLogType.EditRoleNote) return `**Role**: \`${data.role}\`. **Note**: \`${data.note || '-'}\``;
     else if(type == ModLogType.SetRoleExpiration) return `**Role**: \`${data.role}\`. **Expires**: ${data.expires ? `${formatTimestamp(data.expires)} (${formatTimestamp(data.expires, 'R')})` : '`-`'}`;
     else if(type == ModLogType.EditPosition) return `\`${capitalCase(data.positions.old)}\` → \`${capitalCase(data.positions.new)}\``;
     else if(type == ModLogType.ChangeIconType) return `\`${capitalCase(data.icons.old)}\` → \`${capitalCase(data.icons.new)}\``;
     else if(type == ModLogType.ClearIconTexture) return `[\`${data.hash}\`](<${getCustomIconUrl(data.user!.uuid!, data.hash)}>)`;
     else if(type == ModLogType.CreateApiKey || type == ModLogType.RegenerateApiKey || type == ModLogType.DeleteApiKey) return `**Key name**: \`${data.key}\``;
-    else if(type == ModLogType.CreateGiftCode) return `**Name**: \`${data.code}\`. **Role**: \`${data.role}\`. **Max uses**: \`${data.maxUses}\`. **Code expires**: ${data.codeExpiration ? formatTimestamp(data.codeExpiration, 'R') : '`Never`'}. **Gift duration**: \`${data.giftDuration ? data.giftDuration.toString() : 'Permanent'}\``;
-    else if(type == ModLogType.DeleteGiftCode) return `\`${data.code}\``;
+    else if(type == ModLogType.CreateGiftCode) return `\n>>> **ID**: \`${data.code.id}\`\n**Name**: \`${data.code.name}\`\n**Type**: \`${sentenceCase(data.code.gift.type)}\`\n**Value**: \`${data.code.gift.value}\`\n**Max uses**: \`${data.code.max_uses}\`\n**Code expires**: ${data.code.expires_at ? formatTimestamp(data.code.expires_at, 'R') : '`Never`'}\n**Gift duration**: \`${data.code.gift.duration ? data.code.gift.duration.toString() : 'Permanent'}\``;
+    else if(type == ModLogType.DeleteGiftCode) return `\`${data.code.name}\` (\`#${data.code.id}\`)`;
     else if(type == ModLogType.CreateNote || type == ModLogType.DeleteNote) return `\`${data.note}\``;
     else if(type == ModLogType.DeleteReport) return `\`${data.report}\``;
-    else if(type == ModLogType.CreateRole) return `\`${data.role}\``;
+    else if(type == ModLogType.CreateRole) return `\`${data.role.name}\``;
     else if(type == ModLogType.RenameRole) return `\`${data.names.old}\` → \`${data.names.new}\``
     else if(type == ModLogType.ToggleRoleIcon) return `\`${data.role}\`. \`${data.roleIcon ? '❌' : '✅'}\` → \`${data.roleIcon ? '✅' : '❌'}\``;
     else if(type == ModLogType.ChangeRolePermissions) return `\`${data.role}\`\n\`\`\`diff\n${data.permissions.added.map((permission) => `+ ${pascalCase(permission)}`).join('\n')}${data.permissions.added.length > 0 && data.permissions.removed.length > 0 ? '\n' : ''}${data.permissions.removed.map((permission) => `- ${pascalCase(permission)}`).join('\n')}\`\`\``;
     else if(type == ModLogType.SetRoleSku) return `**Role**: \`${data.role}\`. **SKU**: \`${data.sku.old || '-'}\` → \`${data.sku.new || '-'}\``;
-    else if(type == ModLogType.DeleteRole) return `\`${data.role}\``;
+    else if(type == ModLogType.DeleteRole) return `\`${data.role.name}\``;
     else if(type == ModLogType.OverwriteConnection) {
         const redactValue = data.type == 'email' && config.discordBot.notifications.accountConnections.hideEmails;
         return `**Type**: \`${capitalCase(data.type)}\`. ${redactValue ? hiddenConnectionLabel : data.value.old ? `||${data.value.old}||` : '`-`'} → ${redactValue ? hiddenConnectionLabel : data.value.new ? `||${data.value.new}||` : '`-`'}`;

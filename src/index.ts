@@ -21,8 +21,8 @@ import { startEntitlementExpiry, startMetrics, startReferralReset, startRoleCach
 import { config } from "./libs/config";
 import { join } from "path";
 import ip from "./middleware/ip";
-import { generateSecureCode } from "./routes/players/[uuid]/connections";
 import { captureException } from "@sentry/bun";
+import { generateSecureCode, validateKeypair } from "./libs/crypto";
 
 if(config.mongodb.trim().length == 0) {
     Logger.error('Database connection string is empty!');
@@ -88,6 +88,7 @@ const elysia = new Elysia()
         }
         await connectDatabase(config.mongodb);
         
+        validateKeypair();
         startRoleCacheJob();
         startEntitlementExpiry();
         startRoleSynchronization();
@@ -100,7 +101,7 @@ const elysia = new Elysia()
         if(code == 'VALIDATION') {
             set.status = 422;
             error = error as ValidationError;
-            let errorMessage = i18n(error.message);
+            let errorMessage = error.message;
             const errorParts = errorMessage.split(';;');
             errorMessage = i18n(errorParts[0]);
             if(errorParts.length > 1) {
@@ -116,13 +117,13 @@ const elysia = new Elysia()
             return { error: errorMessage.trim() };
         } else if(code == 'NOT_FOUND') {
             set.status = 404;
-            return { error: i18n('error.notFound') };
+            return { error: i18n('$.error.notFound') };
         } else {
             set.status = 500;
             captureException(error);
             const requestId = generateSecureCode(32);
             Logger.error(`An error ocurred with request ${requestId}: ${error}`);
-            return { error: i18n('error.unknownError'), id: requestId };
+            return { error: i18n('$.error.unknownError'), id: requestId };
         }
     })
     .listen({ port: config.port, idleTimeout: 20 });

@@ -13,14 +13,6 @@ export default class ModerateAccountButton extends Button {
     }
 
     async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        if(![
-            Permission.ManageBans,
-            Permission.ManageNotes,
-            Permission.ManageReports,
-            Permission.ManageWatchlist,
-            Permission.ManageTags
-        ].some((permission) => player.hasPermission(permission))) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
-
         const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
@@ -35,30 +27,26 @@ export default class ModerateAccountButton extends Button {
                         .setLabel('Manage Watchlist')
                         .setCustomId(`manageWatchlist_${target.uuid}`)
                         .setStyle(ButtonStyle.Primary)
-                        .setDisabled(!player.hasPermission(Permission.ManageWatchlist)),
+                        .setDisabled(!player.hasPermission(Permission.ManageWatchlistEntries)),
                     new ButtonBuilder()
                         .setLabel('Manage Bans')
                         .setCustomId(`manageBans_${target.uuid}`)
                         .setStyle(ButtonStyle.Primary)
-                        .setDisabled(!player.hasPermission(Permission.ManageBans))
                 ),
             new ActionRowBuilder<ButtonBuilder>()
                 .addComponents(
                     new ButtonBuilder()
-                        .setLabel(`Reports${player.hasPermission(Permission.ManageReports) && target.reports.length > 0 ? ` (${target.reports.length})` : ''}`)
+                        .setLabel(`Reports${player.hasPermission(Permission.ViewReports) && target.reports.length > 0 ? ` (${target.reports.length})` : ''}`)
                         .setCustomId(`reports_${target.uuid}`)
-                        .setStyle(ButtonStyle.Primary)
-                        .setDisabled(!player.hasPermission(Permission.ManageReports)),
+                        .setStyle(ButtonStyle.Primary),
                     new ButtonBuilder()
-                        .setLabel(`Notes${player.hasPermission(Permission.ManageNotes) && target.notes.length > 0 ? ` (${target.notes.length})` : ''}`)
+                        .setLabel(`Notes${target.notes.length > 0 ? ` (${target.notes.length})` : ''}`)
                         .setCustomId(`notes_${target.uuid}`)
-                        .setStyle(ButtonStyle.Primary)
-                        .setDisabled(!player.hasPermission(Permission.ManageNotes)),
+                        .setStyle(ButtonStyle.Primary),
                     new ButtonBuilder()
-                        .setLabel(`Clears${player.hasPermission(Permission.ManageTags) && target.clears.length > 0 ? ` (${target.clears.length})` : ''}`)
+                        .setLabel(`Clears${target.clears.length > 0 ? ` (${target.clears.length})` : ''}`)
                         .setCustomId(`clears_${target.uuid}`)
                         .setStyle(ButtonStyle.Primary)
-                        .setDisabled(!player.hasPermission(Permission.ManageTags))
                 )
         ];
 

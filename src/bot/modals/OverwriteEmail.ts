@@ -9,7 +9,7 @@ export default class OverwriteEmailModal extends Modal {
     constructor() {
         super({
             id: 'overwriteEmail_',
-            requiredPermissions: [Permission.ManageConnections]
+            requiredPermissions: [Permission.RemoveConnections]
         });
     }
 

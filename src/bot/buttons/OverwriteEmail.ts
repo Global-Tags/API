@@ -7,7 +7,7 @@ export default class OverwriteEmailButton extends Button {
     constructor() {
         super({
             id: 'overwriteEmail_',
-            requiredPermissions: [Permission.ManageConnections]
+            requiredPermissions: [Permission.ViewConnections]
         });
     }
 

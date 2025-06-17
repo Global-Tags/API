@@ -2,129 +2,190 @@ import { t } from "elysia";
 import { Permission } from "../types/Permission";
 import { ModLogType, sendModLogMessage } from "../libs/discord-notifier";
 import roles, { getCachedRoles, getNextPosition, updateRoleCache } from "../database/schemas/roles";
-import { snakeCase } from "change-case";
 import { ElysiaApp } from "..";
-import { GameProfile } from "../libs/game-profiles";
 
-export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, error }) => { // Get roles
-    if(!session?.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
+export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }) => { // Get roles
+    if(!session?.player?.hasPermission(Permission.ViewRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
     return getCachedRoles().map((role) => ({
+        id: role.id,
         name: role.name,
         position: role.position,
+        color: role.color || null,
         hasIcon: role.hasIcon,
-        permissions: role.getPermissions().map((permission) => snakeCase(Permission[permission]))
+        permissions: role.permissions
     }));
 }, {
     detail: {
         tags: ['Roles'],
-        description: 'Returns all roles'
+        description: 'Get all roles'
     },
     response: {
-        200: t.Array(t.Object({ name: t.String(), position: t.Integer(), hasIcon: t.Boolean(), permissions: t.Array(t.String()) }), { description: 'An array of all roles' }),
+        200: t.Array(t.Object({ id: t.String(), name: t.String(), position: t.Integer(), hasIcon: t.Boolean(), color: t.Nullable(t.String()), permissions: t.Number() }), { description: 'The role list' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).get('/:name', async ({ session, params, i18n, error }) => { // Get specific role
-    if(!session?.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
-    const name = snakeCase(decodeURIComponent(params.name).trim());
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+}).get('/:id', async ({ session, params: { id }, i18n, status }) => { // Get specific role
+    if(!session?.player?.hasPermission(Permission.ViewRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const role = getCachedRoles().find((role) => role.name == name);
-    if(!role) return error(404, { error: i18n('roles.not_found') });
+    const role = getCachedRoles().find((role) => role.id == id);
+    if(!role) return status(404, { error: i18n('$.roles.not_found') });
 
     return {
+        id: role.id,
         name: role.name,
         position: role.position,
+        color: role.color || null,
         hasIcon: role.hasIcon,
-        permissions: role.getPermissions().map((permission) => snakeCase(Permission[permission]))
+        permissions: role.permissions
     };
 }, {
     detail: {
         tags: ['Roles'],
-        description: 'Returns role data of a specific role'
+        description: 'Get a specific role'
     },
     response: {
-        200: t.Object({ name: t.String(), position: t.Integer(), hasIcon: t.Boolean(), permissions: t.Array(t.String()) }, { description: 'The role info' }),
+        200: t.Object({ id: t.String(), name: t.String(), position: t.Integer(), hasIcon: t.Boolean(), color: t.Nullable(t.String()), permissions: t.Number() }, { description: 'The role data' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
         404: t.Object({ error: t.String() }, { description: 'There is no role with the name you provided' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    params: t.Object({ name: t.String({ description: 'The role name' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).post('/', async ({ session, body, i18n, error }) => { // Create role
-    if(!session?.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
+    params: t.Object({ id: t.String({ description: 'The role ID' }) }),
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+}).post('/', async ({ session, body, i18n, status }) => { // Create role
+    if(!session?.player?.hasPermission(Permission.CreateRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const name = snakeCase(body.name.trim());
-    if(getCachedRoles().find((role) => role.name == name)) return error(409, { error: i18n('roles.create.already_exists').replaceAll('<role>', name) });
-
-    await roles.insertMany([{
-        name,
+    const role = await roles.insertOne({
+        name: body.name.trim(),
         position: await getNextPosition(),
         hasIcon: false,
-        permissions: []
-    }]);
+        permissions: body.permissions || 0
+    });
     updateRoleCache();
 
     sendModLogMessage({
         logType: ModLogType.CreateRole,
-        staff: await GameProfile.getProfileByUUID(session.uuid!),
+        staff: await session.player.getGameProfile(),
         discord: false,
-        role: name
+        role
     });
 
-    return { message: i18n('roles.create.success') };
+    return {
+        id: role.id,
+        name: role.name,
+        position: role.position,
+        color: role.color || null,
+        hasIcon: role.hasIcon,
+        permissions: role.permissions
+    };
 }, {
     detail: {
         tags: ['Roles'],
-        description: 'Creates a new role'
+        description: 'Create a new role'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: 'The role was created successfully' }),
+        200: t.Object({ id: t.String(), name: t.String(), position: t.Integer(), hasIcon: t.Boolean(), color: t.Nullable(t.String()), permissions: t.Number() }, { description: 'The created role' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
         409: t.Object({ error: t.String() }, { description: 'A role with the provided name already exists' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    body: t.Object({ name: t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).delete('/:name', async ({ session, params, i18n, error }) => { // Delete role
-    if(!session?.hasPermission(Permission.ManageRoles)) return error(403, { error: i18n('error.notAllowed') });
+    body: t.Object({ name: t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' }), color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6, error: '$.error.wrongType;;[["field", "color"], ["type", "string"]]' }))), permissions: t.Optional(t.Integer({ error: '$.error.wrongType;;[["field", "permissions"], ["type", "integer"]]' })) }, { error: '$.error.invalidBody', additionalProperties: true }),
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+}).patch('/:id', async ({ session, params, body: { name, color, permissions }, i18n, status }) => { // Edit role
+    if(!session?.player?.hasPermission(Permission.DeleteRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const name = snakeCase(decodeURIComponent(params.name).trim());
+    const role = await roles.findOne({ id: params.id });
+    if(!role) return status(404, { error: i18n('$.roles.not_found') });
 
-    const role = getCachedRoles().find((role) => role.name == name);
-    if(!role) return error(404, { error: i18n('roles.not_found') });
+    let updated = false;
+    if(name && name.trim() !== role.name) {
+        role.name = name.trim();
+        updated = true;
+    }
+    if(color && color !== role.color) {
+        role.color = color;
+        updated = true;
+    }
+    if(permissions !== undefined && permissions !== role.permissions) {
+        if(permissions < 0 || permissions > 2147483647) return status(422, { error: i18n('$.error.invalid_bitfield') });
+        role.permissions = permissions;
+        updated = true;
+    }
 
-    sendModLogMessage({
-        logType: ModLogType.DeleteRole,
-        staff: await GameProfile.getProfileByUUID(session.uuid!),
-        discord: false,
-        role: role.name
-    });
+    if(updated) {
+        await role.save();
+        updateRoleCache();
+    
+        // sendModLogMessage({ // TODO: Add mod log for role edit
+        //     logType: ModLogType.DeleteRole,
+        //     staff: await session.player.getGameProfile(),
+        //     discord: false,
+        //     role
+        // });
+    }
 
-    await role.deleteOne();
-    updateRoleCache();
-
-    return { message: i18n('roles.delete.success') };
+    return {
+        id: role.id,
+        name: role.name,
+        position: role.position,
+        color: role.color || null,
+        hasIcon: role.hasIcon,
+        permissions: role.permissions
+    };
 }, {
     detail: {
         tags: ['Roles'],
-        description: 'Deletes a specific role'
+        description: 'Edit a role'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: 'The role was deleted successfully' }),
+        200: t.Object({ id: t.String(), name: t.String(), position: t.Integer(), hasIcon: t.Boolean(), color: t.Nullable(t.String()), permissions: t.Number() }, { description: 'The edited role' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
         404: t.Object({ error: t.String() }, { description: 'There is no role with the name you provided' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
         429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     },
-    params: t.Object({ name: t.String({ description: 'The role name' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    body: t.Object({ name: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' })), color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6, error: '$.error.wrongType;;[["field", "color"], ["type", "string"]]' }))), permissions: t.Optional(t.Integer({ error: '$.error.wrongType;;[["field", "permissions"], ["type", "integer"]]' })) }, { error: '$.error.invalidBody', additionalProperties: true }),
+    params: t.Object({ id: t.String({ description: 'The role ID' }) }),
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+}) // TODO: Implement route to patch all roles at once
+.delete('/:id', async ({ session, params, i18n, status }) => { // Delete role
+    if(!session?.player?.hasPermission(Permission.DeleteRoles)) return status(403, { error: i18n('$.error.notAllowed') });
+
+    const role = await roles.findOne({ id: params.id });
+    if(!role) return status(404, { error: i18n('$.roles.not_found') });
+
+    sendModLogMessage({
+        logType: ModLogType.DeleteRole,
+        staff: await session.player.getGameProfile(),
+        discord: false,
+        role
+    });
+
+    await role.deleteOne();
+    updateRoleCache();
+
+    return { message: i18n('$.roles.delete.success') };
+}, {
+    detail: {
+        tags: ['Roles'],
+        description: 'Delete a role'
+    },
+    response: {
+        200: t.Object({ message: t.String() }, { description: 'The success message' }),
+        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
+        404: t.Object({ error: t.String() }, { description: 'There is no role with the name you provided' }),
+        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
+        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
+        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+    },
+    params: t.Object({ id: t.String({ description: 'The role ID' }) }),
+    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 });
