@@ -29,11 +29,9 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     const player = await players.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNoTag') });
 
-    const playerIcon = snakeCase(player.icon.name);
-
-    if(playerIcon == snakeCase(GlobalIcon[GlobalIcon.Custom])) {
+    if(player.icon.name == GlobalIcon.Custom) {
         if(!player.hasPermission(Permission.CustomIcon)) {
-            player.icon.name = snakeCase(GlobalIcon[GlobalIcon.None]);
+            player.icon.name = GlobalIcon.None;
             await player.save();
         }
     }
@@ -41,9 +39,9 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     return {
         uuid: formatUUID(player.uuid),
         tag: player.isBanned() ? null : player.tag || null,
-        position: snakeCase(player.position || GlobalPosition[GlobalPosition.Above]),
+        position: player.position,
         icon: {
-            type: playerIcon,
+            type: player.icon.name,
             hash: player.icon.hash || null
         },
         roleIcon: !player.hide_role_icon ? player.getActiveRoles().find((role) => role.role.hasIcon)?.role.name || null : null,

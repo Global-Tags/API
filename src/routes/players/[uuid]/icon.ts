@@ -4,7 +4,7 @@ import { join } from "path";
 import { capitalCase, snakeCase } from "change-case";
 import { config } from "../../../libs/config";
 import { Permission } from "../../../types/Permission";
-import { GlobalIcon } from "../../../types/GlobalIcon";
+import { GlobalIcon, icons } from "../../../types/GlobalIcon";
 import { stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 import { ModLogType, sendCustomIconUploadMessage, sendModLogMessage } from "../../../libs/discord-notifier";
@@ -48,13 +48,13 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     const player = await getOrCreatePlayer(params.uuid);
     if(session.self && player.isBanned()) return status(403, { error: i18n('$.error.banned') });
 
-    const isCustomIconDisallowed = session.self && snakeCase(GlobalIcon[GlobalIcon.Custom]) == icon && !session.player?.hasPermission(Permission.CustomIcon);
-    if(!session.player?.hasPermission(Permission.BypassValidation) && (isCustomIconDisallowed || !(capitalCase(icon) in GlobalIcon) || config.validation.icon.blacklist.includes(capitalCase(icon)))) return status(403, { error: i18n('$.icon.notAllowed') });
+    const isCustomIconDisallowed = session.self && GlobalIcon.Custom == icon && !session.player?.hasPermission(Permission.CustomIcon);
+    if(!session.player?.hasPermission(Permission.BypassValidation) && (isCustomIconDisallowed || !icons.includes(icon as GlobalIcon) || config.validation.icon.blacklist.includes(icon))) return status(403, { error: i18n('$.icon.notAllowed') });
 
     if(player.isBanned()) return status(403, { error: i18n('$.error.banned') });
-    if(snakeCase(player.icon.name) == icon) return status(400, { error: i18n('$.icon.sameIcon') });
+    if(player.icon.name == icon) return status(400, { error: i18n('$.icon.sameIcon') });
 
-    const oldIcon = player.icon;
+    const oldIcon = player.icon.name;
     player.icon.name = icon;
     await player.save();
     
@@ -65,13 +65,13 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
             user: await player.getGameProfile(),
             discord: false,
             icons: {
-                old: oldIcon?.name || '---',
+                old: oldIcon || '---',
                 new: icon
             }
         });
 
         if(player.isEmailVerified()) {
-            sendTagChangeEmail(player.connections.email.address!, oldIcon?.name || '---', icon, getI18nFunctionByLanguage(player.last_language));
+            sendTagChangeEmail(player.connections.email.address!, oldIcon || '---', icon, getI18nFunctionByLanguage(player.last_language));
         }
     }
 
@@ -110,7 +110,7 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     if(!metadata.height || metadata.height != metadata.width) return status(422, { error: i18n('$.icon.upload.wrongResolution')});
     if(metadata.height > config.validation.icon.maxResolution) return status(422, { error: i18n('$.icon.upload.exceedsMaxResolution').replaceAll('<max>', config.validation.icon.maxResolution.toString()) });
 
-    player.icon.name = snakeCase(GlobalIcon[GlobalIcon.Custom]);
+    player.icon.name = GlobalIcon.Custom;
     player.icon.hash = generateSecureCode(32);
     await player.save();
     await Bun.write(Bun.file(join('data', 'icons', player.uuid, `${player.icon.hash}.png`)), await image.arrayBuffer(), { createPath: true });

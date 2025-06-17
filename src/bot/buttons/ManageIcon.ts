@@ -2,7 +2,6 @@ import { ButtonInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder
 import Button from "../structs/Button";
 import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
-import { snakeCase } from "change-case";
 import { getCustomIconUrl } from "../../routes/players/[uuid]/icon";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon } from "../../types/GlobalIcon";
@@ -24,9 +23,8 @@ export default class ManageIconButton extends Button {
             .setTitle('Manage icon')
             .setDescription('Here you can edit the player\'s icon type and texture.');
 
-        const icon = snakeCase(target.icon.name);
-        if(icon != snakeCase(GlobalIcon[GlobalIcon.None])) {
-            if(icon == snakeCase(GlobalIcon[GlobalIcon.Custom])) {
+        if(target.icon.name != GlobalIcon.None) {
+            if(target.icon.name == GlobalIcon.Custom) {
                 if(!!target.icon.hash) {
                     embed.setThumbnail(getCustomIconUrl(target.uuid, target.icon.hash));
                 }
