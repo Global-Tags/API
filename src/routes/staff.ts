@@ -1,17 +1,17 @@
 import { t } from "elysia";
 import { ElysiaApp } from "..";
-import staffCategories, { getNextPosition } from "../database/schemas/staff-categories";
-import staffMembers from "../database/schemas/staff-members";
 import { formatUUID, GameProfile, stripUUID, uuidRegex } from "../libs/game-profiles";
 import { generateSecureCode } from "../libs/crypto";
 import { Permission } from "../types/Permission";
+import { getNextPosition, StaffCategory } from "../database/schemas/StaffCategory";
+import { StaffMember } from "../database/schemas/StaffMember";
 
 export default (app: ElysiaApp) => app.get('/', async () => {
-    const categories = await staffCategories.find().sort({ position: 1 }).lean();
+    const categories = await StaffCategory.find().sort({ position: 1 }).lean();
 
     return await Promise.all(
         categories.map(async (category) => {
-            const members = await staffMembers.find({ category: category.id }).sort({ joinedAt: 1 }).lean();
+            const members = await StaffMember.find({ category: category.id }).sort({ joinedAt: 1 }).lean();
 
             const mappedMembers = await Promise.all(members.map(async (member) => ({
                 uuid: member.uuid,
@@ -41,11 +41,11 @@ export default (app: ElysiaApp) => app.get('/', async () => {
     app.get('/', async ({ session, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.ViewStaffCategories)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        return Promise.all((await staffCategories.find().sort({ position: 1 }).lean()).map(async (category) => ({
+        return Promise.all((await StaffCategory.find().sort({ position: 1 }).lean()).map(async (category) => ({
             id: category.id,
             name: category.name,
             position: category.position,
-            members: (await staffMembers.find({ category: category.id }).sort({ joinedAt: 1 }).lean()).length
+            members: (await StaffMember.find({ category: category.id }).sort({ joinedAt: 1 }).lean()).length
         })));
     }, {
         detail: {
@@ -60,9 +60,9 @@ export default (app: ElysiaApp) => app.get('/', async () => {
     }).get('/:category', async ({ session, params: { category: id }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.ViewStaffCategories)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        const category = await staffCategories.findOne({ id }).lean();
+        const category = await StaffCategory.findOne({ id }).lean();
         if(!category) return status(404, { error: i18n('$.staff.categories.not_found') });
-        const members = await staffMembers.find({ category: category.id }).sort({ joinedAt: 1 }).lean();
+        const members = await StaffMember.find({ category: category.id }).sort({ joinedAt: 1 }).lean();
 
         return {
             id: category.id,
@@ -86,7 +86,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
     }).post('/', async ({ session, body: { name }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.CreateStaffCategories)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        const category = await staffCategories.insertOne({
+        const category = await StaffCategory.insertOne({
             id: generateSecureCode(),
             name: name.trim(),
             position: await getNextPosition()
@@ -114,7 +114,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
     }).patch('/:id', async ({ session, body: { name }, params: { id }, i18n, status }) => { // Edit category
         if(!session?.player?.hasPermission(Permission.EditStaffMembers)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        const category = await staffCategories.findOne({ id });
+        const category = await StaffCategory.findOne({ id });
         if(!category) return status(404, { error: i18n('$.staff.categories.not_found') });
 
         if(name && category.name !== name.trim()) {
@@ -149,7 +149,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
     .delete('/:category', async ({ session, params: { category: id }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.DeleteStaffCategories)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        const category = await staffCategories.findOne({ id });
+        const category = await StaffCategory.findOne({ id });
         if(!category) return status(404, { error: i18n('$.staff.categories.not_found') });
 
         await category.deleteOne();
@@ -173,7 +173,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
     app.get('/', async ({ session, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.ViewStaffMembers)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        return Promise.all((await staffMembers.find().sort({ joinedAt: 1 }).lean()).map(async member => ({
+        return Promise.all((await StaffMember.find().sort({ joinedAt: 1 }).lean()).map(async member => ({
             uuid: formatUUID(member.uuid),
             username: (await GameProfile.getProfileByUUID(member.uuid)).username || 'Unknown',
             category: member.category,
@@ -193,7 +193,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
     }).get('/:uuid', async ({ session, params: { uuid }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.ViewStaffMembers)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        const member = await staffMembers.findOne({ uuid: stripUUID(uuid) });
+        const member = await StaffMember.findOne({ uuid: stripUUID(uuid) });
         if(!member) return status(404, { error: i18n('$.staff.members.not_found') });
 
         return {
@@ -223,15 +223,15 @@ export default (app: ElysiaApp) => app.get('/', async () => {
 
         if(!uuidRegex.test(uuid)) return status(400, { error: i18n('$.staff.members.invalid_uuid') });
 
-        const existingMember = await staffMembers.findOne({ uuid });
+        const existingMember = await StaffMember.findOne({ uuid });
         if(existingMember) return status(409, { error: i18n('$.staff.members.already_exists') });
 
-        if(!(await staffCategories.exists({ id: category }))) return status(404, { error: i18n('$.staff.categories.not_found') });
+        if(!(await StaffCategory.exists({ id: category }))) return status(404, { error: i18n('$.staff.categories.not_found') });
 
         const joinedAt = new Date();
         joinedAt.setHours(0, 0, 0, 0);
 
-        const newMember = await staffMembers.insertOne({
+        const newMember = await StaffMember.insertOne({
             uuid: stripUUID(uuid.trim()),
             category,
             description: description?.trim() || null,
@@ -267,12 +267,12 @@ export default (app: ElysiaApp) => app.get('/', async () => {
     }).patch('/:uuid', async ({ session, body: { category, description }, params: { uuid }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.EditStaffMembers)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        const member = await staffMembers.findOne({ uuid: stripUUID(uuid) });
+        const member = await StaffMember.findOne({ uuid: stripUUID(uuid) });
         if(!member) return status(404, { error: i18n('$.staff.members.not_found') });
 
         let updated = false;
         if(category !== undefined && member.category !== category) {
-            if(!(await staffCategories.exists({ id: category }))) return status(404, { error: i18n('$.staff.categories.not_found') });
+            if(!(await StaffCategory.exists({ id: category }))) return status(404, { error: i18n('$.staff.categories.not_found') });
             member.category = category;
             updated = true;
         }
@@ -309,7 +309,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
     }).delete('/:uuid', async ({ session, params: { uuid }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.DeleteStaffMembers)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        const member = await staffMembers.findOne({ uuid: stripUUID(uuid) });
+        const member = await StaffMember.findOne({ uuid: stripUUID(uuid) });
         if(!member) return status(404, { error: i18n('$.staff.members.not_found') });
 
         await member.deleteOne();
