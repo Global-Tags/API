@@ -1,6 +1,6 @@
 import { client, fetchGuild } from "../bot/bot";
 import players from "../database/schemas/players";
-import { getCachedRoles, synchronizeRoles } from "../database/schemas/roles";
+import { getCachedRoles, synchronizeDiscordRoles } from "../database/schemas/Role";
 import { config } from "./config";
 import { sendDiscordLinkMessage } from "./discord-notifier";
 import { GameProfile } from "./game-profiles";
@@ -37,7 +37,7 @@ export async function onDiscordLink(player: GameProfile, userId: string) {
             if(role.trim().length > 0 && playerData.addRole({ name: role, reason: 'Server boost', autoRemove: true }).success) save = true;
         }
         if(save) await playerData.save();
-        synchronizeRoles();
+        synchronizeDiscordRoles();
     }
 }
 

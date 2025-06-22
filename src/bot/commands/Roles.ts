@@ -4,7 +4,7 @@ import { config } from "../../libs/config";
 import { colors, images } from "../bot";
 import { Player } from "../../database/schemas/players";
 import { Permission } from "../../types/Permission";
-import { getCachedRoles } from "../../database/schemas/roles";
+import { getCachedRoles } from "../../database/schemas/Role";
 import { capitalCase } from "change-case";
 
 export default class RolesCommand extends Command {

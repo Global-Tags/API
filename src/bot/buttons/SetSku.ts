@@ -1,7 +1,7 @@
 import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, MessageFlags, StringSelectMenuBuilder } from "discord.js";
 import Button from "../structs/Button";
 import { client, colors, images } from "../bot";
-import { getCachedRoles } from "../../database/schemas/roles";
+import { getCachedRoles } from "../../database/schemas/Role";
 import { Player } from "../../database/schemas/players";
 import { Permission } from "../../types/Permission";
 

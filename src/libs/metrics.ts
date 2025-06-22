@@ -1,15 +1,15 @@
-import metrics from "../database/schemas/metrics";
 import players from "../database/schemas/players";
 import Logger from "./Logger";
 import axios from "axios";
 import { fetchGuild } from "../bot/bot";
 import { args } from "..";
 import { config } from "./config";
-import { getCachedRoles } from "../database/schemas/roles";
+import { getCachedRoles } from "../database/schemas/Role";
 import { GlobalIcon, icons as iconList } from "../types/GlobalIcon";
 import { snakeCase } from "change-case";
 import { GlobalPosition, positions as positionList } from "../types/GlobalPosition";
 import { captureException } from "@sentry/bun";
+import { Metric } from "../database/schemas/Metric";
 
 let requests: number;
 
@@ -59,7 +59,7 @@ export async function saveMetrics() {
     if(config.discordBot.syncedRoles.enabled) await (await fetchGuild())?.members.fetch();
     const users = await players.find();
     const tags = users.filter((user) => user.tag != null).length;
-    const staff = users.filter((user) => {
+    const admins = users.filter((user) => {
         const adminRole = getCachedRoles().find((role) => role.name == config.metrics.adminRole);
         return !!adminRole && user.getActiveRoles().some((role) => role.role.name == adminRole.name);
     }).length;
@@ -75,10 +75,10 @@ export async function saveMetrics() {
     const addon = await fetchAddon('globaltags');
     const mod = await fetchMod('globaltags');
     
-    metrics.insertMany({
+    Metric.insertOne({
         players: users.length,
         tags,
-        admins: staff,
+        admins,
         bans,
         downloads: {
             flintmc: addon?.downloads ?? 0,
@@ -87,7 +87,7 @@ export async function saveMetrics() {
         ratings: {
             flintmc: addon?.rating.rating ?? 0
         },
-        dailyRequests: getRequests(),
+        daily_requests: getRequests(),
         positions,
         icons
     }).catch((error) => {

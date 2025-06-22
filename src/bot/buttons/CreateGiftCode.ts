@@ -3,7 +3,7 @@ import Button from "../structs/Button";
 import { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
-import { getCachedRoles } from "../../database/schemas/roles";
+import { getCachedRoles } from "../../database/schemas/Role";
 import { capitalCase } from "change-case";
 
 export default class CreateGiftCodeButton extends Button {

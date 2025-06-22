@@ -7,7 +7,7 @@ import { config } from "./config";
 import { stripColors, translateToAnsi } from "./chat-color";
 import Logger from "./Logger";
 import { ApiKey } from "../database/schemas/players";
-import { Role } from "../database/schemas/roles";
+import { RoleDocument } from "../database/schemas/Role";
 import { ReportDocument } from "../database/schemas/Report";
 import { GiftCodeDocument } from "../database/schemas/GiftCode";
 
@@ -71,7 +71,7 @@ type ModLogData = {
     appealable: boolean
 } | {
     logType: ModLogType.AddRole | ModLogType.RemoveRole | ModLogType.CreateRole | ModLogType.DeleteRole,
-    role: Role
+    role: RoleDocument
 } | {
     logType: ModLogType.EditRoleNote,
     role: string,

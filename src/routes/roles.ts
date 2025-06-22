@@ -1,7 +1,7 @@
 import { t } from "elysia";
 import { Permission } from "../types/Permission";
 import { ModLogType, sendModLogMessage } from "../libs/discord-notifier";
-import roles, { getCachedRoles, getNextPosition, updateRoleCache } from "../database/schemas/roles";
+import roles, { getCachedRoles, getNextPosition, updateRoleCache } from "../database/schemas/Role";
 import { ElysiaApp } from "..";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }) => { // Get roles

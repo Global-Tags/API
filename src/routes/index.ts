@@ -2,9 +2,9 @@ import { ElysiaApp } from "..";
 import { getRequests } from "../libs/metrics";
 import { version } from "../../package.json";
 import { Context, t } from "elysia";
-import Metrics from "../database/schemas/metrics";
 import { formatUUID } from "../libs/game-profiles";
 import players from "../database/schemas/players";
+import { Metric } from "../database/schemas/Metric";
 
 export default (app: ElysiaApp) => app.get('/', () => ({
     version,
@@ -24,20 +24,20 @@ export default (app: ElysiaApp) => app.get('/', () => ({
         503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
     }
 }).get('/metrics', async ({ query: { latest } }) => {
-    const metrics = await Metrics.find();
+    const metrics = await Metric.find();
 
     return metrics.filter((doc) => {
         if(latest != 'true') return true;
         return doc.id == (metrics.at(-1)?.id ?? 0);
     }).map((metric) => ({
-        time: new Date(metric.createdAt).getTime(),
+        time: metric.created_at.getTime(),
         users: metric.players,
         tags: metric.tags,
         admins: metric.admins,
         bans: metric.bans,
         downloads: metric.downloads,
         ratings: metric.ratings,
-        dailyRequests: metric.dailyRequests ?? 0,
+        dailyRequests: metric.daily_requests ?? 0,
         positions: metric.positions,
         icons: metric.icons
     }));

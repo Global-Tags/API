@@ -4,7 +4,7 @@ import { fetchSku } from "../bot";
 import players from "../../database/schemas/players";
 import { sendEntitlementMessage } from "../../libs/discord-notifier";
 import { config } from "../../libs/config";
-import { getCachedRoles } from "../../database/schemas/roles";
+import { getCachedRoles } from "../../database/schemas/Role";
 
 const roleReason = (entitlement: string) => `Discord entitlement: ${entitlement}`;
 

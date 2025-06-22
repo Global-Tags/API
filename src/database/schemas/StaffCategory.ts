@@ -1,5 +1,6 @@
 import { HydratedDocument, model, Schema } from "mongoose";
 import { isConnected } from "../mongo";
+import { generateSecureCode } from "../../libs/crypto";
 
 interface IStaffCategory {
     /**
@@ -20,7 +21,8 @@ const StaffCategorySchema = new Schema<IStaffCategory>({
     id: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        default: generateSecureCode
     },
     name: {
         type: String,

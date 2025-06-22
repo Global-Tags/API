@@ -3,7 +3,7 @@ import SelectMenu from "../structs/SelectMenu";
 import { Player } from "../../database/schemas/players";
 import { colors, images } from "../bot";
 import { Permission, permissions as allPermissions } from "../../types/Permission";
-import { getCachedRoles } from "../../database/schemas/roles";
+import { getCachedRoles } from "../../database/schemas/Role";
 import { capitalCase, pascalCase } from "change-case";
 import { config } from "../../libs/config";
 

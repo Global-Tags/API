@@ -3,7 +3,7 @@ import { saveMetrics } from "./metrics";
 import Logger from "./Logger";
 import playerSchema from "../database/schemas/players";
 import { config } from "./config";
-import { synchronizeRoles, updateRoleCache } from "../database/schemas/roles";
+import { synchronizeDiscordRoles, updateRoleCache } from "../database/schemas/Role";
 import { isConnected } from "../database/mongo";
 import { Cron } from "croner";
 
@@ -54,7 +54,7 @@ export function startRoleCacheJob() {
 export function startRoleSynchronization() {
     if(!config.discordBot.syncedRoles.enabled) return;
     Logger.info('Role syncronization initialized.');
-    const job = new Cron('*/10 * * * *', synchronizeRoles, {
+    const job = new Cron('*/10 * * * *', synchronizeDiscordRoles, {
         name: 'Role Synchronization',
         timezone: tz
     });

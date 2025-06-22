@@ -3,7 +3,7 @@ import Button from "../structs/Button";
 import { Permission, permissions } from "../../types/Permission";
 import { Player } from "../../database/schemas/players";
 import { colors, images } from "../bot";
-import { getCachedRoles } from "../../database/schemas/roles";
+import { getCachedRoles } from "../../database/schemas/Role";
 import { capitalCase } from "change-case";
 
 export default class ManagePermissionsButton extends Button {

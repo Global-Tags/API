@@ -1,7 +1,7 @@
 import { HydratedDocument, Schema, model } from "mongoose";
 import { snakeCase } from "change-case";
 import { Permission } from "../../types/Permission";
-import { getCachedRoles, Role } from "./roles";
+import { getCachedRoles, RoleDocument } from "./Role";
 import { GlobalIcon } from "../../types/GlobalIcon";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { isConnected } from "../mongo";
@@ -9,7 +9,7 @@ import { generateSecureCode } from "../../libs/crypto";
 import { Report, ReportDocument } from "./Report";
 
 export type PlayerRole = {
-    role: Role,
+    role: RoleDocument,
     added_at: Date,
     autoRemove: boolean,
     expiresAt?: Date | null,

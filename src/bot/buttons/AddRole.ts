@@ -4,7 +4,7 @@ import players, { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { capitalCase, snakeCase } from "change-case";
 import { Permission } from "../../types/Permission";
-import { getCachedRoles } from "../../database/schemas/roles";
+import { getCachedRoles } from "../../database/schemas/Role";
 
 export default class AddRoleButton extends Button {
     constructor() {

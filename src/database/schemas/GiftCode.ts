@@ -43,7 +43,7 @@ interface IGiftCode {
          * Duration for which the gift is valid, in milliseconds
          * If null, the gift is permanent
          */
-        duration?: number | null
+        duration: number | null
     };
     /**
      * UUID of the user who created this gift code
@@ -57,7 +57,7 @@ interface IGiftCode {
      * Optional expiration date for the gift code
      * If null, the code does not expire
      */
-    expires_at?: Date | null;
+    expires_at: Date | null;
 
     /**
      * Get the GameProfile of the creator of this gift code
@@ -82,7 +82,8 @@ const GiftCodeSchema = new Schema<IGiftCode>({
     id: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        default: generateSecureCode
     },
     name: {
         type: String,
@@ -111,7 +112,8 @@ const GiftCodeSchema = new Schema<IGiftCode>({
         },
         duration: {
             type: Number,
-            required: false
+            required: true,
+            default: null
         }
     },
     created_by: {
@@ -124,7 +126,8 @@ const GiftCodeSchema = new Schema<IGiftCode>({
     },
     expires_at: {
         type: Date,
-        required: false
+        required: true,
+        default: null
     }
 }, {
     methods: {

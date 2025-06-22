@@ -3,9 +3,9 @@ import { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { Permission } from "../../types/Permission";
-import roles, { getNextPosition, updateRoleCache } from "../../database/schemas/roles";
 import { snakeCase } from "change-case";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
+import { getNextPosition, Role, updateRoleCache } from "../../database/schemas/Role";
 
 export default class CreateRoleModal extends Modal {
     constructor() {
@@ -18,9 +18,9 @@ export default class CreateRoleModal extends Modal {
     async submit(interaction: ModalSubmitInteraction, message: Message, fields: ModalSubmitFields, member: GuildMember, player: Player) {
         const name = snakeCase(fields.getTextInputValue('name').trim());
 
-        if(await roles.exists({ name })) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ The role \`${name}\` already exists!`)], flags: [MessageFlags.Ephemeral] });
+        if(await Role.exists({ name })) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ The role \`${name}\` already exists!`)], flags: [MessageFlags.Ephemeral] });
 
-        await roles.insertMany([{
+        await Role.insertMany([{
             name,
             position: await getNextPosition(),
             hasIcon: false,
