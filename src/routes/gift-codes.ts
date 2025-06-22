@@ -3,12 +3,12 @@ import { Permission } from "../types/Permission";
 import { ElysiaApp } from "..";
 import { ModLogType, sendGiftCodeRedeemMessage, sendModLogMessage } from "../libs/discord-notifier";
 import { formatUUID } from "../libs/game-profiles";
-import giftCodes, { createGiftCode } from "../database/schemas/gift-codes";
+import { createGiftCode, GiftCode, GiftType } from "../database/schemas/GiftCode";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }) => { // Get gift code list
     if(!session?.player?.hasPermission(Permission.ViewGiftCodes)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const codes = await giftCodes.find();
+    const codes = await GiftCode.find();
 
     return codes.map((code) => ({
         id: code.id,
@@ -41,7 +41,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
 }).get('/:code', async ({ session, params, i18n, status }) => { // Get info of a specific code
     if(!session?.player?.hasPermission(Permission.ViewGiftCodes)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const code = await giftCodes.findOne({ $or: [{ id: params.code }, { code: params.code }] });
+    const code = await GiftCode.findOne({ $or: [{ id: params.code }, { code: params.code }] });
     if(!code) return status(404, { error: i18n('$.gift_codes.not_found') });
     const { id, name, code: giftCode, uses, max_uses, gift, created_by, created_at, expires_at } = code;
 
@@ -66,7 +66,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     const { player } = session;
     if(!player) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const code = await giftCodes.findOne({ code: params.code });
+    const code = await GiftCode.findOne({ code: params.code });
     if(!code || !code.isValid()) return status(404, { error: i18n('$.gift_codes.not_found') });
     if(code.uses.includes(player.uuid)) return status(422, { error: i18n('$.gift_codes.already_redeemed') });
 
@@ -106,7 +106,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         code: code?.trim() || undefined,
         maxUses,
         gift: {
-            type: 'role',
+            type: GiftType.Role,
             value: role,
             duration: giftExpiresAt
         },
@@ -153,7 +153,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
 }).delete('/:code', async ({ session, params, i18n, status }) => { // Delete gift code
     if(!session?.player?.hasPermission(Permission.DeleteGiftCodes)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const code = await giftCodes.findOne({ id: params.code });
+    const code = await GiftCode.findOne({ id: params.code });
     if(!code) return status(404, { error: i18n('$.gift_codes.not_found') });
     await code.deleteOne();
 

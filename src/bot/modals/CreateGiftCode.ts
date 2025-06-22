@@ -4,7 +4,7 @@ import { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 import ms, { StringValue } from "ms";
-import { createGiftCode } from "../../database/schemas/gift-codes";
+import { createGiftCode, GiftType } from "../../database/schemas/GiftCode";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 
 export default class CreateGiftCodeModal extends Modal {
@@ -36,7 +36,7 @@ export default class CreateGiftCodeModal extends Modal {
             code: code?.trim() || undefined,
             maxUses,
             gift: {
-                type: 'role',
+                type: GiftType.Role,
                 value: role,
                 duration: giftExpiresAt
             },

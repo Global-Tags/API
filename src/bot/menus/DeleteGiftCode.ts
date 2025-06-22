@@ -4,7 +4,7 @@ import { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import codeSchema from "../../database/schemas/gift-codes";
+import { GiftCode } from "../../database/schemas/GiftCode";
 
 export default class DeleteGiftCodeMenu extends SelectMenu {
     constructor() {
@@ -17,7 +17,7 @@ export default class DeleteGiftCodeMenu extends SelectMenu {
     async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: Player) {
         if(values.length == 0) return interaction.deferUpdate();
 
-        const code = await codeSchema.findOne({ code: values[0] });
+        const code = await GiftCode.findOne({ code: values[0] });
         if(!code) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Code not found!')], flags: [MessageFlags.Ephemeral] });
         await code.deleteOne();
 

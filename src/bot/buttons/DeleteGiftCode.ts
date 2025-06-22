@@ -3,7 +3,7 @@ import Button from "../structs/Button";
 import { Player } from "../../database/schemas/players";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
-import codeSchema from "../../database/schemas/gift-codes";
+import { GiftCode } from "../../database/schemas/GiftCode";
 
 export default class DeleteGiftCodeButton extends Button {
     constructor() {
@@ -19,7 +19,7 @@ export default class DeleteGiftCodeButton extends Button {
             .setTitle('Delete gift code')
             .setDescription('Here you can select a gift code to be deleted.');
 
-        const codes = await codeSchema.find();
+        const codes = await GiftCode.find();
         const codeMap = codes.filter((code) => code.isValid()).slice(0, 25).map((code) => ({
             value: code.code,
             label: code.name,

@@ -3,8 +3,8 @@ import Command from "../structs/Command";
 import { Player } from "../../database/schemas/players";
 import { images } from "../bot";
 import { Permission } from "../../types/Permission";
-import giftCodes, { GiftCode } from "../../database/schemas/gift-codes";
 import { formatTimestamp } from "../../libs/discord-notifier";
+import { GiftCode, GiftCodeDocument } from "../../database/schemas/GiftCode";
 
 export default class GiftCodesCommand extends Command {
     constructor() {
@@ -17,8 +17,8 @@ export default class GiftCodesCommand extends Command {
 
     async execute(interaction: CommandInteraction, options: CommandInteractionOptionResolver, member: GuildMember, player: Player) {
         const limit = 30;
-        const codes = await giftCodes.find();
-        const stringifyCode = (code: GiftCode) => `↝ \`${code.name}\` [||**${code.code}**||] - \`${code.uses.length}/${code.max_uses}\` Uses${code.expires_at ? ` (Expires ${formatTimestamp(code.expires_at, 'R')})` : ''}`;
+        const codes = await GiftCode.find();
+        const stringifyCode = (code: GiftCodeDocument) => `↝ \`${code.name}\` [||**${code.code}**||] - \`${code.uses.length}/${code.max_uses}\` Uses${code.expires_at ? ` (Expires ${formatTimestamp(code.expires_at, 'R')})` : ''}`;
         const maps = {
             active: codes.filter((code) => code.isValid()),
             inactive: codes.filter((code) => !code.isValid())
