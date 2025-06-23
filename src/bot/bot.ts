@@ -38,7 +38,7 @@ export const buttons = new Collection<string, Button>();
 export const menus = new Collection<string, SelectMenu>();
 export const modals = new Collection<string, Modal>();
 
-(async () => {
+export async function registerFeatures() {
     const eventDir = join(__dirname, 'events');
     const commandDir = join(__dirname, 'commands');
     const buttonDir = join(__dirname, 'buttons');
@@ -73,7 +73,7 @@ export const modals = new Collection<string, Modal>();
 
         modals.set(modal.id, modal);
     });
-})();
+};
 
 export const spawn = () => client.login(config.discordBot.token);
 export const destroy = () => client.destroy();

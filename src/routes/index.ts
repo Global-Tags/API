@@ -3,8 +3,8 @@ import { getRequests } from "../libs/metrics";
 import { version } from "../../package.json";
 import { Context, t } from "elysia";
 import { formatUUID } from "../libs/game-profiles";
-import players from "../database/schemas/players";
 import { Metric } from "../database/schemas/Metric";
+import { Player } from "../database/schemas/Player";
 
 export default (app: ElysiaApp) => app.get('/', () => ({
     version,
@@ -65,7 +65,7 @@ export default (app: ElysiaApp) => app.get('/', () => ({
         latest: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "element"], ["type", "string"]]' }))
     }, { additionalProperties: true })
 }).get('/referrals', async () => {
-    const data = await players.find();
+    const data = await Player.find();
     const totalReferrals = data.filter((player) => player.referrals.total.length > 0).sort((a, b) => b.referrals.total.length - a.referrals.total.length).slice(0, 10);
     const monthReferrals = data.filter((player) => player.referrals.current_month > 0).sort((a, b) => b.referrals.current_month - a.referrals.current_month).slice(0, 10);
 

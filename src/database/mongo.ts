@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import Logger from "../libs/Logger";
-import { destroy, spawn } from "../bot/bot";
+import { destroy, registerFeatures, spawn } from "../bot/bot";
 import { config } from "../libs/config";
 
 let registered = false;
@@ -13,6 +13,7 @@ export async function connect(connectionString: string) {
 
 function registerEventHandler(connectionString: string) {
     if(registered) return;
+    if(config.discordBot.enabled) registerFeatures();
 
     mongoose.connection.on('connected', () => {
         Logger.info('Connected to database!');

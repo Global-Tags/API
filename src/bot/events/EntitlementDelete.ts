@@ -1,6 +1,6 @@
 import { Entitlement } from "discord.js";
 import Event from "../structs/Event";
-import players from "../../database/schemas/players";
+import players from "../../database/schemas/Player";
 import { sendEntitlementMessage } from "../../libs/discord-notifier";
 import entitlements from "../../database/schemas/entitlement";
 import { config } from "../../libs/config";

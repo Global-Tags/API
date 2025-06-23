@@ -1,6 +1,6 @@
 import { GuildMember } from "discord.js";
 import Event from "../structs/Event";
-import players from "../../database/schemas/players";
+import players from "../../database/schemas/Player";
 import { config } from "../../libs/config";
 
 export default class GuildMemberAddEvent extends Event {

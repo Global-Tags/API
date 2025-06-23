@@ -1,7 +1,7 @@
 import { t } from "elysia";
 import { Permission } from "../types/Permission";
 import { ModLogType, sendModLogMessage } from "../libs/discord-notifier";
-import roles, { getCachedRoles, getNextPosition, updateRoleCache } from "../database/schemas/Role";
+import { getCachedRoles, getNextPosition, Role, updateRoleCache } from "../database/schemas/Role";
 import { ElysiaApp } from "..";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }) => { // Get roles
@@ -60,7 +60,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
 }).post('/', async ({ session, body, i18n, status }) => { // Create role
     if(!session?.player?.hasPermission(Permission.CreateRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const role = await roles.insertOne({
+    const role = await Role.insertOne({
         name: body.name.trim(),
         position: await getNextPosition(),
         hasIcon: false,
@@ -101,7 +101,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
 }).patch('/:id', async ({ session, params, body: { name, color, permissions }, i18n, status }) => { // Edit role
     if(!session?.player?.hasPermission(Permission.DeleteRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const role = await roles.findOne({ id: params.id });
+    const role = await Role.findOne({ id: params.id });
     if(!role) return status(404, { error: i18n('$.roles.not_found') });
 
     let updated = false;
@@ -159,7 +159,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
 .delete('/:id', async ({ session, params, i18n, status }) => { // Delete role
     if(!session?.player?.hasPermission(Permission.DeleteRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const role = await roles.findOne({ id: params.id });
+    const role = await Role.findOne({ id: params.id });
     if(!role) return status(404, { error: i18n('$.roles.not_found') });
 
     sendModLogMessage({

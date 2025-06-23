@@ -1,16 +1,16 @@
 import { t } from "elysia";
-import players from "../../../database/schemas/players";
 import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 import { ModLogType, sendBanAppealMessage, sendModLogMessage } from "../../../libs/discord-notifier";
 import { sendBanEmail, sendUnbanEmail } from "../../../libs/mailer";
 import { Permission } from "../../../types/Permission";
 import { formatUUID, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
+import { Player } from "../../../database/schemas/Player";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get ban list
     if(!session?.player?.hasPermission(Permission.ViewBans)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     return player.bans.map((ban) => ({
@@ -40,7 +40,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).get('/:id', async ({ session, params, i18n, status }) => { // Get ban info of specific ban
     if(!session?.player?.hasPermission(Permission.ViewBans)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
     
     const ban = player.bans.find(({ id }) => id === params.id);
@@ -66,7 +66,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).post('/', async ({ session, body: { reason, appealable, duration }, params, i18n, status }) => { // Ban player
     if(!session?.player?.hasPermission(Permission.CreateBans)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
     if(player.isBanned()) return status(409, { error: i18n('$.ban.already_banned') });
 
@@ -84,13 +84,13 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         expires
     });
 
-    if(player.isEmailVerified()) {
+    if(player.email.verified) {
         sendBanEmail({
-            address: player.connections.email.address!,
+            address: player.email.address!,
             reason: reason || '---',
             appealable: appealable == undefined ? true : appealable,
             duration: expires,
-            i18n: getI18nFunctionByLanguage(player.last_language)
+            i18n: getI18nFunctionByLanguage(player.preferred_language)
         });
     }
 
@@ -115,7 +115,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).patch('/', async ({ session, body: { appealable, reason }, params, i18n, status }) => { // Update ban info
     if(!session?.player?.hasPermission(Permission.EditBans)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
     if(!player.isBanned()) return status(409, { error: i18n('$.ban.not_banned') });
 
@@ -190,7 +190,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).delete('/', async ({ session, params, i18n, status }) => { // Unban player
     if(!session?.player?.hasPermission(Permission.DeleteBans)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
     if(!player.isBanned()) return status(409, { error: i18n('$.ban.not_banned') });
 
@@ -204,8 +204,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         discord: false
     });
 
-    if(player.isEmailVerified()) {
-        sendUnbanEmail(player.connections.email.address!, getI18nFunctionByLanguage(player.last_language));
+    if(player.email.verified) {
+        sendUnbanEmail(player.email.address!, getI18nFunctionByLanguage(player.preferred_language));
     }
 
     return { message: i18n('$.ban.unbanned') };

@@ -1,15 +1,15 @@
 import { t } from "elysia";
-import players from "../../../database/schemas/players";
 import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
 import { Permission } from "../../../types/Permission";
 import { GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 import { generateSecureCode } from "../../../libs/crypto";
+import { Player } from "../../../database/schemas/Player";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get api key list
     if(!session?.player?.hasPermission(Permission.ViewApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     return player.api_keys.map((key) => ({
@@ -36,7 +36,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).get('/:id', async ({ session, params, i18n, status }) => { // Get info of specific api key
     if(!session?.player?.hasPermission(Permission.ViewApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
     
     const key = player.getApiKey(params.id);
@@ -62,7 +62,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).post('/', async ({ session, body: { name }, params, i18n, status }) => { // Create an API key
     if(!session?.player?.hasPermission(Permission.CreateApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     const key = player.createApiKey(name.trim());
@@ -102,7 +102,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).post('/:id/regenerate', async ({ session, params, i18n, status }) => { // Regenerate API key
     if(!session?.player?.hasPermission(Permission.EditApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
     const key = player.getApiKey(params.id);
     if(!key) return status(404, { error: i18n('$.api_keys.not_found') });
@@ -143,7 +143,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).patch('/:id', async ({ session, params, body: { name }, i18n, status }) => { // Edit API key
     if(!session?.player?.hasPermission(Permission.EditApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     const key = player.getApiKey(params.id);
@@ -185,7 +185,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).delete('/:id', async ({ session, params, i18n, status }) => { // Delete api key
     if(!session?.player?.hasPermission(Permission.DeleteApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
     const key = player.getApiKey(params.id);
     if(!key || !player.deleteApiKey(key.id)) return status(404, { error: i18n('$.api_keys.not_found') });

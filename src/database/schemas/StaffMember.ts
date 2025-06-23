@@ -1,6 +1,6 @@
 import { HydratedDocument, model, Schema } from "mongoose";
 import { GameProfile } from "../../libs/game-profiles";
-import players, { Player } from "./players";
+import { Player, PlayerDocument } from "./Player";
 import { StaffCategory, StaffCategoryDocument } from "./StaffCategory";
 
 interface IStaffMember {
@@ -29,9 +29,9 @@ interface IStaffMember {
 
     /**
      * Retrieves the Player document associated with the staff member
-     * @return {Promise<Player | null>} A promise that resolves to the Player document of the staff member, or null if not found
+     * @return {Promise<PlayerDocument | null>} A promise that resolves to the Player document of the staff member, or null if not found
      */
-    getPlayer(): Promise<Player | null>;
+    getPlayer(): Promise<PlayerDocument | null>;
 
     /**
      * Retrieves the StaffCategory document associated with the staff member
@@ -62,8 +62,8 @@ const StaffMemberSchema = new Schema<IStaffMember>({
             return GameProfile.getProfileByUUID(this.uuid);
         },
 
-        getPlayer(): Promise<Player | null> {
-            return players.findOne({ uuid: this.uuid });
+        getPlayer(): Promise<PlayerDocument | null> {
+            return Player.findOne({ uuid: this.uuid });
         },
 
         getCategory(): Promise<StaffCategoryDocument | null> {

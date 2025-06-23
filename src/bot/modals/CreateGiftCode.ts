@@ -1,6 +1,6 @@
 import { ModalSubmitInteraction, Message, ModalSubmitFields, GuildMember, EmbedBuilder, MessageFlags } from "discord.js";
 import Modal from "../structs/Modal";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 import ms, { StringValue } from "ms";
@@ -15,7 +15,7 @@ export default class CreateGiftCodeModal extends Modal {
         });
     }
 
-    async submit(interaction: ModalSubmitInteraction, message: Message, fields: ModalSubmitFields, member: GuildMember, player: Player) {
+    async submit(interaction: ModalSubmitInteraction, message: Message, fields: ModalSubmitFields, member: GuildMember, player: PlayerDocument) {
         const name = fields.getTextInputValue('name');
         const code = fields.getTextInputValue('code');
         const role = interaction.customId.split('_')[1];

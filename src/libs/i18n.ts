@@ -1,7 +1,6 @@
 import { existsSync, readdirSync } from "fs";
 import { join } from "path";
 import Logger from "./Logger";
-import players from "../database/schemas/players";
 import { captureException } from "@sentry/bun";
 
 export type Language = Map<string, string>;
@@ -54,13 +53,4 @@ export function translate(path: string, language: Language): string {
     }
     if(language.has(path)) return language.get(path)!;
     return getLanguage().get(path) || path;
-}
-
-export async function saveLastLanguage(uuid: string, language: string) {
-    const player = await players.findOne({ uuid });
-    if(!player) return;
-    if(player.last_language != language && isValidLanguage(language)) {
-        player.last_language = language;
-        await player.save();
-    }
 }

@@ -1,24 +1,24 @@
 import { t } from "elysia";
-import players from "../../../database/schemas/players";
 import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
 import { config } from "../../../libs/config";
 import { Permission } from "../../../types/Permission";
-import { formatUUID, GameProfile, stripUUID } from "../../../libs/game-profiles";
+import { formatUUID, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
+import { Player } from "../../../database/schemas/Player";
 
 const { validation } = config;
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get notes
     if(!session?.player?.hasPermission(Permission.ViewNotes)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     return player.notes.map((note) => ({
         id: note.id,
-        text: note.text,
+        text: note.content,
         author: formatUUID(note.author),
-        createdAt: note.createdAt.getTime()
+        created_at: note.created_at.getTime()
     }));
 }, {
     detail: {
@@ -26,7 +26,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         description: 'Returns all player notes'
     },
     response: {
-        200: t.Array(t.Object({ id: t.String(), text: t.String(), author: t.String(), createdAt: t.Number() }), { description: 'The notes of the player' }),
+        200: t.Array(t.Object({ id: t.String(), text: t.String(), author: t.String(), created_at: t.Number() }), { description: 'The notes of the player' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage notes' }),
         404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
@@ -38,7 +38,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).get('/:id', async ({ session, params: { uuid, id }, i18n, status }) => { // Get specific note
     if(!session?.player?.hasPermission(Permission.ViewNotes)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     const note = player.notes.find((note) => note.id == id);
@@ -46,9 +46,9 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     return {
         id: note.id,
-        text: note.text,
+        text: note.content,
         author: formatUUID(note.author),
-        createdAt: note.createdAt.getTime()
+        created_at: note.created_at.getTime()
     };
 }, {
     detail: {
@@ -56,7 +56,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         description: 'Returns a specific player note'
     },
     response: {
-        200: t.Object({ id: t.String(), text: t.String(), author: t.String(), createdAt: t.Number() }, { description: 'The note info' }),
+        200: t.Object({ id: t.String(), text: t.String(), author: t.String(), created_at: t.Number() }, { description: 'The note info' }),
         403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage notes' }),
         404: t.Object({ error: t.String() }, { description: 'The player or the note was not found' }),
         422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
@@ -69,10 +69,10 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     if(!session?.player?.hasPermission(Permission.CreateNotes)) return status(403, { error: i18n('$.error.notAllowed') });
     const uuid = stripUUID(params.uuid);
 
-    const player = await players.findOne({ uuid });
+    const player = await Player.findOne({ uuid });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
-    player.createNote({ text: note, author: session.uuid! });
+    player.createNote({ content: note, author: session.uuid! });
     await player.save();
 
     sendModLogMessage({
@@ -103,7 +103,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).delete('/:id', async ({ session, params: { uuid, id }, i18n, status }) => { // Delete note
     if(!session?.player?.hasPermission(Permission.DeleteNotes)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(uuid) });
     if(!player) return status(404, { error: i18n(`error.playerNotFound`) });
 
     const note = player.notes.find((note) => note.id == id);
@@ -117,7 +117,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         staff: await session.player.getGameProfile(),
         user: await player.getGameProfile(),
         discord: false,
-        note: note.text
+        note: note.content
     });
 
     return { message: i18n('$.notes.delete.success') };

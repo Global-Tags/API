@@ -1,6 +1,6 @@
 import { ButtonInteraction, GuildMember, Message } from "discord.js";
 import Interaction, { InteractionOptions } from "./Interaction";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 
 export default abstract class Button extends Interaction {
     public id: string;
@@ -10,5 +10,5 @@ export default abstract class Button extends Interaction {
         this.id = id;
     }
 
-    public abstract trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player | null): any;
+    public abstract trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: PlayerDocument | null): any;
 }

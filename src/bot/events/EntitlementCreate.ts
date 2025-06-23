@@ -1,7 +1,7 @@
 import { Entitlement } from "discord.js";
 import Event from "../structs/Event";
 import { fetchSku } from "../bot";
-import players from "../../database/schemas/players";
+import players from "../../database/schemas/Player";
 import { sendEntitlementMessage } from "../../libs/discord-notifier";
 import { config } from "../../libs/config";
 import { getCachedRoles } from "../../database/schemas/Role";

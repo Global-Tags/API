@@ -3,10 +3,9 @@ import { config } from "../../libs/config";
 import { Permission, permissions } from "../../types/Permission";
 import { isConnected } from "../mongo";
 import Logger from "../../libs/Logger";
-import playerSchema from "./players";
 import { fetchGuild } from "../../bot/bot";
-import players from "./players";
 import { generateSecureCode } from "../../libs/crypto";
+import { Player } from "./Player";
 
 const cachedRoles: RoleDocument[] = [];
 
@@ -31,24 +30,24 @@ interface IRole {
     /**
      * Whether the role has an icon
      */
-    hasIcon: boolean,
+    hasIcon: boolean;
     /**
      * SKU of the role, used for Discord integration
      * Can be null if not applicable
      * @deprecated
      */
-    sku: string | null,
+    sku: string | null;
     /**
      * Bitwise representation of permissions assigned to the role
      * @see Permission
      */
-    permissions: number,
+    permissions: number;
 
     /**
      * Retrieves the permissions of the role as an array of Permission enums
      * @returns {Permission[]} Array of permissions
      */
-    getPermissions(): Permission[],
+    getPermissions(): Permission[];
 
     /**
      * Checks if the role has a specific permission
@@ -56,20 +55,13 @@ interface IRole {
      * @param {boolean} [ignoreAdmin=false] - Whether to ignore the Administrator permission
      * @returns {boolean} True if the role has the permission, false otherwise
      */
-    hasPermission(permission: Permission, ignoreAdmin?: boolean): boolean,
+    hasPermission(permission: Permission, ignoreAdmin?: boolean): boolean;
 
     /**
      * Retrieves the list of Discord role IDs that are synced with this role
      * @returns {string[]} Array of Discord role IDs
      */
-    getSyncedRoles(): string[],
-
-    /**
-     * Renames the role and updates all players with this role. You don't need to save the document after calling this method.
-     * @param {string} name - The new name for the role
-     * @returns {Promise<void>} A promise that resolves when the role is renamed
-     */
-    rename(name: string): Promise<void>
+    getSyncedRoles(): string[];
 }
 
 const RoleSchema = new Schema<IRole>({
@@ -117,14 +109,6 @@ const RoleSchema = new Schema<IRole>({
 
         getSyncedRoles(): string[] {
             return config.discordBot.syncedRoles.getRoles(this.name);
-        },
-
-        async rename(name: string): Promise<void> {
-            const oldName = this.name;
-            this.name = name;
-            await this.save();
-            await players.updateMany({ 'roles.name': oldName }, { $set: { 'roles.$.name': name } });
-            updateRoleCache();
         }
     }
 });
@@ -168,12 +152,12 @@ export async function getNextPosition(): Promise<number> {
 
 export async function synchronizeDiscordRoles() {
     if(!isConnected()) return;
-    const players = await playerSchema.find({ 'connections.discord.id': { $exists: true } });
+    const players = await Player.find({ 'connections.discord.id': { $exists: true } });
     const guild = await fetchGuild();
     const roles = getCachedRoles();
 
     for(const player of players) {
-        const member = await guild.members.fetch(player.connections.discord.id!).catch(() => null);
+        const member = await guild.members.fetch(player.connections.discord!.id).catch(() => null);
         if(!member || !member.id) continue;
         const playerRoles = player.getActiveRoles();
 

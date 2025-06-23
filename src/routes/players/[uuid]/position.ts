@@ -1,9 +1,7 @@
 import { t } from "elysia";
-import { getOrCreatePlayer } from "../../../database/schemas/players";
+import { getOrCreatePlayer } from "../../../database/schemas/Player";
 import { Permission } from "../../../types/Permission";
-import { GlobalPosition } from "../../../types/GlobalPosition";
-import { capitalCase, snakeCase } from "change-case";
-import { GameProfile } from "../../../libs/game-profiles";
+import { GlobalPosition, positions } from "../../../types/GlobalPosition";
 import { ElysiaApp } from "../../..";
 import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
 import { sendTagChangeEmail } from "../../../libs/mailer";
@@ -12,15 +10,15 @@ import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 export default (app: ElysiaApp) => app.post('/', async ({ session, body: { position }, params, i18n, status }) => { // Change tag position
     if(!session || !session.self && !session.player?.hasPermission(Permission.ManagePlayerPositions)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    position = position.toLowerCase();
-    if(!(capitalCase(position) in GlobalPosition)) return status(422, { error: i18n('$.position.invalid') });
+    const globalPosition = position.toLowerCase() as GlobalPosition;
+    if(!positions.includes(globalPosition)) return status(422, { error: i18n('$.position.invalid') });
 
     const player = await getOrCreatePlayer(params.uuid);
     if(session.self && player.isBanned()) return status(403, { error: i18n('$.error.banned') });
-    if(snakeCase(player.position) == position) return status(400, { error: i18n('$.position.samePosition') });
+    if(player.position == position) return status(400, { error: i18n('$.position.samePosition') });
 
     const oldPosition = player.position;
-    player.position = position;
+    player.position = globalPosition;
     await player.save();
 
     if(!session.self && session.player) {
@@ -35,8 +33,8 @@ export default (app: ElysiaApp) => app.post('/', async ({ session, body: { posit
             }
         });
 
-        if(player.isEmailVerified()) {
-            sendTagChangeEmail(player.connections.email.address!, oldPosition || '---', position, getI18nFunctionByLanguage(player.last_language));
+        if(player.email.verified) {
+            sendTagChangeEmail(player.email.address!, oldPosition || '---', position, getI18nFunctionByLanguage(player.preferred_language));
         }
     }
 

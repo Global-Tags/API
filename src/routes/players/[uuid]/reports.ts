@@ -1,5 +1,5 @@
 import { t } from "elysia";
-import players, { getOrCreatePlayer } from "../../../database/schemas/players";
+import { getOrCreatePlayer, Player } from "../../../database/schemas/Player";
 import { Permission } from "../../../types/Permission";
 import { sendReportMessage } from "../../../libs/discord-notifier";
 import { formatUUID, stripUUID } from "../../../libs/game-profiles";
@@ -9,7 +9,7 @@ import { Report } from "../../../database/schemas/Report";
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get player made reports
     if(!session?.self && !session?.player?.hasPermission(Permission.ViewReports)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     const reports = await Report.find({ reporter_uuid: player.uuid });
@@ -60,7 +60,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).get('/:id', async ({ session, params, i18n, status }) => { // Get player made reports
     if(!session?.self && !session?.player?.hasPermission(Permission.ViewReports)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     const report = await Report.findOne({ id: params.id, reporter_uuid: player.uuid });
@@ -112,7 +112,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     if(session.self) return status(403, { error: i18n('$.report.self') });
     if(reason.trim() == '') return status(422, { error: i18n('$.report.invalidReason') });
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNoTag') });
     if(player.isBanned()) return status(403, { error: i18n('$.ban.already_banned') });
     if(player.hasPermission(Permission.ReportImmunity)) return status(403, { error: i18n('$.report.immune') });

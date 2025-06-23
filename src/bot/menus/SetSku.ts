@@ -1,6 +1,6 @@
 import { StringSelectMenuInteraction, Message, GuildMember, EmbedBuilder, MessageFlags } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
@@ -14,7 +14,7 @@ export default class SetSkuMenu extends SelectMenu {
         });
     }
 
-    async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: Player) {
+    async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: PlayerDocument) {
         if(values.length == 0) return interaction.deferUpdate();
 
         const role = await Role.findOne({ name: interaction.customId.split('_')[1] });

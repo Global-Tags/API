@@ -1,4 +1,3 @@
-import players from "../database/schemas/players";
 import Logger from "./Logger";
 import axios from "axios";
 import { fetchGuild } from "../bot/bot";
@@ -10,6 +9,7 @@ import { snakeCase } from "change-case";
 import { GlobalPosition, positions as positionList } from "../types/GlobalPosition";
 import { captureException } from "@sentry/bun";
 import { Metric } from "../database/schemas/Metric";
+import { Player } from "../database/schemas/Player";
 
 let requests: number;
 
@@ -57,26 +57,26 @@ type Addon = {
 
 export async function saveMetrics() {
     if(config.discordBot.syncedRoles.enabled) await (await fetchGuild())?.members.fetch();
-    const users = await players.find();
-    const tags = users.filter((user) => user.tag != null).length;
-    const admins = users.filter((user) => {
+    const players = await Player.find();
+    const tags = players.filter((player) => player.tag != null).length;
+    const admins = players.filter((player) => {
         const adminRole = getCachedRoles().find((role) => role.name == config.metrics.adminRole);
-        return !!adminRole && user.getActiveRoles().some((role) => role.role.name == adminRole.name);
+        return !!adminRole && player.getActiveRoles().some((role) => role.role.name == adminRole.name);
     }).length;
-    const bans = users.filter((user) => user.isBanned()).length;
+    const bans = players.filter((player) => player.isBanned()).length;
     const positions = positionList.reduce((object: any, position) => {
-        object[position] = users.filter((user) => position == snakeCase(user.position)).length;
+        object[position] = players.filter((player) => position == snakeCase(player.position)).length;
         return object;
     }, {});
     const icons = iconList.reduce((object: any, icon) => {
-        object[icon] = users.filter((user) => icon == snakeCase(user.icon.name)).length;
+        object[icon] = players.filter((user) => icon == snakeCase(user.icon.type)).length;
         return object;
     }, {});
     const addon = await fetchAddon('globaltags');
     const mod = await fetchMod('globaltags');
     
     Metric.insertOne({
-        players: users.length,
+        players: players.length,
         tags,
         admins,
         bans,

@@ -1,7 +1,7 @@
 import { ButtonInteraction, Message, GuildMember, ActionRowBuilder, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import { colors } from "../bot";
-import players, { Player } from "../../database/schemas/players";
+import players, { PlayerDocument } from "../../database/schemas/Player";
 import { GameProfile } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 
@@ -13,7 +13,7 @@ export default class DeleteReportButton extends Button {
         });
     }
     
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: PlayerDocument) {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
         const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')] });

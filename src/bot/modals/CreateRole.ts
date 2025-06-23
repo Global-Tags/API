@@ -1,5 +1,5 @@
 import { Message, GuildMember, EmbedBuilder, ModalSubmitInteraction, ModalSubmitFields, MessageFlags } from "discord.js";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { Permission } from "../../types/Permission";
@@ -15,7 +15,7 @@ export default class CreateRoleModal extends Modal {
         });
     }
 
-    async submit(interaction: ModalSubmitInteraction, message: Message, fields: ModalSubmitFields, member: GuildMember, player: Player) {
+    async submit(interaction: ModalSubmitInteraction, message: Message, fields: ModalSubmitFields, member: GuildMember, player: PlayerDocument) {
         const name = snakeCase(fields.getTextInputValue('name').trim());
 
         if(await Role.exists({ name })) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription(`❌ The role \`${name}\` already exists!`)], flags: [MessageFlags.Ephemeral] });
