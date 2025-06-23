@@ -444,7 +444,7 @@ interface IPlayer {
      * @param info.duration The duration in milliseconds for which the role is valid, if applicable (default: null)
      * @return {success: boolean, expiresAt: Date | null} An object indicating success and the expiration date of the role
      */
-    addRole(info: { id: string, reason: string, autoRemove: boolean, visible?: boolean, expiresAt?: Date | null, duration?: number }): { success: boolean, expiresAt: Date | null };
+    addRole(info: { id: string, reason: string, autoRemove: boolean, visible?: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null };
 
     /**
      * Remove a role from the player
@@ -936,7 +936,7 @@ const PlayerSchema = new Schema<IPlayer>({
             return roles.find((role) => role.role.id === id) || null;
         },
 
-        addRole({ id, reason, autoRemove, visible = true, expiresAt, duration }: { id: string, reason: string, autoRemove: boolean, visible?: boolean, expiresAt?: Date | null, duration?: number }): { success: boolean, expiresAt: Date | null } {
+        addRole({ id, reason, autoRemove, visible = true, expiresAt, duration }: { id: string, reason: string, autoRemove: boolean, visible?: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null } {
             const roles = getCachedRoles();
             if(!roles.some((role) => role.id === id)) return { success: false, expiresAt: null };
 
