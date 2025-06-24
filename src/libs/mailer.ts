@@ -1,18 +1,19 @@
 import { TransportOptions, createTransport } from "nodemailer";
 import { config } from "./config";
-import { join } from "path";
 import Logger from "./Logger";
 import { capitalCase } from "change-case";
 import { I18nFunction } from "./i18n";
 import moment from "moment";
 import { stripColors } from "./chat-color";
+import { MailTemplate } from "../types/MailTemplate";
+import { mailTemplateFile } from "./data-accessor";
 
 const { mailer } = config;
 
 type MailOptions = {
     recipient: string,
     subject: string,
-    template: string,
+    template: MailTemplate,
     variables?: string[][]
 }
 
@@ -40,7 +41,7 @@ export async function verify() {
 
 export async function sendEmail({ recipient, subject, template, variables = [] }: MailOptions) {
     if(!mailer.enabled) return;
-    const file = Bun.file(join(__dirname, '..', '..', 'data', 'mail', `${template}.html`));
+    const file = mailTemplateFile(template);
     if(!(await file.exists())) throw new Error('Template does not exist!');
     let message = await file.text();
     for(const variable of variables) {
@@ -67,7 +68,7 @@ export function sendBanEmail({ address, reason, duration, appealable, i18n }: { 
     sendEmail({
         recipient: address,
         subject: i18n('$.email.banned.subject'),
-        template: 'banned',
+        template: MailTemplate.Banned,
         variables: [
             ['title', i18n('$.email.banned.title')],
             ['greeting', i18n('$.email.greeting')],
@@ -86,7 +87,7 @@ export function sendUnbanEmail(address: string, i18n: I18nFunction) {
     sendEmail({
         recipient: address,
         subject: i18n('$.email.unbanned.subject'),
-        template: 'unbanned',
+        template: MailTemplate.Unbanned,
         variables: [
             ['title', i18n('$.email.unbanned.title')],
             ['greeting', i18n('$.email.greeting')],
@@ -101,7 +102,7 @@ export function sendTagClearEmail(address: string, tag: string, i18n: I18nFuncti
     sendEmail({
         recipient: address,
         subject: i18n('$.email.tagCleared.subject'),
-        template: 'tag_cleared',
+        template: MailTemplate.TagCleared,
         variables: [
             ['title', i18n('$.email.tagCleared.title')],
             ['greeting', i18n('$.email.greeting')],
@@ -117,7 +118,7 @@ export function sendTagChangeEmail(address: string, oldTag: string, newTag: stri
     sendEmail({
         recipient: address,
         subject: i18n('$.email.tagChanged.subject'),
-        template: 'tag_changed',
+        template: MailTemplate.TagChanged,
         variables: [
             ['title', i18n('$.email.tagChanged.title')],
             ['greeting', i18n('$.email.greeting')],
@@ -136,7 +137,7 @@ export function sendPositionChangeEmail(address: string, oldPosition: string, ne
     sendEmail({
         recipient: address,
         subject: i18n('$.email.positionChanged.subject'),
-        template: 'position_changed',
+        template: MailTemplate.PositionChanged,
         variables: [
             ['title', i18n('$.email.positionChanged.title')],
             ['greeting', i18n('$.email.greeting')],
@@ -155,7 +156,7 @@ export function sendIconTypeChangeEmail(address: string, oldIcon: string, newIco
     sendEmail({
         recipient: address,
         subject: i18n('$.email.iconChanged.subject'),
-        template: 'icon_changed',
+        template: MailTemplate.IconChanged,
         variables: [
             ['title', i18n('$.email.iconChanged.title')],
             ['greeting', i18n('$.email.greeting')],
@@ -174,7 +175,7 @@ export function sendIconClearEmail(address: string, i18n: I18nFunction) {
     sendEmail({
         recipient: address,
         subject: i18n('$.email.iconCleared.subject'),
-        template: 'icon_cleared',
+        template: MailTemplate.IconCleared,
         variables: [
             ['title', i18n('$.email.iconCleared.title')],
             ['greeting', i18n('$.email.greeting')],
