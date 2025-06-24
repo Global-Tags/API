@@ -1,7 +1,7 @@
 import { ActivityType, REST, Routes } from "discord.js";
 import Logger from "../../libs/Logger";
 import Event from "../structs/Event";
-import players from "../../database/schemas/players";
+import players from "../../database/schemas/Player";
 import * as bot from "../bot";
 import { captureException } from "@sentry/bun";
 

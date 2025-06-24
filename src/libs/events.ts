@@ -1,6 +1,6 @@
 import { client, fetchGuild } from "../bot/bot";
-import players from "../database/schemas/players";
-import { getCachedRoles, synchronizeRoles } from "../database/schemas/roles";
+import { Player } from "../database/schemas/Player";
+import { getCachedRoles, synchronizeDiscordRoles } from "../database/schemas/Role";
 import { config } from "./config";
 import { sendDiscordLinkMessage } from "./discord-notifier";
 import { GameProfile } from "./game-profiles";
@@ -17,7 +17,7 @@ export async function onDiscordLink(player: GameProfile, userId: string) {
     const member = await guild?.members.fetch(userId).catch(() => null);
     if(member) member.roles.add(config.discordBot.notifications.accountConnections.role);
 
-    const playerData = await players.findOne({ 'connections.discord.id': userId });
+    const playerData = await Player.findOne({ 'connections.discord.id': userId });
     if(playerData) {
         let save = false;
         const entitlements = (await client.application!.entitlements.fetch({ user: userId })).filter(e => e.isActive());
@@ -25,7 +25,7 @@ export async function onDiscordLink(player: GameProfile, userId: string) {
             const role = getCachedRoles().find((role) => role.sku == entitlement.skuId);
             if(role) {
                 if(playerData.addRole({
-                    name: role.name,
+                    id: role.id,
                     autoRemove: true,
                     expiresAt: entitlement.endsAt,
                     reason: `Discord entitlement: ${entitlement.id}`
@@ -33,11 +33,11 @@ export async function onDiscordLink(player: GameProfile, userId: string) {
             }
         }
         if(member?.premiumSince) {
-            const role = config.discordBot.boosterRole;
-            if(role.trim().length > 0 && playerData.addRole({ name: role, reason: 'Server boost', autoRemove: true }).success) save = true;
+            const boosterRole = getCachedRoles().find((role) => role.sku === config.discordBot.boosterRole);
+            if(boosterRole && playerData.addRole({ id: boosterRole.id, reason: 'Server boost', autoRemove: true }).success) save = true;
         }
         if(save) await playerData.save();
-        synchronizeRoles();
+        synchronizeDiscordRoles();
     }
 }
 
@@ -55,13 +55,13 @@ export function onDiscordUnlink(player: GameProfile, userId: string): Promise<vo
         if(!member) return resolve();
         member.roles.remove(config.discordBot.notifications.accountConnections.role);
 
-        const playerData = await players.findOne({ 'connections.discord.id': userId });
+        const playerData = await Player.findOne({ 'connections.discord.id': userId });
         if(playerData) {
             if(member.premiumSince) {
-                const boosterRole = config.discordBot.boosterRole;
-                if(boosterRole.trim().length > 0) {
-                    const role = playerData.getRole(boosterRole);
-                    if(role && role.autoRemove && playerData.removeRole(boosterRole)) playerData.save();
+                const boosterRole = getCachedRoles().find((role) => role.sku == config.discordBot.boosterRole);
+                if(boosterRole) {
+                    const role = playerData.getRole(boosterRole.id);
+                    if(role && role.autoRemove && playerData.removeRole(boosterRole.id)) playerData.save();
                 }
             }
             for(const role of playerData.getActiveRoles()) {

@@ -1,32 +1,89 @@
-import { HydratedDocument, Schema, model as createModel } from "mongoose";
+import { HydratedDocument, Schema, model } from "mongoose";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { generateSecureCode } from "../../libs/crypto";
 
-export interface IGiftCode {
+export enum GiftType {
+    Role = 'role'
+}
+
+interface IGiftCode {
+    /**
+     * Unique identifier for the gift code
+     */
     id: string;
+    /**
+     * Name of the gift code
+     */
     name: string;
+    /**
+     * The actual code that users will enter to redeem the gift
+     */
     code: string;
+    /**
+     * List of UUIDs that have used this gift code
+     */
     uses: string[];
+    /**
+     * Maximum number of times this code can be used
+     */
     max_uses: number;
+    /**
+     * The gift that this code provides
+     */
     gift: {
-        type: 'role',
+        /**
+         * Type of gift being provided
+         */
+        type: GiftType,
+        /**
+         * Value of the gift, e.g., role id
+         */
         value: string,
-        duration?: number | null
+        /**
+         * Duration for which the gift is valid, in milliseconds
+         * If null, the gift is permanent
+         */
+        duration: number | null
     };
+    /**
+     * UUID of the user who created this gift code
+     */
     created_by: string;
+    /**
+     * Timestamp when the gift code was created
+     */
     created_at: Date;
-    expires_at?: Date | null;
+    /**
+     * Optional expiration date for the gift code
+     * If null, the code does not expire
+     */
+    expires_at: Date | null;
+
+    /**
+     * Get the GameProfile of the creator of this gift code
+     * @return {Promise<GameProfile>} The GameProfile of the creator
+     */
     getCreatorProfile(): Promise<GameProfile>;
+
+    /**
+     * Check if the gift code is still valid
+     * @return {boolean} True if the code can still be used, false otherwise
+     */
     isValid(): boolean;
+
+    /**
+     * Calculate how many uses are left for this gift code
+     * @return {number} The number of uses left
+     */
     usesLeft(): number;
 }
-export type GiftCode = HydratedDocument<IGiftCode>;
 
-const schema = new Schema<IGiftCode>({
+const GiftCodeSchema = new Schema<IGiftCode>({
     id: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        default: generateSecureCode
     },
     name: {
         type: String,
@@ -55,7 +112,8 @@ const schema = new Schema<IGiftCode>({
         },
         duration: {
             type: Number,
-            required: false
+            required: true,
+            default: null
         }
     },
     created_by: {
@@ -68,7 +126,8 @@ const schema = new Schema<IGiftCode>({
     },
     expires_at: {
         type: Date,
-        required: false
+        required: true,
+        default: null
     }
 }, {
     methods: {
@@ -86,8 +145,6 @@ const schema = new Schema<IGiftCode>({
     }
 });
 
-const model = createModel<IGiftCode>('gift-codes', schema);
-
 export async function createGiftCode({
     name,
     code = generateSecureCode(12),
@@ -102,8 +159,8 @@ export async function createGiftCode({
     gift: IGiftCode['gift'],
     expiresAt?: Date | null,
     createdBy: string
-}): Promise<GiftCode> {
-    return await model.insertOne({
+}): Promise<GiftCodeDocument> {
+    return await GiftCode.insertOne({
         id: generateSecureCode(),
         name,
         code,
@@ -116,4 +173,5 @@ export async function createGiftCode({
     });
 }
 
-export default model;
+export const GiftCode = model<IGiftCode>('GiftCode', GiftCodeSchema);
+export type GiftCodeDocument = HydratedDocument<IGiftCode>;

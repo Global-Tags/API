@@ -1,6 +1,6 @@
 import { GuildMember, Message, ModalSubmitFields, ModalSubmitInteraction } from "discord.js";
 import Interaction, { InteractionOptions } from "./Interaction";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 
 export default abstract class Modale extends Interaction {
     public id: string;
@@ -10,5 +10,5 @@ export default abstract class Modale extends Interaction {
         this.id = id;
     }
 
-    public abstract submit(interaction: ModalSubmitInteraction, message: Message, fields: ModalSubmitFields, member: GuildMember, player: Player | null): any;
+    public abstract submit(interaction: ModalSubmitInteraction, message: Message, fields: ModalSubmitFields, member: GuildMember, player: PlayerDocument | null): any;
 }

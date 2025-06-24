@@ -1,6 +1,6 @@
 import { GuildMember, Message, StringSelectMenuInteraction } from "discord.js";
 import Interaction, { InteractionOptions } from "./Interaction";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 
 export default abstract class SelectMenu extends Interaction {
     public id: string;
@@ -10,5 +10,5 @@ export default abstract class SelectMenu extends Interaction {
         this.id = id;
     }
 
-    public abstract selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: Player | null): any;
+    public abstract selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: PlayerDocument | null): any;
 }

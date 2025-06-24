@@ -3,32 +3,73 @@ import { config } from "../../libs/config";
 import { Permission, permissions } from "../../types/Permission";
 import { isConnected } from "../mongo";
 import Logger from "../../libs/Logger";
-import playerSchema from "./players";
 import { fetchGuild } from "../../bot/bot";
-import players from "./players";
+import { generateSecureCode } from "../../libs/crypto";
+import { Player } from "./Player";
+
+const cachedRoles: RoleDocument[] = [];
 
 interface IRole {
-    id: string,
-    name: string,
-    position: number,
-    color?: string | null,
-    hasIcon: boolean,
-    sku?: string | null,
-    permissions: number,
-    getPermissions(): Permission[],
-    hasPermission(permission: Permission, ignoreAdmin?: boolean): boolean,
-    getSyncedRoles(): string[],
-    rename(name: string): Promise<void>
+    /**
+     * Unique identifier for the role
+     */
+    id: string;
+    /**
+     * Name of the role
+     */
+    name: string;
+    /**
+     * Position of the role in the list
+     */
+    position: number;
+    /**
+     * Color of the role in hex format (e.g., 'FF0000' for red)
+     * Can be null if no color is set
+     */
+    color: string | null;
+    /**
+     * Whether the role has an icon
+     */
+    hasIcon: boolean;
+    /**
+     * SKU of the role, used for Discord integration
+     * Can be null if not applicable
+     * @deprecated
+     */
+    sku: string | null;
+    /**
+     * Bitwise representation of permissions assigned to the role
+     * @see Permission
+     */
+    permissions: number;
+
+    /**
+     * Retrieves the permissions of the role as an array of Permission enums
+     * @returns {Permission[]} Array of permissions
+     */
+    getPermissions(): Permission[];
+
+    /**
+     * Checks if the role has a specific permission
+     * @param {Permission} permission - The permission to check
+     * @param {boolean} [ignoreAdmin=false] - Whether to ignore the Administrator permission
+     * @returns {boolean} True if the role has the permission, false otherwise
+     */
+    hasPermission(permission: Permission, ignoreAdmin?: boolean): boolean;
+
+    /**
+     * Retrieves the list of Discord role IDs that are synced with this role
+     * @returns {string[]} Array of Discord role IDs
+     */
+    getSyncedRoles(): string[];
 }
 
-export type Role = HydratedDocument<IRole>;
-const cachedRoles: Role[] = [];
-
-const schema = new Schema<IRole>({
+const RoleSchema = new Schema<IRole>({
     id: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        default: generateSecureCode
     },
     name: {
         type: String,
@@ -40,7 +81,7 @@ const schema = new Schema<IRole>({
     },
     color: {
         type: String,
-        required: false,
+        required: true,
         default: null
     },
     hasIcon: {
@@ -49,7 +90,8 @@ const schema = new Schema<IRole>({
     },
     sku: {
         type: String,
-        required: false
+        required: true,
+        default: null
     },
     permissions: {
         type: Number,
@@ -67,21 +109,11 @@ const schema = new Schema<IRole>({
 
         getSyncedRoles(): string[] {
             return config.discordBot.syncedRoles.getRoles(this.name);
-        },
-
-        async rename(name: string): Promise<void> {
-            const oldName = this.name;
-            this.name = name;
-            await this.save();
-            await players.updateMany({ 'roles.name': oldName }, { $set: { 'roles.$.name': name } });
-            updateRoleCache();
         }
     }
 });
 
-const Roles = model<IRole>('roles', schema);
-
-export function getCachedRoles(): Role[] {
+export function getCachedRoles(): RoleDocument[] {
     return cachedRoles;
 }
 
@@ -99,9 +131,9 @@ const defaultRoles = [
 export async function updateRoleCache(): Promise<void> {
     if(!isConnected()) return;
     cachedRoles.length = 0;
-    let roles = await Roles.find();
+    let roles = await Role.find();
     if(roles.length == 0) {
-        cachedRoles.push(...await Roles.insertMany(defaultRoles));
+        cachedRoles.push(...await Role.insertMany(defaultRoles));
     }
 
     for(const role of roles) {
@@ -113,19 +145,19 @@ export async function updateRoleCache(): Promise<void> {
 
 export async function getNextPosition(): Promise<number> {
     if(!isConnected()) return -1;
-    const roles = await Roles.find();
+    const roles = await Role.find();
     roles.sort((a, b) => a.position - b.position);
     return roles[roles.length - 1].position + 1;
 }
 
-export async function synchronizeRoles() {
+export async function synchronizeDiscordRoles() {
     if(!isConnected()) return;
-    const players = await playerSchema.find({ 'connections.discord.id': { $exists: true } });
+    const players = await Player.find({ 'connections.discord.id': { $exists: true } });
     const guild = await fetchGuild();
     const roles = getCachedRoles();
 
     for(const player of players) {
-        const member = await guild.members.fetch(player.connections.discord.id!).catch(() => null);
+        const member = await guild.members.fetch(player.connections.discord!.id).catch(() => null);
         if(!member || !member.id) continue;
         const playerRoles = player.getActiveRoles();
 
@@ -151,4 +183,5 @@ export async function synchronizeRoles() {
     }
 }
 
-export default Roles;
+export const Role = model<IRole>('Role', RoleSchema);
+export type RoleDocument = HydratedDocument<IRole>;

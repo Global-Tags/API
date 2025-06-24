@@ -1,7 +1,7 @@
 import { ButtonInteraction, Message, GuildMember, ActionRowBuilder, EmbedBuilder, ButtonBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import { colors } from "../bot";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 import { stripUUID } from "../../libs/game-profiles";
 
 export default class FinishActionsButton extends Button {
@@ -12,7 +12,7 @@ export default class FinishActionsButton extends Button {
         });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: PlayerDocument) {
         if(!player.canManagePlayers()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 

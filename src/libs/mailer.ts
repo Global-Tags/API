@@ -40,8 +40,8 @@ export async function verify() {
 
 export async function sendEmail({ recipient, subject, template, variables = [] }: MailOptions) {
     if(!mailer.enabled) return;
-    const file = Bun.file(join(__dirname, '..', 'mail', `${template}.html`));
-    if(!file.exists()) throw new Error('Template does not exist!');
+    const file = Bun.file(join(__dirname, '..', '..', 'data', 'mail', `${template}.html`));
+    if(!(await file.exists())) throw new Error('Template does not exist!');
     let message = await file.text();
     for(const variable of variables) {
         message = message.replaceAll(`[${variable[0]}]`, variable[1].trim());

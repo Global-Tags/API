@@ -1,11 +1,11 @@
 import { checkExpiredEntitlements } from "./entitlement-expiry";
 import { saveMetrics } from "./metrics";
 import Logger from "./Logger";
-import playerSchema from "../database/schemas/players";
 import { config } from "./config";
-import { synchronizeRoles, updateRoleCache } from "../database/schemas/roles";
+import { synchronizeDiscordRoles, updateRoleCache } from "../database/schemas/Role";
 import { isConnected } from "../database/mongo";
 import { Cron } from "croner";
+import { Player } from "../database/schemas/Player";
 
 const tz = 'Europe/Berlin';
 
@@ -31,7 +31,7 @@ export function startMetrics() {
 export function startReferralReset() {
     new Cron('0 0 1 * *', async () => {
         if(!isConnected()) return;
-        const data = await playerSchema.find({ 'referrals.current_month': { $gt: 0 } });
+        const data = await Player.find({ 'referrals.current_month': { $gt: 0 } });
 
         for(const player of data) {
             player.referrals.current_month = 0;
@@ -52,9 +52,9 @@ export function startRoleCacheJob() {
 }
 
 export function startRoleSynchronization() {
-    if(!config.discordBot.syncedRoles.enabled) return;
+    if(!config.discordBot.enabled || !config.discordBot.syncedRoles.enabled) return;
     Logger.info('Role syncronization initialized.');
-    const job = new Cron('*/10 * * * *', synchronizeRoles, {
+    const job = new Cron('*/10 * * * *', synchronizeDiscordRoles, {
         name: 'Role Synchronization',
         timezone: tz
     });

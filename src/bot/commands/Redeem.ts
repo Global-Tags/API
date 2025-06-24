@@ -1,8 +1,8 @@
 import { ApplicationCommandOptionType, CommandInteraction, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
 import Command, { CommandOptions } from "../structs/Command";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 import { colors, images } from "../bot";
-import giftCodes from "../../database/schemas/gift-codes";
+import giftCodes from "../../database/schemas/GiftCode";
 import { formatTimestamp, sendGiftCodeRedeemMessage } from "../../libs/discord-notifier";
 import { capitalCase } from "change-case";
 
@@ -23,7 +23,7 @@ export default class RedeemCommand extends Command {
         });
     }
 
-    async execute(interaction: CommandInteraction, options: CommandOptions, member: GuildMember, player: Player) {
+    async execute(interaction: CommandInteraction, options: CommandOptions, member: GuildMember, player: PlayerDocument) {
         const code = await giftCodes.findOne({ code: options.getString('code', true) });
         if(!code || !code.isValid()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Code not found!')], flags: [MessageFlags.Ephemeral] });
         if(code.uses.includes(player.uuid)) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You already redeemed this code!')], flags: [MessageFlags.Ephemeral] });

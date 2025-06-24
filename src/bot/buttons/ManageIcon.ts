@@ -1,8 +1,7 @@
 import { ButtonInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
-import players, { Player } from "../../database/schemas/players";
+import players, { PlayerDocument } from "../../database/schemas/Player";
 import { colors } from "../bot";
-import { snakeCase } from "change-case";
 import { getCustomIconUrl } from "../../routes/players/[uuid]/icon";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon } from "../../types/GlobalIcon";
@@ -16,7 +15,7 @@ export default class ManageIconButton extends Button {
         });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: PlayerDocument) {
         const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
@@ -24,9 +23,8 @@ export default class ManageIconButton extends Button {
             .setTitle('Manage icon')
             .setDescription('Here you can edit the player\'s icon type and texture.');
 
-        const icon = snakeCase(target.icon.name);
-        if(icon != snakeCase(GlobalIcon[GlobalIcon.None])) {
-            if(icon == snakeCase(GlobalIcon[GlobalIcon.Custom])) {
+        if(target.icon.name != GlobalIcon.None) {
+            if(target.icon.name == GlobalIcon.Custom) {
                 if(!!target.icon.hash) {
                     embed.setThumbnail(getCustomIconUrl(target.uuid, target.icon.hash));
                 }

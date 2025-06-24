@@ -1,21 +1,22 @@
 import { t } from "elysia";
 import { ElysiaApp } from "..";
-import staffCategories, { getNextPosition } from "../database/schemas/staff-categories";
-import staffMembers from "../database/schemas/staff-members";
 import { formatUUID, GameProfile, stripUUID, uuidRegex } from "../libs/game-profiles";
 import { generateSecureCode } from "../libs/crypto";
 import { Permission } from "../types/Permission";
+import { getNextPosition, StaffCategory } from "../database/schemas/StaffCategory";
+import { StaffMember } from "../database/schemas/StaffMember";
+import { tRequestBody, tResponseBody, tSchema } from "../libs/models";
+import { DocumentationCategory } from "../types/DocumentationCategory";
 
 export default (app: ElysiaApp) => app.get('/', async () => {
-    const categories = await staffCategories.find().sort({ position: 1 }).lean();
+    const categories = await StaffCategory.find().sort({ position: 1 }).lean();
 
     return await Promise.all(
         categories.map(async (category) => {
-            const members = await staffMembers.find({ category: category.id }).sort({ joinedAt: 1 }).lean();
+            const members = await StaffMember.find({ category: category.id }).sort({ joinedAt: 1 }).lean();
 
             const mappedMembers = await Promise.all(members.map(async (member) => ({
                 uuid: member.uuid,
-                username: (await GameProfile.getProfileByUUID(member.uuid)).username || 'Failed to load',
                 description: member.description || null,
                 avatar_url: 'https://example.com/avatar.png', // TODO: Replace with actual avatar URL logic
                 joined_at: member.joined_at.getTime()
@@ -30,39 +31,37 @@ export default (app: ElysiaApp) => app.get('/', async () => {
     );
 }, {
     detail: {
-        tags: ['API'],
-        description: 'Gets the staff team members'
+        tags: [DocumentationCategory.Staff],
+        description: 'Get the staff team overview'
     },
     response: {
-        200: t.Array(t.Object({ id: t.String(), name: t.String(), members: t.Array(t.Object({ uuid: t.String(), username: t.String(), description: t.Union([t.String(), t.Null()]), avatar_url: t.String(), joined_at: t.Integer() })) }), { description: 'The team categories with its members' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tResponseBody.StaffList
     }
 }).group('/categories', (app) =>
     app.get('/', async ({ session, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.ViewStaffCategories)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        return Promise.all((await staffCategories.find().sort({ position: 1 }).lean()).map(async (category) => ({
+        return Promise.all((await StaffCategory.find().sort({ position: 1 }).lean()).map(async (category) => ({
             id: category.id,
             name: category.name,
             position: category.position,
-            members: (await staffMembers.find({ category: category.id }).sort({ joinedAt: 1 }).lean()).length
+            members: (await StaffMember.find({ category: category.id }).sort({ joinedAt: 1 }).lean()).length
         })));
     }, {
         detail: {
-            tags: ['API'],
-            description: 'Gets the staff team categories'
+            tags: [DocumentationCategory.Staff],
+            description: 'Get all staff categories'
         },
         response: {
-            200: t.Array(t.Object({ id: t.String(), name: t.String(), position: t.Integer(), members: t.Integer() }), { description: 'The team categories' }),
-            403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage staff categories' }),
-            503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+            200: t.Array(tSchema.MemberlistStaffCategory, { description: 'A staff category list' }),
+            403: tResponseBody.Error,
         }
     }).get('/:category', async ({ session, params: { category: id }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.ViewStaffCategories)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        const category = await staffCategories.findOne({ id }).lean();
+        const category = await StaffCategory.findOne({ id }).lean();
         if(!category) return status(404, { error: i18n('$.staff.categories.not_found') });
-        const members = await staffMembers.find({ category: category.id }).sort({ joinedAt: 1 }).lean();
+        const members = await StaffMember.find({ category: category.id }).sort({ joinedAt: 1 }).lean();
 
         return {
             id: category.id,
@@ -72,21 +71,20 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         };
     }, {
         detail: {
-            tags: ['API'],
-            description: 'Gets a specific staff team category by ID'
+            tags: [DocumentationCategory.Staff],
+            description: 'Get a specific staff category'
         },
         response: {
-            200: t.Object({ id: t.String(), name: t.String(), position: t.Integer(), members: t.Integer() }, { description: 'The team category' }),
-            403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage staff categories' }),
-            404: t.Object({ error: t.String() }, { description: 'Category not found' }),
-            503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+            200: tSchema.MemberlistStaffCategory,
+            403: tResponseBody.Error,
+            404: tResponseBody.Error,
         },
         params: t.Object({ category: t.String({ description: 'The category ID' }) }),
         headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' }),
     }).post('/', async ({ session, body: { name }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.CreateStaffCategories)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        const category = await staffCategories.insertOne({
+        const category = await StaffCategory.insertOne({
             id: generateSecureCode(),
             name: name.trim(),
             position: await getNextPosition()
@@ -99,22 +97,19 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         });
     }, {
         detail: {
-            tags: ['API'],
-            description: 'Creates a new staff team category'
+            tags: [DocumentationCategory.Staff],
+            description: 'Create a new staff category'
         },
         response: {
-            201: t.Object({ id: t.String(), name: t.String(), position: t.Integer() }, { description: 'The created team category' }),
-            403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage staff categories' }),
-            503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+            201: tSchema.StaffCategory,
+            403: tResponseBody.Error,
         },
-        body: t.Object({
-            name: t.String({ minLength: 1, error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' })
-        }, { error: '$.error.invalidBody', additionalProperties: true }),
+        body: tRequestBody.StaffCategory,
         headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
     }).patch('/:id', async ({ session, body: { name }, params: { id }, i18n, status }) => { // Edit category
         if(!session?.player?.hasPermission(Permission.EditStaffMembers)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        const category = await staffCategories.findOne({ id });
+        const category = await StaffCategory.findOne({ id });
         if(!category) return status(404, { error: i18n('$.staff.categories.not_found') });
 
         if(name && category.name !== name.trim()) {
@@ -124,32 +119,29 @@ export default (app: ElysiaApp) => app.get('/', async () => {
             // TODO: Add mod log
         }
 
-        return status(200, {
+        return {
             id: category.id,
             name: category.name,
             position: category.position
-        });
+        };
     }, {
         detail: {
-            tags: ['API'],
-            description: 'Edits an existing staff category'
+            tags: [DocumentationCategory.Staff],
+            description: 'Edit an existing staff category'
         },
         response: {
-            200: t.Object({ id: t.String(), name: t.String(), position: t.Integer() }, { description: 'The edited team category' }),
-            403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage staff categories' }),
-            404: t.Object({ error: t.String() }, { description: 'Category not found' }),
-            503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+            200: tSchema.StaffCategory,
+            403: tResponseBody.Error,
+            404: tResponseBody.Error,
         },
-        body: t.Object({
-            name: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' }))
-        }, { error: '$.error.invalidBody', additionalProperties: true }),
+        body: tRequestBody.StaffCategory,
         params: t.Object({ id: t.String({ description: 'The category ID' }) }),
         headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
     }) // TODO: Implement route to patch all categories at once
     .delete('/:category', async ({ session, params: { category: id }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.DeleteStaffCategories)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        const category = await staffCategories.findOne({ id });
+        const category = await StaffCategory.findOne({ id });
         if(!category) return status(404, { error: i18n('$.staff.categories.not_found') });
 
         await category.deleteOne();
@@ -157,14 +149,13 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         return { message: i18n('$.staff.categories.delete.success').replace('<name>', category.name) };
     }, {
         detail: {
-            tags: ['API'],
-            description: 'Deletes a specific staff team category by ID'
+            tags: [DocumentationCategory.Staff],
+            description: 'Delete a specific staff category'
         },
         response: {
-            200: t.Object({ message: t.String() }, { description: 'The success message' }),
-            403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage staff categories' }),
-            404: t.Object({ error: t.String() }, { description: 'Category not found' }),
-            503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+            200: tResponseBody.Message,
+            403: tResponseBody.Error,
+            404: tResponseBody.Error,
         },
         params: t.Object({ category: t.String({ description: 'The category ID' }) }),
         headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' }),
@@ -173,7 +164,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
     app.get('/', async ({ session, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.ViewStaffMembers)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        return Promise.all((await staffMembers.find().sort({ joinedAt: 1 }).lean()).map(async member => ({
+        return Promise.all((await StaffMember.find().sort({ joinedAt: 1 }).lean()).map(async member => ({
             uuid: formatUUID(member.uuid),
             username: (await GameProfile.getProfileByUUID(member.uuid)).username || 'Unknown',
             category: member.category,
@@ -182,18 +173,17 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         })));
     }, {
         detail: {
-            tags: ['API'],
-            description: 'Gets all staff team members'
+            tags: [DocumentationCategory.Staff],
+            description: 'Get all staff members'
         },
         response: {
-            200: t.Array(t.Object({ uuid: t.String(), username: t.String(), category: t.String(), description: t.Union([t.String(), t.Null()]), joined_at: t.Integer() }), { description: 'The team members' }),
-            403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage staff members' }),
-            503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+            200: t.Array(tSchema.StaffMember, { description: 'A staff member list' }),
+            403: tResponseBody.Error,
         }
     }).get('/:uuid', async ({ session, params: { uuid }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.ViewStaffMembers)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        const member = await staffMembers.findOne({ uuid: stripUUID(uuid) });
+        const member = await StaffMember.findOne({ uuid: stripUUID(uuid) });
         if(!member) return status(404, { error: i18n('$.staff.members.not_found') });
 
         return {
@@ -205,14 +195,13 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         };
     }, {
         detail: {
-            tags: ['API'],
-            description: 'Gets a specific staff team member by UUID'
+            tags: [DocumentationCategory.Staff],
+            description: 'Get a specific staff member'
         },
         response: {
-            200: t.Object({ uuid: t.String(), username: t.String(), category: t.String(), description: t.Union([t.String(), t.Null()]), joined_at: t.Integer() }, { description: 'The team member' }),
-            403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage staff members' }),
-            404: t.Object({ error: t.String() }, { description: 'Member not found' }),
-            503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+            200: tSchema.StaffMember,
+            403: tResponseBody.Error,
+            404: tResponseBody.Error,
         },
         params: t.Object({ uuid: t.String({ description: 'The member UUID' }) }),
         headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' }),
@@ -223,15 +212,15 @@ export default (app: ElysiaApp) => app.get('/', async () => {
 
         if(!uuidRegex.test(uuid)) return status(400, { error: i18n('$.staff.members.invalid_uuid') });
 
-        const existingMember = await staffMembers.findOne({ uuid });
+        const existingMember = await StaffMember.findOne({ uuid });
         if(existingMember) return status(409, { error: i18n('$.staff.members.already_exists') });
 
-        if(!(await staffCategories.exists({ id: category }))) return status(404, { error: i18n('$.staff.categories.not_found') });
+        if(!(await StaffCategory.exists({ id: category }))) return status(404, { error: i18n('$.staff.categories.not_found') });
 
         const joinedAt = new Date();
         joinedAt.setHours(0, 0, 0, 0);
 
-        const newMember = await staffMembers.insertOne({
+        const newMember = await StaffMember.insertOne({
             uuid: stripUUID(uuid.trim()),
             category,
             description: description?.trim() || null,
@@ -247,32 +236,27 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         });
     }, {
         detail: {
-            tags: ['API'],
-            description: 'Adds a new staff team member'
+            tags: [DocumentationCategory.Staff],
+            description: 'Create a new staff member'
         },
         response: {
-            201: t.Object({ uuid: t.String(), username: t.String(), category: t.String(), description: t.Union([t.String(), t.Null()]), joined_at: t.Integer() }, { description: 'The created team member' }),
-            400: t.Object({ error: t.String() }, { description: 'An invalid UUID was passed' }),
-            403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage staff members' }),
-            404: t.Object({ error: t.String() }, { description: 'Category not found' }),
-            409: t.Object({ error: t.String() }, { description: 'Member already exists' }),
-            503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+            201: tSchema.StaffMember,
+            400: tResponseBody.Error,
+            403: tResponseBody.Error,
+            404: tResponseBody.Error,
+            409: tResponseBody.Error,
         },
-        body: t.Object({
-            uuid: t.String({ error: '$.error.wrongType;;[["field", "uuid"], ["type", "string"]]' }),
-            category: t.String({ error: '$.error.wrongType;;[["field", "category"], ["type", "string"]]' }),
-            description: t.Union([t.String(), t.Null()], { error: '$.error.wrongType;;[["field", "description"], ["type", "string"]]' })
-        }, { error: '$.error.invalidBody', additionalProperties: true }),
+        body: tRequestBody.CreateStaffMember,
         headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
     }).patch('/:uuid', async ({ session, body: { category, description }, params: { uuid }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.EditStaffMembers)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        const member = await staffMembers.findOne({ uuid: stripUUID(uuid) });
+        const member = await StaffMember.findOne({ uuid: stripUUID(uuid) });
         if(!member) return status(404, { error: i18n('$.staff.members.not_found') });
 
         let updated = false;
         if(category !== undefined && member.category !== category) {
-            if(!(await staffCategories.exists({ id: category }))) return status(404, { error: i18n('$.staff.categories.not_found') });
+            if(!(await StaffCategory.exists({ id: category }))) return status(404, { error: i18n('$.staff.categories.not_found') });
             member.category = category;
             updated = true;
         }
@@ -282,34 +266,30 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         }
         if(updated) member.save(); // TODO: Add mod log
 
-        return status(200, {
+        return {
             uuid: formatUUID(member.uuid),
             username: (await GameProfile.getProfileByUUID(member.uuid)).username || 'Unknown',
             category: member.category,
             description: member.description || null,
             joined_at: member.joined_at.getTime()
-        });
+        };
     }, {
         detail: {
-            tags: ['API'],
-            description: 'Edits an existing staff team member'
+            tags: [DocumentationCategory.Staff],
+            description: 'Edit an existing staff member'
         },
         response: {
-            200: t.Object({ uuid: t.String(), username: t.String(), category: t.String(), description: t.Union([t.String(), t.Null()]), joined_at: t.Integer() }, { description: 'The edited team member' }),
-            403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage staff members' }),
-            404: t.Object({ error: t.String() }, { description: 'Mmeber or category not found' }),
-            503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+            200: tSchema.StaffMember,
+            403: tResponseBody.Error,
+            404: tResponseBody.Error,
         },
-        body: t.Object({
-            category: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "category"], ["type", "string"]]' })),
-            description: t.Optional(t.Union([t.String(), t.Null()], { error: '$.error.wrongType;;[["field", "description"], ["type", "string"]]' }))
-        }, { error: 'error.invalidBody', additionalProperties: true }),
+        body: tRequestBody.EditStaffMember,
         params: t.Object({ uuid: t.String({ description: 'The member UUID' }) }),
         headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
     }).delete('/:uuid', async ({ session, params: { uuid }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.DeleteStaffMembers)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        const member = await staffMembers.findOne({ uuid: stripUUID(uuid) });
+        const member = await StaffMember.findOne({ uuid: stripUUID(uuid) });
         if(!member) return status(404, { error: i18n('$.staff.members.not_found') });
 
         await member.deleteOne();
@@ -317,14 +297,13 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         return { message: i18n('$.staff.members.delete.success').replace('<username>', (await GameProfile.getProfileByUUID(uuid)).username || 'Unknown') };
     }, {
         detail: {
-            tags: ['API'],
-            description: 'Deletes a specific staff team member by UUID'
+            tags: [DocumentationCategory.Staff],
+            description: 'Delete a specific staff member'
         },
         response: {
-            200: t.Object({ message: t.String() }, { description: 'The success message' }),
-            403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage staff members' }),
-            404: t.Object({ error: t.String() }, { description: 'Member not found' }),
-            503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+            200: tResponseBody.Message,
+            403: tResponseBody.Error,
+            404: tResponseBody.Error,
         },
         params: t.Object({ uuid: t.String({ description: 'The member UUID' }) }),
         headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })

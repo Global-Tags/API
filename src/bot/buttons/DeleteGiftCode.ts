@@ -1,9 +1,9 @@
 import { ButtonInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder, MessageFlags, StringSelectMenuBuilder } from "discord.js";
 import Button from "../structs/Button";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
-import codeSchema from "../../database/schemas/gift-codes";
+import { GiftCode } from "../../database/schemas/GiftCode";
 
 export default class DeleteGiftCodeButton extends Button {
     constructor() {
@@ -13,13 +13,13 @@ export default class DeleteGiftCodeButton extends Button {
         });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: PlayerDocument) {
         const embed = new EmbedBuilder()
             .setColor(colors.gray)
             .setTitle('Delete gift code')
             .setDescription('Here you can select a gift code to be deleted.');
 
-        const codes = await codeSchema.find();
+        const codes = await GiftCode.find();
         const codeMap = codes.filter((code) => code.isValid()).slice(0, 25).map((code) => ({
             value: code.code,
             label: code.name,

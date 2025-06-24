@@ -1,7 +1,7 @@
 import { ButtonInteraction, Message, GuildMember, ButtonStyle, ButtonBuilder, ActionRowBuilder, EmbedBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import { colors } from "../bot";
-import players, { Player } from "../../database/schemas/players";
+import players, { PlayerDocument } from "../../database/schemas/Player";
 import { Permission } from "../../types/Permission";
 import { stripUUID, uuidRegex } from "../../libs/game-profiles";
 import { config } from "../../libs/config";
@@ -19,7 +19,7 @@ export default class ActionsButton extends Button {
         });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: PlayerDocument) {
         if(!player.canManagePlayers()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
         const uuid = interaction.customId.split('_')[1] || message.embeds[0]?.author?.name || message.embeds[0]?.fields[0]?.value.match(uuidRegex)?.[0];
         if(!uuid) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });

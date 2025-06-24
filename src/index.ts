@@ -3,7 +3,6 @@ import { swagger } from "@elysiajs/swagger";
 import Logger from "./libs/Logger";
 import { connect as connectDatabase } from "./database/mongo";
 import { getRouter } from "./libs/route-loader";
-import { version } from "../package.json";
 import access from "./middleware/access-log";
 import checkDatabase from "./middleware/database-checker";
 import Ratelimiter from "./libs/Ratelimiter";
@@ -23,6 +22,7 @@ import { join } from "path";
 import ip from "./middleware/ip";
 import { captureException } from "@sentry/bun";
 import { generateSecureCode, validateKeypair } from "./libs/crypto";
+import { DocumentationCategory } from "./types/DocumentationCategory";
 
 if(config.mongodb.trim().length == 0) {
     Logger.error('Database connection string is empty!');
@@ -54,7 +54,7 @@ const elysia = new Elysia()
         ],
         documentation: {
             info: {
-                version,
+                version: config.version,
                 title: 'GlobalTags API',
                 description: 'This is the official GlobalTags API documentation containing detailed descriptions about the API endpoints and their usage.',
                 license: {
@@ -68,13 +68,17 @@ const elysia = new Elysia()
                 }
             },
             tags: [
-                { name: 'API', description: 'Get info about the API' },
-                { name: 'Interactions', description: 'Interact with other players' },
-                { name: 'Settings', description: 'Modify the settings of your GlobalTag' },
-                { name: 'Roles', description: 'Holds role management routes' },
-                { name: 'Gift codes', description: 'Holds gift code actions' },
-                { name: 'Admin', description: 'Admininstrative actions' },
-                { name: 'Connections', description: 'Manage account connections' }
+                { name: DocumentationCategory.Api, description: 'Get info about the API' },
+                { name: DocumentationCategory.ApiKeys, description: 'API Key management' },
+                { name: DocumentationCategory.Bans, description: 'Ban management' },
+                { name: DocumentationCategory.GiftCodes, description: 'Gift code management' },
+                { name: DocumentationCategory.Notes, description: 'Staff note management' },
+                { name: DocumentationCategory.Partners, description: 'Partner management' },
+                { name: DocumentationCategory.Referrals, description: 'Referral management' },
+                { name: DocumentationCategory.Reports, description: 'Report management' },
+                { name: DocumentationCategory.Roles, description: 'Route management' },
+                { name: DocumentationCategory.Staff, description: 'Staff member management' },
+                { name: DocumentationCategory.Tags, description: 'Tag management' },
             ]
         }
     }))
