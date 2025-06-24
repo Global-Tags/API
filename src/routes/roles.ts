@@ -3,6 +3,8 @@ import { Permission } from "../types/Permission";
 import { ModLogType, sendModLogMessage } from "../libs/discord-notifier";
 import { getCachedRoles, getNextPosition, Role, updateRoleCache } from "../database/schemas/Role";
 import { ElysiaApp } from "..";
+import { tHeaders, tParams, tRequestBody, tResponseBody, tSchema } from "../libs/models";
+import { DocumentationCategory } from "../types/DocumentationCategory";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }) => { // Get roles
     if(!session?.player?.hasPermission(Permission.ViewRoles)) return status(403, { error: i18n('$.error.notAllowed') });
@@ -17,17 +19,14 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     }));
 }, {
     detail: {
-        tags: ['Roles'],
+        tags: [DocumentationCategory.Roles],
         description: 'Get all roles'
     },
     response: {
-        200: t.Array(t.Object({ id: t.String(), name: t.String(), position: t.Integer(), hasIcon: t.Boolean(), color: t.Nullable(t.String()), permissions: t.Number() }), { description: 'The role list' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
-        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: t.Array(tSchema.Role, { description: 'A role list' }),
+        403: tResponseBody.Error
     },
-    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+    headers: tHeaders
 }).get('/:id', async ({ session, params: { id }, i18n, status }) => { // Get specific role
     if(!session?.player?.hasPermission(Permission.ViewRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
@@ -44,19 +43,16 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     };
 }, {
     detail: {
-        tags: ['Roles'],
+        tags: [DocumentationCategory.Roles],
         description: 'Get a specific role'
     },
     response: {
-        200: t.Object({ id: t.String(), name: t.String(), position: t.Integer(), hasIcon: t.Boolean(), color: t.Nullable(t.String()), permissions: t.Number() }, { description: 'The role data' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
-        404: t.Object({ error: t.String() }, { description: 'There is no role with the name you provided' }),
-        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tSchema.Role,
+        403: tResponseBody.Error,
+        404: tResponseBody.Error
     },
-    params: t.Object({ id: t.String({ description: 'The role ID' }) }),
-    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+    params: tParams.roleId,
+    headers: tHeaders
 }).post('/', async ({ session, body, i18n, status }) => { // Create role
     if(!session?.player?.hasPermission(Permission.CreateRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
@@ -85,19 +81,15 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     };
 }, {
     detail: {
-        tags: ['Roles'],
-        description: 'Create a new role'
+        tags: [DocumentationCategory.Roles],
+        description: 'Create a new role',
     },
     response: {
-        200: t.Object({ id: t.String(), name: t.String(), position: t.Integer(), hasIcon: t.Boolean(), color: t.Nullable(t.String()), permissions: t.Number() }, { description: 'The created role' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
-        409: t.Object({ error: t.String() }, { description: 'A role with the provided name already exists' }),
-        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tSchema.Role,
+        403: tResponseBody.Error
     },
-    body: t.Object({ name: t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' }), color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6, error: '$.error.wrongType;;[["field", "color"], ["type", "string"]]' }))), permissions: t.Optional(t.Integer({ error: '$.error.wrongType;;[["field", "permissions"], ["type", "integer"]]' })) }, { error: '$.error.invalidBody', additionalProperties: true }),
-    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+    body: tRequestBody.Role,
+    headers: tHeaders
 }).patch('/:id', async ({ session, params, body: { name, color, permissions }, i18n, status }) => { // Edit role
     if(!session?.player?.hasPermission(Permission.DeleteRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
@@ -141,20 +133,18 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     };
 }, {
     detail: {
-        tags: ['Roles'],
+        tags: [DocumentationCategory.Roles],
         description: 'Edit a role'
     },
     response: {
-        200: t.Object({ id: t.String(), name: t.String(), position: t.Integer(), hasIcon: t.Boolean(), color: t.Nullable(t.String()), permissions: t.Number() }, { description: 'The edited role' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
-        404: t.Object({ error: t.String() }, { description: 'There is no role with the name you provided' }),
-        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tSchema.Role,
+        403: tResponseBody.Error,
+        404: tResponseBody.Error,
+        422: tResponseBody.Error,
     },
-    body: t.Object({ name: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' })), color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6, error: '$.error.wrongType;;[["field", "color"], ["type", "string"]]' }))), permissions: t.Optional(t.Integer({ error: '$.error.wrongType;;[["field", "permissions"], ["type", "integer"]]' })) }, { error: '$.error.invalidBody', additionalProperties: true }),
-    params: t.Object({ id: t.String({ description: 'The role ID' }) }),
-    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+    body: tRequestBody.Role,
+    params: tParams.roleId,
+    headers: tHeaders
 }) // TODO: Implement route to patch all roles at once
 .delete('/:id', async ({ session, params, i18n, status }) => { // Delete role
     if(!session?.player?.hasPermission(Permission.DeleteRoles)) return status(403, { error: i18n('$.error.notAllowed') });
@@ -175,17 +165,14 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     return { message: i18n('$.roles.delete.success') };
 }, {
     detail: {
-        tags: ['Roles'],
+        tags: [DocumentationCategory.Roles],
         description: 'Delete a role'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: 'The success message' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage roles' }),
-        404: t.Object({ error: t.String() }, { description: 'There is no role with the name you provided' }),
-        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tResponseBody.Message,
+        403: tResponseBody.Error,
+        404: tResponseBody.Error,
     },
-    params: t.Object({ id: t.String({ description: 'The role ID' }) }),
-    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+    params: tParams.roleId,
+    headers: tHeaders
 });

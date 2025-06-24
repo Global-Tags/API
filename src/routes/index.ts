@@ -1,27 +1,23 @@
 import { ElysiaApp } from "..";
 import { getRequests } from "../libs/metrics";
-import { version } from "../../package.json";
 import { Context, t } from "elysia";
 import { formatUUID } from "../libs/game-profiles";
 import { Metric } from "../database/schemas/Metric";
 import { Player } from "../database/schemas/Player";
+import { tResponseBody, tSchema } from "../libs/models";
+import { config } from "../libs/config";
+import { DocumentationCategory } from "../types/DocumentationCategory";
 
 export default (app: ElysiaApp) => app.get('/', () => ({
-    version,
-    requests: getRequests(),
-    commit: {
-        branch: 'deprecated',
-        sha: 'deprecated',
-        tree: 'deprecated'
-    }
+    version: config.version,
+    requests: getRequests()
 }), {
     detail: {
-        tags: ['API'],
-        description: 'Returns some basic info about the API'
+        tags: [DocumentationCategory.Api],
+        description: 'Get API information'
     },
     response: {
-        200: t.Object({ version: t.String(), requests: t.Number(), commit: t.Object({ branch: t.String(), sha: t.Union([t.String(), t.Null()]), tree: t.Union([t.String(), t.Null()]) }) }, { description: 'Some basic API info' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tResponseBody.ApiInfo
     }
 }).get('/metrics', async ({ query: { latest } }) => {
     const metrics = await Metric.find();
@@ -37,29 +33,17 @@ export default (app: ElysiaApp) => app.get('/', () => ({
         bans: metric.bans,
         downloads: metric.downloads,
         ratings: metric.ratings,
-        dailyRequests: metric.daily_requests ?? 0,
+        daily_requests: metric.daily_requests ?? 0,
         positions: metric.positions,
         icons: metric.icons
     }));
 }, {
     detail: {
-        tags: ['API'],
+        tags: [DocumentationCategory.Api],
         description: 'Get API statistics'
     },
     response: {
-        200: t.Array(t.Object({
-            time: t.Number({ default: Date.now() }),
-            users: t.Number(),
-            tags: t.Number(),
-            admins: t.Number(),
-            bans: t.Number(),
-            downloads: t.Object({ flintmc: t.Number(), modrinth: t.Number() }, { additionalProperties: true }),
-            ratings: t.Object({ flintmc: t.Number() }, { additionalProperties: true }),
-            dailyRequests: t.Number(),
-            positions: t.Object({}, { default: {}, additionalProperties: true, description: 'All position counts' }),
-            icons: t.Object({}, { default: {}, additionalProperties: true, description: 'All icon counts' })
-        }, { description: 'The server is reachable' })),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: t.Array(tSchema.Metric, { description: 'A metric list' })
     },
     query: t.Object({
         latest: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "element"], ["type", "string"]]' }))
@@ -83,23 +67,21 @@ export default (app: ElysiaApp) => app.get('/', () => ({
     };
 }, {
     detail: {
-        tags: ['API'],
-        description: 'Get the referral leaderboard'
+        tags: [DocumentationCategory.Referrals],
+        description: 'Get the referral leaderboards'
     },
     response: {
         200: t.Object({
             total: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() })),
             current_month: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() }))
-        }, { description: 'The referral leaderboards' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        }, { description: 'The referral leaderboards' })
     }
 }).get('/ping', ({ status }: Context) => { return status(204, '') }, {
     detail: {
-        tags: ['API'],
-        description: 'Used by uptime checkers. This route is not being logged'
+        tags: [DocumentationCategory.Api],
+        description: 'Check the status of the API. This route is not being logged'
     },
     response: {
-        204: t.Any({ description: 'The server is reachable' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        204: t.Any({ description: 'Empty response' })
     }
-})
+});

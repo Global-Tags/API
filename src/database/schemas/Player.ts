@@ -442,7 +442,7 @@ interface IPlayer {
      * @param info.visible Whether the role icon should be visible (default: true)
      * @param info.expiresAt The expiration date of the role, if applicable (default: null)
      * @param info.duration The duration in milliseconds for which the role is valid, if applicable (default: null)
-     * @return {success: boolean, expiresAt: Date | null} An object indicating success and the expiration date of the role
+     * @return {{ success: boolean, expiresAt: Date | null }} An object indicating success and the expiration date of the role
      */
     addRole(info: { id: string, reason: string, autoRemove: boolean, visible?: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null };
 
@@ -1036,7 +1036,7 @@ const PlayerSchema = new Schema<IPlayer>({
 
             const ban = {
                 id: generateSecureCode(),
-                reason,
+                reason: reason.trim(),
                 staff,
                 banned_at: new Date(),
                 expires_at: expiresAt || null,

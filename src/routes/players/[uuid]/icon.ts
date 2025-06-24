@@ -12,6 +12,8 @@ import sharp from "sharp";
 import Logger from "../../../libs/Logger";
 import { generateSecureCode } from "../../../libs/crypto";
 import { getOrCreatePlayer, Player } from "../../../database/schemas/Player";
+import { tResponseBody, tHeaders, tParams, tRequestBody } from "../../../libs/models";
+import { DocumentationCategory } from "../../../types/DocumentationCategory";
 
 export function getCustomIconUrl(uuid: string, hash: string) {
     return `${config.baseUrl}/players/${uuid}/icon/${hash}`;
@@ -28,18 +30,15 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     return file;
 }, {
     detail: {
-        tags: ['Settings'],
-        description: 'Returns a custom icon by its owner and its hash'
+        tags: [DocumentationCategory.Tags],
+        description: 'Get a custom icon'
     },
     response: {
-        200: t.File({ description: 'The custom icon' }),
-        403: t.Object({ error: t.String() }, { description: 'The player is banned' }),
-        404: t.Object({ error: t.String() }, { description: 'The icon was not found' }),
-        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: t.File({ description: 'An image file' }),
+        403: tResponseBody.Error,
+        404: tResponseBody.Error
     },
-    params: t.Object({ uuid: t.String({ description: 'The uuid of the image owner' }), hash: t.String({ description: 'The image hash' }) })
+    params: tParams.uuidAndIconHash
 }).post('/', async ({ session, body: { icon }, params, i18n, status }) => { // Change icon
     if(!session || !session.self && !session.player?.hasPermission(Permission.ManagePlayerIcons)) return status(403, { error: i18n('error.notAllowed') });
 
@@ -51,7 +50,7 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     if(!session.player?.hasPermission(Permission.BypassValidation) && (isCustomIconDisallowed || !icons.includes(globalIcon) || config.validation.icon.blacklist.includes(icon))) return status(403, { error: i18n('$.icon.notAllowed') });
 
     if(player.isBanned()) return status(403, { error: i18n('$.error.banned') });
-    if(player.icon.type == icon) return status(400, { error: i18n('$.icon.sameIcon') });
+    if(player.icon.type == icon) return status(409, { error: i18n('$.icon.sameIcon') });
 
     const oldIcon = player.icon.type;
     player.icon.type = globalIcon;
@@ -77,20 +76,19 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     return { message: i18n(session.self ? `$.icon.success.self` : '$.icon.success.admin') };
 }, {
     detail: {
-        tags: ['Settings'],
-        description: 'Changes your GlobalTag icon'
+        tags: [DocumentationCategory.Tags],
+        description: 'Change your GlobalTag icon',
+        deprecated: true
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: 'The icon was updated' }),
-        400: t.Object({ error: t.String() }, { description: 'You\'re already using that icon' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to change your icon' }),
-        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tResponseBody.Message,
+        403: tResponseBody.Error,
+        404: tResponseBody.Error,
+        409: tResponseBody.Error,
     },
-    body: t.Object({ icon: t.String({ error: '$.error.wrongType;;[["field", "icon"], ["type", "string"]]' }) }, { error: '$.error.invalidBody', additionalProperties: true }),
-    params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
-    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+    body: t.Object({ icon: t.String({ error: '$.error.wrongType;;[["field", "icon"], ["type", "string"]]' }) }, { error: '$.error.invalidBody', additionalProperties: true }), // TODO: Merge with other settings
+    params: tParams.uuid,
+    headers: tHeaders
 }).post('/upload', async ({ session, body: { image }, params, i18n, status }) => { // Upload custom icon
     if(!session || !session.self) return status(403, { error: i18n('$.error.notAllowed') });
 
@@ -122,18 +120,16 @@ export default (app: ElysiaApp) => app.get('/:hash', async ({ params: { uuid, ha
     return { message: i18n('$.icon.upload.success'), hash: player.icon.hash };
 }, {
     detail: {
-        tags: ['Settings'],
+        tags: [DocumentationCategory.Tags],
         description: 'Upload a custom icon'
     },
     response: {
-        200: t.Object({ message: t.String(), hash: t.String() }, { description: 'The icon was uploaded' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to change your icon' }),
-        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account' }),
-        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: t.Object({ message: t.String(), hash: t.String() }, { description: 'A message and icon hash' }),
+        403: tResponseBody.Error,
+        404: tResponseBody.Error,
+        422: tResponseBody.Error
     },
-    body: t.Object({ image: t.File({ type: 'image/png', error: '$.error.wrongType;;[["field", "image"], ["type", "png file"]]' }) }, { error: '$.error.invalidBody', additionalProperties: true }),
-    params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
-    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+    body: tRequestBody.UploadCustomIcon,
+    params: tParams.uuid,
+    headers: tHeaders
 });

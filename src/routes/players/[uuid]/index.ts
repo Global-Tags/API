@@ -10,6 +10,8 @@ import { GlobalIcon } from "../../../types/GlobalIcon";
 import { formatUUID, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 import { getOrCreatePlayer, Player } from "../../../database/schemas/Player";
+import { tResponseBody } from "../../../libs/models";
+import { DocumentationCategory } from "../../../types/DocumentationCategory";
 
 const { validation, strictAuth } = config;
 const { min, max, blacklist, watchlist } = validation.tag;
@@ -46,15 +48,13 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     };
 }, {
     detail: {
-        tags: ['Interactions'],
-        description: 'Returns a players\' tag info'
+        tags: [DocumentationCategory.Tags],
+        description: 'Get a players\' tag info'
     },
     response: {
-        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referrals: t.Object({ has_referred: t.Boolean(), total_referrals: t.Integer(), current_month_referrals: t.Integer() }), roleIcon: t.Union([t.String(), t.Null()]), roles: t.Array(t.String()), permissions: t.Integer() }, { description: 'The tag data' }),
-        403: t.Object({ error: t.String() }, { description: 'The player is banned' }),
-        404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tResponseBody.TagData,
+        403: tResponseBody.Error,
+        404: tResponseBody.Error,
     },
     params: t.Object({ uuid: t.String({ description: 'The uuid of the player you want to fetch the info of' }) }),
     headers: t.Object({ authorization: strictAuth ? t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) : t.Optional(t.String({ description: 'Your authentication token' })) }, { error: '$.error.notAllowed' }),
@@ -71,15 +71,13 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     }));
 }, {
     detail: {
-        tags: ['Interactions'],
-        description: 'Returns a players\' tag history'
+        tags: [DocumentationCategory.Tags],
+        description: 'Get a players\' tag history'
     },
     response: {
         200: t.Array(t.Object({ tag: t.String(), timestamp: t.Number(), flagged_words: t.Array(t.String()) }), { description: 'The tag history' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage tags' }),
-        404: t.Object({ error: t.String() }, { description: 'The player is not in the database' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        403: tResponseBody.Error,
+        404: tResponseBody.Error,
     },
     params: t.Object({ uuid: t.String({ description: 'The uuid of the player you want to fetch the info of' }) }),
     headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' }),
@@ -138,19 +136,18 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     return { message: i18n(session.self ? '$.setTag.success.self' : '$.setTag.success.admin') };
 }, {
     detail: {
-        tags: ['Settings'],
-        description: 'Changes your global tag'
+        tags: [DocumentationCategory.Tags],
+        description: 'Change your GlobalTag',
+        deprecated: true
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: 'Your tag was changed' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re banned' }),
-        409: t.Object({ error: t.String() }, { description: 'You already have this tag' }),
-        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tResponseBody.Message,
+        403: tResponseBody.Error,
+        409: tResponseBody.Error,
+        422: tResponseBody.Error,
     },
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
-    body: t.Object({ tag: t.String({ error: '$.error.wrongType;;[["field", "tag"], ["type", "string"]]' }) }, { error: '$.error.invalidBody', additionalProperties: true }),
+    body: t.Object({ tag: t.String({ error: '$.error.wrongType;;[["field", "tag"], ["type", "string"]]' }) }, { error: '$.error.invalidBody', additionalProperties: true }), // TODO: Merge with other settings
     headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
 }).delete('/', async ({ session, params, i18n, status }) => { // Delete tag
     if(!session || !session.self && !session.player?.hasPermission(Permission.ManagePlayerTags)) return status(403, { error: i18n('$.error.notAllowed') });
@@ -179,15 +176,13 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     return { message: i18n(session.self ? '$.resetTag.success.self' : '$.resetTag.success.admin') };
 }, {
     detail: {
-        tags: ['Settings'],
-        description: 'Deletes your global tag'
+        tags: [DocumentationCategory.Tags],
+        description: 'Delete your GlobalTag'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: 'Your tag was deleted' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re banned' }),
-        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tResponseBody.Message,
+        403: tResponseBody.Error,
+        404: tResponseBody.Error,
     },
     params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
     headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })

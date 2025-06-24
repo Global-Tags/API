@@ -1,5 +1,6 @@
 import { config as loadEnv } from "dotenv";
 import { constantCase, snakeCase } from "change-case";
+import * as pkg from "../../package.json";
 
 function getEnvNumber(path: string | undefined, defaultValue: number) {
     const number = Number(path);
@@ -15,6 +16,7 @@ loadEnv();
 loadEnv({ path: `./.env.${process.env.NODE_ENV || 'dev'}`, override: true });
 
 export let config = {
+    version: pkg.version,
     port: getEnvNumber(process.env.GT_PORT, 5500),
     strictAuth: getEnvBoolean(process.env.GT_STRICT_AUTH, true),
     logLevel: process.env.GT_LOG_LEVEL || 'Info',

@@ -6,6 +6,8 @@ import { ElysiaApp } from "../../..";
 import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
 import { sendTagChangeEmail } from "../../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
+import { tResponseBody, tHeaders, tParams } from "../../../libs/models";
+import { DocumentationCategory } from "../../../types/DocumentationCategory";
 
 export default (app: ElysiaApp) => app.post('/', async ({ session, body: { position }, params, i18n, status }) => { // Change tag position
     if(!session || !session.self && !session.player?.hasPermission(Permission.ManagePlayerPositions)) return status(403, { error: i18n('$.error.notAllowed') });
@@ -15,7 +17,7 @@ export default (app: ElysiaApp) => app.post('/', async ({ session, body: { posit
 
     const player = await getOrCreatePlayer(params.uuid);
     if(session.self && player.isBanned()) return status(403, { error: i18n('$.error.banned') });
-    if(player.position == position) return status(400, { error: i18n('$.position.samePosition') });
+    if(player.position == position) return status(409, { error: i18n('$.position.samePosition') });
 
     const oldPosition = player.position;
     player.position = globalPosition;
@@ -41,19 +43,17 @@ export default (app: ElysiaApp) => app.post('/', async ({ session, body: { posit
     return { message: i18n(session.self ? '$.position.success.self' : '$.position.success.admin') };
 }, {
     detail: {
-        tags: ['Settings'],
-        description: 'Changes your GlobalTag position'
+        tags: [DocumentationCategory.Tags],
+        description: 'Change your GlobalTag position',
+        deprecated: true
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: 'The tag position was updated' }),
-        400: t.Object({ error: t.String() }, { description: 'You provided an invalid position' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to change your tag position' }),
-        409: t.Object({ error: t.String() }, { description: 'Your tag is already in that position' }),
-        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tResponseBody.Message,
+        403: tResponseBody.Error,
+        409: tResponseBody.Error,
+        422: tResponseBody.Error,
     },
-    body: t.Object({ position: t.String({ error: '$.error.wrongType;;[["field", "position"], ["type", "string"]]' }) }, { error: '$.error.invalidBody', additionalProperties: true }),
-    params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
-    headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+    body: t.Object({ position: t.String({ error: '$.error.wrongType;;[["field", "position"], ["type", "string"]]' }) }, { error: '$.error.invalidBody', additionalProperties: true }), // TODO: Merge with other settings
+    params: tParams.uuid,
+    headers: tHeaders
 });
