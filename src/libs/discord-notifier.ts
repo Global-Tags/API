@@ -1,7 +1,7 @@
 import * as bot from "../bot/bot";
 import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonBuilder, ButtonStyle, ContainerBuilder, EmbedBuilder, JSONEncodable, MessageCreateOptions, MessageFlags, SectionBuilder, TextDisplayBuilder, ThumbnailBuilder, TopLevelComponentData } from "discord.js";
 import { GameProfile } from "./game-profiles";
-import { getCustomIconUrl } from "../routes/players/[uuid]/icon";
+import { getCustomIconUrl } from "../routes/players/[uuid]/icons";
 import { capitalCase, pascalCase, sentenceCase } from "change-case";
 import { config } from "./config";
 import { stripColors, translateToAnsi } from "./chat-color";

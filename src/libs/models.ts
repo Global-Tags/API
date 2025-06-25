@@ -75,6 +75,15 @@ export namespace tRequestBody {
         reason: t.String({ error: '$.error.wrongType;;[["field", "reason"], ["type", "string"]]', description: 'A report reason' })
     }, { description: 'A report object', ...options });
 
+    export const TagSettings = t.Object({
+        tag: t.Optional(t.Nullable(t.String({ error: '$.error.wrongType;;[["field", "tag"], ["type", "string"]]', description: 'The tag content' }))),
+        position: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "position"], ["type", "string"]]', description: 'The position of the tag' })),
+        icon: t.Optional(t.Object({
+            type: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "icon.type"], ["type", "string"]]', description: 'The type of the icon' })),
+            hash: t.Optional(t.Nullable(t.String({ error: '$.error.wrongType;;[["field", "icon.hash"], ["type", "string"]]', description: 'The hash of the icon' })))
+        }, { error: '$.error.wrongType;;[["field", "icon"], ["type", "object"]]' })),
+    }, { description: 'A tag settings object', ...options });
+
     export const CreateGiftCode = t.Object({
         name: t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' }),
         code: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "code"], ["type", "string"]]' })),
@@ -137,6 +146,22 @@ export namespace tResponseBody {
         roles: t.Array(t.String()),
         permissions: t.Integer()
     }, { description: 'A tag data object' });
+
+    export const EditTagSettings = t.Object({
+        errors: t.Object({
+            tag: t.Nullable(tString, { description: 'An error message for the tag' }),
+            position: t.Nullable(tString, { description: 'An error message for the position' }),
+            icon: t.Nullable(tString, { description: 'An error message for the icon' })
+        }, { description: 'A list of errors that occurred during the update' }),
+        data: t.Object({
+            tag: t.Nullable(tString),
+            position: t.String({ default: 'above', description: 'The position of the tag' }),
+            icon: t.Object({
+                type: t.String({ default: 'none', description: 'The type of the icon' }),
+                hash: t.Optional(t.Nullable(t.String({ default: generateSecureCode(32), description: 'The hash of the icon' })))
+            })
+        }, { description: 'The updated tag settings' })
+    }, { description: 'An edit tag settings response object' });
 
     export const ApiInfo = t.Object({
         version: t.String({ default: config.version, description: 'The API version' }),

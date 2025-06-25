@@ -6,7 +6,7 @@ import { GameProfile } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 import { formatTimestamp } from "../../libs/discord-notifier";
 import { stripColors } from "../../libs/chat-color";
-import { getCustomIconUrl } from "../../routes/players/[uuid]/icon";
+import { getCustomIconUrl } from "../../routes/players/[uuid]/icons";
 
 export default class ClearsButton extends Button {
     constructor() {

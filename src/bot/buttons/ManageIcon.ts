@@ -2,7 +2,7 @@ import { ButtonInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder
 import Button from "../structs/Button";
 import players, { PlayerDocument } from "../../database/schemas/Player";
 import { colors } from "../bot";
-import { getCustomIconUrl } from "../../routes/players/[uuid]/icon";
+import { getCustomIconUrl } from "../../routes/players/[uuid]/icons";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon } from "../../types/GlobalIcon";
 import { config } from "../../libs/config";
