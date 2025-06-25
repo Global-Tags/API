@@ -122,6 +122,9 @@ const elysia = new Elysia()
         } else if(code == 'NOT_FOUND') {
             set.status = 404;
             return { error: i18n('$.error.notFound') };
+        } else if(code == 'PARSE') {
+            set.status = 422;
+            return { error: i18n('$.error.invalid_body') };
         } else {
             set.status = 500;
             captureException(error);
