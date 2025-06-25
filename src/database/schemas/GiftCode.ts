@@ -95,7 +95,8 @@ const GiftCodeSchema = new Schema<IGiftCode>({
     },
     uses: {
         type: [String],
-        required: true
+        required: true,
+        default: []
     },
     max_uses: {
         type: Number,
@@ -104,7 +105,9 @@ const GiftCodeSchema = new Schema<IGiftCode>({
     gift: {
         type: {
             type: String,
-            required: true
+            required: true,
+            enum: Object.values(GiftType),
+            default: GiftType.Role
         },
         value: {
             type: String,
@@ -112,7 +115,6 @@ const GiftCodeSchema = new Schema<IGiftCode>({
         },
         duration: {
             type: Number,
-            required: true,
             default: null
         }
     },
@@ -122,7 +124,8 @@ const GiftCodeSchema = new Schema<IGiftCode>({
     },
     created_at: {
         type: Date,
-        required: true
+        required: true,
+        default: Date.now
     },
     expires_at: {
         type: Date,
@@ -161,7 +164,6 @@ export async function createGiftCode({
     createdBy: string
 }): Promise<GiftCodeDocument> {
     return await GiftCode.insertOne({
-        id: generateSecureCode(),
         name,
         code,
         uses: [],

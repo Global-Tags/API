@@ -1,5 +1,6 @@
 import { HydratedDocument, model, Schema } from "mongoose";
 import { ContextSchema, PlayerContext, PunishmentAction, PunishmentActionSchema } from "./Report";
+import { generateSecureCode } from "../../libs/crypto";
 
 interface IWatchlistAlert {
     /**
@@ -31,12 +32,34 @@ interface IWatchlistAlert {
 }
 
 const WatchlistAlertSchema = new Schema<IWatchlistAlert>({
-    id: { type: String, required: true, unique: true },
-    player_uuid: { type: String, required: true },
-    context: ContextSchema,
-    new: { type: Boolean, required: true },
-    actions: [PunishmentActionSchema],
-    created_at: { type: Date, default: Date.now }
+    id: {
+        type: String,
+        required: true,
+        unique: true,
+        default: generateSecureCode
+    },
+    player_uuid: {
+        type: String,
+        required: true
+    },
+    context: {
+        type: ContextSchema,
+        required: true
+    },
+    new: {
+        type: Boolean,
+        required: true
+    },
+    actions: {
+        type: [PunishmentActionSchema],
+        required: true,
+        default: []
+    },
+    created_at: {
+        type: Date,
+        required: true,
+        default: Date.now
+    }
 });
 
 export const WatchlistAlert = model<IWatchlistAlert>('WatchlistAlert', WatchlistAlertSchema);

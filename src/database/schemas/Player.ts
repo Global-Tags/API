@@ -1,5 +1,4 @@
 import { HydratedDocument, Schema, model } from "mongoose";
-import { snakeCase } from "change-case";
 import { Permission } from "../../types/Permission";
 import { getCachedRoles, RoleDocument } from "./Role";
 import { GlobalIcon, icons } from "../../types/GlobalIcon";
@@ -8,6 +7,7 @@ import { isConnected } from "../mongo";
 import { generateSecureCode } from "../../libs/crypto";
 import { Report, ReportDocument } from "./Report";
 import { GlobalPosition, positions } from "../../types/GlobalPosition";
+import { config } from "../../libs/config";
 
 export interface PlayerRole {
     /**
@@ -351,11 +351,19 @@ interface IPlayer {
         // TODO: Add twitch connection
     };
 
+    //* Miscellaneous
+
     /**
      * Get the player's GameProfile
      * @return {Promise<GameProfile>} A promise that resolves to the GameProfile of the player
      */
     getGameProfile(): Promise<GameProfile>;
+
+    /**
+     * Change the player's tag
+     * @param newTag The new tag to set, can be null to clear the tag
+     */
+    changeTag(newTag: string | null): void;
 
     //* API Keys
 
@@ -531,9 +539,27 @@ const PlayerSchema = new Schema<IPlayer>({
         unique: true
     },
     email: {
-        type: String,
-        required: true,
-        default: null
+        address: {
+            type: String,
+            default: null
+        },
+        last_changed_at: {
+            type: Date,
+            default: null
+        },
+        verification_code: {
+            type: String,
+            default: null
+        },
+        verification_expires_at: {
+            type: Date,
+            default: null
+        },
+        verified: {
+            type: Boolean,
+            required: true,
+            default: false
+        }
     },
     tag: {
         type: String,
@@ -542,20 +568,28 @@ const PlayerSchema = new Schema<IPlayer>({
     position: {
         type: String,
         required: true,
-        enum: positions
+        enum: positions,
+        default: GlobalPosition.Above
     },
-    icon: new Schema({
-        type: {
-            type: String,
-            required: true,
-            enum: icons
-        },
-        hash: {
-            type: String,
-            required: true,
-            default: null
+    icon: {
+        type: new Schema({
+            type: {
+                type: String,
+                required: true,
+                enum: icons,
+                default: GlobalIcon.None
+            },
+            hash: {
+                type: String,
+                default: null
+            }
+        }, { _id: false }),
+        required: true,
+        default: {
+            type: GlobalIcon.None,
+            hash: null
         }
-    }, { _id: false }),
+    },
     preferred_language: {
         type: String,
         required: true,
@@ -599,8 +633,9 @@ const PlayerSchema = new Schema<IPlayer>({
                     required: true
                 },
                 referred_at: {
-                    type: Number,
-                    required: true
+                    type: Date,
+                    required: true,
+                    default: Date.now
                 }
             }],
             required: true,
@@ -620,11 +655,11 @@ const PlayerSchema = new Schema<IPlayer>({
             },
             auto_remove: {
                 type: Boolean,
-                required: true
+                required: true,
+                default: false
             },
             reason: {
                 type: String,
-                required: true,
                 default: null
             },
             visible: {
@@ -634,11 +669,11 @@ const PlayerSchema = new Schema<IPlayer>({
             },
             added_at: {
                 type: Date,
-                required: true
+                required: true,
+                default: Date.now
             },
             expires_at: {
                 type: Date,
-                required: true,
                 default: null
             }
         }],
@@ -649,7 +684,8 @@ const PlayerSchema = new Schema<IPlayer>({
         type: [{
             id: {
                 type: String,
-                required: true
+                required: true,
+                default: generateSecureCode
             },
             name: {
                 type: String,
@@ -661,11 +697,11 @@ const PlayerSchema = new Schema<IPlayer>({
             },
             created_at: {
                 type: Date,
-                required: true
+                required: true,
+                default: Date.now
             },
             last_used: {
                 type: Date,
-                required: true,
                 default: null
             }
         }],
@@ -676,7 +712,8 @@ const PlayerSchema = new Schema<IPlayer>({
         type: [{
             id: {
                 type: String,
-                required: true
+                required: true,
+                default: generateSecureCode
             },
             content: {
                 type: String,
@@ -707,7 +744,8 @@ const PlayerSchema = new Schema<IPlayer>({
             },
             cleared_at: {
                 type: Date,
-                required: true
+                required: true,
+                default: Date.now
             }
         }],
         required: true,
@@ -734,11 +772,11 @@ const PlayerSchema = new Schema<IPlayer>({
             },
             locked_at: {
                 type: Date,
-                required: true
+                required: true,
+                default: Date.now
             },
             expires_at: {
                 type: Date,
-                required: true,
                 default: null
             }
         }],
@@ -761,11 +799,11 @@ const PlayerSchema = new Schema<IPlayer>({
             },
             watched_at: {
                 type: Date,
-                required: true
+                required: true,
+                default: Date.now
             },
             expires_at: {
                 type: Date,
-                required: true,
                 default: null
             }
         }],
@@ -776,7 +814,8 @@ const PlayerSchema = new Schema<IPlayer>({
         type: [{
             id: {
                 type: String,
-                required: true
+                required: true,
+                default: generateSecureCode
             },
             reason: {
                 type: String,
@@ -788,11 +827,11 @@ const PlayerSchema = new Schema<IPlayer>({
             },
             banned_at: {
                 type: Date,
-                required: true
+                required: true,
+                default: Date.now
             },
             expires_at: {
                 type: Date,
-                required: true,
                 default: null
             },
             appeal: {
@@ -808,12 +847,10 @@ const PlayerSchema = new Schema<IPlayer>({
                 },
                 reason: {
                     type: String,
-                    required: true,
                     default: null
                 },
                 appealed_at: {
                     type: Date,
-                    required: true,
                     default: null
                 }
             }
@@ -826,7 +863,8 @@ const PlayerSchema = new Schema<IPlayer>({
             type: {
                 id: {
                     type: String,
-                    required: true
+                    required: true,
+                    default: generateSecureCode
                 },
                 access_token: {
                     type: String,
@@ -841,7 +879,6 @@ const PlayerSchema = new Schema<IPlayer>({
                     required: true
                 }
             },
-            required: true,
             default: null
         }
     }
@@ -849,6 +886,18 @@ const PlayerSchema = new Schema<IPlayer>({
     methods: {
         getGameProfile(): Promise<GameProfile> {
             return GameProfile.getProfileByUUID(this.uuid);
+        },
+
+        changeTag(newTag: string | null): void {
+            if(this.tag === newTag) return;
+
+            this.tag = newTag;
+            if(!newTag) return;
+
+            this.tag_history.push({
+                content: newTag,
+                timestamp: new Date()
+            });
         },
 
         createApiKey(name: string): ApiKey {

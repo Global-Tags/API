@@ -46,7 +46,10 @@ const StaffMemberSchema = new Schema<IStaffMember>({
         required: true,
         unique: true
     },
-    description: String,
+    description: {
+        type: String,
+        default: null
+    },
     category: {
         type: String,
         required: true

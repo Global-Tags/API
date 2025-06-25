@@ -119,14 +119,24 @@ interface IReport {
 }
 
 export const PunishmentActionSchema = new Schema<PunishmentAction>({
-    user: { type: String, required: true },
+    user: {
+        type: String,
+        required: true
+    },
     type: {
         type: String,
         enum: Object.values(PunishmentActionType),
         required: true,
     },
-    comment: { type: String, required: true, default: null },
-    added_at: { type: Date, required: true },
+    comment: {
+        type: String,
+        default: null
+    },
+    added_at: {
+        type: Date,
+        required: true,
+        default: Date.now
+    },
 }, { _id: false });
 
 export const ContextSchema = new Schema<PlayerContext>({
@@ -135,26 +145,60 @@ export const ContextSchema = new Schema<PlayerContext>({
         type: String,
         enum: positions,
         required: true,
+        default: GlobalPosition.Above,
     },
     icon: {
         type: {
             type: String,
             enum: icons,
             required: true,
+            default: GlobalIcon.None,
         },
-        hash: { type: String, required: true, default: null },
+        hash: {
+            type: String,
+            default: null
+        },
     },
 }, { _id: false });
 
 const ReportSchema = new Schema<IReport>({
-    id: { type: String, required: true, unique: true, default: generateSecureCode },
-    reported_uuid: { type: String, required: true },
-    reporter_uuid: { type: String, required: true },
-    reason: { type: String, required: true },
-    actions: { type: [PunishmentActionSchema], default: [] },
-    context: { type: ContextSchema, required: true },
-    created_at: { type: Date, required: true },
-    last_updated: { type: Date, required: true },
+    id: {
+        type: String,
+        required: true,
+        unique: true,
+        default: generateSecureCode
+    },
+    reported_uuid: {
+        type: String,
+        required: true
+    },
+    reporter_uuid: {
+        type: String,
+        required: true
+    },
+    reason: {
+        type: String,
+        required: true
+    },
+    actions: {
+        type: [PunishmentActionSchema],
+        required: true,
+        default: []
+    },
+    context: {
+        type: ContextSchema,
+        required: true
+    },
+    created_at: {
+        type: Date,
+        required: true,
+        default: Date.now
+    },
+    last_updated: {
+        type: Date,
+        required: true,
+        default: Date.now
+    },
 }, {
     methods: {
         isResolved(): boolean {

@@ -81,21 +81,21 @@ const RoleSchema = new Schema<IRole>({
     },
     color: {
         type: String,
-        required: true,
         default: null
     },
     hasIcon: {
         type: Boolean,
-        required: true
+        required: true,
+        default: false
     },
     sku: {
         type: String,
-        required: true,
         default: null
     },
     permissions: {
         type: Number,
-        required: true
+        required: true,
+        default: 0
     }
 }, {
     methods: {
