@@ -1,6 +1,7 @@
 import { HydratedDocument, model, Schema } from "mongoose";
 import { ContextSchema, PlayerContext, PunishmentAction, PunishmentActionSchema } from "./Report";
 import { generateSecureCode } from "../../libs/crypto";
+import { WatchlistPeriod } from "./Player";
 
 interface IWatchlistAlert {
     /**
@@ -11,6 +12,7 @@ interface IWatchlistAlert {
      * UUID of the player who is being watched
      */
     player_uuid: string;
+    period: string;
     /**
      * Contextual information about the player at the time of the alert
      * @see PlayerContext
@@ -29,6 +31,8 @@ interface IWatchlistAlert {
      * Timestamp of when the alert was created
      */
     created_at: Date;
+
+    getWatchlistPeriod(): Promise<WatchlistPeriod | null>;
 }
 
 const WatchlistAlertSchema = new Schema<IWatchlistAlert>({
@@ -39,6 +43,10 @@ const WatchlistAlertSchema = new Schema<IWatchlistAlert>({
         default: generateSecureCode
     },
     player_uuid: {
+        type: String,
+        required: true
+    },
+    period: {
         type: String,
         required: true
     },
@@ -59,6 +67,12 @@ const WatchlistAlertSchema = new Schema<IWatchlistAlert>({
         type: Date,
         required: true,
         default: Date.now
+    }
+}, {
+    methods: {
+        getWatchlistPeriod(): Promise<WatchlistPeriod | null> {
+            return WatchlistAlert.findOne({ id: this.period });
+        }
     }
 });
 

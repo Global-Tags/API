@@ -8,6 +8,11 @@ import { generateSecureCode } from "../../libs/crypto";
 import { Report, ReportDocument } from "./Report";
 import { GlobalPosition, positions } from "../../types/GlobalPosition";
 import { config } from "../../libs/config";
+import { WatchlistAlert, WatchlistAlertDocument } from "./WatchlistAlert";
+import { stripColors } from "../../libs/chat-color";
+import Logger from "../../libs/Logger";
+
+const { watchlist } = config.validation.tag;
 
 export interface PlayerRole {
     /**
@@ -154,6 +159,23 @@ export interface AccountLock {
     expires_at: Date | null;
 }
 
+export enum WatchlistReasonType {
+    MatchedWord = 'matched_word',
+    SuspiciousActivity = 'suspicious_activity',
+    PreviousBan = 'previous_ban'
+}
+
+export interface WatchlistReason {
+    /**
+     * The type of reason for the watchlist entry
+     */
+    type: WatchlistReasonType;
+    /**
+     * Additional details about the reason, if applicable
+     */
+    details: string | null;
+}
+
 export interface WatchlistPeriod {
     /**
      * Unique identifier for the watchlist period
@@ -162,7 +184,7 @@ export interface WatchlistPeriod {
     /**
      * The reason for the watchlist entry
      */
-    reason: string;
+    reason: WatchlistReason;
     /**
      * The UUID of the staff member who added the player to the watchlist
      */
@@ -507,6 +529,43 @@ interface IPlayer {
      */
     clearIconTexture(reason: string, staff: string): void;
 
+    //* Watchlist
+
+    /**
+     * Check if the player is currently on the watchlist
+     * @return {boolean} True if the player is on the watchlist, otherwise false
+     */
+    isWatched(): boolean;
+
+    /**
+     * Get the current watchlist period of the player, if any
+     * @returns {WatchlistPeriod | null} The current WatchlistPeriod object, or null if not on the watchlist
+     */
+    getWatchlistPeriod(): WatchlistPeriod | null;
+
+    /**
+     * Start a watchlist period for the player
+     * @param data The data for the watchlist period
+     * @param data.reason The reason for adding the player to the watchlist
+     * @param data.staff The UUID of the staff member adding the player to the watchlist
+     * @param data.expiresAt The expiration date of the watchlist period, if applicable (default: null)
+     * @returns {WatchlistPeriod | null} The created WatchlistPeriod object, or null if not successful
+     */
+    startWatching(data: { reason: WatchlistReason, staff: string, expiresAt?: Date | null }): WatchlistPeriod | null;
+
+    /**
+     * Send a watchlist alert for the player
+     * @param initial Whether this is the initial alert for the player (default: false)
+     * @returns {Promise<WatchlistAlertDocument>} A promise that resolves to the created WatchlistAlertDocument
+     */
+    sendWatchlistAlert(initial?: boolean): Promise<WatchlistAlertDocument>;
+
+    /**
+     * Stop watching the player, removing them from the watchlist
+     * @returns {boolean} True if the player was removed from the watchlist, otherwise false
+     */
+    stopWatching(): boolean;
+
     //* Bans
 
     /**
@@ -514,6 +573,12 @@ interface IPlayer {
      * @return {boolean} True if the player is banned, otherwise false
      */
     isBanned(): boolean;
+
+    /**
+     * Get the current ban of the player, if any
+     * @returns {PlayerBan | null} The current PlayerBan object, or null if not banned
+     */
+    getBan(): PlayerBan | null;
 
     /**
      * Ban the player with the given reason and staff information
@@ -898,6 +963,16 @@ const PlayerSchema = new Schema<IPlayer>({
                 content: newTag,
                 timestamp: new Date()
             });
+            const isWatched = this.isWatched();
+            const watchlistedWord = watchlist.find((word) => stripColors(newTag).toLowerCase().includes(word));
+
+            if(isWatched || watchlistedWord) {
+                if(!isWatched) {
+                    Logger.warn(`Now watching ${this.uuid} for matching "${watchlistedWord}" in "${newTag}".`);
+                    this.startWatching({ reason: { type: WatchlistReasonType.MatchedWord, details: watchlistedWord! }, staff: '25944a62fdd646b7baec9a0d2aad77e1' });
+                }
+                this.sendWatchlistAlert(isWatched);
+            }
         },
 
         createApiKey(name: string): ApiKey {
@@ -1075,9 +1150,68 @@ const PlayerSchema = new Schema<IPlayer>({
             this.icon.hash = null;
         },
 
+        isWatched(): boolean {
+            const period = this.watchlist_periods.at(-1);
+            return !!period && (!period.expires_at || period.expires_at.getTime() > Date.now());
+        },
+
+        getWatchlistPeriod(): WatchlistPeriod | null {
+            if(!this.isWatched()) return null;
+            return this.watchlist_periods.at(-1)!;
+        },
+
+        startWatching({ reason: { type, details }, staff, expiresAt = null }: { reason: WatchlistReason, staff: string, expiresAt?: Date | null }): WatchlistPeriod | null {
+            if(this.isWatched() && !this.stopWatching()) return null;
+            const period = {
+                id: generateSecureCode(),
+                reason: {
+                    type: type,
+                    details: details?.trim() || null
+                },
+                staff,
+                watched_at: new Date(),
+                expires_at: expiresAt
+            };
+            this.watchlist_periods.push(period);
+            return period;
+        },
+
+        sendWatchlistAlert(initial: boolean = false): Promise<WatchlistAlertDocument> {
+            const period = this.getWatchlistPeriod();
+            if(!period) return Promise.reject(new Error('Player is not on the watchlist'));
+
+            // TODO: Add discord notification
+
+            return WatchlistAlert.insertOne({
+                player_uuid: this.uuid,
+                new: initial,
+                period: period.id,
+                context: {
+                    tag: this.tag || '',
+                    position: this.position,
+                    icon: {
+                        type: this.icon.type,
+                        hash: this.icon.hash
+                    }
+                }
+            });
+        },
+
+        stopWatching(): boolean {
+            const period = this.getWatchlistPeriod();
+            if(!period) return false;
+            period.expires_at = new Date();
+            return true;
+        },
+
         isBanned(): boolean {
             const ban = this.bans.at(-1);
             return !!ban && (!ban.expires_at || ban.expires_at.getTime() > Date.now());
+        },
+
+        getBan(): PlayerBan | null {
+            if(!this.isBanned()) return null;
+            return this.bans.at(-1)!;
         },
 
         banPlayer({ reason, staff, appealable = true, expiresAt }: { reason: string, staff: string, appealable?: boolean, expiresAt?: Date | null }): PlayerBan | null {
@@ -1102,7 +1236,7 @@ const PlayerSchema = new Schema<IPlayer>({
         },
 
         unban() {
-            const ban = this.bans.at(-1);
+            const ban = this.getBan();
             if(!ban) return false;
             ban.expires_at = new Date();
             return true;
