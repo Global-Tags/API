@@ -56,7 +56,11 @@
         "validation": "Das \"reason\" Feld darf nur zwischen <min> und <max> Zeichen lang sein.",
         "invalidReason": "Du musst einen gültigen Grund angeben!",
         "success": "Der Spieler wurde erfolgreich gemeldet!",
-        "immune": "Dieser Spieler kann nicht gemeldet werden!"
+        "immune": "Dieser Spieler kann nicht gemeldet werden!",
+        "delete": {
+            "success": "Die Meldung wurde erfolgreich gelöscht!",
+            "not_found": "Die Meldung wurde nicht gefunden!"
+        }
     },
     "appeal": {
         "notBanned": "Du bist nicht gebannt!",
