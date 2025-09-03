@@ -6,6 +6,7 @@ import { sendDiscordLinkMessage } from "./discord-notifier";
 import { GameProfile } from "./game-profiles";
 import Logger from "./Logger";
 
+// TODO: Find a better solution for this
 export async function onDiscordLink(player: GameProfile, userId: string) {
     sendDiscordLinkMessage(
         player,
