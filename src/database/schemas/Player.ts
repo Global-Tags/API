@@ -126,7 +126,8 @@ export enum AccountLockType {
     ChangePosition = 'change_position',
     ChangeIcon = 'change_icon',
     UploadCustomIcon = 'upload_custom_icon',
-    ReportPlayers = 'report_players'
+    ReportPlayers = 'report_players',
+    SendApplication = 'send_application'
 }
 
 export interface AccountLock {

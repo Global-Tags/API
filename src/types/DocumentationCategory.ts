@@ -1,6 +1,7 @@
 export enum DocumentationCategory {
     Api = 'API',
     ApiKeys = 'API Keys',
+    Applications = 'Applications',
     Bans = 'Bans',
     GiftCodes = 'Gift codes',
     Notes = 'Notes',
