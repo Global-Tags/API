@@ -32,6 +32,10 @@ interface IWatchlistAlert {
      */
     created_at: Date;
 
+    /**
+     * Get the watchlist period for the alert
+     * @returns The watchlist period for the alert
+     */
     getWatchlistPeriod(): Promise<WatchlistPeriod | null>;
 }
 
