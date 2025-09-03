@@ -133,7 +133,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     reason = reason?.trim();
 
     if(reason !== undefined && ban.reason != reason) {
-        ban.reason = reason.trim();
+        ban.reason = reason;
         changed = true;
     }
     if(appealable !== undefined && ban.appeal.appealable !== appealable) {

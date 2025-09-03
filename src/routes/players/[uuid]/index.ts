@@ -79,14 +79,14 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     },
     params: tParams.uuid,
     headers: tHeaders,
-}).post('/', async ({ session, params, i18n, status }) => { // Update settings
+}).post('/', async ({ session, params, i18n, status }) => { // Create account
     if(!session || !session.self && !session.player?.hasPermission(Permission.ManagePlayerTags)) return status(403, { error: i18n('$.error.notAllowed') });
 
     if(await Player.exists({ uuid: stripUUID(params.uuid) })) return status(409, { error: i18n('$.account.create.account_already_exists') });
     (await getOrCreatePlayer(params.uuid)).save();
 
     if(!session.self && session.player) {
-        // TODO: Reimplement logs and email notifications
+        // TODO: Reimplement mod log
     }
 
     return {
@@ -100,8 +100,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     response: {
         200: tResponseBody.Message,
         403: tResponseBody.Error,
-        409: tResponseBody.Error,
-        422: tResponseBody.Error,
+        409: tResponseBody.Error
     },
     params: tParams.uuid,
     headers: tHeaders
@@ -153,6 +152,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         }
     }
     if(icon !== undefined) {
+        // TODO: Remove comment when permissions are done
         const hasCustomIconPermission = !session.self || true//session.player?.hasPermission(Permission.CustomIcon) || session.player?.hasPermission(Permission.BypassValidation);
         if(icon.hash !== undefined) {
             if(!hasCustomIconPermission) {
@@ -204,9 +204,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     },
     response: {
         200: tResponseBody.EditTagSettings,
-        403: tResponseBody.Error,
-        409: tResponseBody.Error,
-        422: tResponseBody.Error,
+        403: tResponseBody.Error
     },
     params: tParams.uuid,
     body: tRequestBody.TagSettings,

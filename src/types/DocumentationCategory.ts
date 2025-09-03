@@ -4,6 +4,7 @@ export enum DocumentationCategory {
     Applications = 'Applications',
     Bans = 'Bans',
     GiftCodes = 'Gift codes',
+    Locks = 'Locks',
     Notes = 'Notes',
     Partners = 'Partners',
     Referrals = 'Referrals',

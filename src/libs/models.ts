@@ -1,6 +1,8 @@
 import { t } from "elysia";
 import { config } from "./config";
 import { generateSecureCode } from "./crypto";
+import { AccountLockType } from "../database/schemas/Player";
+import { ApplicationType } from "../database/schemas/Application";
 const { validation } = config;
 
 export const tId = t.String({
@@ -30,6 +32,7 @@ export namespace tParams {
     export const uuid = uuidAnd({});
     export const uuidAndApiKeyId = uuidAndId('An API Key ID');
     export const uuidAndBanId = uuidAndId('A ban ID');
+    export const uuidAndLockId = uuidAndId('A lock ID');
     export const uuidAndNoteId = uuidAndId('A note ID');
     export const uuidAndIconHash = uuidAnd({ hash: t.String({ description: 'An icon hash' }) });
     export const uuidAndReportId = uuidAndId('A report ID');
@@ -67,6 +70,16 @@ export namespace tRequestBody {
     export const UploadCustomIcon = t.Object({
         image: t.File({ type: 'image/png', error: '$.error.wrongType;;[["field", "image"], ["type", "png file"]]', description: 'A png image file' })
     }, { description: 'A ban edit object', ...options });
+
+    export const CreateLock = t.Object({
+        type: t.Enum(AccountLockType),
+        reason: t.String({ maxLength: validation.notes.maxLength, error: `$.error.wrongType;;[["field", "reason"], ["type", "string"]]`, description: 'A lock reason' }),
+        duration: t.Optional(t.Number({ error: '$.error.wrongType;;[["field", "duration"], ["type", "number"]]', description: 'A lock duration' }))
+    }, { description: 'A lock creation object', ...options });
+
+    export const EditLock = t.Object({
+        reason: t.Optional(t.String({ maxLength: validation.notes.maxLength, error: `$.error.wrongType;;[["field", "reason"], ["type", "string"]]`, description: 'A lock reason' }))
+    }, { description: 'A lock edit object', ...options });
 
     export const Note = t.Object({
         content: t.String({ maxLength: validation.notes.maxLength, error: `$.notes.create.max_length;;[["max", "${validation.notes.maxLength}"]]`, description: 'A player note' })
@@ -205,7 +218,16 @@ export namespace tSchema {
         appealed: t.Boolean({ default: false }),
         banned_at: tTimestamp,
         expires_at: t.Nullable(tTimestamp)
-    });
+    }, { description: 'A ban object' });
+
+    export const Lock = t.Object({
+        id: tId,
+        type: t.Enum(AccountLockType),
+        reason: tString,
+        staff: tUUID,
+        locked_at: tTimestamp,
+        expires_at: t.Nullable(tTimestamp)
+    }, { description: 'A lock object' });
 
     export const Note = t.Object({
         id: tId,
@@ -237,7 +259,7 @@ export namespace tSchema {
     export const Application = t.Object({
         id: tId,
         applicant: tUUID,
-        type: t.String(),
+        type: t.Enum(ApplicationType),
         status: t.String(),
         answers: t.Array(t.Object({ question: t.String(), answer: t.String() })),
         review: t.Object({

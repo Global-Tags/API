@@ -530,6 +530,26 @@ interface IPlayer {
      */
     clearIconTexture(reason: string, staff: string): void;
 
+    //* Locks
+
+    /**
+     * Check if the player has a specific lock
+     * @param type The type of the lock to check
+     * @returns {boolean} True if the player has the lock, otherwise false
+     */
+    hasLock(type: AccountLockType): boolean;
+
+    /**
+     * Create a lock for the player
+     * @param data The data for the lock
+     * @param data.type The type of the lock
+     * @param data.reason The reason for the lock
+     * @param data.staff The UUID of the staff member creating the lock
+     * @param data.expiresAt The expiration date of the lock, if applicable (default: null)
+     * @returns {AccountLock | null} The created AccountLock object, or null if not successful
+     */
+    createLock(data: { type: AccountLockType, reason: string, staff: string, expiresAt?: Date | null }): AccountLock | null;
+
     //* Watchlist
 
     /**
@@ -1149,6 +1169,25 @@ const PlayerSchema = new Schema<IPlayer>({
             });
             this.icon.type = GlobalIcon.None;
             this.icon.hash = null;
+        },
+
+        hasLock(type: AccountLockType): boolean {
+            const lock = this.locks.find((lock) => lock.type === type);
+            return !!lock && (!lock.expires_at || lock.expires_at.getTime() > Date.now());
+        },
+
+        createLock(data: { type: AccountLockType, reason: string, staff: string, expiresAt?: Date | null }): AccountLock | null {
+            if(this.hasLock(data.type)) return null;
+            const lock = {
+                id: generateSecureCode(),
+                type: data.type,
+                reason: data.reason,
+                staff: data.staff,
+                locked_at: new Date(),
+                expires_at: data.expiresAt || null
+            };
+            this.locks.push(lock);
+            return lock;
         },
 
         isWatched(): boolean {
