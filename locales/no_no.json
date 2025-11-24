@@ -34,7 +34,9 @@
             "notAllowed": "Du trenger GlobalTags Premium for å laste opp et egendefinertikon!",
             "invalidMetadata": "Opplastingen mislyktes. Vennligst kontakt kundestøtte!",
             "wrongFormat": "Filen du lastet opp er ikke et PNG-bilde!",
-            "wrongResolution": "Filen du lastet opp er ikke et firkantet bilde!"
+            "wrongResolution": "Filen du lastet opp er ikke et firkantet bilde!",
+            "exceedsMaxResolution": "Filen du lastet opp overskrider den maksimale oppløsningen på <max>x<max>!",
+            "success": "Det egendefinerte ikonet ble lastet opp!"
         }
     },
     "position": {
@@ -60,7 +62,11 @@
         "invalidReason": "Du må oppgi en gyldig årsak!",
         "validation": "Hold \"reason\"-feltet mellom <min> og <max> tegn.",
         "success": "Spilleren ble meldt inn!",
-        "immune": "Denne spilleren kan ikke bli meldt inn!"
+        "immune": "Denne spilleren kan ikke bli meldt inn!",
+        "delete": {
+            "not_found": "Rapporten ble ikke funnet!",
+            "success": "Rapporten ble slettet!"
+        }
     },
     "setTag": {
         "empty": "Taggen må ikke være tom!",
