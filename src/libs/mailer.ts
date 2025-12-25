@@ -30,6 +30,7 @@ const transporter = createTransport({
 export let enabled = mailer.enabled;
 
 export async function verify() {
+    if(!enabled) return;
     transporter.verify((error) => {
         if(error) {
             enabled = false;

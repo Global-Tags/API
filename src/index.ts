@@ -82,9 +82,7 @@ const elysia = new Elysia()
         Ratelimiter.initialize();
         AuthProvider.loadProviders();
         loadLanguages();
-        if(config.mailer.enabled) {
-            verifyMailOptions();
-        }
+        verifyMailOptions();
         await connectDatabase(config.mongodb);
         
         validateKeypair();
