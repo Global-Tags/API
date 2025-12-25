@@ -12,8 +12,8 @@ function getEnvBoolean(path: string | undefined, defaultValue: boolean) {
     return path.toLowerCase() === 'true';
 }
 
-loadEnv();
-loadEnv({ path: `./.env.${process.env.NODE_ENV || 'dev'}`, override: true });
+loadEnv({ quiet: true });
+loadEnv({ quiet: true, path: `./.env.${process.env.NODE_ENV || 'dev'}`, override: true });
 
 export let config = {
     version: pkg.version,
