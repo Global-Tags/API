@@ -24,7 +24,7 @@ export default (app: ElysiaApp) => app.get('/', () => ({
 
     return metrics.filter((doc) => {
         if(latest != 'true') return true;
-        return doc.id == (metrics.at(-1)?.id ?? 0);
+        return doc._id == (metrics.at(-1)?._id ?? 0);
     }).map((metric) => ({
         time: metric.created_at.getTime(),
         users: metric.players,
@@ -76,7 +76,7 @@ export default (app: ElysiaApp) => app.get('/', () => ({
             current_month: t.Array(t.Object({ uuid: t.String(), total_referrals: t.Number(), current_month_referrals: t.Number() }))
         }, { description: 'The referral leaderboards' })
     }
-}).get('/ping', ({ status }: Context) => { return status(204, '') }, {
+}).get('/ping', ({ status }) => status(204, ''), {
     detail: {
         tags: [DocumentationCategory.Api],
         description: 'Check the status of the API. This route is not being logged'
