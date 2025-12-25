@@ -1,7 +1,6 @@
 import Logger from "./Logger";
 import axios from "axios";
 import { fetchGuild } from "../bot/bot";
-import { args } from "..";
 import { config } from "./config";
 import { getCachedRoles } from "../database/schemas/Role";
 import { icons as iconList } from "../types/GlobalIcon";
@@ -11,12 +10,7 @@ import { captureException } from "@sentry/bun";
 import { Metric } from "../database/schemas/Metric";
 import { Player } from "../database/schemas/Player";
 
-let requests: number;
-
-export function loadRequests() {
-    const defaultValue = Number(args["requests"]);
-    requests = !isNaN(defaultValue) ? defaultValue : 0;
-}
+let requests: number = config.requests;
 
 export function recordRequest() {
     requests++;

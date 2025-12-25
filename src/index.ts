@@ -9,11 +9,9 @@ import Ratelimiter from "./libs/Ratelimiter";
 import checkRatelimit from "./middleware/ratelimit-checker";
 import { load as loadLanguages } from "./libs/i18n";
 import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/fetch-i18n";
-import { loadRequests } from "./libs/metrics";
 import AuthProvider from "./auth/AuthProvider";
 import getAuthProvider from "./middleware/get-auth-provider";
 import { handleErrors, initializeSentry } from "./libs/error-handler";
-import minimist from "minimist";
 import cors from "@elysiajs/cors";
 import { verify as verifyMailOptions } from "./libs/mailer";
 import { startEntitlementExpiry, startMetrics, startReferralReset, startRoleCacheJob, startRoleSynchronization } from "./libs/cron-jobs";
@@ -31,9 +29,6 @@ if(config.mongodb.trim().length == 0) {
 
 handleErrors();
 if(config.sentry.enabled) initializeSentry(config.sentry.dsn);
-
-export const args = minimist(process.argv.slice(2));
-loadRequests();
 
 // Elysia API
 const elysia = new Elysia()
