@@ -1,9 +1,9 @@
 import { StringSelectMenuInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, parseEmoji } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 import { colors, images } from "../bot";
 import { Permission, permissions as allPermissions } from "../../types/Permission";
-import { getCachedRoles } from "../../database/schemas/roles";
+import { getCachedRoles } from "../../database/schemas/Role";
 import { capitalCase, pascalCase } from "change-case";
 import { config } from "../../libs/config";
 
@@ -15,7 +15,7 @@ export default class ManageRoleMenu extends SelectMenu {
         });
     }
 
-    async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: Player) {
+    async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: PlayerDocument) {
         if(values.length == 0) return interaction.deferUpdate();
 
         const role = getCachedRoles().find((role) => role.name == values[0]);

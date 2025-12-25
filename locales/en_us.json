@@ -80,7 +80,7 @@
         "alreadyReported": "You've already reported this player's tag!",
         "invalidReason": "You have to provide a valid reason!",
         "validation": "Keep the \"reason\" field between <min> and <max> characters.",
-        "success": "The player was successfully reported!",
+        "success": "You have successfully created the report with the ID #<id>!",
         "immune": "This player cannot be reported!",
         "delete": {
             "not_found": "The report was not found!",

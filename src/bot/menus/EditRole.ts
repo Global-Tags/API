@@ -1,6 +1,6 @@
 import { StringSelectMenuInteraction, Message, GuildMember, EmbedBuilder, MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
-import players, { Player } from "../../database/schemas/players";
+import players, { PlayerDocument } from "../../database/schemas/Player";
 import { colors } from "../bot";
 import { formatTimestamp } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
@@ -13,7 +13,7 @@ export default class EditRoleMenu extends SelectMenu {
         });
     }
 
-    async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: Player) {
+    async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: PlayerDocument) {
         if(values.length == 0) return interaction.deferUpdate();
         const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });

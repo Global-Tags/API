@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, CommandInteraction, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
 import Command, { CommandOptions } from "../structs/Command";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 import { colors } from "../bot";
 import { join } from 'path';
 import axios from "axios";
@@ -8,7 +8,6 @@ import { config } from "../../libs/config";
 import { Permission } from "../../types/Permission";
 import { GlobalIcon } from "../../types/GlobalIcon";
 import { sendCustomIconUploadMessage } from "../../libs/discord-notifier";
-import { snakeCase } from "change-case";
 import { generateSecureCode } from "../../libs/crypto";
 
 export default class CustomIconCommand extends Command {
@@ -54,13 +53,13 @@ export default class CustomIconCommand extends Command {
         });
     }
 
-    async execute(interaction: CommandInteraction, options: CommandOptions, member: GuildMember, player: Player) {
+    async execute(interaction: CommandInteraction, options: CommandOptions, member: GuildMember, player: PlayerDocument) {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
         const sub = options.getSubcommand();
 
         if(sub == 'toggle') {
             const shouldEnable = options.getBoolean('enable', true);
-            player.icon.name = snakeCase(GlobalIcon[shouldEnable ? GlobalIcon.Custom : GlobalIcon.None]);
+            player.icon.name = shouldEnable ? GlobalIcon.Custom : GlobalIcon.None;
             await player.save();
 
             interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ Your custom icon has been ${shouldEnable ? 'enabled' : 'disabled'}!`)] });
@@ -74,7 +73,7 @@ export default class CustomIconCommand extends Command {
             const request = await axios.get(file.url, { responseType: 'arraybuffer' }).catch(() => null);
             if(!request) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ The upload failed, please try again!')] });
 
-            player.icon.name = snakeCase(GlobalIcon[GlobalIcon.Custom]);
+            player.icon.name = GlobalIcon.Custom;
             player.icon.hash = generateSecureCode(32);
             await player.save();
             await Bun.write(Bun.file(join('data', 'icons', player.uuid, `${player.icon.hash}.png`)), request.data, { createPath: true });
@@ -86,7 +85,7 @@ export default class CustomIconCommand extends Command {
 
             interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription('✅ Your custom icon was successfully uploaded!\nYou may need to clear your cache ingame for the icon to be shown.').setThumbnail(`attachment://${file.name}`)], files: [file] });
         } else if(sub == 'unset') {
-            player.icon.name = snakeCase(GlobalIcon[GlobalIcon.None]);
+            player.icon.name = GlobalIcon.None;
             player.icon.hash = null;
             await player.save();
 

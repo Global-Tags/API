@@ -1,11 +1,9 @@
 import crypto, { randomBytes } from "crypto";
 import Logger from "./Logger";
-
-const publicKeyFile = Bun.file('./data/certificate/pubkey.pem');
-const privateKeyFile = Bun.file('./data/certificate/privkey.pem');
+import { CertificateFiles } from "./data-accessor";
 
 export async function validateKeypair() {
-    if(await publicKeyFile.exists() && await privateKeyFile.exists()) return;
+    if(await CertificateFiles.publicKeyFile.exists() && await CertificateFiles.privateKeyFile.exists()) return;
     Logger.info('Generating new RSA keypair for JWT signing...');
     await generateKeypair();
 }
@@ -25,8 +23,8 @@ async function generateKeypair() {
         }
     });
 
-    Bun.write(publicKeyFile, publicKey);
-    Bun.write(privateKeyFile, privateKey);
+    Bun.write(CertificateFiles.publicKeyFile, publicKey);
+    Bun.write(CertificateFiles.privateKeyFile, privateKey);
 }
 
 /**

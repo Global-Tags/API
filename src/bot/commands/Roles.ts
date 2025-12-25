@@ -2,9 +2,9 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, Embed
 import Command, { CommandOptions } from "../structs/Command";
 import { config } from "../../libs/config";
 import { colors, images } from "../bot";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 import { Permission } from "../../types/Permission";
-import { getCachedRoles } from "../../database/schemas/roles";
+import { getCachedRoles } from "../../database/schemas/Role";
 import { capitalCase } from "change-case";
 
 export default class RolesCommand extends Command {
@@ -16,7 +16,7 @@ export default class RolesCommand extends Command {
         });
     }    
 
-    async execute(interaction: CommandInteraction, options: CommandOptions, member: GuildMember, player: Player) {
+    async execute(interaction: CommandInteraction, options: CommandOptions, member: GuildMember, player: PlayerDocument) {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
         const roles = getCachedRoles();
 

@@ -1,7 +1,7 @@
 import { ButtonInteraction, Message, GuildMember, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import Button from "../structs/Button";
 import { Permission } from "../../types/Permission";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 
 export default class BanButton extends Button {
     constructor() {
@@ -11,7 +11,7 @@ export default class BanButton extends Button {
         });
     }
 
-    public trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+    public trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: PlayerDocument) {
         const modal = new ModalBuilder()
             .setTitle('Ban player')
             .setCustomId(`ban_${interaction.customId.split('_')[1]}`)

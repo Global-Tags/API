@@ -18,6 +18,12 @@ export enum Permission { // TODO: Replace real bitfield values
     EditStaffMembers = 1 << 0,
     DeleteStaffMembers = 1 << 0,
 
+    //* Applications
+
+    ViewApplications = 1 << 0,
+    ReviewApplications = 1 << 0,
+    DeleteApplications = 1 << 0,
+
     //* Bans
 
     ViewBans = 1 << 0,
@@ -44,20 +50,16 @@ export enum Permission { // TODO: Replace real bitfield values
     EditGiftCodes = 1 << 0,
     DeleteGiftCodes = 1 << 0,
 
+    //* Locks
+    ViewLocks = 1 << 0,
+    ManageLocks = 1 << 0,
+
     //* Notes
 
     ViewNotes = 1 << 0,
     CreateNotes = 1 << 0,
     EditNotes = 1 << 0,
     DeleteNotes = 1 << 0,
-
-    //* Roles
-
-    ViewRoles = 1 << 0,
-    CreateRoles = 1 << 0,
-    EditRoles = 1 << 0,
-    DeleteRoles = 1 << 0,
-    ManagePlayerRoles = 1 << 0,
 
     //* Player management
     
@@ -77,6 +79,14 @@ export enum Permission { // TODO: Replace real bitfield values
     ViewReports = 1 << 0,
     ReviewReports = 1 << 0,
     DeleteReports = 1 << 0,
+
+    //* Roles
+
+    ViewRoles = 1 << 0,
+    CreateRoles = 1 << 0,
+    EditRoles = 1 << 0,
+    DeleteRoles = 1 << 0,
+    ManagePlayerRoles = 1 << 0,
 
     //* Watchlist
 

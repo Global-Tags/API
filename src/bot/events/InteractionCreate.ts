@@ -2,7 +2,7 @@ import { CommandInteractionOptionResolver, EmbedBuilder, GuildMember, Interactio
 import Event from "../structs/Event";
 import * as bot from "../bot";
 import { captureException } from "@sentry/bun";
-import players, { Player } from "../../database/schemas/players";
+import players, { PlayerDocument } from "../../database/schemas/Player";
 import { config } from "../../libs/config";
 import Interaction from "../structs/Interaction";
 
@@ -92,7 +92,7 @@ function getErrorReplyOptions(error: string): InteractionReplyOptions {
     return { embeds: [new EmbedBuilder().setColor(bot.colors.error).setDescription(error)], flags: [MessageFlags.Ephemeral] };
 }
 
-function getInteractionError(interaction: Interaction, player: Player | null): string | null {
+function getInteractionError(interaction: Interaction, player: PlayerDocument | null): string | null {
     if(interaction.requireDiscordLink) {
         if(!config.discordBot.notifications.accountConnections.enabled) return '❌ Account linking is deactivated!';
         if(!player) return '❌ You need to link your Minecraft account with `/link`!';

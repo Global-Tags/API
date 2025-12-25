@@ -1,4 +1,5 @@
-data
+data/*
+!data/mail
 node_modules
 .venv
 .DS_Store

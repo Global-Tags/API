@@ -1,8 +1,8 @@
 export enum GlobalPosition {
-    Above,
-    Below,
-    Right,
-    Left
+    Above = 'above',
+    Below = 'below',
+    Right = 'right',
+    Left = 'left'
 }
 
-export const positions = Object.keys(GlobalPosition).filter(key => isNaN(Number(key))).map((icon) => GlobalPosition[icon as keyof typeof GlobalPosition]);
+export const positions = Object.values(GlobalPosition);

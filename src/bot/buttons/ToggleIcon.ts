@@ -1,10 +1,10 @@
 import { ButtonInteraction, Message, GuildMember, EmbedBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import { Permission } from "../../types/Permission";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 import { colors } from "../bot";
-import roles, { updateRoleCache } from "../../database/schemas/roles";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
+import { Role, updateRoleCache } from "../../database/schemas/Role";
 
 export default class ToggleIconButton extends Button {
     constructor() {
@@ -14,8 +14,8 @@ export default class ToggleIconButton extends Button {
         });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        const role = await roles.findOne({ name: interaction.customId.split('_')[1] });
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: PlayerDocument) {
+        const role = await Role.findOne({ name: interaction.customId.split('_')[1] });
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
 
         role.hasIcon = !role.hasIcon;
