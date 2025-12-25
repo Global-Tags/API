@@ -5,8 +5,6 @@ import { connect as connectDatabase } from "./database/mongo";
 import { getRouter } from "./libs/route-loader";
 import access from "./middleware/access-log";
 import checkDatabase from "./middleware/database-checker";
-import Ratelimiter from "./libs/Ratelimiter";
-import checkRatelimit from "./middleware/ratelimit-checker";
 import { load as loadLanguages } from "./libs/i18n";
 import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/fetch-i18n";
 import AuthProvider from "./auth/AuthProvider";
@@ -34,7 +32,6 @@ if(config.sentry.enabled) initializeSentry(config.sentry.dsn);
 const elysia = new Elysia()
     .onRequest(checkDatabase)
     .onTransform(access)
-    .onBeforeHandle(checkRatelimit)
     .use(ip)
     .use(cors())
     .use(fetchI18n)
@@ -79,7 +76,6 @@ const elysia = new Elysia()
     }))
     .onStart(async () => {
         Logger.info(`Elysia listening on port ${config.port}!`);
-        Ratelimiter.initialize();
         AuthProvider.loadProviders();
         loadLanguages();
         verifyMailOptions();
