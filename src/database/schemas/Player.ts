@@ -112,7 +112,7 @@ export interface DataClear {
      */
     type: 'tag' | 'icon';
     /**
-     * The timestamp when the data was cleared
+     * The UUID of the staff member who performed the data clear
      */
     staff: string;
     /**
@@ -302,8 +302,14 @@ interface IPlayer {
          * All referrals made by the player, containing UUID and timestamp
          */
         total: {
+            /**
+             * The UUID of the referred player
+             */
             uuid: string;
-            referred_at: number;
+            /**
+             * The timestamp when the player was referred
+             */
+            referred_at: Date;
         }[];
         /**
          * The current month referrals count
@@ -1045,7 +1051,7 @@ const PlayerSchema = new Schema<IPlayer>({
         },
 
         addReferral(uuid: string): void {
-            this.referrals.total.push({ uuid, referred_at: Date.now() });
+            this.referrals.total.push({ uuid, referred_at: new Date() });
             this.referrals.current_month++;
         },
 

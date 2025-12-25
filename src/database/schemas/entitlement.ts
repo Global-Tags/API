@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
 
+// TODO: improve schema later
 const schema = new Schema({
     id: {
         type: String,
