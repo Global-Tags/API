@@ -9,6 +9,8 @@ enum LogLevel {
     Debug
 }
 
+// TODO: Replace with consola logger
+
 export default class Logger {
     private static getTimestamp() {
         return chalk.gray(`[${moment(new Date()).format('YYYY-MM-DD HH:mm:ss')}]`);

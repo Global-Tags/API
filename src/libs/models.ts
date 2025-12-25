@@ -42,6 +42,7 @@ export namespace tParams {
     export const roleId = id('A role ID');
 }
 
+// Do not use any types with default values here as it will override optional values on requests
 export namespace tRequestBody {
     export const options = {
         error: '$.error.invalidBody',
