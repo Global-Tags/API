@@ -144,6 +144,8 @@ export namespace tResponseBody {
         error: t.String({ default: 'Some error', description: 'The error message to be returned' })
     }, { description: 'An error object' });
 
+    export const IconList = t.Array(t.String(), { description: 'A list of icon hashes' });
+
     export const TagData = t.Object({
         uuid: tUUID,
         tag: t.Nullable(tString),

@@ -66,6 +66,8 @@ export enum Permission { // TODO: Replace real bitfield values
     ViewTagHistory = 1 << 0,
     ManagePlayerTags = 1 << 0,
     ManagePlayerIcons = 1 << 0,
+    ViewPlayerCustomIcons = 1 << 0,
+    DeletePlayerCustomIcons = 1 << 0,
     ManagePlayerPositions = 1 << 0,
     ViewClears = 1 << 0,
 

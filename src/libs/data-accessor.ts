@@ -8,6 +8,8 @@ export namespace CertificateFiles {
     export const privateKeyFile = Bun.file(dataPath('certificate', 'privkey.pem'));
 }
 
+export const customIconPath = (uuid: string) => dataPath('icons', uuid);
+
 export const customIconFile = (uuid: string, hash: string) => {
     return Bun.file(dataPath('icons', uuid, `${hash.trim()}.png`));
 }

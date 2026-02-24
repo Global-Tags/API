@@ -532,9 +532,9 @@ interface IPlayer {
     /**
      * Clear the player's icon texture
      * @param reason The reason for clearing the icon texture
-     * @param staff The UUID of the staff member performing the action
+     * @param user The UUID of the user performing the action
      */
-    clearIconTexture(reason: string, staff: string): void;
+    clearIconTexture(reason: string, user: string): void;
 
     //* Locks
 
@@ -1165,14 +1165,16 @@ const PlayerSchema = new Schema<IPlayer>({
             this.tag = null;
         },
 
-        clearIconTexture(reason: string, staff: string): void {
-            this.clears.push({
-                current_value: this.icon.hash!,
-                reason,
-                type: 'icon',
-                staff,
-                cleared_at: new Date()
-            });
+        clearIconTexture(reason: string, user: string): void {
+            if(user !== this.uuid) {
+                this.clears.push({
+                    current_value: this.icon.hash!,
+                    reason,
+                    type: 'icon',
+                    staff: user,
+                    cleared_at: new Date()
+                });
+            }
             this.icon.type = GlobalIcon.None;
             this.icon.hash = null;
         },
