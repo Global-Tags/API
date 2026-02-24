@@ -86,7 +86,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     (await getOrCreatePlayer(params.uuid)).save();
 
     if(!session.self && session.player) {
-        // TODO: Reimplement mod log
+        // TODO: notification
     }
 
     return {
@@ -186,7 +186,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     if(changed) player.save();
 
     if(!session.self && session.player) {
-        // TODO: Reimplement logs and email notifications
+        // TODO: notification
     }
 
     return {

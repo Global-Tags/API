@@ -116,7 +116,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
             category.name = name.trim();
             await category.save();
 
-            // TODO: Add mod log
+            // TODO: notification
         }
 
         return {
@@ -264,7 +264,10 @@ export default (app: ElysiaApp) => app.get('/', async () => {
             member.description = description?.trim() || null;
             updated = true;
         }
-        if(updated) member.save(); // TODO: Add mod log
+        if(updated) {
+            member.save();
+            // TODO: notification
+        }
 
         return {
             uuid: formatUUID(member.uuid),

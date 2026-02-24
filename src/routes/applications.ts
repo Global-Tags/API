@@ -60,7 +60,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     if(!application) return status(404, { error: i18n('$.applications.not_found') });
     await application.deleteOne();
 
-    // TODO: Add mod log
+    // TODO: notification
 
     return { message: i18n('$.applications.deleted') };
 }, {

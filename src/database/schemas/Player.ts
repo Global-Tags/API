@@ -1228,8 +1228,6 @@ const PlayerSchema = new Schema<IPlayer>({
             const period = this.getWatchlistPeriod();
             if(!period) return Promise.reject(new Error('Player is not on the watchlist'));
 
-            // TODO: Add discord notification
-
             return WatchlistAlert.insertOne({
                 player_uuid: this.uuid,
                 new: initial,

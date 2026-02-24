@@ -78,7 +78,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     const lock = player.createLock({ type, reason: reason.trim(), staff: session.uuid!, expiresAt: expires })!;
     await player.save();
 
-    // TODO: Send mod log message
+    // TODO: notification
 
     return {
         id: lock.id,
@@ -116,8 +116,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     if(reason !== undefined && lock.reason != reason) {
         lock.reason = reason;
-        // TODO: Send mod log message
         await player.save();
+        // TODO: notification
     }
 
     return {
@@ -154,7 +154,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     lock.expires_at = new Date();
     await player.save();
 
-    // TODO: Add mod log message
+    // TODO: notification
 
     return { message: i18n('$.locks.removed') };
 }, {

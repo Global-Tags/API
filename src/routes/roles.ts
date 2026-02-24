@@ -114,13 +114,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     if(updated) {
         await role.save();
         updateRoleCache();
-    
-        // sendModLogMessage({ // TODO: Add mod log for role edit
-        //     logType: ModLogType.DeleteRole,
-        //     staff: await session.player.getGameProfile(),
-        //     discord: false,
-        //     role
-        // });
+
+        // TODO: notification
     }
 
     return {

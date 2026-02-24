@@ -142,13 +142,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     key.name = name.trim();
     await player.save();
 
-    // sendModLogMessage({ // TODO: Add own log message
-    //     logType: ModLogType.RegenerateApiKey,
-    //     user: await player.getGameProfile(),
-    //     staff: await session.player.getGameProfile(),
-    //     discord: false,
-    //     key: key
-    // });
+    // TODO: notification
 
     return {
         id: key.id,
