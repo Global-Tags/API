@@ -36,7 +36,7 @@ const elysia = new Elysia()
     .use(cors())
     .use(fetchI18n)
     .use(getAuthProvider)
-    .use(getRouter(join(__dirname, 'routes')))
+    .use(async () => await getRouter(join(__dirname, 'routes')))
     .use(swagger({
         path: '/docs',
         autoDarkMode: true,
