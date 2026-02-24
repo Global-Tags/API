@@ -1,39 +1,31 @@
 import { t } from "elysia";
-import players, { getOrCreatePlayer } from "../../../database/schemas/players";
-import Logger from "../../../libs/Logger";
-import { ModLogType, sendModLogMessage, sendWatchlistAddMessage, sendWatchlistTagUpdateMessage } from "../../../libs/discord-notifier";
-import { getI18nFunctionByLanguage } from "../../../middleware/fetch-i18n";
 import { colorCodesWithSpaces, hexColorCodesWithSpaces, stripColors } from "../../../libs/chat-color";
-import { snakeCase } from "change-case";
-import { sendTagChangeEmail, sendTagClearEmail } from "../../../libs/mailer";
-import { saveLastLanguage } from "../../../libs/i18n";
 import { config } from "../../../libs/config";
-import { Permission, permissions } from "../../../types/Permission";
-import { GlobalIcon } from "../../../types/GlobalIcon";
-import { GlobalPosition } from "../../../types/GlobalPosition";
-import { formatUUID, GameProfile, stripUUID } from "../../../libs/game-profiles";
+import { Permission } from "../../../types/Permission";
+import { GlobalIcon, icons } from "../../../types/GlobalIcon";
+import { formatUUID, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
+import { getOrCreatePlayer, Player } from "../../../database/schemas/Player";
+import { tHeaders, tParams, tRequestBody, tResponseBody } from "../../../libs/models";
+import { DocumentationCategory } from "../../../types/DocumentationCategory";
+import { customIconFile } from "../../../libs/data-accessor";
+import { GlobalPosition, positions } from "../../../types/GlobalPosition";
 
 const { validation, strictAuth } = config;
 const { min, max, blacklist, watchlist } = validation.tag;
 const multipleSpaces = /\s{2,}/g;
 
-export default (app: ElysiaApp) => app.get('/', async ({ session, language, params, i18n, error }) => { // Get player info
-    if(!!session?.uuid && !!language) saveLastLanguage(session.uuid, language);
+export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get player info
     if(strictAuth) {
-        if(!session?.uuid) return error(403, { error: i18n('error.notAllowed') });
+        if(!session?.uuid) return status(403, { error: i18n('$.error.notAllowed') });
     }
-    const showBan = session?.equal || session?.hasPermission(Permission.ManageBans) || false;
-    const showRoleIconVisibility = session?.equal || session?.hasPermission(Permission.ManageRoles) || false;
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return error(404, { error: i18n('error.playerNoTag') });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
+    if(!player) return status(404, { error: i18n('$.error.playerNoTag') });
 
-    const playerIcon = snakeCase(player.icon.name);
-
-    if(playerIcon == snakeCase(GlobalIcon[GlobalIcon.Custom])) {
+    if(player.icon.type == GlobalIcon.Custom) {
         if(!player.hasPermission(Permission.CustomIcon)) {
-            player.icon.name = snakeCase(GlobalIcon[GlobalIcon.None]);
+            player.icon.type = GlobalIcon.None;
             await player.save();
         }
     }
@@ -41,179 +33,180 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, language, para
     return {
         uuid: formatUUID(player.uuid),
         tag: player.isBanned() ? null : player.tag || null,
-        position: snakeCase(player.position || GlobalPosition[GlobalPosition.Above]),
-        icon: {
-            type: playerIcon,
-            hash: player.icon.hash || null
-        },
-        roleIcon: !player.hide_role_icon ? player.getActiveRoles().find((role) => role.role.hasIcon)?.role.name || null : null,
-        hideRoleIcon: showRoleIconVisibility ? player.hide_role_icon : false,
+        position: player.position,
+        icon: player.icon,
+        roleIcon: player.getActiveRoles().find((role) => role.role.hasIcon)?.role.name || null,
         roles: player.getActiveRoles().map((role) => role.role.name),
-        permissions: permissions.filter((permission) => player.hasPermission(permission)).map((permission) => snakeCase(Permission[permission])),
+        permissions: player.getActiveRoles().reduce((acc, role) => acc | role.role.permissions, 0),
         referrals: {
-            has_referred: player.referrals.has_referred,
+            has_referred: await player.hasReferrer(),
             total_referrals: player.referrals.total.length,
             current_month_referrals: player.referrals.current_month
-        },
-        ban: showBan && player.isBanned() ? (() => {
-            const { appeal, banned_at, expires_at, id, reason, staff } = player.bans.at(0)!;
-            return {
-                appealable: appeal.appealable,
-                appealed: appeal.appealed,
-                banned_at: banned_at.getTime(),
-                expires_at: expires_at?.getTime() || null,
-                id,
-                reason,
-                staff: formatUUID(staff)
-            }
-        })() : null
+        }
     };
 }, {
     detail: {
-        tags: ['Interactions'],
-        description: 'Returns a players\' tag info'
+        tags: [DocumentationCategory.Tags],
+        description: 'Get a players\' tag info'
     },
     response: {
-        200: t.Object({ uuid: t.String(), tag: t.Union([t.String(), t.Null()]), position: t.String(), icon: t.Object({ type: t.String(), hash: t.Union([t.String(), t.Null()]) }), referrals: t.Object({ has_referred: t.Boolean(), total_referrals: t.Integer(), current_month_referrals: t.Integer() }), roleIcon: t.Union([t.String(), t.Null()]), hideRoleIcon: t.Boolean(), roles: t.Array(t.String()), permissions: t.Array(t.String()), ban: t.Union([t.Object({ appealable: t.Boolean(), appealed: t.Boolean(), banned_at: t.Number(), expires_at: t.Union([t.Number(), t.Null()]), id: t.String(), reason: t.Union([t.String(), t.Null()]), staff: t.String() }), t.Null()]) }, { description: 'The tag data' }),
-        403: t.Object({ error: t.String() }, { description: 'The player is banned' }),
-        404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tResponseBody.TagData,
+        403: tResponseBody.Error,
+        404: tResponseBody.Error,
     },
-    params: t.Object({ uuid: t.String({ description: 'The uuid of the player you want to fetch the info of' }) }),
-    headers: t.Object({ authorization: strictAuth ? t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) : t.Optional(t.String({ description: 'Your authentication token' })) }, { error: 'error.notAllowed' }),
-}).get('/history', async ({ session, params, i18n, error }) => { // Get player's tag history
-    if(!session || session?.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
+    params: tParams.uuid,
+    headers: tHeaders,
+}).get('/history', async ({ session, params, i18n, status }) => { // Get player's tag and icon history
+    if(!session || session?.self && !session.player?.hasPermission(Permission.ViewTagHistory)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return error(404, { error: i18n('error.playerNoTag') });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
+    if(!player) return status(404, { error: i18n('$.error.playerNoTag') });
 
-    return player.history.map((tag) => ({
-        tag,
-        flaggedWords: watchlist.filter((entry) => stripColors(tag).trim().toLowerCase().includes(entry))
+    return player.tag_history.map((tag) => ({
+        tag: tag.content,
+        timestamp: tag.timestamp.getTime(),
+        flagged_words: watchlist.filter((entry) => stripColors(tag.content).trim().toLowerCase().includes(entry))
     }));
 }, {
     detail: {
-        tags: ['Interactions'],
-        description: 'Returns a players\' tag history'
+        tags: [DocumentationCategory.Tags],
+        description: 'Get a players\' tag history'
     },
     response: {
-        200: t.Array(t.Object({ tag: t.String(), flaggedWords: t.Array(t.String()) }), { description: 'The tag history' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage tags' }),
-        404: t.Object({ error: t.String() }, { description: 'The player is not in the database' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: t.Array(t.Object({ tag: t.String(), timestamp: t.Number(), flagged_words: t.Array(t.String()) }), { description: 'The tag history' }),
+        403: tResponseBody.Error,
+        404: tResponseBody.Error,
     },
-    params: t.Object({ uuid: t.String({ description: 'The uuid of the player you want to fetch the info of' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' }),
-}).post('/', async ({ session, body: { tag }, params, i18n, error }) => { // Change tag
-    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
+    params: tParams.uuid,
+    headers: tHeaders,
+}).post('/', async ({ session, params, i18n, status }) => { // Create account
+    if(!session || !session.self && !session.player?.hasPermission(Permission.ManagePlayerTags)) return status(403, { error: i18n('$.error.notAllowed') });
+
+    if(await Player.exists({ uuid: stripUUID(params.uuid) })) return status(409, { error: i18n('$.account.create.account_already_exists') });
+    (await getOrCreatePlayer(params.uuid)).save();
+
+    if(!session.self && session.player) {
+        // TODO: Reimplement mod log
+    }
+
+    return {
+        message: i18n('$.account.create.success'),
+    }
+}, {
+    detail: {
+        tags: [DocumentationCategory.Tags],
+        description: 'Create an account'
+    },
+    response: {
+        200: tResponseBody.Message,
+        403: tResponseBody.Error,
+        409: tResponseBody.Error
+    },
+    params: tParams.uuid,
+    headers: tHeaders
+}).patch('/', async ({ session, body: { tag, position, icon }, params, i18n, status }) => { // Update settings
+    if(!session || !session.self && !session.player?.hasPermission(Permission.ManagePlayerTags)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const player = await getOrCreatePlayer(params.uuid);
-    if(session.equal && player.isBanned()) return error(403, { error: i18n('error.banned') });
+    if(session.self && player.isBanned()) return status(403, { error: i18n('$.error.banned') });
 
-    let isWatched = false;
-    let isWatchedInitially = false;
-    const gameProfile = await player.getGameProfile();
-    if(!session.hasPermission(Permission.BypassValidation)) {
-        tag = tag.trim().replace(multipleSpaces, ' ').replace(colorCodesWithSpaces, '').replace(hexColorCodesWithSpaces, '');
-        const strippedTag = stripColors(tag);
-        if(strippedTag == '') return error(422, { error: i18n('setTag.empty') });
-        if(strippedTag.length < min || strippedTag.length > max) return error(422, { error: i18n('setTag.validation').replace('<min>', String(min)).replace('<max>', String(max)) });
-        const blacklistedWord = blacklist.find((word) => strippedTag.toLowerCase().includes(word));
-        if(blacklistedWord) return error(422, { error: i18n('setTag.blacklisted').replaceAll('<word>', blacklistedWord) });
-        isWatched = (player && player.watchlist) || watchlist.some((word) => {
-            if(strippedTag.toLowerCase().includes(word)) {
-                Logger.warn(`Now watching ${player.uuid} for matching "${word}" in "${tag}".`);
-                sendWatchlistAddMessage({ player: gameProfile, tag, word });
-                isWatchedInitially = true;
-                return true;
-            }
-            return false;
-        });
+    const errors: {
+        tag: string | null;
+        position: string | null;
+        icon: string | null;
+    } = {
+        tag: null,
+        position: null,
+        icon: null
     }
 
-    if(player.tag == tag) return error(409, { error: i18n('setTag.sameTag') });
+    let changed = false;
+    if(tag !== undefined) {
+        if(tag !== null && !session.player?.hasPermission(Permission.BypassValidation)) {
+            tag = tag.trim()
+                .replace(multipleSpaces, ' ')
+                .replace(colorCodesWithSpaces, '')
+                .replace(hexColorCodesWithSpaces, '');
 
-    const oldTag = player.tag;
-    player.tag = tag;
-    if(isWatched) player.watchlist = true;
-    if(player.history.at(-1) != tag) player.history.push(tag);
-    await player.save();
-    
-    if(!session.equal) {
-        sendModLogMessage({
-            logType: ModLogType.ChangeTag,
-            staff: await GameProfile.getProfileByUUID(session.uuid!),
-            user: gameProfile,
-            discord: false,
-            tags: {
-                old: oldTag || 'None',
-                new: tag
+            const strippedTag = stripColors(tag);
+            const blacklistedWord = blacklist.find((word) => strippedTag.toLowerCase().includes(word));
+
+            if(strippedTag.length < min || strippedTag.length > max){
+                errors.tag = i18n('$.set_tag.validation').replace('<min>', String(min)).replace('<max>', String(max)); 
+            } else if(blacklistedWord) {
+                errors.tag = i18n('$.set_tag.blacklisted_word').replaceAll('<word>', blacklistedWord);
             }
-        });
-
-        if(player.isEmailVerified()) {
-            sendTagChangeEmail(player.connections.email.address!, oldTag || '---', tag, getI18nFunctionByLanguage(player.last_language));
+        }
+        if(!errors.tag && player.tag !== tag) {
+            player.changeTag(tag);
+            changed = true;
         }
     }
-
-    if(isWatched && !isWatchedInitially) sendWatchlistTagUpdateMessage(gameProfile, tag);
-    return { message: i18n(`setTag.success.${session.equal ? 'self' : 'admin'}`) };
-}, {
-    detail: {
-        tags: ['Settings'],
-        description: 'Changes your global tag'
-    },
-    response: {
-        200: t.Object({ message: t.String() }, { description: 'Your tag was changed' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re banned' }),
-        409: t.Object({ error: t.String() }, { description: 'You already have this tag' }),
-        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
-    },
-    params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
-    body: t.Object({ tag: t.String({ error: 'error.wrongType;;[["field", "tag"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).delete('/', async ({ session, params, i18n, error }) => { // Delete tag
-    if(!session || !session.equal && !session.hasPermission(Permission.ManageTags)) return error(403, { error: i18n('error.notAllowed') });
-    const uuid = stripUUID(params.uuid);
-
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n('error.noTag') });
-    if(session.equal && player.isBanned()) return error(403, { error: i18n('error.banned') });
-    if(!player.tag) return error(404, { error: i18n('error.noTag') });
-
-    if(!session.equal) {
-        sendModLogMessage({
-            logType: ModLogType.ClearTag,
-            staff: await GameProfile.getProfileByUUID(session.uuid!),
-            user: await player.getGameProfile(),
-            discord: false
-        });
-        if(player.isEmailVerified()) {
-            sendTagClearEmail(player.connections.email.address!, player.tag, getI18nFunctionByLanguage(player.last_language));
+    if(position !== undefined) {
+        const globalPosition = position.toLowerCase() as GlobalPosition;
+        if(!positions.includes(globalPosition)) {
+            errors.position = i18n('$.position.invalid');
+        } else {
+            player.position = globalPosition;
+            changed = true;
         }
-        player.clearTag(session.uuid!);
-    } else {
-        player.tag = null;
     }
-    await player.save();
+    if(icon !== undefined) {
+        // TODO: Remove comment when permissions are done
+        const hasCustomIconPermission = !session.self || true//session.player?.hasPermission(Permission.CustomIcon) || session.player?.hasPermission(Permission.BypassValidation);
+        if(icon.hash !== undefined) {
+            if(!hasCustomIconPermission) {
+                errors.icon = i18n('$.icon.upload.notAllowed');
+            } else if(icon.hash != null && (icon.hash.trim().length < 1 || !(await customIconFile(player.uuid, icon.hash).exists()))) {
+                errors.icon = i18n('$.icon.upload.notFound');
+            } else if(player.icon.hash !== icon.hash) {
+                player.icon.hash = icon.hash;
+                changed = true;
+            }
+        }
+        if(icon.type !== undefined && !errors.icon) {
+            const globalIcon = icon.type.toLowerCase() as GlobalIcon;
 
-    return { message: i18n(`resetTag.success.${session.equal ? 'self' : 'admin'}`) };
+            if(!icons.includes(globalIcon)) {
+                errors.icon = i18n('$.icon.not_allowed');
+            } else if(!hasCustomIconPermission && globalIcon === GlobalIcon.Custom) {
+                errors.icon = i18n('$.icon.upload.notAllowed');
+            } else if(globalIcon === GlobalIcon.Custom && !player.icon.hash) {
+                if(player.icon.type === GlobalIcon.Custom) {
+                    player.icon.type = GlobalIcon.None;
+                    changed = true;
+                }
+                errors.icon = i18n('$.icon.upload.noHash');
+            } else if(player.icon.type !== globalIcon) {
+                player.icon.type = globalIcon;
+                changed = true;
+            }
+        }
+    }
+    if(changed) player.save();
+
+    if(!session.self && session.player) {
+        // TODO: Reimplement logs and email notifications
+    }
+
+    return {
+        errors,
+        data: {
+            tag: player.tag,
+            position: player.position,
+            icon: player.icon,
+        }
+    };
 }, {
     detail: {
-        tags: ['Settings'],
-        description: 'Deletes your global tag'
+        tags: [DocumentationCategory.Tags],
+        description: 'Change your GlobalTag settings'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: 'Your tag was deleted' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re banned' }),
-        404: t.Object({ error: t.String() }, { description: 'You don\'t have an account' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tResponseBody.EditTagSettings,
+        403: tResponseBody.Error
     },
-    params: t.Object({ uuid: t.String({ description: 'Your UUID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    params: tParams.uuid,
+    body: tRequestBody.TagSettings,
+    headers: tHeaders
 });

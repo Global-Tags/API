@@ -1,19 +1,19 @@
 import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, MessageFlags, StringSelectMenuBuilder } from "discord.js";
 import Button from "../structs/Button";
 import { client, colors, images } from "../bot";
-import { getCachedRoles } from "../../database/schemas/roles";
-import { Player } from "../../database/schemas/players";
+import { getCachedRoles } from "../../database/schemas/Role";
+import { PlayerDocument } from "../../database/schemas/Player";
 import { Permission } from "../../types/Permission";
 
 export default class SetSkuButton extends Button {
     constructor() {
         super({
             id: 'setSku_',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.EditRoles]
         });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: PlayerDocument) {
         const role = getCachedRoles().find((role) => role.name == interaction.customId.split('_')[1]);
         if(!role) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Role not found!')], flags: [MessageFlags.Ephemeral] });
 

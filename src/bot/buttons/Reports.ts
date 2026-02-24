@@ -1,7 +1,7 @@
 import { ButtonInteraction, Message, GuildMember, ButtonBuilder, ActionRowBuilder, EmbedBuilder, ButtonStyle, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import { colors } from "../bot";
-import players, { Player } from "../../database/schemas/players";
+import players, { PlayerDocument } from "../../database/schemas/Player";
 import { GameProfile } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 import { formatTimestamp } from "../../libs/discord-notifier";
@@ -10,11 +10,11 @@ export default class ReportsButton extends Button {
     constructor() {
         super({
             id: 'reports_',
-            requiredPermissions: [Permission.ManageReports]
+            requiredPermissions: [Permission.ViewReports]
         });
     }
     
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: PlayerDocument) {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
         const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.editReply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')] });

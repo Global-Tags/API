@@ -1,17 +1,17 @@
 import { StringSelectMenuInteraction, Message, GuildMember, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 import { Permission } from "../../types/Permission";
 
 export default class CreateGiftCodeMenu extends SelectMenu {
     constructor() {
         super({
             id: 'createGiftCode',
-            requiredPermissions: [Permission.ManageApiKeys]
+            requiredPermissions: [Permission.CreateGiftCodes]
         });
     }
 
-    async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: Player) {
+    async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: PlayerDocument) {
         if(values.length == 0) return interaction.deferUpdate();
 
         const modal = new ModalBuilder()

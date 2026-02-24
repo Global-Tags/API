@@ -1,15 +1,15 @@
 import entitlement from "../database/schemas/entitlement";
-import players from "../database/schemas/players";
 import { fetchSku } from "../bot/bot";
 import { isConnected } from "../database/mongo";
 import { sendEntitlementMessage } from "./discord-notifier";
+import { Player } from "../database/schemas/Player";
 
 export async function checkExpiredEntitlements() {
     if(!isConnected()) return;
     const entitlements = await entitlement.find({ done: false, expires_at: { $lt: new Date() } });
     if(!entitlements) return;
     for (const entitlement of entitlements) {
-        const player = await players.findOne({ 'connections.discord.id': entitlement.user_id });
+        const player = await Player.findOne({ 'connections.discord.id': entitlement.user_id });
         const sku = await fetchSku(entitlement.sku_id);
         if(!sku) continue;
 

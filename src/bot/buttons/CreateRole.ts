@@ -2,17 +2,17 @@ import { ButtonInteraction, Message, GuildMember, ModalBuilder, ActionRowBuilder
 import Button from "../structs/Button";
 import { config } from "../../libs/config";
 import { Permission } from "../../types/Permission";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 
 export default class CreateRoleButton extends Button {
     constructor() {
         super({
             id: 'createRole',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.CreateRoles]
         });
     }
 
-    public trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+    public trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: PlayerDocument) {
         const modal = new ModalBuilder()
         .setTitle('Create role')
         .setCustomId('createRole')

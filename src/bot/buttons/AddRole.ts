@@ -1,20 +1,20 @@
 import { ButtonInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
-import players, { Player } from "../../database/schemas/players";
+import players, { PlayerDocument } from "../../database/schemas/Player";
 import { colors } from "../bot";
 import { capitalCase, snakeCase } from "change-case";
 import { Permission } from "../../types/Permission";
-import { getCachedRoles } from "../../database/schemas/roles";
+import { getCachedRoles } from "../../database/schemas/Role";
 
 export default class AddRoleButton extends Button {
     constructor() {
         super({
             id: 'addRole_',
-            requiredPermissions: [Permission.ManageRoles]
+            requiredPermissions: [Permission.ManagePlayerRoles]
         });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: PlayerDocument) {
         const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 

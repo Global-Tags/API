@@ -1,21 +1,21 @@
 import { ModalSubmitInteraction, Message, ModalSubmitFields, GuildMember, EmbedBuilder, MessageFlags } from "discord.js";
 import Modal from "../structs/Modal";
-import { Player } from "../../database/schemas/players";
+import { PlayerDocument } from "../../database/schemas/Player";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 import ms, { StringValue } from "ms";
-import { createGiftCode } from "../../database/schemas/gift-codes";
+import { createGiftCode, GiftType } from "../../database/schemas/GiftCode";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 
 export default class CreateGiftCodeModal extends Modal {
     constructor() {
         super({
             id: 'createGiftCode_',
-            requiredPermissions: [Permission.ManageGiftCodes]
+            requiredPermissions: [Permission.CreateGiftCodes]
         });
     }
 
-    async submit(interaction: ModalSubmitInteraction, message: Message, fields: ModalSubmitFields, member: GuildMember, player: Player) {
+    async submit(interaction: ModalSubmitInteraction, message: Message, fields: ModalSubmitFields, member: GuildMember, player: PlayerDocument) {
         const name = fields.getTextInputValue('name');
         const code = fields.getTextInputValue('code');
         const role = interaction.customId.split('_')[1];
@@ -36,24 +36,21 @@ export default class CreateGiftCodeModal extends Modal {
             code: code?.trim() || undefined,
             maxUses,
             gift: {
-                type: 'role',
+                type: GiftType.Role,
                 value: role,
                 duration: giftExpiresAt
             },
-            expiresAt: codeExpiresAt
+            expiresAt: codeExpiresAt,
+            createdBy: player.uuid
         });
 
         sendModLogMessage({
             logType: ModLogType.CreateGiftCode,
             staff: await player.getGameProfile(),
             discord: true,
-            code: name,
-            role,
-            maxUses,
-            codeExpiration: codeExpiresAt,
-            giftDuration: giftExpiresAt
+            code: giftCode
         });
 
-        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The code was successfully created!\n\n🎁 ||**${giftCode}**||`)], flags: [MessageFlags.Ephemeral] });
+        interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.success).setDescription(`✅ The code was successfully created!\n\n🎁 ||**${giftCode.code}**||`)], flags: [MessageFlags.Ephemeral] });
     }
 }

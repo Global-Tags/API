@@ -7,7 +7,7 @@ export function stripColors(text: string): string {
     return text.replaceAll(colorCodes, '').replaceAll(hexColorCodes, '');
 }
 
-export function translateToAnsi(text: string): string {
+export function translateToAnsi(text: string): string { // TODO: Support hex colors
     return text
         .replaceAll(/(&|§)0/gi, '[0;30m')
         .replaceAll(/(&|§)7/gi, '[0;30m')

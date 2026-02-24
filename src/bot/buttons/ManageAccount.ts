@@ -1,6 +1,6 @@
 import { ButtonInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
-import players, { Player } from "../../database/schemas/players";
+import players, { PlayerDocument } from "../../database/schemas/Player";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 
@@ -12,14 +12,7 @@ export default class ManageAccountButton extends Button {
         });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
-        if(![
-            Permission.ManageConnections,
-            Permission.ManageRoles,
-            Permission.ManageApiKeys,
-            Permission.ManageTags
-        ].some((permission) => player.hasPermission(permission))) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ You\'re not allowed to perform this action!')], flags: [MessageFlags.Ephemeral] });
-        
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: PlayerDocument) {
         const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
@@ -33,26 +26,22 @@ export default class ManageAccountButton extends Button {
                     new ButtonBuilder()
                         .setLabel('Connections')
                         .setCustomId(`manageConnections_${target.uuid}`)
-                        .setStyle(ButtonStyle.Primary)
-                        .setDisabled(!player.hasPermission(Permission.ManageConnections)),
+                        .setStyle(ButtonStyle.Primary),
                     new ButtonBuilder()
                         .setLabel('Roles')
                         .setCustomId(`manageRoles_${target.uuid}`)
-                        .setStyle(ButtonStyle.Primary)
-                        .setDisabled(!player.hasPermission(Permission.ManageRoles)),
+                        .setStyle(ButtonStyle.Primary),
                     new ButtonBuilder()
                         .setLabel('API Keys')
                         .setCustomId(`manageApiKeys_${target.uuid}`)
                         .setStyle(ButtonStyle.Primary)
-                        .setDisabled(!player.hasPermission(Permission.ManageApiKeys))
                 ),
             new ActionRowBuilder<ButtonBuilder>()
                 .addComponents(
                     new ButtonBuilder()
                         .setLabel('Tag History')
                         .setCustomId(`tagHistory_${target.uuid}`)
-                        .setStyle(ButtonStyle.Primary)
-                        .setDisabled(!player.hasPermission(Permission.ManageTags)),
+                        .setStyle(ButtonStyle.Primary),
                     new ButtonBuilder()
                         .setLabel('Referrals')
                         .setCustomId(`referrals_${target.uuid}`)

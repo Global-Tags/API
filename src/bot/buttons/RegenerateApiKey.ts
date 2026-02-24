@@ -1,6 +1,6 @@
 import { ButtonInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder, MessageFlags, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from "discord.js";
 import Button from "../structs/Button";
-import players, { Player } from "../../database/schemas/players";
+import players, { PlayerDocument } from "../../database/schemas/Player";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 
@@ -8,11 +8,11 @@ export default class RegenerateApiKeyButton extends Button {
     constructor() {
         super({
             id: 'regenerateApiKey_',
-            requiredPermissions: [Permission.ManageApiKeys]
+            requiredPermissions: [Permission.EditApiKeys]
         });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: PlayerDocument) {
         const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 

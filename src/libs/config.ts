@@ -1,5 +1,6 @@
 import { config as loadEnv } from "dotenv";
 import { constantCase, snakeCase } from "change-case";
+import * as pkg from "../../package.json";
 
 function getEnvNumber(path: string | undefined, defaultValue: number) {
     const number = Number(path);
@@ -11,10 +12,12 @@ function getEnvBoolean(path: string | undefined, defaultValue: boolean) {
     return path.toLowerCase() === 'true';
 }
 
-loadEnv();
-loadEnv({ path: `./.env.${process.env.NODE_ENV || 'dev'}`, override: true });
+loadEnv({ quiet: true });
+loadEnv({ quiet: true, path: `./.env.${process.env.NODE_ENV || 'dev'}`, override: true });
 
 export let config = {
+    version: pkg.version,
+    requests: getEnvNumber(process.env.GT_REQUESTS, 0),
     port: getEnvNumber(process.env.GT_PORT, 5500),
     strictAuth: getEnvBoolean(process.env.GT_STRICT_AUTH, true),
     logLevel: process.env.GT_LOG_LEVEL || 'Info',
@@ -66,9 +69,6 @@ export let config = {
             address: process.env.GT_MAILER_SENDER_ADDRESS || '',
             name: process.env.GT_MAILER_SENDER_NAME || 'GlobalTags System'
         }
-    },
-    ratelimiter: {
-        enabled: getEnvBoolean(process.env.GT_RATELIMITER_ENABLED, true)
     },
     discordBot: {
         enabled: getEnvBoolean(process.env.GT_DISCORD_BOT_ENABLED, false),

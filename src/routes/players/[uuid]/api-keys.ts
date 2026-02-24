@@ -1,110 +1,104 @@
 import { t } from "elysia";
-import players from "../../../database/schemas/players";
 import { ModLogType, sendModLogMessage } from "../../../libs/discord-notifier";
 import { Permission } from "../../../types/Permission";
 import { GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
-import { generateSecureCode } from "./connections";
-import { snakeCase } from "change-case";
+import { generateSecureCode } from "../../../libs/crypto";
+import { Player } from "../../../database/schemas/Player";
+import { tHeaders, tParams, tRequestBody, tResponseBody, tSchema } from "../../../libs/models";
+import { DocumentationCategory } from "../../../types/DocumentationCategory";
 
-export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, error }) => { // Get api key list
-    if(!session?.hasPermission(Permission.ManageApiKeys)) return error(403, { error: i18n('error.notAllowed') });
+export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get api key list
+    if(!session?.player?.hasPermission(Permission.ViewApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return error(404, { error: i18n('error.playerNotFound') });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) }).lean();
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     return player.api_keys.map((key) => ({
+        id: key.id,
+        name: key.name,
         created_at: key.created_at.getTime(),
-        last_used: key.last_used?.getTime() || null,
-        name: key.name
+        last_used: key.last_used?.getTime() || null
     }));
 }, {
     detail: {
-        tags: ['Admin'],
-        description: 'Returns all player API keys'
+        tags: [DocumentationCategory.ApiKeys],
+        description: 'Get all player API keys'
     },
     response: {
-        200: t.Array(t.Object({ created_at: t.Number(), last_used: t.Union([t.Number(), t.Null()]), name: t.String() }), { description: 'A list of API keys' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage API keys' }),
-        404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
-        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: t.Array(tSchema.PublicApiKey, { description: 'An API key list' }),
+        403: tResponseBody.Error,
+        404: tResponseBody.Error
     },
-    params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).get('/:name', async ({ session, params, i18n, error }) => { // Get info of specific api key
-    if(!session?.hasPermission(Permission.ManageApiKeys)) return error(403, { error: i18n('error.notAllowed') });
+    params: tParams.uuid,
+    headers: tHeaders
+}).get('/:id', async ({ session, params, i18n, status }) => { // Get info of specific api key
+    if(!session?.player?.hasPermission(Permission.ViewApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid: stripUUID(params.uuid) });
-    if(!player) return error(404, { error: i18n('error.playerNotFound') });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) }).lean();
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
     
-    const key = player.api_keys.find(({ name }) => name === params.name);
-    if(!key) return error(404, { error: i18n('api_keys.not_found') });
-    const { created_at, last_used, name } = key;
+    const key = player.getApiKey(params.id);
+    if(!key) return status(404, { error: i18n('$.api_keys.not_found') });
+    const { name, id, created_at, last_used } = key;
 
-    return { created_at: created_at.getTime(), last_used: last_used?.getTime() || null, name };
+    return { id, name, created_at: created_at.getTime(), last_used: last_used?.getTime() || null };
 }, {
     detail: {
-        tags: ['Admin'],
-        description: 'Returns info about a specific API key'
+        tags: [DocumentationCategory.ApiKeys],
+        description: 'Get a specific API key'
     },
     response: {
-        200: t.Object({ created_at: t.Number(), last_used: t.Union([t.Number(), t.Null()]), name: t.String() }, { description: 'The API key info' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage API keys' }),
-        404: t.Object({ error: t.String() }, { description: 'The player or API key was not found' }),
-        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tSchema.PublicApiKey,
+        403: tResponseBody.Error,
+        404: tResponseBody.Error
     },
-    params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }), name: t.String({ description: 'The API key name' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).post('/', async ({ session, body: { name }, params, i18n, error }) => { // Create an API key
-    if(!session?.hasPermission(Permission.ManageApiKeys)) return error(403, { error: i18n('error.notAllowed') });
-    const uuid = stripUUID(params.uuid);
+    params: tParams.uuidAndApiKeyId,
+    headers: tHeaders
+}).post('/', async ({ session, body: { name }, params, i18n, status }) => { // Create an API key
+    if(!session?.player?.hasPermission(Permission.CreateApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n('error.playerNotFound') });
-    if(player.api_keys.find((key) => key.name.toLowerCase() == name.toLowerCase())) return error(409, { error: i18n('api_keys.already_exists') });
-    name = snakeCase(name.trim());
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
-    const key = player.createApiKey(name);
+    const key = player.createApiKey(name.trim());
     await player.save();
 
     sendModLogMessage({
         logType: ModLogType.CreateApiKey,
-        staff: await GameProfile.getProfileByUUID(session.uuid!),
+        staff: await session.player.getGameProfile(),
         user: await player.getGameProfile(),
         discord: false,
-        key: name
+        key
     });
 
-    return { message: i18n('api_keys.created'), name, key };
+    return {
+        id: key.id,
+        name: key.name,
+        key: key.key,
+        created_at: key.created_at.getTime(),
+        last_used: key.last_used?.getTime() || null
+    };
 }, {
     detail: {
-        tags: ['Admin'],
-        description: 'Creates an API key'
+        tags: [DocumentationCategory.ApiKeys],
+        description: 'Create an API key'
     },
     response: {
-        200: t.Object({ message: t.String(), name: t.String(), key: t.String() }, { description: 'The API key was created' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage API keys' }),
-        404: t.Object({ error: t.String() }, { description: 'The player was not found' }),
-        409: t.Object({ error: t.String() }, { description: 'An API key with this name already exists' }),
-        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tSchema.PrivateApiKey,
+        403: tResponseBody.Error,
+        404: tResponseBody.Error,
     },
-    body: t.Object({ name: t.String({ error: 'error.wrongType;;[["field", "name"], ["type", "string"]]' }) }, { error: 'error.invalidBody', additionalProperties: true }),
-    params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).patch('/:name', async ({ session, params, i18n, error }) => { // Regenerate API key
-    if(!session?.hasPermission(Permission.ManageApiKeys)) return error(403, { error: i18n('error.notAllowed') });
-    const uuid = stripUUID(params.uuid);
+    body: tRequestBody.ApiKey,
+    params: tParams.uuid,
+    headers: tHeaders
+}).post('/:id/regenerate', async ({ session, params, i18n, status }) => { // Regenerate API key
+    if(!session?.player?.hasPermission(Permission.EditApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n('error.playerNotFound') });
-    const key = player.api_keys.find((key) => key.name.toLowerCase() == params.name.toLowerCase());
-    if(!key) return error(404, { error: i18n('api_keys.not_found') });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
+    const key = player.getApiKey(params.id);
+    if(!key) return status(404, { error: i18n('$.api_keys.not_found') });
 
     key.key = `sk_${generateSecureCode(32)}`;
     await player.save();
@@ -112,37 +106,77 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     sendModLogMessage({
         logType: ModLogType.RegenerateApiKey,
         user: await player.getGameProfile(),
-        staff: await GameProfile.getProfileByUUID(session.uuid!),
+        staff: await session.player.getGameProfile(),
         discord: false,
-        key: key.name
+        key: key
     });
 
-    return { message: i18n('api_keys.regenerated'), key: key.key };
+    return {
+        id: key.id,
+        name: key.name,
+        key: key.key,
+        created_at: key.created_at.getTime(),
+        last_used: key.last_used?.getTime() || null
+    };
 }, {
     detail: {
-        tags: ['Admin'],
-        description: 'Regenerates an existing API key'
+        tags: [DocumentationCategory.ApiKeys],
+        description: 'Regenerate an existing API key'
     },
     response: {
-        200: t.Object({ message: t.String(), key: t.String() }, { description: 'The key was regenerated' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage API keys' }),
-        404: t.Object({ error: t.String() }, { description: 'The player or key was not found' }),
-        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tSchema.PrivateApiKey,
+        403: tResponseBody.Error,
+        404: tResponseBody.Error,
     },
-    params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }), name: t.String({ description: 'The API key name' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
-}).delete('/:name', async ({ session, params, i18n, error }) => { // Delete api key
-    if(!session?.hasPermission(Permission.ManageApiKeys)) return error(403, { error: i18n('error.notAllowed') });
-    const uuid = stripUUID(params.uuid);
+    params: tParams.uuidAndApiKeyId,
+    headers: tHeaders
+}).patch('/:id', async ({ session, params, body: { name }, i18n, status }) => { // Edit API key
+    if(!session?.player?.hasPermission(Permission.EditApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await players.findOne({ uuid });
-    if(!player) return error(404, { error: i18n('error.playerNotFound') });
-    const key = player.api_keys.find((key) => key.name.toLowerCase() == params.name.toLowerCase());
-    if(!key) return error(404, { error: i18n('api_keys.not_found') });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
-    player.api_keys = player.api_keys.filter((k) => k.name != key.name);
+    const key = player.getApiKey(params.id);
+    if(!key) return status(404, { error: i18n('$.api_keys.not_found') });
+
+    key.name = name.trim();
+    await player.save();
+
+    // sendModLogMessage({ // TODO: Add own log message
+    //     logType: ModLogType.RegenerateApiKey,
+    //     user: await player.getGameProfile(),
+    //     staff: await session.player.getGameProfile(),
+    //     discord: false,
+    //     key: key
+    // });
+
+    return {
+        id: key.id,
+        name: key.name,
+        created_at: key.created_at.getTime(),
+        last_used: key.last_used?.getTime() || null
+    };
+}, {
+    detail: {
+        tags: [DocumentationCategory.ApiKeys],
+        description: 'Edit an existing API key'
+    },
+    response: {
+        200: tSchema.PublicApiKey,
+        403: tResponseBody.Error,
+        404: tResponseBody.Error,
+    },
+    body: tRequestBody.ApiKey,
+    params: tParams.uuidAndApiKeyId,
+    headers: tHeaders
+}).delete('/:id', async ({ session, params, i18n, status }) => { // Delete api key
+    if(!session?.player?.hasPermission(Permission.DeleteApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
+
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
+    const key = player.getApiKey(params.id);
+    if(!key || !player.deleteApiKey(key.id)) return status(404, { error: i18n('$.api_keys.not_found') });
+
     await player.save();
 
     sendModLogMessage({
@@ -150,23 +184,20 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         staff: await GameProfile.getProfileByUUID(session.uuid!),
         user: await player.getGameProfile(),
         discord: false,
-        key: key.name
+        key: key
     });
 
-    return { message: i18n('api_keys.deleted') };
+    return { message: i18n('$.api_keys.deleted') };
 }, {
     detail: {
-        tags: ['Admin'],
-        description: 'Deletes an API key'
+        tags: [DocumentationCategory.ApiKeys],
+        description: 'Delete an API key'
     },
     response: {
-        200: t.Object({ message: t.String() }, { description: 'The key was deleted' }),
-        403: t.Object({ error: t.String() }, { description: 'You\'re not allowed to manage API keys' }),
-        404: t.Object({ error: t.String() }, { description: 'The player or key was not found' }),
-        422: t.Object({ error: t.String() }, { description: 'You\'re lacking the validation requirements' }),
-        429: t.Object({ error: t.String() }, { description: 'You\'re ratelimited' }),
-        503: t.Object({ error: t.String() }, { description: 'The database is not reachable' })
+        200: tResponseBody.Message,
+        403: tResponseBody.Error,
+        404: tResponseBody.Error
     },
-    params: t.Object({ uuid: t.String({ description: 'The player\'s UUID' }), name: t.String({ description: 'The API key name' }) }),
-    headers: t.Object({ authorization: t.String({ error: 'error.notAllowed', description: 'Your authentication token' }) }, { error: 'error.notAllowed' })
+    params: tParams.uuidAndApiKeyId,
+    headers: tHeaders
 });

@@ -1,7 +1,7 @@
 import { ButtonInteraction, Message, GuildMember, EmbedBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import { colors } from "../bot";
-import players, { Player } from "../../database/schemas/players";
+import players, { PlayerDocument } from "../../database/schemas/Player";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendUnbanEmail } from "../../libs/mailer";
 import { getI18nFunctionByLanguage } from "../../middleware/fetch-i18n";
@@ -11,11 +11,11 @@ export default class UnbanButton extends Button {
     constructor() {
         super({
             id: 'unban_',
-            requiredPermissions: [Permission.ManageBans]
+            requiredPermissions: [Permission.DeleteBans]
         });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: PlayerDocument) {
         const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
         if(!target.isBanned()) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ This player is not banned!')], flags: [MessageFlags.Ephemeral] });

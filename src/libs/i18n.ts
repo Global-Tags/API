@@ -1,7 +1,7 @@
 import { existsSync, readdirSync } from "fs";
 import { join } from "path";
 import Logger from "./Logger";
-import players from "../database/schemas/players";
+import { captureException } from "@sentry/bun";
 
 export type Language = Map<string, string>;
 export type I18nFunction = (path: string) => string;
@@ -35,6 +35,7 @@ function extractTranslations(target: Language, json: any, parentKey?: string): v
 }
 
 export function getLanguage(language: string = fallback): Language {
+    if(languages.size === 0) throw new Error('Languages have not been loaded yet!');
     if(languages.has(language)) return languages.get(language)!;
     else return getLanguage();
 }
@@ -44,15 +45,13 @@ export function isValidLanguage(language: string): boolean {
 }
 
 export function translate(path: string, language: Language): string {
+    if(!path.startsWith('\$\.')) {
+        const error = new Error(`Translation path "${path}" was not prefixed with "$."!`);
+        Logger.warn(error.message);
+        captureException(error);
+    } else {
+        path = path.slice(2);
+    }
     if(language.has(path)) return language.get(path)!;
     return getLanguage().get(path) || path;
-}
-
-export async function saveLastLanguage(uuid: string, language: string) {
-    const player = await players.findOne({ uuid });
-    if(!player) return;
-    if(player.last_language != language && isValidLanguage(language)) {
-        player.last_language = language;
-        await player.save();
-    }
 }

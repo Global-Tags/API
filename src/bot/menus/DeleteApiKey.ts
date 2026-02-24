@@ -1,6 +1,6 @@
 import { StringSelectMenuInteraction, Message, GuildMember, EmbedBuilder, MessageFlags } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
-import players, { Player } from "../../database/schemas/players";
+import players, { PlayerDocument } from "../../database/schemas/Player";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
@@ -9,11 +9,11 @@ export default class DeleteApiKeyMenu extends SelectMenu {
     constructor() {
         super({
             id: 'deleteApiKey_',
-            requiredPermissions: [Permission.ManageApiKeys]
+            requiredPermissions: [Permission.DeleteApiKeys]
         });
     }
 
-    async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: Player) {
+    async selection(interaction: StringSelectMenuInteraction, message: Message, values: string[], member: GuildMember, player: PlayerDocument) {
         if(values.length == 0) return interaction.deferUpdate();
 
         const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });

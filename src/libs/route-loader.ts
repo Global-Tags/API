@@ -1,29 +1,56 @@
 import Elysia from "elysia";
 import { lstatSync, readdirSync } from "fs";
-import { join } from "path";
+import { join, basename, extname } from "path";
 import Logger from "./Logger";
 
 export async function getRouter(dirname: string) {
     const app = new Elysia();
-    await getRoutes(app, '', dirname);
-
+    await loadRoutes(app, dirname, '');
     return app;
 }
 
-async function getRoutes(app: Elysia, prefix: string, dirname: string) {
-    prefix = prefix.replace(/\[(\w+)\]/g, ':$1');
-    const elysia = new Elysia({ prefix });
-    for(const file of readdirSync(dirname)) {
-        if(lstatSync(join(dirname, file)).isDirectory()) {
-            await getRoutes(app, `${prefix}/${file}`, join(dirname, file));
+function toElysiaParam(segment: string): string {
+    return segment.replace(/\[(\w+)\]/g, ':$1');
+}
+
+async function loadRoutes(app: Elysia, directory: string, prefix: string) {
+    const entries = readdirSync(directory);
+
+    const dirs = entries.filter((entry) => lstatSync(join(directory, entry)).isDirectory());
+    const files = entries.filter((entry) => !lstatSync(join(directory, entry)).isDirectory());
+
+    const router = new Elysia({ prefix: toElysiaParam(prefix) });
+
+    for (const file of files) {
+        const ext = extname(file);
+        if (ext !== '.ts') continue;
+
+        const name = basename(file, ext);
+        const isIndex = name === 'index';
+        const routePrefix = isIndex ? undefined : `/${toElysiaParam(name)}`;
+
+        const route = new Elysia({ prefix: routePrefix });
+
+        const mod = require(join(directory, file));
+
+        if (typeof mod.default !== 'function') {
+            Logger.warn(`Skipping ${join(directory, file)}: no default export function`);
             continue;
         }
-        const root = file == 'index.ts';
-        const route = new Elysia({ prefix: root ? undefined : file.slice(0, -3) });
-        (await import(join(dirname, file))).default(route);
-        elysia.use(route);
 
-        Logger.debug(`Loaded route ${prefix}/${route.config.prefix || ''}`);
+        const configured = mod.default(route);
+        router.use(configured ?? route);
+
+        Logger.debug(`Loaded route: ${toElysiaParam(prefix)}${routePrefix ?? '/'}`);
     }
-    app.use(elysia);
+
+    app.use(router);
+
+    for (const subdir of dirs) {
+        await loadRoutes(
+            app,
+            join(directory, subdir),
+            `${prefix}/${toElysiaParam(subdir)}`.replace(/\/+/g, '/')
+        );
+    }
 }

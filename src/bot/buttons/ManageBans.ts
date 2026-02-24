@@ -1,6 +1,6 @@
 import { ButtonInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
-import players, { Player } from "../../database/schemas/players";
+import players, { PlayerDocument } from "../../database/schemas/Player";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 import { GameProfile } from "../../libs/game-profiles";
@@ -10,11 +10,11 @@ export default class ManageBansButton extends Button {
     constructor() {
         super({
             id: 'manageBans_',
-            requiredPermissions: [Permission.ManageBans]
+            requiredPermissions: [Permission.ViewBans]
         });
     }
 
-    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: Player) {
+    async trigger(interaction: ButtonInteraction, message: Message, member: GuildMember, player: PlayerDocument) {
         const target = await players.findOne({ uuid: interaction.customId.split('_')[1] });
         if(!target) return interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.error).setDescription('❌ Player not found!')], flags: [MessageFlags.Ephemeral] });
 
