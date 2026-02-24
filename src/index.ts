@@ -74,20 +74,7 @@ const elysia = new Elysia()
             ]
         }
     }))
-    .onStart(async () => {
-        Logger.info(`Elysia listening on port ${config.port}!`);
-        AuthProvider.loadProviders();
-        loadLanguages();
-        verifyMailOptions();
-        await connectDatabase(config.mongodb);
-        
-        validateKeypair();
-        startRoleCacheJob();
-        startEntitlementExpiry();
-        startRoleSynchronization();
-        startMetrics();
-        startReferralReset();
-    })
+    .onStart(async () => Logger.info(`Elysia listening on port ${config.port}!`))
     .onError(({ code, set, error, request }) => {
         const i18n = getI18nFunctionByLanguage(request.headers.get('x-language') || undefined);
 
@@ -121,7 +108,24 @@ const elysia = new Elysia()
             Logger.error(`An error ocurred with request ${requestId}: ${error}`);
             return { error: i18n('$.error.unknownError'), id: requestId };
         }
-    })
-    .listen({ port: config.port, idleTimeout: 20 });
+    });
 
 export type ElysiaApp = typeof elysia;
+
+async function main() {
+    AuthProvider.loadProviders();
+    loadLanguages();
+    verifyMailOptions();
+    validateKeypair();
+    connectDatabase(config.mongodb).then(() => {
+        startRoleCacheJob();
+        startEntitlementExpiry();
+        startRoleSynchronization();
+        startMetrics();
+        startReferralReset();
+    });
+
+    elysia.listen({ port: config.port });
+}
+
+main();
