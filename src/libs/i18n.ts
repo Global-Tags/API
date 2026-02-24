@@ -35,6 +35,7 @@ function extractTranslations(target: Language, json: any, parentKey?: string): v
 }
 
 export function getLanguage(language: string = fallback): Language {
+    if(languages.size === 0) throw new Error('Languages have not been loaded yet!');
     if(languages.has(language)) return languages.get(language)!;
     else return getLanguage();
 }
