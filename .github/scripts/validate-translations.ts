@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
 const KEY_REGEX = /(['`])\$\.(\w+(?:\.\w+)+)(?=;;|\1|$)/g;
-const LOCALE_FILE = resolve('locales/en_us.json');
+const LOCALE_FILE = resolve('data/i18n/en_us.json');
 const SRC_FILES = globSync(['src/**/*.ts'], { dot: false });
 
 type LocaleObject = Record<string, any>;

@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'src/**/*.ts'
-      - 'locales/en_us.json'
+      - 'data/i18n/en_us.json'
       - '.github/scripts/validate-translations.ts'
       - '.github/workflows/validate-translations.yml'
   pull_request:

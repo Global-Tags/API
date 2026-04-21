@@ -2,6 +2,7 @@ import { existsSync, readdirSync } from "fs";
 import { join } from "path";
 import Logger from "./Logger";
 import { captureException } from "@sentry/bun";
+import { translationFilePath } from "./data-accessor";
 
 export type Language = Map<string, string>;
 export type I18nFunction = (path: string) => string;
@@ -10,7 +11,7 @@ const fallback = 'en_us';
 const languages = new Map<string, Language>();
 
 export async function load() {
-    const languageDirectory = join(__dirname, '..', '..', 'locales');
+    const languageDirectory = translationFilePath;
     if(!existsSync(languageDirectory)) return Logger.error('Translation directory not found!');
     for(const file of readdirSync(languageDirectory).filter((file) => file.endsWith('.json'))) {
         const id = file.replace('.json', '');
