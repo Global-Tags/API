@@ -60,7 +60,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         name: body.name.trim(),
         position: await getNextPosition(),
         hasIcon: false,
-        permissions: body.permissions || 0
+        permissions: body.permissions ?? 0
     });
     updateRoleCache();
 

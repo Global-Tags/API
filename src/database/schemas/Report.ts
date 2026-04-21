@@ -2,7 +2,7 @@ import { HydratedDocument, model, Schema } from "mongoose";
 import { GlobalIcon, icons } from "../../types/GlobalIcon";
 import { GlobalPosition, positions } from "../../types/GlobalPosition";
 import { GameProfile } from "../../libs/game-profiles";
-import { generateSecureCode } from "../../libs/crypto";
+import { generateDocumentId } from "../../libs/crypto";
 
 export enum PunishmentActionType {
     Banned = 'banned',
@@ -140,7 +140,10 @@ export const PunishmentActionSchema = new Schema<PunishmentAction>({
 }, { _id: false });
 
 export const ContextSchema = new Schema<PlayerContext>({
-    tag: { type: String, required: true },
+    tag: {
+        type: String,
+        required: true
+    },
     position: {
         type: String,
         enum: positions,
@@ -166,7 +169,7 @@ const ReportSchema = new Schema<IReport>({
         type: String,
         required: true,
         unique: true,
-        default: generateSecureCode
+        default: generateDocumentId
     },
     reported_uuid: {
         type: String,

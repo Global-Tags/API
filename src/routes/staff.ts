@@ -85,7 +85,6 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         if(!session?.player?.hasPermission(Permission.CreateStaffCategories)) return status(403, { error: i18n('$.error.notAllowed') });
 
         const category = await StaffCategory.insertOne({
-            id: generateSecureCode(),
             name: name.trim(),
             position: await getNextPosition()
         });

@@ -1,6 +1,6 @@
 import { HydratedDocument, Schema, model } from "mongoose";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
-import { generateSecureCode } from "../../libs/crypto";
+import { generateDocumentId, generateSecureCode } from "../../libs/crypto";
 
 export enum GiftType {
     Role = 'role'
@@ -83,7 +83,7 @@ const GiftCodeSchema = new Schema<IGiftCode>({
         type: String,
         required: true,
         unique: true,
-        default: generateSecureCode
+        default: generateDocumentId
     },
     name: {
         type: String,

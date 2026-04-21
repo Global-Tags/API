@@ -1,6 +1,6 @@
 import { HydratedDocument, model, Schema } from "mongoose";
 import { ContextSchema, PlayerContext, PunishmentAction, PunishmentActionSchema } from "./Report";
-import { generateSecureCode } from "../../libs/crypto";
+import { generateDocumentId, generateSecureCode } from "../../libs/crypto";
 import { WatchlistPeriod } from "./Player";
 
 interface IWatchlistAlert {
@@ -44,7 +44,7 @@ const WatchlistAlertSchema = new Schema<IWatchlistAlert>({
         type: String,
         required: true,
         unique: true,
-        default: generateSecureCode
+        default: generateDocumentId
     },
     player_uuid: {
         type: String,

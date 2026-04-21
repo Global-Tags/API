@@ -28,10 +28,18 @@ async function generateKeypair() {
 }
 
 /**
+ * Generates a hopefully unique document ID for MongoDB documents. This is not guaranteed to be unique, but the chances of a collision are extremely low.
+ * @returns A random string of 10 characters that can be used as a document ID.
+ */
+export function generateDocumentId(): string {
+    return generateSecureCode(10);
+}
+
+/**
  * Generates a secure random code of the specified length.
- * @param length The length of the secure code. 10 characters by default (for document IDs)
+ * @param length The length of the secure code
  * @returns A random hexadecimal string of the specified length.
  */
-export function generateSecureCode(length: number = 10) {
+export function generateSecureCode(length: number): string {
     return randomBytes(length).toString('hex').slice(0, length);
 }

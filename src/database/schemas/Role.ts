@@ -4,7 +4,7 @@ import { Permission, permissions } from "../../types/Permission";
 import { isConnected } from "../mongo";
 import Logger from "../../libs/Logger";
 import { fetchGuild } from "../../bot/bot";
-import { generateSecureCode } from "../../libs/crypto";
+import { generateDocumentId, generateSecureCode } from "../../libs/crypto";
 import { Player } from "./Player";
 
 const cachedRoles: RoleDocument[] = [];
@@ -65,13 +65,12 @@ interface IRole {
 }
 
 const RoleSchema = new Schema<IRole>({
-    id: {
+    id: { // Snake case representation of the nice name
         type: String,
         required: true,
-        unique: true,
-        default: generateSecureCode
+        unique: true
     },
-    name: {
+    name: { // Nice name
         type: String,
         required: true
     },
@@ -119,7 +118,8 @@ export function getCachedRoles(): RoleDocument[] {
 
 const defaultRoles = [
     {
-        name: 'admin',
+        id: 'admin',
+        name: 'Admin',
         position: 0,
         hasIcon: false,
         color: 'FF0000',
@@ -128,6 +128,7 @@ const defaultRoles = [
     }
 ]
 
+// TODO: Use #find#lean() and improve role cache
 export async function updateRoleCache(): Promise<void> {
     if(!isConnected()) return;
     cachedRoles.length = 0;

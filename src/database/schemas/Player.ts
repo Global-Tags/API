@@ -4,7 +4,7 @@ import { getCachedRoles, RoleDocument } from "./Role";
 import { GlobalIcon, icons } from "../../types/GlobalIcon";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { isConnected } from "../mongo";
-import { generateSecureCode } from "../../libs/crypto";
+import { generateDocumentId, generateSecureCode } from "../../libs/crypto";
 import { Report, ReportDocument } from "./Report";
 import { GlobalPosition, positions } from "../../types/GlobalPosition";
 import { config } from "../../libs/config";
@@ -126,8 +126,7 @@ export enum AccountLockType {
     ChangePosition = 'change_position',
     ChangeIcon = 'change_icon',
     UploadCustomIcon = 'upload_custom_icon',
-    ReportPlayers = 'report_players',
-    SendApplication = 'send_application'
+    ReportPlayers = 'report_players'
 }
 
 export interface AccountLock {
@@ -1004,7 +1003,7 @@ const PlayerSchema = new Schema<IPlayer>({
 
         createApiKey(name: string): ApiKey {
             const key = {
-                id: generateSecureCode(),
+                id: generateDocumentId(),
                 name,
                 key: `sk_${generateSecureCode(32)}`,
                 created_at: new Date(),
@@ -1133,7 +1132,7 @@ const PlayerSchema = new Schema<IPlayer>({
 
         createNote({ content, author }: { content: string, author: string }): PlayerNote {
             const note = {
-                id: generateSecureCode(),
+                id: generateDocumentId(),
                 content,
                 author,
                 created_at: new Date()
@@ -1187,7 +1186,7 @@ const PlayerSchema = new Schema<IPlayer>({
         createLock(data: { type: AccountLockType, reason: string, staff: string, expiresAt?: Date | null }): AccountLock | null {
             if(this.hasLock(data.type)) return null;
             const lock = {
-                id: generateSecureCode(),
+                id: generateDocumentId(),
                 type: data.type,
                 reason: data.reason,
                 staff: data.staff,
@@ -1211,7 +1210,7 @@ const PlayerSchema = new Schema<IPlayer>({
         startWatching({ reason: { type, details }, staff, expiresAt = null }: { reason: WatchlistReason, staff: string, expiresAt?: Date | null }): WatchlistPeriod | null {
             if(this.isWatched() && !this.stopWatching()) return null;
             const period = {
-                id: generateSecureCode(),
+                id: generateDocumentId(),
                 reason: {
                     type: type,
                     details: details?.trim() || null
@@ -1264,7 +1263,7 @@ const PlayerSchema = new Schema<IPlayer>({
             if(this.isBanned()) return null;
 
             const ban = {
-                id: generateSecureCode(),
+                id: generateDocumentId(),
                 reason: reason.trim(),
                 staff,
                 banned_at: new Date(),
