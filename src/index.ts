@@ -78,7 +78,7 @@ const elysia = new Elysia()
     .onError(({ code, set, error, request }) => {
         const i18n = getI18nFunctionByLanguage(request.headers.get('x-language') || undefined);
 
-        if(code == 'VALIDATION') {
+        if(code == 'VALIDATION') { // TODO: Error handling update
             set.status = 422;
             error = error as ValidationError;
             let errorMessage = error.message;

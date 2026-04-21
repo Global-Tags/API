@@ -106,8 +106,14 @@ export namespace tRequestBody {
         gift_duration: t.Optional(t.Number({ error: '$.error.wrongType;;[["field", "gift_duration"], ["type", "number"]]' }))
     }, { description: 'A gift code creation object', ...options });
 
-    export const Role = t.Object({
+    export const CreateRole = t.Object({
         name: t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' }),
+        color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6, error: '$.error.wrongType;;[["field", "color"], ["type", "string"]]' }))),
+        permissions: t.Optional(t.Integer({ error: '$.error.wrongType;;[["field", "permissions"], ["type", "integer"]]' }))
+    }, { description: 'A role object', ...options });
+
+    export const EditRole = t.Object({
+        name: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' })),
         color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6, error: '$.error.wrongType;;[["field", "color"], ["type", "string"]]' }))),
         permissions: t.Optional(t.Integer({ error: '$.error.wrongType;;[["field", "permissions"], ["type", "integer"]]' }))
     }, { description: 'A role object', ...options });
@@ -118,7 +124,7 @@ export namespace tRequestBody {
 
     export const ReorderRoles = t.Array(t.String({
         description: 'A role ID',
-        error: '$.error.wrongType;;[["type", "string"]]',
+        error: '$.error.wrongType;;[["field", "body[x]"], ["type", "string"]]',
     }), { description: 'A role order array', ...options });
 
     export const StaffCategory = t.Object({

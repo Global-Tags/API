@@ -101,7 +101,30 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         403: tResponseBody.Error,
         422: tResponseBody.Error
     },
-    body: tRequestBody.Role,
+    body: tRequestBody.CreateRole,
+    headers: tHeaders
+}).get('/:id/icon', async ({ session, params, i18n, status }) => { // Get role icon
+    if(!session?.player?.hasPermission(Permission.EditRoles)) return status(403, { error: i18n('$.error.notAllowed') });
+
+    const role = await Role.findOne({ id: params.id });
+    if(!role) return status(404, { error: i18n('$.roles.not_found') });
+    if(!role.hasIcon) return status(404, { error: i18n('$.roles.icon_not_found') });
+    
+    const file = roleIconFile(role.id);
+    if(!(await file.exists())) return status(404, { error: i18n('$.roles.icon_not_found') });
+
+    return file as File;
+}, {
+    detail: {
+        tags: [DocumentationCategory.Roles],
+        description: 'Get a role icon',
+    },
+    response: {
+        200: t.File({ description: 'The role icon file' }),
+        404: tResponseBody.Error,
+        403: tResponseBody.Error,
+        422: tResponseBody.Error
+    },
     headers: tHeaders
 }).post('/:id/icon', async ({ session, params, body: { image }, i18n, status }) => { // Set role icon
     if(!session?.player?.hasPermission(Permission.EditRoles)) return status(403, { error: i18n('$.error.notAllowed') });
@@ -226,7 +249,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         404: tResponseBody.Error,
         422: tResponseBody.Error
     },
-    body: tRequestBody.Role,
+    body: tRequestBody.EditRole,
     params: tParams.roleId,
     headers: tHeaders
 }).patch('/', async ({ session, body, i18n, status }) => { // Reorder role positions
@@ -244,6 +267,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
             Logger.debug(`Updated position of role "${role.id}" to ${newPosition}.`);
         }
     }
+    updateRoleCache();
 
     return { message: i18n('$.roles.reorder.success') };
 }, {
