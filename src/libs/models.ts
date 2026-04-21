@@ -1,12 +1,11 @@
 import { t } from "elysia";
 import { config } from "./config";
-import { generateSecureCode } from "./crypto";
+import { generateDocumentId, generateSecureCode } from "./crypto";
 import { AccountLockType } from "../database/schemas/Player";
-import { ApplicationType } from "../database/schemas/Application";
 const { validation } = config;
 
 export const tId = t.String({
-    default: generateSecureCode()
+    default: generateDocumentId()
 });
 
 export const tUUID = t.String({
@@ -37,7 +36,6 @@ export namespace tParams {
     export const uuidAndIconHash = uuidAnd({ hash: t.String({ description: 'An icon hash' }) });
     export const uuidAndReportId = uuidAndId('A report ID');
     export const giftCodeId = id('A gift code ID');
-    export const applicationId = id('An application ID');
     export const reportId = id('A report ID');
     export const roleId = id('A role ID');
 }
@@ -257,19 +255,6 @@ export namespace tSchema {
         is_resolved: t.Boolean(),
         created_at: tTimestamp,
         last_updated: tTimestamp
-    });
-
-    export const Application = t.Object({
-        id: tId,
-        applicant: tUUID,
-        type: t.Enum(ApplicationType),
-        status: t.String(),
-        answers: t.Array(t.Object({ question: t.String(), answer: t.String() })),
-        review: t.Object({
-            reviewer: t.Nullable(tUUID),
-            timestamp: t.Nullable(tTimestamp)
-        }),
-        submitted_at: tTimestamp
     });
 
     export const GiftCode = t.Object({

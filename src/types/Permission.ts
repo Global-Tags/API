@@ -18,12 +18,6 @@ export enum Permission { // TODO: Replace real bitfield values
     EditStaffMembers = 1 << 0,
     DeleteStaffMembers = 1 << 0,
 
-    //* Applications
-
-    ViewApplications = 1 << 0,
-    ReviewApplications = 1 << 0,
-    DeleteApplications = 1 << 0,
-
     //* Bans
 
     ViewBans = 1 << 0,
