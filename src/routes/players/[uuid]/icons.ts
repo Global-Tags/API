@@ -20,7 +20,7 @@ export function getCustomIconUrl(uuid: string, hash: string) {
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, params: { uuid }, i18n, status }) => { // Get all custom icons of a player
     if(!session || !session.self && !session?.player?.hasPermission(Permission.ViewPlayerCustomIcons)) return status(403, { error: i18n('$.error.notAllowed') });
-    const player = await Player.findOne({ uuid: stripUUID(uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(uuid) }).lean();
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     return readdirSync(customIconPath(player.uuid)).filter(file => file.endsWith('.png')).map(file => file.replace('.png', ''));
@@ -75,6 +75,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params: { uuid
 
     player.icon.type = GlobalIcon.Custom;
     player.icon.hash = generateSecureCode(32);
+    player.markModified('icon');
     await player.save();
     await Bun.write(customIconFile(player.uuid, player.icon.hash), await image.arrayBuffer(), { createPath: true });
 

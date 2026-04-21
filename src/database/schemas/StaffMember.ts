@@ -1,7 +1,7 @@
 import { HydratedDocument, model, Schema } from "mongoose";
 import { GameProfile } from "../../libs/game-profiles";
 import { Player, PlayerDocument } from "./Player";
-import { StaffCategory, StaffCategoryDocument } from "./StaffCategory";
+import { IStaffCategory, StaffCategory, StaffCategoryDocument } from "./StaffCategory";
 
 interface IStaffMember {
     /**

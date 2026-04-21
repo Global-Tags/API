@@ -13,6 +13,7 @@ export default class ApiKeyProvider extends AuthProvider {
         const usedKey = player.api_keys.find(key => key.key === token);
         if(usedKey) {
             usedKey.last_used = new Date();
+            player.markModified('api_keys');
             await player.save();
         }
         return player.uuid;

@@ -116,11 +116,10 @@ const defaultRoles = [
     }
 ]
 
-// TODO: Use #find#lean() and improve role cache
 export async function updateRoleCache(): Promise<void> {
     if(!isConnected()) return;
     cachedRoles.length = 0;
-    let roles = await Role.find().lean();
+    let roles = await Role.find();
     if(roles.length == 0) {
         cachedRoles.push(...await Role.insertMany(defaultRoles));
     }

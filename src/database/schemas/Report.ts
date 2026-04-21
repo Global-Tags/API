@@ -216,6 +216,9 @@ const ReportSchema = new Schema<IReport>({
                 added_at: new Date(),
             };
             this.actions.push(action);
+            this.last_updated = new Date();
+            this.markModified('actions');
+            this.markModified('last_updated');
             return action;
         },
 

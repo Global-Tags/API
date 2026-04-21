@@ -11,7 +11,7 @@ import { DocumentationCategory } from "../../../types/DocumentationCategory";
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get player made reports
     if(!session?.self && !session?.player?.hasPermission(Permission.ViewReports)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) }).lean();
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     const reports = await Report.find({ reporter_uuid: player.uuid });
@@ -41,7 +41,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).get('/:id', async ({ session, params, i18n, status }) => { // Get player made reports
     if(!session?.self && !session?.player?.hasPermission(Permission.ViewReports)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) }).lean();
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     const report = await Report.findOne({ id: params.id, reporter_uuid: player.uuid });

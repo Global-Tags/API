@@ -12,7 +12,7 @@ import { DocumentationCategory } from "../../../types/DocumentationCategory";
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get ban list
     if(!session?.player?.hasPermission(Permission.ViewBans)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) }).lean();
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     return player.bans.map((ban) => ({
@@ -39,7 +39,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).get('/:id', async ({ session, params, i18n, status }) => { // Get a specific ban
     if(!session?.player?.hasPermission(Permission.ViewBans)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) }).lean();
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
     
     const ban = player.bans.find(({ id }) => id === params.id);
@@ -129,18 +129,17 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     if(!player.isBanned()) return status(409, { error: i18n('$.ban.not_banned') });
 
     const ban = player.bans.at(-1)!;
-    let changed = false;
     reason = reason?.trim();
 
     if(reason !== undefined && ban.reason != reason) {
         ban.reason = reason;
-        changed = true;
+        player.markModified('bans');
     }
     if(appealable !== undefined && ban.appeal.appealable !== appealable) {
         ban.appeal.appealable = appealable;
-        changed = true;
+        player.markModified('bans');
     }
-    if(changed) {
+    if(player.isModified('bans')) {
         // sendModLogMessage({
         //     logType: ModLogType.EditBan,
         //     staff: await session.player.getGameProfile(),
@@ -189,6 +188,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     ban.appeal.appealed = true;
     ban.appeal.reason = reason;
     ban.appeal.appealed_at = new Date();
+    player.markModified('bans');
     await player.save();
 
     sendBanAppealMessage(

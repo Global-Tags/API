@@ -10,7 +10,7 @@ import { DocumentationCategory } from "../types/DocumentationCategory";
 export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }) => { // Get gift code list
     if(!session?.player?.hasPermission(Permission.ViewGiftCodes)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const codes = await GiftCode.find();
+    const codes = await GiftCode.find().lean();
 
     return codes.map((code) => ({
         id: code.id,
@@ -40,11 +40,25 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
 }).get('/:code', async ({ session, params, i18n, status }) => { // Get a specific code
     if(!session?.player?.hasPermission(Permission.ViewGiftCodes)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const code = await GiftCode.findOne({ $or: [{ id: params.id }, { code: params.id }] });
+    const code = await GiftCode.findOne({ $or: [{ id: params.id }, { code: params.id }] }).lean();
     if(!code) return status(404, { error: i18n('$.gift_codes.not_found') });
     const { id, name, code: giftCode, uses, max_uses, gift, created_by, created_at, expires_at } = code;
 
-    return { id, name, code: giftCode, uses: uses.map((uuid) => formatUUID(uuid)), max_uses, gift: { type: gift.type, value: gift.value, duration: gift.duration || null }, created_by: formatUUID(created_by), created_at: created_at.getTime(), expires_at: expires_at?.getTime() || null };
+    return {
+        id,
+        name,
+        code: giftCode,
+        uses: uses.map((uuid) => formatUUID(uuid)),
+        max_uses,
+        gift: {
+            type: gift.type,
+            value: gift.value,
+            duration: gift.duration || null
+        },
+        created_by: formatUUID(created_by),
+        created_at: created_at.getTime(),
+        expires_at: expires_at?.getTime() || null
+    };
 }, {
     detail: {
         tags: [DocumentationCategory.GiftCodes],
@@ -69,6 +83,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     const { success, expiresAt } = player.addRole({ id: code.gift.value, reason: `Gift code: ${code.code}`, setConditions: [], duration: code.gift.duration });
     if(!success) return status(409, { error: i18n('$.gift_codes.already_have_role') });
     code.uses.push(player.uuid);
+    code.markModified('uses');
     await player.save();
     await code.save();
     

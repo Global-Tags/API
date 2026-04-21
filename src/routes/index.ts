@@ -20,7 +20,7 @@ export default (app: ElysiaApp) => app.get('/', () => ({
         200: tResponseBody.ApiInfo
     }
 }).get('/metrics', async ({ query: { latest } }) => {
-    const metrics = await Metric.find();
+    const metrics = await Metric.find().lean();
 
     return metrics.filter((doc) => {
         if(latest != 'true') return true;
@@ -49,7 +49,7 @@ export default (app: ElysiaApp) => app.get('/', () => ({
         latest: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "element"], ["type", "string"]]' }))
     }, { additionalProperties: true })
 }).get('/referrals', async () => {
-    const data = await Player.find();
+    const data = await Player.find().lean();
     const totalReferrals = data.filter((player) => player.referrals.total.length > 0).sort((a, b) => b.referrals.total.length - a.referrals.total.length).slice(0, 10);
     const monthReferrals = data.filter((player) => player.referrals.current_month > 0).sort((a, b) => b.referrals.current_month - a.referrals.current_month).slice(0, 10);
 

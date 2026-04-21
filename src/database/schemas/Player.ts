@@ -450,6 +450,11 @@ interface IPlayer {
      */
     hasReferrer(): Promise<boolean>;
 
+    /**
+     * Reset the current month referrals count for the player
+     */
+    resetMonthlyReferrals(): void;
+
     //* Roles
 
     /**
@@ -988,12 +993,14 @@ const PlayerSchema = new Schema<IPlayer>({
             if(this.tag === newTag) return;
 
             this.tag = newTag;
+            this.markModified('tag');
             if(!newTag) return;
 
             this.tag_history.push({
                 content: newTag,
                 timestamp: new Date()
             });
+            this.markModified('tag_history');
             const isWatched = this.isWatched();
             const watchlistedWord = watchlist.find((word) => stripColors(newTag).toLowerCase().includes(word));
 
@@ -1015,6 +1022,7 @@ const PlayerSchema = new Schema<IPlayer>({
                 last_used: null
             }
             this.api_keys.push(key);
+            this.markModified('api_keys');
             return key;
         },
 
@@ -1028,6 +1036,7 @@ const PlayerSchema = new Schema<IPlayer>({
             const index = this.api_keys.findIndex((key) => key.id == id);
             if(index === -1) return false;
             this.api_keys.splice(index, 1);
+            this.markModified('api_keys');
             return true;
         },
 
@@ -1057,11 +1066,17 @@ const PlayerSchema = new Schema<IPlayer>({
         addReferral(uuid: string): void {
             this.referrals.total.push({ uuid, referred_at: new Date() });
             this.referrals.current_month++;
+            this.markModified('referrals');
         },
 
         async hasReferrer(): Promise<boolean> {
             const exists = await Player.exists({ 'referrals.total.uuid': this.uuid });
             return !!exists;
+        },
+
+        resetMonthlyReferrals(): void {
+            this.referrals.current_month = 0;
+            this.markModified('referrals');
         },
 
         getAllRoles(): PlayerRole[] {
@@ -1104,6 +1119,7 @@ const PlayerSchema = new Schema<IPlayer>({
                         playerRole.conditions = [...playerRole.conditions, ...addConditions];
                     }
                     playerRole.expires_at = expiresAt ? expiresAt : duration ? new Date(playerRole.expires_at.getTime() + duration) : null;
+                    this.markModified('roles');
                     return { success: true, expiresAt: playerRole.expires_at };
                 } else {
                     playerRole.reason = reason;
@@ -1114,6 +1130,7 @@ const PlayerSchema = new Schema<IPlayer>({
                     }
                     playerRole.added_at = new Date();
                     playerRole.expires_at = expiresAt ? expiresAt : duration ? new Date(Date.now() + duration) : null;
+                    this.markModified('roles');
                     return { success: true, expiresAt: playerRole.expires_at };
                 }
             } else {
@@ -1126,6 +1143,7 @@ const PlayerSchema = new Schema<IPlayer>({
                     conditions: [...(setConditions || []), ...(addConditions || [])]
                 };
                 this.roles.push(role);
+                this.markModified('roles');
                 return { success: true, expiresAt: role.expires_at };
             }
         },
@@ -1134,6 +1152,7 @@ const PlayerSchema = new Schema<IPlayer>({
             const role = this.roles.find((role) => role.id === id);
             if(!role) return false;
             role.expires_at = new Date();
+            this.markModified('roles');
             return true;
         },
 
@@ -1150,6 +1169,7 @@ const PlayerSchema = new Schema<IPlayer>({
             };
 
             this.notes.push(note);
+            this.markModified('notes');
             return note;
         },
 
@@ -1161,6 +1181,7 @@ const PlayerSchema = new Schema<IPlayer>({
             const index = this.notes.findIndex((note) => note.id == id);
             if(index === -1) return false;
             this.notes.splice(index, 1);
+            this.markModified('notes');
             return true;
         },
 
@@ -1173,6 +1194,8 @@ const PlayerSchema = new Schema<IPlayer>({
                 cleared_at: new Date()
             });
             this.tag = null;
+            this.markModified('tag');
+            this.markModified('clears');
         },
 
         clearIconTexture(reason: string, user: string): void {
@@ -1187,6 +1210,7 @@ const PlayerSchema = new Schema<IPlayer>({
             }
             this.icon.type = GlobalIcon.None;
             this.icon.hash = null;
+            this.markModified('icon');
         },
 
         hasLock(type: AccountLockType): boolean {
@@ -1205,6 +1229,7 @@ const PlayerSchema = new Schema<IPlayer>({
                 expires_at: data.expiresAt || null
             };
             this.locks.push(lock);
+            this.markModified('locks');
             return lock;
         },
 
@@ -1231,6 +1256,7 @@ const PlayerSchema = new Schema<IPlayer>({
                 expires_at: expiresAt
             };
             this.watchlist_periods.push(period);
+            this.markModified('watchlist_periods');
             return period;
         },
 
@@ -1287,6 +1313,7 @@ const PlayerSchema = new Schema<IPlayer>({
                 }
             };
             this.bans.push(ban);
+            this.markModified('bans');
 
             return ban;
         },
@@ -1295,6 +1322,7 @@ const PlayerSchema = new Schema<IPlayer>({
             const ban = this.getBan();
             if(!ban) return false;
             ban.expires_at = new Date();
+            this.markModified('bans');
             return true;
         },
     }
@@ -1312,7 +1340,7 @@ export async function resetMonthlyReferrals() {
     const data = await Player.find({ 'referrals.current_month': { $gt: 0 } });
 
     for(const player of data) {
-        player.referrals.current_month = 0;
+        player.resetMonthlyReferrals();
         player.save();
     }
 }

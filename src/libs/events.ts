@@ -19,13 +19,11 @@ export async function onDiscordLink(player: GameProfile, userId: string) {
     if(member) member.roles.add(config.discordBot.notifications.accountConnections.role);
 
     const playerData = await Player.findOne({ 'connections.discord.id': userId });
-    if(playerData) {
-        let save = false;
-        if(member?.premiumSince) {
-            const boosterRole = getCachedRoles().find((role) => role.id === config.discordBot.boosterRole);
-            if(boosterRole && playerData.addRole({ id: boosterRole.id, reason: 'Server boost', addConditions: [RoleCondition.ServerBoost], visible: true, expiresAt: null, duration: null }).success) save = true;
-        }
-        if(save) await playerData.save();
+    if(!playerData || !member?.premiumSince) return;
+    const boosterRole = getCachedRoles().find((role) => role.id === config.discordBot.boosterRole);
+    if(boosterRole) {
+        playerData.addRole({ id: boosterRole.id, reason: 'Server boost', addConditions: [RoleCondition.ServerBoost], visible: true, expiresAt: null, duration: null });
+        await playerData.save();
         synchronizeDiscordRoles();
     }
 }

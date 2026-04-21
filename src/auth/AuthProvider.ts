@@ -22,7 +22,7 @@ export default abstract class AuthProvider {
         const tokenUUID = await this.getUUID(token);
         if(uuid) uuid = stripUUID(uuid);
         if(!tokenUUID) return { uuid: null, player: null, self: false };
-        const data = await Player.findOne({ uuid: tokenUUID });
+        const data = await Player.findOne({ uuid: tokenUUID }); // TODO: look at this
         if(!data) return { uuid: tokenUUID, player: null, self: tokenUUID == uuid };
         return {
             uuid: tokenUUID,

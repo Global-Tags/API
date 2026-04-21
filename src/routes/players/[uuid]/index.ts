@@ -26,6 +26,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     if(player.icon.type == GlobalIcon.Custom) {
         if(!player.hasPermission(Permission.CustomIcon)) {
             player.icon.type = GlobalIcon.None;
+            player.markModified('icon');
             await player.save();
         }
     }
@@ -59,7 +60,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).get('/history', async ({ session, params, i18n, status }) => { // Get player's tag and icon history
     if(!session || session?.self && !session.player?.hasPermission(Permission.ViewTagHistory)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) }).lean();
     if(!player) return status(404, { error: i18n('$.error.playerNoTag') });
 
     return player.tag_history.map((tag) => ({
@@ -120,7 +121,6 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         icon: null
     }
 
-    let changed = false;
     if(tag !== undefined) {
         if(tag !== null && !session.player?.hasPermission(Permission.BypassValidation)) {
             tag = tag.trim()
@@ -139,7 +139,6 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
         }
         if(!errors.tag && player.tag !== tag) {
             player.changeTag(tag);
-            changed = true;
         }
     }
     if(position !== undefined) {
@@ -148,7 +147,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
             errors.position = i18n('$.position.invalid');
         } else {
             player.position = globalPosition;
-            changed = true;
+            player.markModified('position');
         }
     }
     if(icon !== undefined) {
@@ -161,7 +160,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
                 errors.icon = i18n('$.icon.upload.notFound');
             } else if(player.icon.hash !== icon.hash) {
                 player.icon.hash = icon.hash;
-                changed = true;
+                player.markModified('icon');
             }
         }
         if(icon.type !== undefined && !errors.icon) {
@@ -174,16 +173,16 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
             } else if(globalIcon === GlobalIcon.Custom && !player.icon.hash) {
                 if(player.icon.type === GlobalIcon.Custom) {
                     player.icon.type = GlobalIcon.None;
-                    changed = true;
+                    player.markModified('icon');
                 }
                 errors.icon = i18n('$.icon.upload.noHash');
             } else if(player.icon.type !== globalIcon) {
                 player.icon.type = globalIcon;
-                changed = true;
+                player.markModified('icon');
             }
         }
     }
-    if(changed) player.save();
+    if(player.isModified()) player.save();
 
     if(!session.self && session.player) {
         // TODO: notification

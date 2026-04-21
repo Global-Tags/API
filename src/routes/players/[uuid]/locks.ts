@@ -11,7 +11,7 @@ const lockTypes = Object.values(AccountLockType);
 export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, status }) => { // Get all player locks
     if(!session?.player?.hasPermission(Permission.ViewLocks)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) }).lean();
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     return player.locks.map((lock) => ({
@@ -37,7 +37,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).get('/:id', async ({ session, params, i18n, status }) => { // Get a specific player lock
     if(!session?.player?.hasPermission(Permission.ViewLocks)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) }).lean();
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     const lock = player.locks.find(({ id }) => id === params.id);
@@ -116,6 +116,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 
     if(reason !== undefined && lock.reason != reason) {
         lock.reason = reason;
+        player.markModified('locks');
         await player.save();
         // TODO: notification
     }
@@ -152,6 +153,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     if(!lock) return status(404, { error: i18n('$.locks.not_found') });
 
     lock.expires_at = new Date();
+    player.markModified('locks');
     await player.save();
 
     // TODO: notification

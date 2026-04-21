@@ -2,7 +2,7 @@ import { HydratedDocument, model, Schema } from "mongoose";
 import { isConnected } from "../mongo";
 import { generateDocumentId } from "../../libs/crypto";
 
-interface IStaffCategory {
+export interface IStaffCategory {
     /**
      * Unique identifier for the staff category
      */
@@ -36,7 +36,7 @@ const StaffCategorySchema = new Schema<IStaffCategory>({
 
 export async function getNextPosition(): Promise<number> {
     if(!isConnected()) return -1;
-    const roles = await StaffCategory.find();
+    const roles = await StaffCategory.find().lean();
     roles.sort((a, b) => a.position - b.position);
     return roles[roles.length - 1].position + 1;
 }

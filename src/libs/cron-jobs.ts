@@ -4,7 +4,7 @@ import { config } from "./config";
 import { synchronizeDiscordRoles, updateRoleCache } from "../database/schemas/Role";
 import { isConnected } from "../database/mongo";
 import { Cron } from "croner";
-import { Player } from "../database/schemas/Player";
+import { resetMonthlyReferrals } from "../database/schemas/Player";
 
 const tz = 'Europe/Berlin';
 
@@ -18,15 +18,7 @@ export function startMetrics() {
 }
 
 export function startReferralReset() {
-    new Cron('0 0 1 * *', async () => {
-        if(!isConnected()) return;
-        const data = await Player.find({ 'referrals.current_month': { $gt: 0 } });
-
-        for(const player of data) {
-            player.referrals.current_month = 0;
-            player.save();
-        }
-    }, {
+    new Cron('0 0 1 * *', resetMonthlyReferrals, {
         name: 'Referral Resetter',
         timezone: tz
     });

@@ -1,7 +1,7 @@
 import { HydratedDocument, model, Schema } from "mongoose";
 import { ContextSchema, PlayerContext, PunishmentAction, PunishmentActionSchema } from "./Report";
-import { generateDocumentId, generateSecureCode } from "../../libs/crypto";
-import { WatchlistPeriod } from "./Player";
+import { generateDocumentId } from "../../libs/crypto";
+import { Player, WatchlistPeriod } from "./Player";
 
 interface IWatchlistAlert {
     /**
@@ -74,8 +74,9 @@ const WatchlistAlertSchema = new Schema<IWatchlistAlert>({
     }
 }, {
     methods: {
-        getWatchlistPeriod(): Promise<WatchlistPeriod | null> {
-            return WatchlistAlert.findOne({ id: this.period });
+        async getWatchlistPeriod(): Promise<WatchlistPeriod | null> {
+            const player = await Player.findOne({ 'watchlist_periods.id': this.period }).lean();
+            return player ? player.watchlist_periods.find(period => period.id === this.period) || null : null;
         }
     }
 });

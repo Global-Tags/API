@@ -186,22 +186,21 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     const role = await Role.findOne({ id: params.id });
     if(!role) return status(404, { error: i18n('$.roles.not_found') });
 
-    let updated = false;
     if(name && name.trim() !== role.name) {
         role.name = name.trim();
-        updated = true;
+        role.markModified('name');
     }
     if(color && color !== role.color) {
         role.color = color;
-        updated = true;
+        role.markModified('color');
     }
     if(permissions !== undefined && permissions !== role.permissions) {
         if(permissions < 0 || permissions > 2147483647) return status(422, { error: i18n('$.error.invalid_bitfield') });
         role.permissions = permissions;
-        updated = true;
+        role.markModified('permissions');
     }
 
-    if(updated) {
+    if(role.isModified()) {
         await role.save();
         updateRoleCache();
 

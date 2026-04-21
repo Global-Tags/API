@@ -113,6 +113,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
 
         if(name && category.name !== name.trim()) {
             category.name = name.trim();
+            category.markModified('name');
             await category.save();
 
             // TODO: notification
@@ -182,7 +183,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
     }).get('/:uuid', async ({ session, params: { uuid }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.ViewStaffMembers)) return status(403, { error: i18n('$.error.notAllowed') });
 
-        const member = await StaffMember.findOne({ uuid: stripUUID(uuid) });
+        const member = await StaffMember.findOne({ uuid: stripUUID(uuid) }).lean();
         if(!member) return status(404, { error: i18n('$.staff.members.not_found') });
 
         return {
@@ -210,10 +211,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         uuid = stripUUID(uuid.trim());
 
         if(!uuidRegex.test(uuid)) return status(400, { error: i18n('$.staff.members.invalid_uuid') });
-
-        const existingMember = await StaffMember.findOne({ uuid });
-        if(existingMember) return status(409, { error: i18n('$.staff.members.already_exists') });
-
+        if(await StaffMember.exists({ uuid })) return status(409, { error: i18n('$.staff.members.already_exists') });
         if(!(await StaffCategory.exists({ id: category }))) return status(404, { error: i18n('$.staff.categories.not_found') });
 
         const joinedAt = new Date();
@@ -253,17 +251,16 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         const member = await StaffMember.findOne({ uuid: stripUUID(uuid) });
         if(!member) return status(404, { error: i18n('$.staff.members.not_found') });
 
-        let updated = false;
         if(category !== undefined && member.category !== category) {
             if(!(await StaffCategory.exists({ id: category }))) return status(404, { error: i18n('$.staff.categories.not_found') });
             member.category = category;
-            updated = true;
+            member.markModified('category');
         }
         if(description !== undefined && member.description !== description?.trim()) {
             member.description = description?.trim() || null;
-            updated = true;
+            member.markModified('description');
         }
-        if(updated) {
+        if(member.isModified()) {
             member.save();
             // TODO: notification
         }

@@ -51,7 +51,7 @@ type Addon = {
 
 export async function saveMetrics() {
     if(config.discordBot.syncedRoles.enabled) await (await fetchGuild())?.members.fetch();
-    const players = await Player.find();
+    const players = await Player.find().lean();
     const tags = players.filter((player) => player.tag != null).length;
     const admins = players.filter((player) => {
         const adminRole = getCachedRoles().find((role) => role.name == config.metrics.adminRole);

@@ -35,7 +35,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
 }).get('/:id', async ({ session, params, i18n, status }) => { // Get info of specific api key
     if(!session?.player?.hasPermission(Permission.ViewApiKeys)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    const player = await Player.findOne({ uuid: stripUUID(params.uuid) }).lean();
+    const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
     
     const key = player.getApiKey(params.id);
@@ -101,6 +101,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     if(!key) return status(404, { error: i18n('$.api_keys.not_found') });
 
     key.key = `sk_${generateSecureCode(32)}`;
+    player.markModified('api_keys');
     await player.save();
 
     sendModLogMessage({
@@ -140,6 +141,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     if(!key) return status(404, { error: i18n('$.api_keys.not_found') });
 
     key.name = name.trim();
+    player.markModified('api_keys');
     await player.save();
 
     // TODO: notification
