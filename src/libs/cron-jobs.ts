@@ -1,4 +1,3 @@
-import { checkExpiredEntitlements } from "./entitlement-expiry";
 import { saveMetrics } from "./metrics";
 import Logger from "./Logger";
 import { config } from "./config";
@@ -8,16 +7,6 @@ import { Cron } from "croner";
 import { Player } from "../database/schemas/Player";
 
 const tz = 'Europe/Berlin';
-
-export function startEntitlementExpiry() {
-    if(!config.discordBot.notifications.entitlements.enabled) return;
-    Logger.debug('Entitlement expiry initialized.');
-    const job = new Cron('*/5 * * * *', checkExpiredEntitlements, {
-        name: 'Entitlement Expiry Check',
-        timezone: tz
-    });
-    job.trigger();
-}
 
 export function startMetrics() {
     if(!config.metrics.enabled) return;

@@ -12,7 +12,7 @@ import getAuthProvider from "./middleware/get-auth-provider";
 import { handleErrors, initializeSentry } from "./libs/error-handler";
 import cors from "@elysiajs/cors";
 import { verify as verifyMailOptions } from "./libs/mailer";
-import { startEntitlementExpiry, startMetrics, startReferralReset, startRoleCacheJob, startRoleSynchronization } from "./libs/cron-jobs";
+import { startMetrics, startReferralReset, startRoleCacheJob, startRoleSynchronization } from "./libs/cron-jobs";
 import { config } from "./libs/config";
 import { join } from "path";
 import ip from "./middleware/ip";
@@ -119,7 +119,6 @@ async function main() {
     validateKeypair();
     connectDatabase(config.mongodb).then(() => {
         startRoleCacheJob();
-        startEntitlementExpiry();
         startRoleSynchronization();
         startMetrics();
         startReferralReset();

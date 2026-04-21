@@ -1,6 +1,6 @@
 import { HydratedDocument, Schema, model } from "mongoose";
 import { Permission } from "../../types/Permission";
-import { getCachedRoles, RoleDocument } from "./Role";
+import { getCachedRoles, IRole, RoleDocument } from "./Role";
 import { GlobalIcon, icons } from "../../types/GlobalIcon";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";
 import { isConnected } from "../mongo";
@@ -14,21 +14,21 @@ import Logger from "../../libs/Logger";
 
 const { watchlist } = config.validation.tag;
 
+export enum RoleCondition {
+    ServerBoost = 'server_boost'
+}
+
 export interface PlayerRole {
     /**
      * The role document containing the role information
-     * @see RoleDocument
+     * @see IRole
      */
-    role: RoleDocument;
+    role: IRole;
     /**
      * The reason for assigning the role to the player
      * Can be null if no reason was provided
      */
     reason: string | null;
-    /**
-     * Whether the role is set to auto-remove after expiration
-     */
-    autoRemove: boolean;
     /**
      * Whether the role icon should be hidden
      */
@@ -42,6 +42,10 @@ export interface PlayerRole {
      * If null, the role does not expire
      */
     expiresAt: Date | null;
+    /**
+     * The conditions under which the role is active, if applicable
+     */
+    conditions: RoleCondition[];
 }
 
 export interface HistoryEntry {
@@ -320,11 +324,11 @@ interface IPlayer {
      */
     roles: {
         id: string;
-        auto_remove: boolean;
         reason: string | null;
         visible: boolean;
         added_at: Date;
         expires_at: Date | null;
+        conditions: RoleCondition[]
     }[];
     /**
      * The API keys associated with the player, containing key information
@@ -474,13 +478,14 @@ interface IPlayer {
      * @param info The information about the role to add
      * @param info.id The id of the role to add
      * @param info.reason The reason for adding the role
-     * @param info.autoRemove Whether the role should be removed when a subscription expires
+     * @param info.addConditions Add conditions to the role
+     * @param info.setConditions Set conditions for the role, replacing any existing conditions
      * @param info.visible Whether the role icon should be visible (default: true)
      * @param info.expiresAt The expiration date of the role, if applicable (default: null)
      * @param info.duration The duration in milliseconds for which the role is valid, if applicable (default: null)
      * @return {{ success: boolean, expiresAt: Date | null }} An object indicating success and the expiration date of the role
      */
-    addRole(info: { id: string, reason: string, autoRemove: boolean, visible?: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null };
+    addRole(info: { id: string, reason: string, addConditions?: RoleCondition[], setConditions?: RoleCondition[], visible?: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null };
 
     /**
      * Remove a role from the player
@@ -744,11 +749,6 @@ const PlayerSchema = new Schema<IPlayer>({
                 type: String,
                 required: true
             },
-            auto_remove: {
-                type: Boolean,
-                required: true,
-                default: false
-            },
             reason: {
                 type: String,
                 default: null
@@ -766,6 +766,11 @@ const PlayerSchema = new Schema<IPlayer>({
             expires_at: {
                 type: Date,
                 default: null
+            },
+            conditions: {
+                type: [String],
+                enum: Object.values(RoleCondition),
+                default: []
             }
         }],
         required: true,
@@ -1061,18 +1066,16 @@ const PlayerSchema = new Schema<IPlayer>({
 
         getAllRoles(): PlayerRole[] {
             const roles = getCachedRoles();
-            return this.roles.filter(({ id }) => {
-                return roles.some((role) => role.id === id);
-            }).map((playerRole) => {
+            return this.roles.filter(({ id }) => roles.some((role) => role.id === id)).map((playerRole) => {
                 const role = roles.find((role) => role.id === playerRole.id)!;
 
                 return {
                     role,
-                    autoRemove: playerRole.auto_remove,
                     reason: playerRole.reason,
                     visible: playerRole.visible,
                     addedAt: playerRole.added_at,
-                    expiresAt: playerRole.expires_at
+                    expiresAt: playerRole.expires_at,
+                    conditions: playerRole.conditions
                 }
             });
         },
@@ -1086,7 +1089,7 @@ const PlayerSchema = new Schema<IPlayer>({
             return roles.find((role) => role.role.id === id) || null;
         },
 
-        addRole({ id, reason, autoRemove, visible = true, expiresAt, duration }: { id: string, reason: string, autoRemove: boolean, visible?: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null } {
+        addRole({ id, reason, addConditions, setConditions, visible = true, expiresAt, duration }: { id: string, reason: string, addConditions?: RoleCondition[], setConditions?: RoleCondition[], visible?: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null } {
             const roles = getCachedRoles();
             if(!roles.some((role) => role.id === id)) return { success: false, expiresAt: null };
 
@@ -1095,12 +1098,20 @@ const PlayerSchema = new Schema<IPlayer>({
                 if(!playerRole.expires_at) return { success: false, expiresAt: null };
                 if(playerRole.expires_at.getTime() > Date.now()) {
                     playerRole.reason += ` | ${reason}`;
-                    playerRole.auto_remove = autoRemove;
+                    if(setConditions) {
+                        playerRole.conditions = setConditions;
+                    } else if(addConditions) {
+                        playerRole.conditions = [...playerRole.conditions, ...addConditions];
+                    }
                     playerRole.expires_at = expiresAt ? expiresAt : duration ? new Date(playerRole.expires_at.getTime() + duration) : null;
                     return { success: true, expiresAt: playerRole.expires_at };
                 } else {
                     playerRole.reason = reason;
-                    playerRole.auto_remove = autoRemove;
+                    if(setConditions) {
+                        playerRole.conditions = setConditions;
+                    } else if(addConditions) {
+                        playerRole.conditions = [...playerRole.conditions, ...addConditions];
+                    }
                     playerRole.added_at = new Date();
                     playerRole.expires_at = expiresAt ? expiresAt : duration ? new Date(Date.now() + duration) : null;
                     return { success: true, expiresAt: playerRole.expires_at };
@@ -1109,10 +1120,10 @@ const PlayerSchema = new Schema<IPlayer>({
                 const role = {
                     id,
                     reason,
-                    auto_remove: autoRemove,
                     visible,
                     added_at: new Date(),
-                    expires_at: expiresAt ? expiresAt : duration ? new Date(Date.now() + duration) : null
+                    expires_at: expiresAt ? expiresAt : duration ? new Date(Date.now() + duration) : null,
+                    conditions: [...(setConditions || []), ...(addConditions || [])]
                 };
                 this.roles.push(role);
                 return { success: true, expiresAt: role.expires_at };

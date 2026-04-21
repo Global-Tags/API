@@ -4,12 +4,11 @@ import { Permission, permissions } from "../../types/Permission";
 import { isConnected } from "../mongo";
 import Logger from "../../libs/Logger";
 import { fetchGuild } from "../../bot/bot";
-import { generateDocumentId, generateSecureCode } from "../../libs/crypto";
 import { Player } from "./Player";
 
-const cachedRoles: RoleDocument[] = [];
+const cachedRoles: IRole[] = [];
 
-interface IRole {
+export interface IRole {
     /**
      * Unique identifier for the role
      */
@@ -31,12 +30,6 @@ interface IRole {
      * Whether the role has an icon
      */
     hasIcon: boolean;
-    /**
-     * SKU of the role, used for Discord integration
-     * Can be null if not applicable
-     * @deprecated
-     */
-    sku: string | null;
     /**
      * Bitwise representation of permissions assigned to the role
      * @see Permission
@@ -87,10 +80,6 @@ const RoleSchema = new Schema<IRole>({
         required: true,
         default: false
     },
-    sku: {
-        type: String,
-        default: null
-    },
     permissions: {
         type: Number,
         required: true,
@@ -112,7 +101,7 @@ const RoleSchema = new Schema<IRole>({
     }
 });
 
-export function getCachedRoles(): RoleDocument[] {
+export function getCachedRoles(): IRole[] {
     return cachedRoles;
 }
 
@@ -123,7 +112,6 @@ const defaultRoles = [
         position: 0,
         hasIcon: false,
         color: 'FF0000',
-        sku: null,
         permissions: Permission.Administrator
     }
 ]
@@ -132,7 +120,7 @@ const defaultRoles = [
 export async function updateRoleCache(): Promise<void> {
     if(!isConnected()) return;
     cachedRoles.length = 0;
-    let roles = await Role.find();
+    let roles = await Role.find().lean();
     if(roles.length == 0) {
         cachedRoles.push(...await Role.insertMany(defaultRoles));
     }
@@ -146,9 +134,10 @@ export async function updateRoleCache(): Promise<void> {
 
 export async function getNextPosition(): Promise<number> {
     if(!isConnected()) return -1;
-    const roles = await Role.find();
+    const roles = await Role.find().lean();
+    if(roles.length === 0) return 0;
     roles.sort((a, b) => a.position - b.position);
-    return roles[roles.length - 1].position + 1;
+    return roles.at(-1)!.position + 1;
 }
 
 export async function synchronizeDiscordRoles() {

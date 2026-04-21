@@ -68,7 +68,7 @@ export namespace tRequestBody {
 
     export const UploadCustomIcon = t.Object({
         image: t.File({ type: 'image/png', error: '$.error.wrongType;;[["field", "image"], ["type", "png file"]]', description: 'A png image file' })
-    }, { description: 'A ban edit object', ...options });
+    }, { description: 'A custom icon upload object', ...options });
 
     export const CreateLock = t.Object({
         type: t.Enum(AccountLockType),
@@ -111,6 +111,15 @@ export namespace tRequestBody {
         color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6, error: '$.error.wrongType;;[["field", "color"], ["type", "string"]]' }))),
         permissions: t.Optional(t.Integer({ error: '$.error.wrongType;;[["field", "permissions"], ["type", "integer"]]' }))
     }, { description: 'A role object', ...options });
+
+    export const UploadRoleIcon = t.Object({
+        image: t.File({ type: 'image/png', error: '$.error.wrongType;;[["field", "image"], ["type", "png file"]]', description: 'A png image file' })
+    }, { description: 'A role icon upload object', ...options });
+
+    export const ReorderRoles = t.Array(t.String({
+        description: 'A role ID',
+        error: '$.error.wrongType;;[["type", "string"]]',
+    }), { description: 'A role order array', ...options });
 
     export const StaffCategory = t.Object({
         name: t.String({ minLength: 1, error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' })

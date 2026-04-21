@@ -5,15 +5,20 @@ import { getCachedRoles, getNextPosition, Role, updateRoleCache } from "../datab
 import { ElysiaApp } from "..";
 import { tHeaders, tParams, tRequestBody, tResponseBody, tSchema } from "../libs/models";
 import { DocumentationCategory } from "../types/DocumentationCategory";
+import { snakeCase } from "change-case";
+import Logger from "../libs/Logger";
+import sharp from "sharp";
+import { config } from "../libs/config";
+import { roleIconFile } from "../libs/data-accessor";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }) => { // Get roles
     if(!session?.player?.hasPermission(Permission.ViewRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
-    return getCachedRoles().map((role) => ({
+    return getCachedRoles().sort((a, b) => a.position - b.position).map((role) => ({
         id: role.id,
         name: role.name,
         position: role.position,
-        color: role.color || null,
+        color: role.color,
         hasIcon: role.hasIcon,
         permissions: role.permissions
     }));
@@ -37,7 +42,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         id: role.id,
         name: role.name,
         position: role.position,
-        color: role.color || null,
+        color: role.color,
         hasIcon: role.hasIcon,
         permissions: role.permissions
     };
@@ -56,11 +61,18 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
 }).post('/', async ({ session, body, i18n, status }) => { // Create role
     if(!session?.player?.hasPermission(Permission.CreateRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
+    const name = body.name.trim();
+    const permissions = body.permissions ?? 0;
+    const color = body.color || null;
+
+    if(permissions < 0 || permissions > 2147483647) return status(422, { error: i18n('$.error.invalid_bitfield') });
+
     const role = await Role.insertOne({
-        name: body.name.trim(),
+        id: snakeCase(name),
+        name,
         position: await getNextPosition(),
-        hasIcon: false,
-        permissions: body.permissions ?? 0
+        color,
+        permissions
     });
     updateRoleCache();
 
@@ -86,12 +98,90 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     },
     response: {
         200: tSchema.Role,
-        403: tResponseBody.Error
+        403: tResponseBody.Error,
+        422: tResponseBody.Error
     },
     body: tRequestBody.Role,
     headers: tHeaders
+}).post('/:id/icon', async ({ session, params, body: { image }, i18n, status }) => { // Set role icon
+    if(!session?.player?.hasPermission(Permission.EditRoles)) return status(403, { error: i18n('$.error.notAllowed') });
+
+    const role = await Role.findOne({ id: params.id });
+    if(!role) return status(404, { error: i18n('$.roles.not_found') });
+
+    const metadata = await sharp(await image.arrayBuffer()).metadata().catch((err: Error) => {
+        Logger.error('Failed to read image metadata:', err.message);
+        return null;
+    });
+
+    if(!metadata) return status(422, { error: i18n('$.icon.upload.invalidMetadata') });
+    if(metadata.format != 'png') return status(422, { error: i18n('$.icon.upload.wrongFormat')});
+    if(!metadata.height || metadata.height != metadata.width) return status(422, { error: i18n('$.icon.upload.wrongResolution')});
+    if(metadata.height > config.validation.icon.maxResolution) return status(422, { error: i18n('$.icon.upload.exceedsMaxResolution').replaceAll('<max>', config.validation.icon.maxResolution.toString()) });
+
+    await Bun.write(roleIconFile(role.id), await image.arrayBuffer(), { createPath: true });
+    role.hasIcon = true;
+    role.markModified('hasIcon');
+    await role.save();
+    updateRoleCache();
+
+    return {
+        id: role.id,
+        name: role.name,
+        position: role.position,
+        color: role.color || null,
+        hasIcon: role.hasIcon,
+        permissions: role.permissions
+    };
+}, {
+    detail: {
+        tags: [DocumentationCategory.Roles],
+        description: 'Upload a role icon',
+    },
+    response: {
+        200: tSchema.Role,
+        404: tResponseBody.Error,
+        403: tResponseBody.Error,
+        422: tResponseBody.Error
+    },
+    body: tRequestBody.UploadRoleIcon,
+    headers: tHeaders
+}).delete('/:id/icon', async ({ session, params, i18n, status }) => { // Delete role icon
+    if(!session?.player?.hasPermission(Permission.EditRoles)) return status(403, { error: i18n('$.error.notAllowed') });
+
+    const role = await Role.findOne({ id: params.id });
+    if(!role) return status(404, { error: i18n('$.roles.not_found') });
+    if(!role.hasIcon) return status(404, { error: i18n('$.roles.icon_not_found') });
+
+    await roleIconFile(role.id).delete();
+    role.hasIcon = false;
+    role.markModified('hasIcon');
+    await role.save();
+    updateRoleCache();
+
+    return {
+        id: role.id,
+        name: role.name,
+        position: role.position,
+        color: role.color || null,
+        hasIcon: role.hasIcon,
+        permissions: role.permissions
+    };
+}, {
+    detail: {
+        tags: [DocumentationCategory.Roles],
+        description: 'Delete a role icon',
+    },
+    response: {
+        200: tSchema.Role,
+        404: tResponseBody.Error,
+        403: tResponseBody.Error,
+        422: tResponseBody.Error
+    },
+    body: tRequestBody.UploadRoleIcon,
+    headers: tHeaders
 }).patch('/:id', async ({ session, params, body: { name, color, permissions }, i18n, status }) => { // Edit role
-    if(!session?.player?.hasPermission(Permission.DeleteRoles)) return status(403, { error: i18n('$.error.notAllowed') });
+    if(!session?.player?.hasPermission(Permission.EditRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const role = await Role.findOne({ id: params.id });
     if(!role) return status(404, { error: i18n('$.roles.not_found') });
@@ -135,13 +225,41 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         200: tSchema.Role,
         403: tResponseBody.Error,
         404: tResponseBody.Error,
-        422: tResponseBody.Error,
+        422: tResponseBody.Error
     },
     body: tRequestBody.Role,
     params: tParams.roleId,
     headers: tHeaders
-}) // TODO: Implement route to patch all roles at once
-.delete('/:id', async ({ session, params, i18n, status }) => { // Delete role
+}).patch('/', async ({ session, body, i18n, status }) => { // Reorder role positions
+    if(!session?.player?.hasPermission(Permission.EditRoles)) return status(403, { error: i18n('$.error.notAllowed') });
+
+    const roles = getCachedRoles();
+    if(roles.length !== body.length) return status(422, { error: i18n('$.roles.reorder.invalid_length') });
+    const unknownRole = roles.find((role) => !body.includes(role.id));
+    if(unknownRole) return status(422, { error: i18n('$.roles.reorder.unknown_role').replace('{role}', unknownRole.name) });
+
+    for(const role of roles) {
+        const newPosition = body.indexOf(role.id);
+        if(role.position !== newPosition) {
+            await Role.updateOne({ id: role.id }, { position: newPosition });
+            Logger.debug(`Updated position of role "${role.id}" to ${newPosition}.`);
+        }
+    }
+
+    return { message: i18n('$.roles.reorder.success') };
+}, {
+    detail: {
+        tags: [DocumentationCategory.Roles],
+        description: 'Reorder role positions'
+    },
+    response: {
+        200: tResponseBody.Message,
+        403: tResponseBody.Error,
+        422: tResponseBody.Error
+    },
+    body: tRequestBody.ReorderRoles,
+    headers: tHeaders
+}).delete('/:id', async ({ session, params, i18n, status }) => { // Delete role
     if(!session?.player?.hasPermission(Permission.DeleteRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const role = await Role.findOne({ id: params.id });
