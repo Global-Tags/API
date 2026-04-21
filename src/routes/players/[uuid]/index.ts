@@ -83,7 +83,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     if(!session || !session.self && !session.player?.hasPermission(Permission.ManagePlayerTags)) return status(403, { error: i18n('$.error.notAllowed') });
 
     if(await Player.exists({ uuid: stripUUID(params.uuid) })) return status(409, { error: i18n('$.account.create.account_already_exists') });
-    (await getOrCreatePlayer(params.uuid)).save();
+    await Player.create({ uuid: stripUUID(params.uuid) });
 
     if(!session.self && session.player) {
         // TODO: notification
