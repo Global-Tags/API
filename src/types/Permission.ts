@@ -52,7 +52,6 @@ export enum Permission { // TODO: Replace real bitfield values
 
     ViewNotes = 1 << 0,
     CreateNotes = 1 << 0,
-    EditNotes = 1 << 0,
     DeleteNotes = 1 << 0,
 
     //* Player management
