@@ -79,12 +79,12 @@ const elysia = new Elysia()
             if(error.customError && typeof error.customError == 'string') return { error: i18n(error.customError) };
             const errorData = JSON.parse(error.message);
             return { error: errorData.summary || errorData.message || i18n('$.error.validation') };
+        } else if(code == 'PARSE') {
+            set.status = 422;
+            return { error: i18n('$.error.validation') };
         } else if(code == 'NOT_FOUND') {
             set.status = 404;
             return { error: i18n('$.error.notFound') };
-        } else if(code == 'PARSE') {
-            set.status = 422;
-            return { error: i18n('$.error.invalid_body') };
         } else {
             set.status = 500;
             captureException(error);
