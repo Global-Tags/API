@@ -19,9 +19,9 @@ export const tTimestamp = t.Integer({
 });
 
 export const tHeaders = t.Object({
-    authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }),
+    authorization: t.String({ error: '$.error.not_allowed', description: 'Your authentication token' }),
     'x-language': t.Optional(t.String({ default: 'en_us', description: 'The language to use for translations' }))
-}, { error: '$.error.notAllowed' });
+});
 
 export namespace tParams {
     const id = (type: string) => t.Object({ id: t.String({ description: type }) });
@@ -43,103 +43,101 @@ export namespace tParams {
 // Do not use any types with default values here as it will override optional values on requests
 export namespace tRequestBody {
     export const options = {
-        error: '$.error.invalidBody',
         additionalProperties: true
     };
 
     export const ApiKey = t.Object({
-        name: t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]', description: 'An API key name' })
+        name: t.String({ description: 'An API key name' })
     }, { description: 'An API key object', ...options });
     
     export const AppealBan = t.Object({
-        reason: t.String({ error: '$.error.wrongType;;[["field", "reason"], ["type", "string"]]' })
+        reason: t.String()
     }, { description: 'A ban appeal object', ...options });
 
     export const CreateBan = t.Object({
-        reason: t.String({ minLength: 1, error: '$.error.wrongType;;[["field", "reason"], ["type", "string"]]', description: 'A ban reason' }),
-        appealable: t.Optional(t.Boolean({ error: '$.error.wrongType;;[["field", "appealable"], ["type", "boolean"]]', description: 'A boolean indicating if the ban is appealable' })),
-        duration: t.Optional(t.Number({ error: '$.error.wrongType;;[["field", "duration"], ["type", "number"]]', description: 'A ban duration' }))
+        reason: t.String({ minLength: 1, description: 'A ban reason' }),
+        appealable: t.Optional(t.Boolean({ description: 'A boolean indicating if the ban is appealable' })),
+        duration: t.Optional(t.Number({ description: 'A ban duration' }))
     }, { description: 'A ban creation object', ...options });
 
     export const EditBan = t.Object({
-        reason: t.Optional(t.String({ minLength: 1, error: '$.error.wrongType;;[["field", "reason"], ["type", "string"]]', description: 'A ban reason' })),
-        appealable: t.Optional(t.Boolean({ error: '$.error.wrongType;;[["field", "appealable"], ["type", "boolean"]]', description: 'A boolean indicating if the ban is appealable' }))
+        reason: t.Optional(t.String({ minLength: 1, description: 'A ban reason' })),
+        appealable: t.Optional(t.Boolean({ description: 'A boolean indicating if the ban is appealable' }))
     }, { description: 'A ban edit object', ...options });
 
     export const UploadCustomIcon = t.Object({
-        image: t.File({ type: 'image/png', error: '$.error.wrongType;;[["field", "image"], ["type", "png file"]]', description: 'A png image file' })
+        image: t.File({ type: 'image/png', description: 'A png image file' })
     }, { description: 'A custom icon upload object', ...options });
 
     export const CreateLock = t.Object({
         type: t.Enum(AccountLockType),
-        reason: t.String({ maxLength: validation.notes.maxLength, error: `$.error.wrongType;;[["field", "reason"], ["type", "string"]]`, description: 'A lock reason' }),
-        duration: t.Optional(t.Number({ error: '$.error.wrongType;;[["field", "duration"], ["type", "number"]]', description: 'A lock duration' }))
+        reason: t.String({ maxLength: validation.notes.maxLength, description: 'A lock reason' }),
+        duration: t.Optional(t.Number({ description: 'A lock duration' }))
     }, { description: 'A lock creation object', ...options });
 
     export const EditLock = t.Object({
-        reason: t.Optional(t.String({ maxLength: validation.notes.maxLength, error: `$.error.wrongType;;[["field", "reason"], ["type", "string"]]`, description: 'A lock reason' }))
+        reason: t.Optional(t.String({ maxLength: validation.notes.maxLength, description: 'A lock reason' }))
     }, { description: 'A lock edit object', ...options });
 
     export const Note = t.Object({
-        content: t.String({ maxLength: validation.notes.maxLength, error: `$.notes.create.max_length;;[["max", "${validation.notes.maxLength}"]]`, description: 'A player note' })
+        content: t.String({ maxLength: validation.notes.maxLength, description: 'A player note' })
     }, { description: 'A note object', ...options });
 
     export const Report = t.Object({
-        reason: t.String({ error: '$.error.wrongType;;[["field", "reason"], ["type", "string"]]', description: 'A report reason' })
+        reason: t.String({ description: 'A report reason' })
     }, { description: 'A report object', ...options });
 
     export const TagSettings = t.Object({
-        tag: t.Optional(t.Nullable(t.String({ error: '$.error.wrongType;;[["field", "tag"], ["type", "string"]]', description: 'The tag content' }))),
-        position: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "position"], ["type", "string"]]', description: 'The position of the tag' })),
+        tag: t.Optional(t.Nullable(t.String({ description: 'The tag content' }))),
+        position: t.Optional(t.String({ description: 'The position of the tag' })),
         icon: t.Optional(t.Object({
-            type: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "icon.type"], ["type", "string"]]', description: 'The type of the icon' })),
-            hash: t.Optional(t.Nullable(t.String({ error: '$.error.wrongType;;[["field", "icon.hash"], ["type", "string"]]', description: 'The hash of the icon' })))
-        }, { error: '$.error.wrongType;;[["field", "icon"], ["type", "object"]]' })),
+            type: t.Optional(t.String({ description: 'The type of the icon' })),
+            hash: t.Optional(t.Nullable(t.String({ description: 'The hash of the icon' })))
+        })),
     }, { description: 'A tag settings object', ...options });
 
     export const CreateGiftCode = t.Object({
-        name: t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' }),
-        code: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "code"], ["type", "string"]]' })),
-        role: t.String({ error: '$.error.wrongType;;[["field", "role"], ["type", "string"]]' }),
-        max_uses: t.Number({ error: '$.error.wrongType;;[["field", "max_uses"], ["type", "number"]]' }),
-        code_expiration: t.Optional(t.Number({ error: '$.error.wrongType;;[["field", "code_expiration"], ["type", "number"]]' })),
-        gift_duration: t.Optional(t.Number({ error: '$.error.wrongType;;[["field", "gift_duration"], ["type", "number"]]' }))
+        name: t.String(),
+        code: t.Optional(t.String()),
+        role: t.String(),
+        max_uses: t.Number(),
+        code_expiration: t.Optional(t.Number()),
+        gift_duration: t.Optional(t.Number())
     }, { description: 'A gift code creation object', ...options });
 
     export const CreateRole = t.Object({
-        name: t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' }),
-        color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6, error: '$.error.wrongType;;[["field", "color"], ["type", "string"]]' }))),
-        permissions: t.Optional(t.Integer({ error: '$.error.wrongType;;[["field", "permissions"], ["type", "integer"]]' }))
+        name: t.String(),
+        color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6 }))),
+        permissions: t.Optional(t.Integer())
     }, { description: 'A role object', ...options });
 
     export const EditRole = t.Object({
-        name: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' })),
-        color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6, error: '$.error.wrongType;;[["field", "color"], ["type", "string"]]' }))),
-        permissions: t.Optional(t.Integer({ error: '$.error.wrongType;;[["field", "permissions"], ["type", "integer"]]' }))
+        name: t.Optional(t.String()),
+        color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6 }))),
+        permissions: t.Optional(t.Integer())
     }, { description: 'A role object', ...options });
 
     export const UploadRoleIcon = t.Object({
-        image: t.File({ type: 'image/png', error: '$.error.wrongType;;[["field", "image"], ["type", "png file"]]', description: 'A png image file' })
+        image: t.File({ type: 'image/png', description: 'A png image file' })
     }, { description: 'A role icon upload object', ...options });
 
     export const ReorderRoles = t.Array(t.String({
         description: 'A role ID',
-        error: '$.error.wrongType;;[["field", "body[x]"], ["type", "string"]]',
     }), { description: 'A role order array', ...options });
 
     export const StaffCategory = t.Object({
-        name: t.String({ minLength: 1, error: '$.error.wrongType;;[["field", "name"], ["type", "string"]]' })
+        name: t.String({ minLength: 1 })
     }, { description: 'A staff category object', ...options });
 
     export const CreateStaffMember = t.Object({
-        uuid: t.String({ error: '$.error.wrongType;;[["field", "uuid"], ["type", "string"]]' }),
-        category: t.String({ error: '$.error.wrongType;;[["field", "category"], ["type", "string"]]' }),
-        description: t.Optional(t.Nullable(t.String({ error: '$.error.wrongType;;[["field", "description"], ["type", "string"]]' })))
+        uuid: t.String(),
+        category: t.String(),
+        description: t.Optional(t.Nullable(t.String()))
     }, { description: 'A staff member creation object', ...options });
 
     export const EditStaffMember = t.Object({
-        category: t.Optional(t.String({ error: '$.error.wrongType;;[["field", "category"], ["type", "string"]]' })),
-        description: t.Optional(t.Nullable(t.String({ error: '$.error.wrongType;;[["field", "description"], ["type", "string"]]' })))
+        category: t.Optional(t.String()),
+        description: t.Optional(t.Nullable(t.String()))
     }, { description: 'A staff member edit object', ...options });
 }
 

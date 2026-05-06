@@ -78,23 +78,11 @@ const elysia = new Elysia()
     .onError(({ code, set, error, request }) => {
         const i18n = getI18nFunctionByLanguage(request.headers.get('x-language') || undefined);
 
-        if(code == 'VALIDATION') { // TODO: Error handling update
+        if(code == 'VALIDATION') {
             set.status = 422;
-            error = error as ValidationError;
-            let errorMessage = error.message;
-            const errorParts = errorMessage.split(';;');
-            errorMessage = i18n(errorParts[0]);
-            if(errorParts.length > 1) {
-                try {
-                    const args: string[][] = JSON.parse(errorParts[1]);
-                    for(const argument of args)
-                        errorMessage = errorMessage.replaceAll(`<${argument[0]}>`, argument[1]);
-                } catch(error) {
-                    captureException(error);
-                    Logger.error(`Failed to apply arguments "${errorParts[1]}": ${error}`);
-                }
-            }
-            return { error: errorMessage.trim() };
+            if(error.customError && typeof error.customError == 'string') return { error: i18n(error.customError) };
+            const errorData = JSON.parse(error.message);
+            return { error: errorData.summary || errorData.message || i18n('$.error.validation') };
         } else if(code == 'NOT_FOUND') {
             set.status = 404;
             return { error: i18n('$.error.notFound') };
