@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import Logger from "../libs/Logger";
-import { destroy, registerFeatures, spawn } from "../bot/bot";
-import { config } from "../libs/config";
+import Logger from "../Logger";
+import { destroy, registerFeatures, spawn } from "../../bot/bot";
+import { config } from "../config";
 
 let registered = false;
 

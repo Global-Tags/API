@@ -1,9 +1,9 @@
 import { StringSelectMenuInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, parseEmoji } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 import { colors, images } from "../bot";
 import { Permission, permissions as allPermissions } from "../../types/Permission";
-import { getCachedRoles } from "../../database/schemas/Role";
+import { getCachedRoles } from "../../libs/database/schemas/Role";
 import { capitalCase, pascalCase } from "change-case";
 import { config } from "../../libs/config";
 

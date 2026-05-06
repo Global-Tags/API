@@ -1,10 +1,10 @@
 import { saveMetrics } from "./metrics";
 import Logger from "./Logger";
 import { config } from "./config";
-import { synchronizeDiscordRoles, updateRoleCache } from "../database/schemas/Role";
-import { isConnected } from "../database/mongo";
+import { synchronizeDiscordRoles, updateRoleCache } from "./database/schemas/Role";
+import { isConnected } from "./database/connection";
 import { Cron } from "croner";
-import { resetMonthlyReferrals } from "../database/schemas/Player";
+import { resetMonthlyReferrals } from "./database/schemas/Player";
 
 const tz = 'Europe/Berlin';
 

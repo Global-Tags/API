@@ -5,7 +5,7 @@ import { sendBanEmail, sendUnbanEmail } from "../../../libs/mailer";
 import { Permission } from "../../../types/Permission";
 import { formatUUID, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
-import { Player } from "../../../database/schemas/Player";
+import { Player } from "../../../libs/database/schemas/Player";
 import { tHeaders, tResponseBody, tParams, tRequestBody, tSchema } from "../../../libs/models";
 import { DocumentationCategory } from "../../../types/DocumentationCategory";
 

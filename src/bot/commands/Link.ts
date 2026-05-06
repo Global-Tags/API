@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, CommandInteraction, EmbedBuilder, GuildMember, MessageFlags, User } from "discord.js";
 import Command, { CommandOptions } from "../structs/Command";
-import players, { PlayerDocument } from "../../database/schemas/Player";
+import players, { PlayerDocument } from "../../libs/database/schemas/Player";
 import { colors } from "../bot";
 import { config } from "../../libs/config";
 import { onDiscordLink } from "../../libs/events";

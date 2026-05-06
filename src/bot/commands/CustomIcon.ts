@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, CommandInteraction, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
 import Command, { CommandOptions } from "../structs/Command";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 import { colors } from "../bot";
 import { join } from 'path';
 import axios from "axios";

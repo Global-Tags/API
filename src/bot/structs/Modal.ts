@@ -1,6 +1,6 @@
 import { GuildMember, Message, ModalSubmitFields, ModalSubmitInteraction } from "discord.js";
 import Interaction, { InteractionOptions } from "./Interaction";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 
 export default abstract class Modale extends Interaction {
     public id: string;

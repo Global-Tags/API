@@ -1,6 +1,6 @@
 import { client, fetchGuild } from "../bot/bot";
-import { Player, RoleCondition } from "../database/schemas/Player";
-import { getCachedRoles, synchronizeDiscordRoles } from "../database/schemas/Role";
+import { Player, RoleCondition } from "./database/schemas/Player";
+import { getCachedRoles, synchronizeDiscordRoles } from "./database/schemas/Role";
 import { config } from "./config";
 import { sendDiscordLinkMessage } from "./discord-notifier";
 import { GameProfile } from "./game-profiles";

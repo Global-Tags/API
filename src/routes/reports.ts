@@ -1,6 +1,6 @@
 import { t } from "elysia";
 import { ElysiaApp } from "..";
-import { Report } from "../database/schemas/Report";
+import { Report } from "../libs/database/schemas/Report";
 import { formatUUID } from "../libs/game-profiles";
 import { tHeaders, tParams, tResponseBody, tSchema } from "../libs/models";
 import { Permission } from "../types/Permission";

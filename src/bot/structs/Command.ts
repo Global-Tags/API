@@ -1,5 +1,5 @@
 import { AutocompleteInteraction, CacheType, CommandInteraction, CommandInteractionOptionResolver, GuildMember } from "discord.js";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 import Interaction, { InteractionOptions } from "./Interaction";
 
 export type CommandOptions = Omit<CommandInteractionOptionResolver<CacheType>, "getMessage" | "getFocused">;

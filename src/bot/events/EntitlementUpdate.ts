@@ -1,8 +1,8 @@
 import { Entitlement } from "discord.js";
 import Event from "../structs/Event";
-import entitlement from "../../database/schemas/entitlement";
+import entitlement from "../../libs/database/schemas/entitlement";
 import { sendEntitlementMessage } from "../../libs/discord-notifier";
-import players from "../../database/schemas/Player";
+import players from "../../libs/database/schemas/Player";
 import { config } from "../../libs/config";
 import { fetchSku } from "../bot";
 

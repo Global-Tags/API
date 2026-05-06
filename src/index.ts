@@ -1,13 +1,13 @@
 import { Elysia, ValidationError } from "elysia";
 import { swagger } from "@elysiajs/swagger";
 import Logger from "./libs/Logger";
-import { connect as connectDatabase } from "./database/mongo";
+import { connect as connectDatabase } from "./libs/database/connection";
 import { getRouter } from "./libs/route-loader";
 import access from "./middleware/access-log";
 import checkDatabase from "./middleware/database-checker";
 import { load as loadLanguages } from "./libs/i18n";
 import fetchI18n, { getI18nFunctionByLanguage } from "./middleware/fetch-i18n";
-import AuthProvider from "./auth/AuthProvider";
+import AuthProvider from "./libs/auth/AuthProvider";
 import getAuthProvider from "./middleware/get-auth-provider";
 import { handleErrors, initializeSentry } from "./libs/error-handler";
 import cors from "@elysiajs/cors";

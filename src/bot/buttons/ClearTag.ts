@@ -1,6 +1,6 @@
 import { ButtonInteraction, Message, GuildMember, EmbedBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
-import players, { PlayerDocument } from "../../database/schemas/Player";
+import players, { PlayerDocument } from "../../libs/database/schemas/Player";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { sendTagClearEmail } from "../../libs/mailer";

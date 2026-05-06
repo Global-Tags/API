@@ -1,6 +1,6 @@
 import { HydratedDocument, model, Schema } from "mongoose";
 import { ContextSchema, PlayerContext, PunishmentAction, PunishmentActionSchema } from "./Report";
-import { generateDocumentId } from "../../libs/crypto";
+import { generateDocumentId } from "../../crypto";
 import { Player, WatchlistPeriod } from "./Player";
 
 interface IWatchlistAlert {

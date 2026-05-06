@@ -1,10 +1,10 @@
 import { ModalSubmitInteraction, Message, ModalSubmitFields, GuildMember, EmbedBuilder, MessageFlags } from "discord.js";
 import Modal from "../structs/Modal";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
 import ms, { StringValue } from "ms";
-import { createGiftCode, GiftType } from "../../database/schemas/GiftCode";
+import { createGiftCode, GiftType } from "../../libs/database/schemas/GiftCode";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 
 export default class CreateGiftCodeModal extends Modal {

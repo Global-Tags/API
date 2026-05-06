@@ -8,7 +8,7 @@ import { sendCustomIconUploadMessage } from "../../../libs/discord-notifier";
 import sharp from "sharp";
 import Logger from "../../../libs/Logger";
 import { generateSecureCode } from "../../../libs/crypto";
-import { Player } from "../../../database/schemas/Player";
+import { Player } from "../../../libs/database/schemas/Player";
 import { tResponseBody, tHeaders, tParams, tRequestBody } from "../../../libs/models";
 import { DocumentationCategory } from "../../../types/DocumentationCategory";
 import { customIconFile, customIconPath } from "../../../libs/data-accessor";

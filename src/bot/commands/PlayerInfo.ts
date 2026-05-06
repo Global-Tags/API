@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, CommandInteraction, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
 import Command, { CommandOptions } from "../structs/Command";
-import players, { PlayerDocument } from "../../database/schemas/Player";
+import players, { PlayerDocument } from "../../libs/database/schemas/Player";
 import * as bot from "../bot";
 import { translateToAnsi } from "../../libs/chat-color";
 import { GameProfile, stripUUID } from "../../libs/game-profiles";

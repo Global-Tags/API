@@ -1,7 +1,7 @@
 import { ButtonInteraction, Message, GuildMember, ActionRowBuilder, EmbedBuilder, ButtonBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import { colors } from "../bot";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 import { stripUUID } from "../../libs/game-profiles";
 
 export default class FinishActionsButton extends Button {

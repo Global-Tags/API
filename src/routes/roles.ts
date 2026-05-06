@@ -1,7 +1,7 @@
 import { t } from "elysia";
 import { Permission } from "../types/Permission";
 import { ModLogType, sendModLogMessage } from "../libs/discord-notifier";
-import { getCachedRoles, getNextPosition, Role, updateRoleCache } from "../database/schemas/Role";
+import { getCachedRoles, getNextPosition, Role, updateRoleCache } from "../libs/database/schemas/Role";
 import { ElysiaApp } from "..";
 import { tHeaders, tParams, tRequestBody, tResponseBody, tSchema } from "../libs/models";
 import { DocumentationCategory } from "../types/DocumentationCategory";

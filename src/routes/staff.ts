@@ -3,8 +3,8 @@ import { ElysiaApp } from "..";
 import { formatUUID, GameProfile, stripUUID, uuidRegex } from "../libs/game-profiles";
 import { generateSecureCode } from "../libs/crypto";
 import { Permission } from "../types/Permission";
-import { getNextPosition, StaffCategory } from "../database/schemas/StaffCategory";
-import { StaffMember } from "../database/schemas/StaffMember";
+import { getNextPosition, StaffCategory } from "../libs/database/schemas/StaffCategory";
+import { StaffMember } from "../libs/database/schemas/StaffMember";
 import { tRequestBody, tResponseBody, tSchema } from "../libs/models";
 import { DocumentationCategory } from "../types/DocumentationCategory";
 

@@ -1,9 +1,9 @@
 import { ButtonInteraction, Message, GuildMember, EmbedBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import { Permission } from "../../types/Permission";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 import { colors } from "../bot";
-import { Role, updateRoleCache } from "../../database/schemas/Role";
+import { Role, updateRoleCache } from "../../libs/database/schemas/Role";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 
 export default class DeleteRole extends Button {

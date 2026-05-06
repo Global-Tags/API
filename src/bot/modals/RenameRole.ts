@@ -1,11 +1,11 @@
 import { Message, GuildMember, EmbedBuilder, ModalSubmitInteraction, ModalSubmitFields } from "discord.js";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 import { colors } from "../bot";
 import Modal from "../structs/Modal";
 import { Permission } from "../../types/Permission";
 import { snakeCase } from "change-case";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
-import { getCachedRoles, Role } from "../../database/schemas/Role";
+import { getCachedRoles, Role } from "../../libs/database/schemas/Role";
 
 export default class RenameRoleModal extends Modal {
     constructor() {

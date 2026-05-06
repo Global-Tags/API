@@ -5,7 +5,7 @@ import { Permission } from "../../../types/Permission";
 import { GlobalIcon, icons } from "../../../types/GlobalIcon";
 import { formatUUID, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
-import { getOrCreatePlayer, Player } from "../../../database/schemas/Player";
+import { getOrCreatePlayer, Player } from "../../../libs/database/schemas/Player";
 import { tHeaders, tParams, tRequestBody, tResponseBody } from "../../../libs/models";
 import { DocumentationCategory } from "../../../types/DocumentationCategory";
 import { customIconFile } from "../../../libs/data-accessor";

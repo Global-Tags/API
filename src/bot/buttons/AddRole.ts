@@ -1,10 +1,10 @@
 import { ButtonInteraction, Message, GuildMember, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
-import players, { PlayerDocument } from "../../database/schemas/Player";
+import players, { PlayerDocument } from "../../libs/database/schemas/Player";
 import { colors } from "../bot";
 import { capitalCase, snakeCase } from "change-case";
 import { Permission } from "../../types/Permission";
-import { getCachedRoles } from "../../database/schemas/Role";
+import { getCachedRoles } from "../../libs/database/schemas/Role";
 
 export default class AddRoleButton extends Button {
     constructor() {

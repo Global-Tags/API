@@ -1,7 +1,7 @@
 import { t } from "elysia";
 import { config } from "./config";
 import { generateDocumentId, generateSecureCode } from "./crypto";
-import { AccountLockType } from "../database/schemas/Player";
+import { AccountLockType } from "./database/schemas/Player";
 const { validation } = config;
 
 export const tId = t.String({

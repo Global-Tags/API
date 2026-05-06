@@ -1,9 +1,9 @@
 import { ButtonInteraction, Message, GuildMember, EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import { Permission, permissions } from "../../types/Permission";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 import { colors, images } from "../bot";
-import { getCachedRoles } from "../../database/schemas/Role";
+import { getCachedRoles } from "../../libs/database/schemas/Role";
 import { capitalCase } from "change-case";
 
 export default class ManagePermissionsButton extends Button {

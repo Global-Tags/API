@@ -1,6 +1,6 @@
 import { HydratedDocument, Schema, model } from "mongoose";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
-import { generateDocumentId, generateSecureCode } from "../../libs/crypto";
+import { GameProfile, stripUUID } from "../../game-profiles";
+import { generateDocumentId, generateSecureCode } from "../../crypto";
 
 export enum GiftType {
     Role = 'role'

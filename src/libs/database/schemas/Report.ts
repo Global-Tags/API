@@ -1,8 +1,8 @@
 import { HydratedDocument, model, Schema } from "mongoose";
-import { GlobalIcon, icons } from "../../types/GlobalIcon";
-import { GlobalPosition, positions } from "../../types/GlobalPosition";
-import { GameProfile } from "../../libs/game-profiles";
-import { generateDocumentId } from "../../libs/crypto";
+import { GlobalIcon, icons } from "../../../types/GlobalIcon";
+import { GlobalPosition, positions } from "../../../types/GlobalPosition";
+import { GameProfile } from "../../game-profiles";
+import { generateDocumentId } from "../../crypto";
 
 export enum PunishmentActionType {
     Banned = 'banned',

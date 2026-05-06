@@ -4,7 +4,7 @@ import { Permission } from "../../../types/Permission";
 import { GameProfile, stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 import { generateSecureCode } from "../../../libs/crypto";
-import { Player } from "../../../database/schemas/Player";
+import { Player } from "../../../libs/database/schemas/Player";
 import { tHeaders, tParams, tRequestBody, tResponseBody, tSchema } from "../../../libs/models";
 import { DocumentationCategory } from "../../../types/DocumentationCategory";
 

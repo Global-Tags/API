@@ -1,10 +1,10 @@
 import { StringSelectMenuInteraction, Message, GuildMember, EmbedBuilder, MessageFlags } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 import { colors } from "../bot";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
-import { GiftCode } from "../../database/schemas/GiftCode";
+import { GiftCode } from "../../libs/database/schemas/GiftCode";
 
 export default class DeleteGiftCodeMenu extends SelectMenu {
     constructor() {

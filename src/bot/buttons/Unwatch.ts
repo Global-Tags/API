@@ -1,7 +1,7 @@
 import { ButtonInteraction, Message, GuildMember, EmbedBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import { colors } from "../bot";
-import players, { PlayerDocument } from "../../database/schemas/Player";
+import players, { PlayerDocument } from "../../libs/database/schemas/Player";
 import { ModLogType, sendModLogMessage } from "../../libs/discord-notifier";
 import { Permission } from "../../types/Permission";
 

@@ -1,8 +1,8 @@
 import { existsSync, readdirSync } from "fs";
 import { join } from "path";
-import Logger from "../libs/Logger";
+import Logger from "../Logger";
 import { Player, PlayerDocument } from "../database/schemas/Player";
-import { stripUUID } from "../libs/game-profiles";
+import { stripUUID } from "../game-profiles";
 
 export type SessionData = {
     uuid: string | null,
@@ -22,7 +22,7 @@ export default abstract class AuthProvider {
         const tokenUUID = await this.getUUID(token);
         if(uuid) uuid = stripUUID(uuid);
         if(!tokenUUID) return { uuid: null, player: null, self: false };
-        const data = await Player.findOne({ uuid: tokenUUID }); // TODO: look at this
+        const data = await Player.findOne({ uuid: tokenUUID });
         if(!data) return { uuid: tokenUUID, player: null, self: tokenUUID == uuid };
         return {
             uuid: tokenUUID,

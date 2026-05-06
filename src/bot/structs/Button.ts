@@ -1,6 +1,6 @@
 import { ButtonInteraction, GuildMember, Message } from "discord.js";
 import Interaction, { InteractionOptions } from "./Interaction";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 
 export default abstract class Button extends Interaction {
     public id: string;

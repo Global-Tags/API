@@ -1,5 +1,5 @@
 import { PreContext } from "elysia";
-import { isConnected } from "../database/mongo";
+import { isConnected } from "../libs/database/connection";
 import { getI18nFunctionByLanguage } from "./fetch-i18n";
 
 export default function checkDatabase({ status, request: { headers } }: PreContext) {

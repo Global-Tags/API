@@ -1,10 +1,10 @@
 import { t } from "elysia";
-import { getOrCreatePlayer, Player } from "../../../database/schemas/Player";
+import { getOrCreatePlayer, Player } from "../../../libs/database/schemas/Player";
 import { Permission } from "../../../types/Permission";
 import { sendReportMessage } from "../../../libs/discord-notifier";
 import { stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
-import { Report } from "../../../database/schemas/Report";
+import { Report } from "../../../libs/database/schemas/Report";
 import { tResponseBody, tHeaders, tParams, tRequestBody, tSchema } from "../../../libs/models";
 import { DocumentationCategory } from "../../../types/DocumentationCategory";
 

@@ -2,7 +2,7 @@ import { ButtonInteraction, Message, GuildMember, ModalBuilder, ActionRowBuilder
 import Button from "../structs/Button";
 import { config } from "../../libs/config";
 import { Permission } from "../../types/Permission";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 
 export default class CreateRoleButton extends Button {
     constructor() {

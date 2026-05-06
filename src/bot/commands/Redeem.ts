@@ -1,8 +1,8 @@
 import { ApplicationCommandOptionType, CommandInteraction, EmbedBuilder, GuildMember, MessageFlags } from "discord.js";
 import Command, { CommandOptions } from "../structs/Command";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 import { colors, images } from "../bot";
-import giftCodes from "../../database/schemas/GiftCode";
+import giftCodes from "../../libs/database/schemas/GiftCode";
 import { formatTimestamp, sendGiftCodeRedeemMessage } from "../../libs/discord-notifier";
 import { capitalCase } from "change-case";
 

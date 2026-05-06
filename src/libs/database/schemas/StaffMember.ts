@@ -1,5 +1,5 @@
 import { HydratedDocument, model, Schema } from "mongoose";
-import { GameProfile } from "../../libs/game-profiles";
+import { GameProfile } from "../../game-profiles";
 import { Player, PlayerDocument } from "./Player";
 import { IStaffCategory, StaffCategory, StaffCategoryDocument } from "./StaffCategory";
 

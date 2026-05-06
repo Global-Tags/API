@@ -1,6 +1,6 @@
 import { StringSelectMenuInteraction, Message, GuildMember, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import SelectMenu from "../structs/SelectMenu";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 import { Permission } from "../../types/Permission";
 
 export default class CreateGiftCodeMenu extends SelectMenu {

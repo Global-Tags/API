@@ -1,4 +1,4 @@
-import AuthProvider from "../auth/AuthProvider";
+import AuthProvider from "../libs/auth/AuthProvider";
 import Elysia from "elysia";
 
 export default function getAuthProvider(app: Elysia) {

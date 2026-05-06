@@ -1,9 +1,9 @@
 import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, MessageFlags, StringSelectMenuBuilder } from "discord.js";
 import Button from "../structs/Button";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 import { colors } from "../bot";
 import { Permission } from "../../types/Permission";
-import { getCachedRoles } from "../../database/schemas/Role";
+import { getCachedRoles } from "../../libs/database/schemas/Role";
 import { capitalCase } from "change-case";
 
 export default class CreateGiftCodeButton extends Button {

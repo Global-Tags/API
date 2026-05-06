@@ -1,6 +1,6 @@
 import { HydratedDocument, Schema, model } from "mongoose";
-import { GlobalPosition } from "../../types/GlobalPosition";
-import { GlobalIcon } from "../../types/GlobalIcon";
+import { GlobalPosition } from "../../../types/GlobalPosition";
+import { GlobalIcon } from "../../../types/GlobalIcon";
 
 const requiredNumber = {
     type: Number,

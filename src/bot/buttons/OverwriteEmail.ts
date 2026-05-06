@@ -1,6 +1,6 @@
 import { ButtonInteraction, Message, GuildMember, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import Button from "../structs/Button";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 import { Permission } from "../../types/Permission";
 
 export default class OverwriteEmailButton extends Button {

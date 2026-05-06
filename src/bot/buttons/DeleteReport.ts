@@ -1,7 +1,7 @@
 import { ButtonInteraction, Message, GuildMember, ActionRowBuilder, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import { colors } from "../bot";
-import players, { PlayerDocument } from "../../database/schemas/Player";
+import players, { PlayerDocument } from "../../libs/database/schemas/Player";
 import { GameProfile } from "../../libs/game-profiles";
 import { Permission } from "../../types/Permission";
 

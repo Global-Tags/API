@@ -1,6 +1,6 @@
 import { HydratedDocument, model, Schema } from "mongoose";
-import { isConnected } from "../mongo";
-import { generateDocumentId } from "../../libs/crypto";
+import { isConnected } from "../connection";
+import { generateDocumentId } from "../../crypto";
 
 export interface IStaffCategory {
     /**

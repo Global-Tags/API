@@ -1,8 +1,8 @@
 import { ButtonInteraction, Message, GuildMember, User, EmbedBuilder, ActionRowBuilder, MessageFlags, StringSelectMenuBuilder } from "discord.js";
 import Button from "../structs/Button";
 import { client, colors, images } from "../bot";
-import { getCachedRoles } from "../../database/schemas/Role";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { getCachedRoles } from "../../libs/database/schemas/Role";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 import { Permission } from "../../types/Permission";
 
 export default class SetSkuButton extends Button {

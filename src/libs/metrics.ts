@@ -2,13 +2,13 @@ import Logger from "./Logger";
 import axios from "axios";
 import { fetchGuild } from "../bot/bot";
 import { config } from "./config";
-import { getCachedRoles } from "../database/schemas/Role";
+import { getCachedRoles } from "./database/schemas/Role";
 import { icons as iconList } from "../types/GlobalIcon";
 import { snakeCase } from "change-case";
 import { positions as positionList } from "../types/GlobalPosition";
 import { captureException } from "@sentry/bun";
-import { Metric } from "../database/schemas/Metric";
-import { Player } from "../database/schemas/Player";
+import { Metric } from "./database/schemas/Metric";
+import { Player } from "./database/schemas/Player";
 
 let requests: number = config.requests;
 

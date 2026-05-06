@@ -3,7 +3,7 @@ import { Permission } from "../types/Permission";
 import { ElysiaApp } from "..";
 import { ModLogType, sendGiftCodeRedeemMessage, sendModLogMessage } from "../libs/discord-notifier";
 import { formatUUID } from "../libs/game-profiles";
-import { createGiftCode, GiftCode, GiftType } from "../database/schemas/GiftCode";
+import { createGiftCode, GiftCode, GiftType } from "../libs/database/schemas/GiftCode";
 import { tResponseBody, tHeaders, tParams, tRequestBody, tSchema } from "../libs/models";
 import { DocumentationCategory } from "../types/DocumentationCategory";
 

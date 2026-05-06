@@ -1,16 +1,16 @@
 import { HydratedDocument, Schema, model } from "mongoose";
-import { Permission } from "../../types/Permission";
+import { Permission } from "../../../types/Permission";
 import { getCachedRoles, IRole, RoleDocument } from "./Role";
-import { GlobalIcon, icons } from "../../types/GlobalIcon";
-import { GameProfile, stripUUID } from "../../libs/game-profiles";
-import { isConnected } from "../mongo";
-import { generateDocumentId, generateSecureCode } from "../../libs/crypto";
+import { GlobalIcon, icons } from "../../../types/GlobalIcon";
+import { GameProfile, stripUUID } from "../../game-profiles";
+import { isConnected } from "../connection";
+import { generateDocumentId, generateSecureCode } from "../../crypto";
 import { Report, ReportDocument } from "./Report";
-import { GlobalPosition, positions } from "../../types/GlobalPosition";
-import { config } from "../../libs/config";
+import { GlobalPosition, positions } from "../../../types/GlobalPosition";
+import { config } from "../../config";
 import { WatchlistAlert, WatchlistAlertDocument } from "./WatchlistAlert";
-import { stripColors } from "../../libs/chat-color";
-import Logger from "../../libs/Logger";
+import { stripColors } from "../../chat-color";
+import Logger from "../../Logger";
 
 const { watchlist } = config.validation.tag;
 

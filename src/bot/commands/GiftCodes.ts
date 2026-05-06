@@ -1,10 +1,10 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, CommandInteractionOptionResolver, ContainerBuilder, EmbedBuilder, GuildMember, MediaGalleryBuilder, MessageFlags, SectionBuilder, SeparatorSpacingSize, TextDisplayBuilder, ThumbnailBuilder } from "discord.js";
 import Command from "../structs/Command";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 import { images } from "../bot";
 import { Permission } from "../../types/Permission";
 import { formatTimestamp } from "../../libs/discord-notifier";
-import { GiftCode, GiftCodeDocument } from "../../database/schemas/GiftCode";
+import { GiftCode, GiftCodeDocument } from "../../libs/database/schemas/GiftCode";
 
 export default class GiftCodesCommand extends Command {
     constructor() {

@@ -1,6 +1,6 @@
 import { Context } from "elysia";
 import Logger from "../libs/Logger";
-import AuthProvider from "../auth/AuthProvider";
+import AuthProvider from "../libs/auth/AuthProvider";
 import { recordRequest } from "../libs/metrics";
 
 export default function access({ request: { headers, method }, path }: { request: { headers: Headers, method: string }, path: Context['path'] }) {

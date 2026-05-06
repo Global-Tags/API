@@ -2,9 +2,9 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, Embed
 import Command, { CommandOptions } from "../structs/Command";
 import { config } from "../../libs/config";
 import { colors, images } from "../bot";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 import { Permission } from "../../types/Permission";
-import { getCachedRoles } from "../../database/schemas/Role";
+import { getCachedRoles } from "../../libs/database/schemas/Role";
 import { capitalCase } from "change-case";
 
 export default class RolesCommand extends Command {

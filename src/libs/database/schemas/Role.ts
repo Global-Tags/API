@@ -1,9 +1,9 @@
 import { HydratedDocument, model, Schema } from "mongoose"
-import { config } from "../../libs/config";
-import { Permission, permissions } from "../../types/Permission";
-import { isConnected } from "../mongo";
-import Logger from "../../libs/Logger";
-import { fetchGuild } from "../../bot/bot";
+import { config } from "../../config";
+import { Permission, permissions } from "../../../types/Permission";
+import { isConnected } from "../connection";
+import Logger from "../../Logger";
+import { fetchGuild } from "../../../bot/bot";
 import { Player } from "./Player";
 
 const cachedRoles: IRole[] = [];

@@ -2,7 +2,7 @@ import { CommandInteractionOptionResolver, EmbedBuilder, GuildMember, Interactio
 import Event from "../structs/Event";
 import * as bot from "../bot";
 import { captureException } from "@sentry/bun";
-import players, { PlayerDocument } from "../../database/schemas/Player";
+import players, { PlayerDocument } from "../../libs/database/schemas/Player";
 import { config } from "../../libs/config";
 import Interaction from "../structs/Interaction";
 

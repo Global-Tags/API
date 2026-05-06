@@ -6,10 +6,10 @@ import { capitalCase, pascalCase, sentenceCase } from "change-case";
 import { config } from "./config";
 import { stripColors, translateToAnsi } from "./chat-color";
 import Logger from "./Logger";
-import { ApiKey } from "../database/schemas/Player";
-import { RoleDocument } from "../database/schemas/Role";
-import { ReportDocument } from "../database/schemas/Report";
-import { GiftCodeDocument } from "../database/schemas/GiftCode";
+import { ApiKey } from "./database/schemas/Player";
+import { RoleDocument } from "./database/schemas/Role";
+import { ReportDocument } from "./database/schemas/Report";
+import { GiftCodeDocument } from "./database/schemas/GiftCode";
 
 export enum ModLogType {
     ChangeTag,

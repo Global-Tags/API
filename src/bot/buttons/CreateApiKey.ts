@@ -1,7 +1,7 @@
 import { ButtonInteraction, Message, GuildMember, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import Button from "../structs/Button";
 import { Permission } from "../../types/Permission";
-import { PlayerDocument } from "../../database/schemas/Player";
+import { PlayerDocument } from "../../libs/database/schemas/Player";
 
 export default class CreateApiKeyButton extends Button {
     constructor() {

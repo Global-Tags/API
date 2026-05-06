@@ -1,7 +1,7 @@
 import { ButtonInteraction, Message, GuildMember, EmbedBuilder, MessageFlags } from "discord.js";
 import Button from "../structs/Button";
 import { colors } from "../bot";
-import players, { PlayerDocument } from "../../database/schemas/Player";
+import players, { PlayerDocument } from "../../libs/database/schemas/Player";
 import { Permission } from "../../types/Permission";
 import { stripColors } from "../../libs/chat-color";
 import { config } from "../../libs/config";
