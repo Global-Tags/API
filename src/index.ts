@@ -1,4 +1,4 @@
-import { Elysia, ValidationError } from "elysia";
+import { Elysia } from "elysia";
 import { swagger } from "@elysiajs/swagger";
 import Logger from "./libs/Logger";
 import { connect as connectDatabase } from "./libs/database/connection";
@@ -13,18 +13,14 @@ import { handleErrors, initializeSentry } from "./libs/error-handler";
 import cors from "@elysiajs/cors";
 import { verify as verifyMailOptions } from "./libs/mailer";
 import { startMetrics, startReferralReset, startRoleCacheJob, startRoleSynchronization } from "./libs/cron-jobs";
-import { config } from "./libs/config";
+import { config, validateRequiredVariables } from "./libs/config";
 import { join } from "path";
 import ip from "./middleware/ip";
 import { captureException } from "@sentry/bun";
 import { generateSecureCode, validateKeypair } from "./libs/crypto";
 import { DocumentationCategory } from "./types/DocumentationCategory";
 
-if(config.mongodb.trim().length == 0) {
-    Logger.error('Database connection string is empty!');
-    process.exit(1);
-}
-
+validateRequiredVariables();
 handleErrors();
 if(config.sentry.enabled) initializeSentry(config.sentry.dsn);
 

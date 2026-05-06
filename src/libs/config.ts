@@ -1,6 +1,11 @@
 import { config as loadEnv } from "dotenv";
 import { constantCase, snakeCase } from "change-case";
 import * as pkg from "../../package.json";
+import Logger from "./Logger";
+
+const REQUIRED_VARIABLES: string[] = [
+    'GT_MONGODB_CONNECTION'
+];
 
 function getEnvNumber(path: string | undefined, defaultValue: number) {
     const number = Number(path);
@@ -12,6 +17,16 @@ function getEnvBoolean(path: string | undefined, defaultValue: boolean) {
     return path.toLowerCase() === 'true';
 }
 
+export function validateRequiredVariables() {
+
+    for(const variable of REQUIRED_VARIABLES) {
+        if(!process.env[variable]) {
+            Logger.error(`Missing required environment variable: ${variable}`);
+            process.exit(1);
+        }
+    }
+}
+
 loadEnv({ quiet: true });
 loadEnv({ quiet: true, path: `./.env.${process.env.NODE_ENV || 'dev'}`, override: true });
 
@@ -21,7 +36,7 @@ export let config = {
     port: getEnvNumber(process.env.GT_PORT, 5500),
     strictAuth: getEnvBoolean(process.env.GT_STRICT_AUTH, true),
     logLevel: process.env.GT_LOG_LEVEL || 'Info',
-    mongodb: process.env.GT_MONGODB_CONNECTION || '',
+    mongodb: process.env.GT_MONGODB_CONNECTION!,
     baseUrl: process.env.GT_BASE_URL || 'http://localhost:5500',
     iconUrl: (icon: string) => (process.env.GT_ICON_URL || 'https://cdn.rappytv.com/globaltags/icons/{icon}.png').replaceAll('{icon}', snakeCase(icon)),
     roleIconUrl: (role: string) => (process.env.GT_ROLE_ICON_URL || 'https://cdn.rappytv.com/globaltags/icons/role/{role}.png').replaceAll('{role}', snakeCase(role)),
