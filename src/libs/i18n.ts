@@ -3,12 +3,22 @@ import { join } from "path";
 import Logger from "./Logger";
 import { captureException } from "@sentry/bun";
 import { translationFilePath } from "./data-accessor";
-
-export type Language = Map<string, string>;
-export type I18nFunction = (path: string) => string;
+import keys from "../../data/i18n/en_us.json";
 
 const fallback = 'en_us';
 const languages = new Map<string, Language>();
+
+type DotPaths<T> = T extends string
+    ? never
+    : {
+        [K in keyof T & string]: T[K] extends string
+            ? K
+            : `${K}.${DotPaths<T[K]>}`;
+    }[keyof T & string];
+    
+export type TranslationKey = string;//`$.${DotPaths<typeof keys>}`; TODO: uncomment when all translations are proofread
+export type Language = Map<string, string>;
+export type I18nFunction = (path: TranslationKey) => string;
 
 export async function load() {
     const languageDirectory = translationFilePath;
@@ -19,6 +29,7 @@ export async function load() {
         extractTranslations(locales, await import(join(languageDirectory, file)))
         languages.set(id, locales);
     }
+    if(!languages.has(fallback)) throw new Error(`Fallback language "${fallback}" not found!`);
     Logger.debug(`Loaded ${languages.size} languages`);
 }
 
@@ -45,7 +56,11 @@ export function isValidLanguage(language: string): boolean {
     return languages.has(language.toLowerCase())
 }
 
-export function translate(path: string, language: Language): string {
+export function translate(
+    language: Language,
+    key: TranslationKey
+): string {
+    let path = key as string;
     if(!path.startsWith('\$\.')) {
         const error = new Error(`Translation path "${path}" was not prefixed with "$."!`);
         Logger.warn(error.message);

@@ -41,5 +41,5 @@ export async function getNextPosition(): Promise<number> {
     return roles[roles.length - 1].position + 1;
 }
 
-export const StaffCategory = model<IStaffCategory>('StaffCategory', StaffCategorySchema);;
+export const StaffCategory = model<IStaffCategory>('StaffCategory', StaffCategorySchema);
 export type StaffCategoryDocument = HydratedDocument<IStaffCategory>;

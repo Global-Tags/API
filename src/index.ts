@@ -98,7 +98,10 @@ export type ElysiaApp = typeof elysia;
 
 async function main() {
     AuthProvider.loadProviders();
-    loadLanguages();
+    loadLanguages().catch(err => {
+        Logger.error('Failed to load languages:', err.message);
+        process.exit(1);
+    });
     verifyMailOptions();
     validateKeypair();
     connectDatabase(config.mongodb).then(() => {
