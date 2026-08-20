@@ -286,7 +286,10 @@ export namespace tSchema {
         id: tId,
         name: tString,
         code: t.String({ default: generateSecureCode(12) }),
-        uses: t.Array(t.String()),
+        uses: t.Array(t.Object({
+            uuid: tUUID,
+            used_at: tTimestamp
+        })),
         max_uses: t.Number(),
         gift: t.Object({
             type: t.String({ default: 'role' }),

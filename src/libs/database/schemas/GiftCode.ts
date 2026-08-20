@@ -6,6 +6,17 @@ export enum GiftType {
     Role = 'role'
 }
 
+export interface GiftCodeUse {
+    /**
+     * UUID of the player who used the gift code
+     */
+    uuid: string;
+    /**
+     * Timestamp when the gift code was used
+     */
+    used_at: Date;
+}
+
 interface IGiftCode {
     /**
      * Unique identifier for the gift code
@@ -22,7 +33,7 @@ interface IGiftCode {
     /**
      * List of UUIDs that have used this gift code
      */
-    uses: string[];
+    uses: GiftCodeUse[];
     /**
      * Maximum number of times this code can be used
      */
@@ -94,7 +105,17 @@ const GiftCodeSchema = new Schema<IGiftCode>({
         required: true
     },
     uses: {
-        type: [String],
+        type: [{
+            uuid: {
+                type: String,
+                required: true
+            },
+            used_at: {
+                type: Date,
+                required: true,
+                default: Date.now
+            }
+        }],
         required: true,
         default: []
     },

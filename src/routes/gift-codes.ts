@@ -16,7 +16,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         id: code.id,
         name: code.name,
         code: code.code,
-        uses: code.uses.map((uuid) => formatUUID(uuid)),
+        uses: code.uses.map((use) => ({ uuid: formatUUID(use.uuid), used_at: use.used_at.getTime() })),
         max_uses: code.max_uses,
         gift: {
             type: code.gift.type,
@@ -48,7 +48,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         id,
         name,
         code: giftCode,
-        uses: uses.map((uuid) => formatUUID(uuid)),
+        uses: uses.map((use) => ({ uuid: formatUUID(use.uuid), used_at: use.used_at.getTime() })),
         max_uses,
         gift: {
             type: gift.type,
@@ -78,11 +78,11 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
 
     const code = await GiftCode.findOne({ code: params.id });
     if(!code || !code.isValid()) return status(404, { error: i18n('$.gift_codes.not_found') });
-    if(code.uses.includes(player.uuid)) return status(409, { error: i18n('$.gift_codes.already_redeemed') });
+    if(code.uses.some((use) => use.uuid === player.uuid)) return status(409, { error: i18n('$.gift_codes.already_redeemed') });
 
     const { success, expiresAt } = player.addRole({ id: code.gift.value, reason: `Gift code: ${code.code}`, setConditions: [], duration: code.gift.duration });
     if(!success) return status(409, { error: i18n('$.gift_codes.already_have_role') });
-    code.uses.push(player.uuid);
+    code.uses.push({ uuid: player.uuid, used_at: new Date() });
     code.markModified('uses');
     await player.save();
     await code.save();
@@ -133,7 +133,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         id: giftCode.id,
         name: giftCode.name,
         code: giftCode.code,
-        uses: giftCode.uses.map((uuid) => formatUUID(uuid)),
+        uses: giftCode.uses.map((use) => ({ uuid: formatUUID(use.uuid), used_at: use.used_at.getTime() })),
         max_uses: giftCode.max_uses,
         gift: {
             type: giftCode.gift.type,
