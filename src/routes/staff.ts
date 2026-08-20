@@ -1,11 +1,10 @@
 import { t } from "elysia";
 import { ElysiaApp } from "..";
 import { formatUUID, GameProfile, stripUUID, uuidRegex } from "../libs/game-profiles";
-import { generateSecureCode } from "../libs/crypto";
 import { Permission } from "../types/Permission";
 import { getNextPosition, StaffCategory } from "../libs/database/schemas/StaffCategory";
 import { StaffMember } from "../libs/database/schemas/StaffMember";
-import { tRequestBody, tResponseBody, tSchema } from "../libs/models";
+import { tHeaders, tRequestBody, tResponseBody, tSchema } from "../libs/models";
 import { DocumentationCategory } from "../types/DocumentationCategory";
 
 export default (app: ElysiaApp) => app.get('/', async () => {
@@ -37,8 +36,8 @@ export default (app: ElysiaApp) => app.get('/', async () => {
     response: {
         200: tResponseBody.StaffList
     }
-}).group('/categories', (app) =>
-    app.get('/', async ({ session, i18n, status }) => {
+}).group('/categories', (group) =>
+    group.get('/', async ({ session, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.ViewStaffCategories)) return status(403, { error: i18n('$.error.notAllowed') });
 
         return Promise.all((await StaffCategory.find().sort({ position: 1 }).lean()).map(async (category) => ({
@@ -80,7 +79,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
             404: tResponseBody.Error,
         },
         params: t.Object({ category: t.String({ description: 'The category ID' }) }),
-        headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' }),
+        headers: tHeaders,
     }).post('/', async ({ session, body: { name }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.CreateStaffCategories)) return status(403, { error: i18n('$.error.notAllowed') });
 
@@ -104,7 +103,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
             403: tResponseBody.Error,
         },
         body: tRequestBody.StaffCategory,
-        headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+        headers: tHeaders
     }).patch('/:id', async ({ session, body: { name }, params: { id }, i18n, status }) => { // Edit category
         if(!session?.player?.hasPermission(Permission.EditStaffMembers)) return status(403, { error: i18n('$.error.notAllowed') });
 
@@ -136,7 +135,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         },
         body: tRequestBody.StaffCategory,
         params: t.Object({ id: t.String({ description: 'The category ID' }) }),
-        headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+        headers: tHeaders
     }) // TODO: Implement route to patch all categories at once
     .delete('/:category', async ({ session, params: { category: id }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.DeleteStaffCategories)) return status(403, { error: i18n('$.error.notAllowed') });
@@ -158,10 +157,10 @@ export default (app: ElysiaApp) => app.get('/', async () => {
             404: tResponseBody.Error,
         },
         params: t.Object({ category: t.String({ description: 'The category ID' }) }),
-        headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' }),
+        headers: tHeaders,
     })
-).group('/members', (app) =>
-    app.get('/', async ({ session, i18n, status }) => {
+).group('/members', (group) =>
+    group.get('/', async ({ session, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.ViewStaffMembers)) return status(403, { error: i18n('$.error.notAllowed') });
 
         return Promise.all((await StaffMember.find().sort({ joinedAt: 1 }).lean()).map(async member => ({
@@ -204,7 +203,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
             404: tResponseBody.Error,
         },
         params: t.Object({ uuid: t.String({ description: 'The member UUID' }) }),
-        headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' }),
+        headers: tHeaders,
     }).post('/', async ({ session, body: { uuid, category, description }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.CreateStaffMembers)) return status(403, { error: i18n('$.error.notAllowed') });
 
@@ -244,7 +243,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
             409: tResponseBody.Error,
         },
         body: tRequestBody.CreateStaffMember,
-        headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+        headers: tHeaders
     }).patch('/:uuid', async ({ session, body: { category, description }, params: { uuid }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.EditStaffMembers)) return status(403, { error: i18n('$.error.notAllowed') });
 
@@ -284,7 +283,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         },
         body: tRequestBody.EditStaffMember,
         params: t.Object({ uuid: t.String({ description: 'The member UUID' }) }),
-        headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+        headers: tHeaders
     }).delete('/:uuid', async ({ session, params: { uuid }, i18n, status }) => {
         if(!session?.player?.hasPermission(Permission.DeleteStaffMembers)) return status(403, { error: i18n('$.error.notAllowed') });
 
@@ -305,6 +304,6 @@ export default (app: ElysiaApp) => app.get('/', async () => {
             404: tResponseBody.Error,
         },
         params: t.Object({ uuid: t.String({ description: 'The member UUID' }) }),
-        headers: t.Object({ authorization: t.String({ error: '$.error.notAllowed', description: 'Your authentication token' }) }, { error: '$.error.notAllowed' })
+        headers: tHeaders
     })
 );

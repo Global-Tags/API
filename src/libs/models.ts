@@ -2,6 +2,7 @@ import { t } from "elysia";
 import { config } from "./config";
 import { generateDocumentId, generateSecureCode } from "./crypto";
 import { AccountLockType, DataClearType } from "./database/schemas/Player";
+import { PartnerIconType, PartnerType } from "./database/schemas/Partner";
 const { validation } = config;
 
 export const tId = t.String({
@@ -46,6 +47,13 @@ export namespace tRequestBody {
         additionalProperties: true
     };
 
+    export const tUploadIcon = (description: string) => t.Object({
+        image: t.File({ type: 'image/png', description: 'A png image file' })
+    }, { description: description, ...options });
+    export const UploadCustomIcon = tUploadIcon('A custom icon upload object');
+    export const UploadRoleIcon = tUploadIcon('A role icon upload object');
+    export const UploadPartnerIcon = tUploadIcon('A partner icon upload object');
+
     export const ApiKey = t.Object({
         name: t.String({ description: 'An API key name' })
     }, { description: 'An API key object', ...options });
@@ -64,10 +72,6 @@ export namespace tRequestBody {
         reason: t.Optional(t.String({ minLength: 1, description: 'A ban reason' })),
         appealable: t.Optional(t.Boolean({ description: 'A boolean indicating if the ban is appealable' }))
     }, { description: 'A ban edit object', ...options });
-
-    export const UploadCustomIcon = t.Object({
-        image: t.File({ type: 'image/png', description: 'A png image file' })
-    }, { description: 'A custom icon upload object', ...options });
 
     export const CreateLock = t.Object({
         type: t.Enum(AccountLockType),
@@ -109,6 +113,23 @@ export namespace tRequestBody {
         gift_duration: t.Optional(t.Number())
     }, { description: 'A gift code creation object', ...options });
 
+    export const CreatePartner = t.Object({
+        uuid: t.String(),
+        name: t.String(),
+        type: t.Enum(PartnerType),
+        redirect_url: t.Optional(t.Nullable(t.String())),
+        discord_id: t.String(),
+        icon_type: t.Enum(PartnerIconType)
+    }, { description: 'A partner creation object', ...options });
+
+    export const EditPartner = t.Object({
+        name: t.Optional(t.String()),
+        type: t.Optional(t.Enum(PartnerType)),
+        redirect_url: t.Optional(t.Nullable(t.String())),
+        discord_id: t.Optional(t.String()),
+        icon_type: t.Optional(t.Enum(PartnerIconType))
+    }, { description: 'A partner edit object', ...options });
+
     export const CreateRole = t.Object({
         name: t.String(),
         color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6 }))),
@@ -120,10 +141,6 @@ export namespace tRequestBody {
         color: t.Optional(t.Nullable(t.String({ minLength: 6, maxLength: 6 }))),
         permissions: t.Optional(t.Integer())
     }, { description: 'A role object', ...options });
-
-    export const UploadRoleIcon = t.Object({
-        image: t.File({ type: 'image/png', description: 'A png image file' })
-    }, { description: 'A role icon upload object', ...options });
 
     export const ReorderRoles = t.Array(t.String({
         description: 'A role ID',
@@ -318,6 +335,15 @@ export namespace tSchema {
         positions: t.Object({}, { default: {}, additionalProperties: true, description: 'All position counts' }),
         icons: t.Object({}, { default: {}, additionalProperties: true, description: 'All icon counts' })
     }, { description: 'A metric object' });
+
+    export const Partner = t.Object({
+        uuid: tUUID,
+        name: tString,
+        type: t.Enum(PartnerType),
+        redirect_url: t.Nullable(tString),
+        icon_url: tString,
+        joined_at: tTimestamp
+    }, { description: 'A partner object' });
 
     export const Role = t.Object({
         id: tId,
