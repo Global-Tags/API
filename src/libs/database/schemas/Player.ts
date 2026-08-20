@@ -102,6 +102,11 @@ export interface PlayerNote {
     created_at: Date;
 }
 
+export enum DataClearType {
+    Tag = 'tag',
+    Icon = 'icon'
+}
+
 export interface DataClear {
     /**
      * The current value of the cleared data, such as tag or icon hash
@@ -114,7 +119,7 @@ export interface DataClear {
     /**
      * The type of data that was cleared, either 'tag' or 'icon'
      */
-    type: 'tag' | 'icon';
+    type: DataClearType;
     /**
      * The UUID of the staff member who performed the data clear
      */
@@ -1203,7 +1208,7 @@ const PlayerSchema = new Schema<IPlayer>({
             this.clears.push({
                 current_value: this.tag!,
                 reason,
-                type: 'tag',
+                type: DataClearType.Tag,
                 staff,
                 cleared_at: new Date()
             });
@@ -1217,7 +1222,7 @@ const PlayerSchema = new Schema<IPlayer>({
                 this.clears.push({
                     current_value: this.icon.hash!,
                     reason,
-                    type: 'icon',
+                    type: DataClearType.Icon,
                     staff: user,
                     cleared_at: new Date()
                 });

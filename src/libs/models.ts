@@ -1,7 +1,7 @@
 import { t } from "elysia";
 import { config } from "./config";
 import { generateDocumentId, generateSecureCode } from "./crypto";
-import { AccountLockType } from "./database/schemas/Player";
+import { AccountLockType, DataClearType } from "./database/schemas/Player";
 const { validation } = config;
 
 export const tId = t.String({
@@ -237,6 +237,14 @@ export namespace tSchema {
         banned_at: tTimestamp,
         expires_at: t.Nullable(tTimestamp)
     }, { description: 'A ban object' });
+
+    export const Clear = t.Object({
+        current_value: tString,
+        reason: tString,
+        type: t.Enum(DataClearType),
+        staff: tString,
+        cleared_at: tTimestamp
+    }, { description: 'A data clear object' });
 
     export const Lock = t.Object({
         id: tId,
