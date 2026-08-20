@@ -100,7 +100,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params: { uuid
     params: tParams.uuid,
     headers: tHeaders
 }).delete('/:hash', async ({ session, params: { uuid, hash }, i18n, status }) => { // Delete custom icon
-    if(!session || !session.self && !session.player?.hasPermission(Permission.DeletePlayerCustomIcons)) return status(403, { error: i18n('$.error.notAllowed') });
+    if(!session?.selfOrHasPermission(Permission.DeletePlayerCustomIcons)) return status(403, { error: i18n('$.error.notAllowed') });
     const player = await Player.findOne({ uuid: stripUUID(uuid) });
     if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 

@@ -67,7 +67,7 @@ export enum Permission { // TODO: Replace real bitfield values
     //* Referrals
 
     ViewReferrals = 1 << 0,
-    RemoveReferrer = 1 << 0,
+    ModifyReferrer = 1 << 0,
 
     //* Reports
 

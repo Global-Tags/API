@@ -83,6 +83,10 @@ export namespace tRequestBody {
         content: t.String({ maxLength: validation.notes.maxLength, description: 'A player note' })
     }, { description: 'A note object', ...options });
 
+    export const Referral = t.Object({
+        referrer: t.String({ description: 'The referrer player UUID' })
+    }, { description: 'A referral object', ...options });
+
     export const Report = t.Object({
         reason: t.String({ description: 'A report reason' })
     }, { description: 'A report object', ...options });

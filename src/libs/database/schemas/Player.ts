@@ -439,6 +439,12 @@ interface IPlayer {
     addReferral(uuid: string): void;
 
     /**
+     * Remove a referral from the player
+     * @param uuid The UUID to be removed from the referral list
+     */
+    removeReferral(uuid: string): boolean;
+
+    /**
      * Get the referrer of the player
      * @returns {Promise<PlayerDocument | null>} A PlayerDocument representing the referrer, or null if not found
      */
@@ -1069,6 +1075,14 @@ const PlayerSchema = new Schema<IPlayer>({
             this.markModified('referrals');
         },
 
+        removeReferral(uuid: string): boolean {
+            const index = this.referrals.total.findIndex((referral) => referral.uuid === uuid);
+            if(index === -1) return false;
+            this.referrals.total.splice(index, 1);
+            this.markModified('referrals');
+            return true;
+        },
+
         async hasReferrer(): Promise<boolean> {
             const exists = await Player.exists({ 'referrals.total.uuid': this.uuid });
             return !!exists;
@@ -1330,9 +1344,7 @@ const PlayerSchema = new Schema<IPlayer>({
 
 export async function getOrCreatePlayer(uuid: string): Promise<PlayerDocument> {
     uuid = stripUUID(uuid);
-    const player = await Player.findOne({ uuid });
-    if(player) return player;
-    return await Player.create({ uuid });
+    return Player.findOneAndUpdate({ uuid }, { uuid }, { upsert: true, new: true }).exec()
 }
 
 export async function resetMonthlyReferrals() {

@@ -1,13 +1,30 @@
 import { existsSync, readdirSync } from "fs";
 import { join } from "path";
 import Logger from "../Logger";
-import { Player, PlayerDocument } from "../database/schemas/Player";
+import { getOrCreatePlayer, Player, PlayerDocument } from "../database/schemas/Player";
 import { stripUUID } from "../game-profiles";
+import { Permission } from "../../types/Permission";
 
-export type SessionData = {
-    uuid: string | null,
-    player: PlayerDocument | null,
-    self: boolean
+export class SessionData {
+    public uuid: string | null;
+    public player: PlayerDocument | null;
+    public self: boolean;
+
+    constructor(uuid: string | null, player: PlayerDocument | null, self?: boolean) {
+        this.uuid = uuid;
+        this.player = player;
+        this.self = self !== undefined ? self : false;
+    }
+
+    public getOrCreateDocument(): Promise<PlayerDocument> {
+        if(this.player) return Promise.resolve(this.player);
+        if(!this.uuid) return Promise.reject(new Error('Cannot create player document without UUID'));
+        return getOrCreatePlayer(this.uuid);
+    }
+
+    public selfOrHasPermission(permission: Permission): boolean {
+        return this.self || this.player?.hasPermission(permission) || false;
+    }
 }
 
 export default abstract class AuthProvider {
@@ -21,15 +38,11 @@ export default abstract class AuthProvider {
     public async getSession(token: string, uuid?: string | null): Promise<SessionData> {
         const tokenUUID = await this.getUUID(token);
         if(uuid) uuid = stripUUID(uuid);
-        if(!tokenUUID) return { uuid: null, player: null, self: false };
+        if(!tokenUUID) return new SessionData(null, null);
         const data = await Player.findOne({ uuid: tokenUUID });
-        if(!data) return { uuid: tokenUUID, player: null, self: tokenUUID == uuid };
-        return {
-            uuid: tokenUUID,
-            player: data,
-            self: uuid == tokenUUID
-        }
+        return new SessionData(tokenUUID, data ? data : null, tokenUUID == uuid);
     }
+
     public abstract getUUID(token: string): Promise<string | null>;
 
     public static trimTokenType(token: string): string {

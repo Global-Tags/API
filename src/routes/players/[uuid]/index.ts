@@ -81,7 +81,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     params: tParams.uuid,
     headers: tHeaders,
 }).post('/', async ({ session, params, i18n, status }) => { // Create account
-    if(!session || !session.self && !session.player?.hasPermission(Permission.ManagePlayerTags)) return status(403, { error: i18n('$.error.notAllowed') });
+    if(!session?.selfOrHasPermission(Permission.ManagePlayerTags)) return status(403, { error: i18n('$.error.notAllowed') });
 
     if(await Player.exists({ uuid: stripUUID(params.uuid) })) return status(409, { error: i18n('$.account.create.account_already_exists') });
     await Player.create({ uuid: stripUUID(params.uuid) });
@@ -106,7 +106,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     params: tParams.uuid,
     headers: tHeaders
 }).patch('/', async ({ session, body: { tag, position, icon }, params, i18n, status }) => { // Update settings
-    if(!session || !session.self && !session.player?.hasPermission(Permission.ManagePlayerTags)) return status(403, { error: i18n('$.error.notAllowed') });
+    if(!session?.selfOrHasPermission(Permission.ManagePlayerTags)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const player = await getOrCreatePlayer(params.uuid);
     if(session.self && player.isBanned()) return status(403, { error: i18n('$.error.banned') });
