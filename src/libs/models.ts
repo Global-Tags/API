@@ -195,6 +195,11 @@ export namespace tResponseBody {
         }, { description: 'The updated tag settings' })
     }, { description: 'An edit tag settings response object' });
 
+    export const Referral = t.Object({
+        uuid: tUUID,
+        referred_at: tTimestamp
+    }, { description: 'A referral object' });
+
     export const ApiInfo = t.Object({
         version: t.String({ default: config.version, description: 'The API version' }),
         requests: t.Number({ default: 0, description: 'The amount of requests made since the start of the day' })

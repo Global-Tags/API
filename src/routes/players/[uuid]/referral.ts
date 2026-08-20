@@ -5,8 +5,42 @@ import { tResponseBody, tHeaders, tParams, tRequestBody } from "../../../libs/mo
 import { DocumentationCategory } from "../../../types/DocumentationCategory";
 import { Permission } from "../../../types/Permission";
 import Logger from "../../../libs/Logger";
+import { t } from "elysia";
 
-export default (app: ElysiaApp) => app.post('/', async ({ session, body, i18n, status }) => { // Mark player as referrer
+export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }) => { // Get referrals and referrer
+    if(!session?.selfOrHasPermission(Permission.ViewReferrals)) return status(403, { error: i18n('$.error.notAllowed') });
+
+    const player = await session.getOrCreateDocument();
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
+    const referrer = await player.getReferrer();
+
+    return {
+        referrer: referrer === null ? null : {
+            uuid: referrer.uuid,
+            referred_at: referrer.referrals.total.find((ref) => ref.uuid === player.uuid)?.referred_at.getTime() || -1
+        },
+        referrals: player.referrals.total.map((uuid) => ({
+            uuid: uuid.uuid,
+            referred_at: uuid.referred_at.getTime()
+        }))
+    };
+}, {
+    detail: {
+        tags: [DocumentationCategory.Referrals],
+        description: 'Get referrals and referrer of the player'
+    },
+    response: {
+        200: t.Object({
+            referrer: t.Nullable(tResponseBody.Referral),
+            referrals: t.Array(tResponseBody.Referral, { description: 'A list of referrals' })
+        }),
+        403: tResponseBody.Error,
+        404: tResponseBody.Error,
+        409: tResponseBody.Error
+    },
+    params: tParams.uuid,
+    headers: tHeaders
+}).post('/', async ({ session, body, i18n, status }) => { // Mark player as referrer
     if(!session?.selfOrHasPermission(Permission.ModifyReferrer)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const player = await session.getOrCreateDocument();
