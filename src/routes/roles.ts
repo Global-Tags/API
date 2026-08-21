@@ -7,9 +7,9 @@ import { tHeaders, tParams, tRequestBody, tResponseBody, tSchema } from "../libs
 import { DocumentationCategory } from "../types/DocumentationCategory";
 import { snakeCase } from "change-case";
 import Logger from "../libs/Logger";
-import sharp from "sharp";
 import { config } from "../libs/config";
 import { roleIconFile } from "../libs/data-accessor";
+import { imageErrorTranslation, processUploadedImage } from "../libs/image-processor";
 
 export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }) => { // Get roles
     if(!session?.player?.hasPermission(Permission.ViewRoles)) return status(403, { error: i18n('$.error.notAllowed') });
@@ -126,36 +126,35 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
         422: tResponseBody.Error
     },
     headers: tHeaders
-}).post('/:id/icon', async ({ session, params, body: { image }, i18n, status }) => { // Set role icon
+}).post('/:id/icon', async ({ session, params, body, i18n, status }) => { // Set role icon
     if(!session?.player?.hasPermission(Permission.EditRoles)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const role = await Role.findOne({ id: params.id });
     if(!role) return status(404, { error: i18n('$.roles.not_found') });
 
-    const metadata = await sharp(await image.arrayBuffer()).metadata().catch((err: Error) => {
-        Logger.error('Failed to read image metadata:', err.message);
-        return null;
-    });
-
-    if(!metadata) return status(422, { error: i18n('$.icon.upload.invalidMetadata') });
-    if(metadata.format != 'png') return status(422, { error: i18n('$.icon.upload.wrongFormat')});
-    if(!metadata.height || metadata.height != metadata.width) return status(422, { error: i18n('$.icon.upload.wrongResolution')});
-    if(metadata.height > config.validation.icon.maxResolution) return status(422, { error: i18n('$.icon.upload.exceedsMaxResolution').replaceAll('<max>', config.validation.icon.maxResolution.toString()) });
-
-    await Bun.write(roleIconFile(role.id), await image.arrayBuffer(), { createPath: true });
     role.hasIcon = true;
     role.markModified('hasIcon');
-    await role.save();
-    updateRoleCache();
 
-    return {
-        id: role.id,
-        name: role.name,
-        position: role.position,
-        color: role.color || null,
-        hasIcon: role.hasIcon,
-        permissions: role.permissions
-    };
+    try {
+        await processUploadedImage(
+            new Bun.Image(await body.image.arrayBuffer()),
+            config.validation.icon.maxResolution,
+            roleIconFile(role.id)
+        );
+        await role.save();
+        updateRoleCache();
+
+        return {
+            id: role.id,
+            name: role.name,
+            position: role.position,
+            color: role.color || null,
+            hasIcon: role.hasIcon,
+            permissions: role.permissions
+        };
+    } catch(err) {
+        return status(422, { error: i18n(imageErrorTranslation(err)) });
+    }
 }, {
     detail: {
         tags: [DocumentationCategory.Roles],

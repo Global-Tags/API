@@ -5,7 +5,6 @@ import { GlobalIcon, icons } from "../../../types/GlobalIcon";
 import { stripUUID } from "../../../libs/game-profiles";
 import { ElysiaApp } from "../../..";
 import { sendCustomIconUploadMessage } from "../../../libs/discord-notifier";
-import sharp from "sharp";
 import Logger from "../../../libs/Logger";
 import { generateSecureCode } from "../../../libs/crypto";
 import { Player } from "../../../libs/database/schemas/Player";
@@ -13,6 +12,7 @@ import { tResponseBody, tHeaders, tParams, tRequestBody } from "../../../libs/mo
 import { DocumentationCategory } from "../../../types/DocumentationCategory";
 import { customIconFile, customIconPath } from "../../../libs/data-accessor";
 import { readdirSync } from "fs";
+import { imageErrorTranslation, processUploadedImage } from "../../../libs/image-processor";
 
 export function getCustomIconUrl(uuid: string, hash: string) {
     return `${config.baseUrl}/players/${uuid}/icon/${hash}`;
@@ -37,7 +37,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params: { uuid
     params: tParams.uuid
 }).get('/:hash', async ({ params: { uuid, hash }, i18n, status }) => { // Get custom icon
     const player = await Player.findOne({ uuid: stripUUID(uuid) });
-    if(!player) return status(404, { error: i18n('$.error.noTag') });
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
     if(player.isBanned()) return status(403, { error: i18n('$.error.playerBanned') });
 
     const file = customIconFile(player.uuid, hash);
@@ -55,7 +55,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params: { uuid
         404: tResponseBody.Error
     },
     params: tParams.uuidAndIconHash
-}).post('/', async ({ session, body: { image }, params, i18n, status }) => { // Upload custom icon
+}).post('/', async ({ session, body, params, i18n, status }) => { // Upload custom icon
     if(!session || !session.self) return status(403, { error: i18n('$.error.notAllowed') });
 
     const player = await Player.findOne({ uuid: stripUUID(params.uuid) });
@@ -63,28 +63,27 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params: { uuid
     if(player.isBanned()) return status(403, { error: i18n('$.error.banned') });
     if(!player.hasPermission(Permission.CustomIcon)) return status(403, { error: i18n('$.icon.upload.notAllowed') });
 
-    const metadata = await sharp(await image.arrayBuffer()).metadata().catch((err: Error) => {
-        Logger.error('Failed to read image metadata:', err.message);
-        return null;
-    });
-
-    if(!metadata) return status(422, { error: i18n('$.icon.upload.invalidMetadata') });
-    if(metadata.format != 'png') return status(422, { error: i18n('$.icon.upload.wrongFormat')});
-    if(!metadata.height || metadata.height != metadata.width) return status(422, { error: i18n('$.icon.upload.wrongResolution')});
-    if(metadata.height > config.validation.icon.maxResolution) return status(422, { error: i18n('$.icon.upload.exceedsMaxResolution').replaceAll('<max>', config.validation.icon.maxResolution.toString()) });
-
     player.icon.type = GlobalIcon.Custom;
     player.icon.hash = generateSecureCode(32);
     player.markModified('icon');
-    await player.save();
-    await Bun.write(customIconFile(player.uuid, player.icon.hash), await image.arrayBuffer(), { createPath: true });
 
-    if(!player.hasPermission(Permission.BypassValidation)) sendCustomIconUploadMessage(
-        await player.getGameProfile(),
-        player.icon.hash
-    );
+    try {
+        await processUploadedImage(
+            new Bun.Image(await body.image.arrayBuffer()),
+            config.validation.icon.maxResolution,
+            customIconFile(player.uuid, player.icon.hash)
+        );
+        await player.save();
 
-    return { message: i18n('$.icon.upload.success'), hash: player.icon.hash };
+        if(!player.hasPermission(Permission.BypassValidation)) sendCustomIconUploadMessage(
+            await player.getGameProfile(),
+            player.icon.hash
+        );
+
+        return { message: i18n('$.icon.upload.success'), hash: player.icon.hash };
+    } catch(err) {
+        return status(422, { error: i18n(imageErrorTranslation(err)) });
+    }
 }, {
     detail: {
         tags: [DocumentationCategory.Tags],

@@ -6,9 +6,9 @@ import { DocumentationCategory } from "../types/DocumentationCategory";
 import { Permission } from "../types/Permission";
 import { formatUUID, GameProfile, stripUUID, uuidRegex } from "../libs/game-profiles";
 import { partnerIconFile } from "../libs/data-accessor";
-import sharp from "sharp";
 import Logger from "../libs/Logger";
 import { config } from "../libs/config";
+import { imageErrorTranslation, processUploadedImage } from "../libs/image-processor";
 
 export default (app: ElysiaApp) => app.get('/', async () =>
     Promise.all((await Partner.find().sort({ joinedAt: 1 }).lean()).map(async partner => ({
@@ -190,25 +190,23 @@ export default (app: ElysiaApp) => app.get('/', async () =>
         },
         params: t.Object({ uuid: t.String({ description: 'The partner UUID' }) }),
         headers: tHeaders
-    }).post('/', async ({ session, params, body: { image }, i18n, status }) => { // Set role icon
+    }).post('/', async ({ session, params, body, i18n, status }) => { // Set role icon
         if(!session?.selfOrHasPermission(Permission.ManagePartners)) return status(403, { error: i18n('$.error.notAllowed') });
 
         const partner = await Partner.findOne({ uuid: stripUUID(params.uuid) });
         if(!partner) return status(404, { error: i18n('$.partners.not_found') });
 
-        const metadata = await sharp(await image.arrayBuffer()).metadata().catch((err: Error) => {
-            Logger.error('Failed to read image metadata:', err.message);
-            return null;
-        });
+        try {
+            await processUploadedImage(
+                new Bun.Image(await body.image.arrayBuffer()),
+                config.validation.icon.maxResolution,
+                partnerIconFile(partner.uuid)
+            );
 
-        if(!metadata) return status(422, { error: i18n('$.partners.icon.upload.invalidMetadata') });
-        if(metadata.format != 'png') return status(422, { error: i18n('$.partners.icon.upload.wrongFormat')});
-        if(!metadata.height || metadata.height != metadata.width) return status(422, { error: i18n('$.partners.icon.upload.wrongResolution')});
-        if(metadata.height > config.validation.icon.maxResolution) return status(422, { error: i18n('$.partners.icon.upload.exceedsMaxResolution').replaceAll('<max>', config.validation.icon.maxResolution.toString()) });
-
-        await Bun.write(partnerIconFile(partner.uuid), await image.arrayBuffer(), { createPath: true });
-
-        return { message: i18n('$.partners.icon.upload.success') };
+            return { message: i18n('$.partners.icon.upload.success') };
+        } catch(err) {
+            return status(422, { error: i18n(imageErrorTranslation(err)) });
+        }
     }, {
         detail: {
             tags: [DocumentationCategory.Partners],

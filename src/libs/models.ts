@@ -48,7 +48,7 @@ export namespace tRequestBody {
     };
 
     export const tUploadIcon = (description: string) => t.Object({
-        image: t.File({ type: 'image/png', description: 'A png image file' })
+        image: t.File({ description: 'A png image file' })
     }, { description: description, ...options });
     export const UploadCustomIcon = tUploadIcon('A custom icon upload object');
     export const UploadRoleIcon = tUploadIcon('A role icon upload object');
