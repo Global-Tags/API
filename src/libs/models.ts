@@ -36,6 +36,7 @@ export namespace tParams {
     export const uuidAndNoteId = uuidAndId('A note ID');
     export const uuidAndIconHash = uuidAnd({ hash: t.String({ description: 'An icon hash' }) });
     export const uuidAndReportId = uuidAndId('A report ID');
+    export const uuidAndRoleId = uuidAndId('A role ID');
     export const giftCodeId = id('A gift code ID');
     export const reportId = id('A report ID');
     export const roleId = id('A role ID');
@@ -94,6 +95,19 @@ export namespace tRequestBody {
     export const Report = t.Object({
         reason: t.String({ description: 'A report reason' })
     }, { description: 'A report object', ...options });
+
+    export const AddPlayerRole = t.Object({
+        role: t.String({ description: 'The role ID' }),
+        reason: t.String({ description: 'A reason for the role' }),
+        visible: t.Optional(t.Boolean({ description: 'Whether the role icon is visible to others' })),
+        expires_at: t.Optional(t.Nullable(t.Integer({ description: 'The expiration timestamp of the role' })))
+    }, { description: 'A player role addition object', ...options });
+
+    export const EditPlayerRole = t.Object({
+        reason: t.Optional(t.String({ description: 'A reason for the role' })),
+        visible: t.Optional(t.Boolean({ description: 'Whether the role icon is visible to others' })),
+        expires_at: t.Optional(t.Nullable(t.Integer({ description: 'The expiration timestamp of the role' })))
+    }, { description: 'A player role edit object', ...options });
 
     export const TagSettings = t.Object({
         tag: t.Optional(t.Nullable(t.String({ description: 'The tag content' }))),
@@ -303,6 +317,15 @@ export namespace tSchema {
         created_at: tTimestamp,
         last_updated: tTimestamp
     });
+
+    export const PlayerRole = t.Object({
+        id: tId,
+        reason: t.Nullable(tString),
+        visible: t.Boolean(),
+        added_at: tTimestamp,
+        expires_at: t.Nullable(tTimestamp),
+        conditions: t.Array(t.String())
+    }, { description: 'A player role object' });
 
     export const GiftCode = t.Object({
         id: tId,

@@ -129,8 +129,8 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     if(!player.isBanned()) return status(409, { error: i18n('$.ban.not_banned') });
 
     const ban = player.bans.at(-1)!;
-    reason = reason?.trim();
 
+    reason &&= reason.trim();
     if(reason !== undefined && ban.reason != reason) {
         ban.reason = reason;
         player.markModified('bans');

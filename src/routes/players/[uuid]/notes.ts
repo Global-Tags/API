@@ -139,10 +139,10 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     if(!session?.player?.hasPermission(Permission.DeleteNotes)) return status(403, { error: i18n('$.error.notAllowed') });
 
     const player = await Player.findOne({ uuid: stripUUID(uuid) });
-    if(!player) return status(404, { error: i18n(`error.playerNotFound`) });
+    if(!player) return status(404, { error: i18n('$.error.playerNotFound') });
 
     const note = player.notes.find((note) => note.id === id);
-    if(!note) return status(404, { error: i18n(`notes.delete.not_found`) });
+    if(!note) return status(404, { error: i18n('$.notes.delete.not_found') });
 
     player.deleteNote(note.id);
     await player.save();

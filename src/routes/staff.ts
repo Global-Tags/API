@@ -110,8 +110,9 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         const category = await StaffCategory.findOne({ id });
         if(!category) return status(404, { error: i18n('$.staff.categories.not_found') });
 
-        if(name && category.name !== name.trim()) {
-            category.name = name.trim();
+        name &&= name.trim();
+        if(name && category.name !== name) {
+            category.name = name;
             category.markModified('name');
             await category.save();
 
@@ -217,7 +218,7 @@ export default (app: ElysiaApp) => app.get('/', async () => {
         joinedAt.setHours(0, 0, 0, 0);
 
         const newMember = await StaffMember.insertOne({
-            uuid: stripUUID(uuid.trim()),
+            uuid: uuid,
             category,
             description: description?.trim() || null,
             joined_at: joinedAt
@@ -255,8 +256,9 @@ export default (app: ElysiaApp) => app.get('/', async () => {
             member.category = category;
             member.markModified('category');
         }
-        if(description !== undefined && member.description !== description?.trim()) {
-            member.description = description?.trim() || null;
+        description &&= description.trim();
+        if(description !== undefined && member.description !== description) {
+            member.description = description || null;
             member.markModified('description');
         }
         if(member.isModified()) {

@@ -65,7 +65,7 @@ export default (app: ElysiaApp) => app.get('/', async () =>
     if(icon_type === PartnerIconType.Custom) icon_type = PartnerIconType.Skull; // icon does not exist on first creation
 
     const newPartner = await Partner.insertOne({
-        uuid: stripUUID(uuid.trim()),
+        uuid,
         name: name.trim(),
         type: type,
         redirect_url: redirect_url,

@@ -112,8 +112,7 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, params, i18n, 
     const lock = player.locks.find(({ id }) => id === params.id);
     if(!lock) return status(404, { error: i18n('$.locks.not_found') });
 
-    reason = reason?.trim();
-
+    reason &&= reason.trim();
     if(reason !== undefined && lock.reason != reason) {
         lock.reason = reason;
         player.markModified('locks');

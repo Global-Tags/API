@@ -208,8 +208,9 @@ export default (app: ElysiaApp) => app.get('/', async ({ session, i18n, status }
     const role = await Role.findOne({ id: params.id });
     if(!role) return status(404, { error: i18n('$.roles.not_found') });
 
-    if(name && name.trim() !== role.name) {
-        role.name = name.trim();
+    name &&= name.trim();
+    if(name && name !== role.name) {
+        role.name = name;
         role.markModified('name');
     }
     if(color && color !== role.color) {

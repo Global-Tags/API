@@ -1125,11 +1125,11 @@ const PlayerSchema = new Schema<IPlayer>({
 
         addRole({ id, reason, addConditions, setConditions, visible = true, expiresAt, duration }: { id: string, reason: string, addConditions?: RoleCondition[], setConditions?: RoleCondition[], visible?: boolean, expiresAt?: Date | null, duration?: number | null }): { success: boolean, expiresAt: Date | null } {
             const roles = getCachedRoles();
-            if(!roles.some((role) => role.id === id)) return { success: false, expiresAt: null };
+            if(!roles.some((role) => role.id === id)) return { success: false, expiresAt: null }; // Role doesn't exist
 
             const playerRole = this.roles.find((role) => role.id === id);
             if(playerRole) {
-                if(!playerRole.expires_at) return { success: false, expiresAt: null };
+                if(!playerRole.expires_at) return { success: false, expiresAt: null }; // Player already has role permanently
                 if(playerRole.expires_at.getTime() > Date.now()) {
                     playerRole.reason += ` | ${reason}`;
                     if(setConditions) {
