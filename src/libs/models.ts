@@ -1,8 +1,11 @@
 import { t } from "elysia";
 import { config } from "./config";
 import { generateDocumentId, generateSecureCode } from "./crypto";
-import { AccountLockType, DataClearType } from "./database/schemas/Player";
+import { AccountLockType, DataClearType, RoleCondition } from "./database/schemas/Player";
 import { PartnerIconType, PartnerType } from "./database/schemas/Partner";
+import { GiftType } from "./database/schemas/GiftCode";
+import { GlobalIcon } from "../types/GlobalIcon";
+import { GlobalPosition } from "../types/GlobalPosition";
 const { validation } = config;
 
 export const tId = t.String({
@@ -111,9 +114,9 @@ export namespace tRequestBody {
 
     export const TagSettings = t.Object({
         tag: t.Optional(t.Nullable(t.String({ description: 'The tag content' }))),
-        position: t.Optional(t.String({ description: 'The position of the tag' })),
+        position: t.Optional(t.Enum(GlobalPosition, { description: 'The position of the tag' })),
         icon: t.Optional(t.Object({
-            type: t.Optional(t.String({ description: 'The type of the icon' })),
+            type: t.Optional(t.Enum(GlobalIcon, { description: 'The type of the icon' })),
             hash: t.Optional(t.Nullable(t.String({ description: 'The hash of the icon' })))
         })),
     }, { description: 'A tag settings object', ...options });
@@ -324,7 +327,7 @@ export namespace tSchema {
         visible: t.Boolean(),
         added_at: tTimestamp,
         expires_at: t.Nullable(tTimestamp),
-        conditions: t.Array(t.String())
+        conditions: t.Array(t.Enum(RoleCondition))
     }, { description: 'A player role object' });
 
     export const GiftCode = t.Object({
@@ -337,7 +340,7 @@ export namespace tSchema {
         })),
         max_uses: t.Number(),
         gift: t.Object({
-            type: t.String({ default: 'role' }),
+            type: t.Enum(GiftType),
             value: tString,
             duration: t.Nullable(t.Number())
         }),
