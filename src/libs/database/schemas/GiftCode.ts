@@ -1,5 +1,5 @@
 import { HydratedDocument, Schema, model } from "mongoose";
-import { GameProfile, stripUUID } from "../../game-profiles";
+import { formatUUID, GameProfile, stripUUID } from "../../game-profiles";
 import { generateDocumentId, generateSecureCode } from "../../crypto";
 
 export enum GiftType {
@@ -194,6 +194,20 @@ export async function createGiftCode({
         created_at: new Date(),
         expires_at: expiresAt || null
     });
+}
+
+export function formatGiftCodeSchema(code: GiftCodeDocument) {
+    return {
+        id: code.id,
+        name: code.name,
+        code: code.code,
+        uses: code.uses.map(use => ({ uuid: formatUUID(use.uuid), used_at: use.used_at.getTime() })),
+        max_uses: code.max_uses,
+        gift: code.gift,
+        created_by: formatUUID(code.created_by),
+        created_at: code.created_at.getTime(),
+        expires_at: code.expires_at?.getTime() ?? null
+    };
 }
 
 export const GiftCode = model<IGiftCode>('GiftCode', GiftCodeSchema);

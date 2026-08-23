@@ -40,9 +40,10 @@ export namespace tParams {
     export const uuidAndIconHash = uuidAnd({ hash: t.String({ description: 'An icon hash' }) });
     export const uuidAndReportId = uuidAndId('A report ID');
     export const uuidAndRoleId = uuidAndId('A role ID');
-    export const giftCodeId = id('A gift code ID');
     export const reportId = id('A report ID');
     export const roleId = id('A role ID');
+    export const giftCode = t.Object({ code: t.String({ description: 'A gift code' }) });
+    export const partnerUuid = t.Object({ uuid: t.String({ description: 'A partner player UUID' }) });
 }
 
 // Do not use any types with default values here as it will override optional values on requests

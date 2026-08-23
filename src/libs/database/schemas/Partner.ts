@@ -1,6 +1,9 @@
-import { HydratedDocument, model, Schema } from "mongoose";
+import { HydratedDocument, model, Schema, Types } from "mongoose";
 import { formatUUID } from "../../game-profiles";
 import { config } from "../../config";
+import { createGiftCode, GiftCodeDocument, GiftType } from "./GiftCode";
+
+const ONE_DAY = 1000 * 60 * 60 * 24;
 
 export enum PartnerType {
     ContentCreator = 'content_creator',
@@ -38,6 +41,10 @@ interface IPartner {
      */
     icon_type: PartnerIconType;
     /**
+     * List of gift codes the partner has created.
+     */
+    gift_codes: Types.ObjectId[];
+    /**
      * Date when the partner joined
      */
     joined_at: Date;
@@ -46,6 +53,11 @@ interface IPartner {
      * Get the URL of the partner icon
      */
     getIconUrl(): string;
+
+    /**
+     * Create a new gift code for the partner
+     */
+    createGiftCode(): Promise<GiftCodeDocument>;
 }
 
 const PartnerSchema = new Schema<IPartner>({
@@ -76,6 +88,11 @@ const PartnerSchema = new Schema<IPartner>({
         enum: Object.values(PartnerIconType),
         required: true
     },
+    gift_codes: {
+        type: [Types.ObjectId],
+        ref: 'GiftCode',
+        default: []
+    },
     joined_at: {
         type: Date,
         required: true,
@@ -94,6 +111,23 @@ const PartnerSchema = new Schema<IPartner>({
                 default:
                     throw new Error(`Unexpected icon type: ${this.icon_type}`);
             }
+        },
+
+        async createGiftCode(): Promise<GiftCodeDocument> {
+            const code = await createGiftCode({
+                name: `${this.name} Partner Code`,
+                maxUses: 1,
+                gift: {
+                    type: GiftType.Role,
+                    value: 'premium',
+                    duration: ONE_DAY * 31 // 31 days, a bit longer than a month
+                },
+                createdBy: this.uuid,
+                expiresAt: new Date(Date.now() + ONE_DAY * 7) // Expires in 7 days
+            });
+            this.gift_codes.push(new Types.ObjectId(code._id));
+            this.markModified('gift_codes');
+            return code;
         }
     }
 });
